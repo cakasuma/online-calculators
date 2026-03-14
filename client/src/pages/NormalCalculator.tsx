@@ -57,7 +57,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
 
   const handleOperator = useCallback(
     (op: string) => {
-      const displaySymbol = op === "*" ? "×" : op === "/" ? "÷" : op;
+      const displaySymbol = op === "*" ? "\u00d7" : op === "/" ? "\u00f7" : op;
       if (lastResult !== null) {
         setExpression(lastResult + " " + displaySymbol + " ");
         setLastResult(null);
@@ -98,14 +98,12 @@ export default function NormalCalculator({ onCalculate }: Props) {
 
   const evaluate = useCallback(() => {
     const fullExpr = expression + display;
-    // Convert display symbols back to operators
     const evalExpr = fullExpr
-      .replace(/×/g, "*")
-      .replace(/÷/g, "/")
+      .replace(/\u00d7/g, "*")
+      .replace(/\u00f7/g, "/")
       .replace(/[^0-9+\-*/.() ]/g, "");
 
     try {
-      // Using Function constructor for safe math evaluation
       const fn = new Function(`"use strict"; return (${evalExpr});`);
       const rawResult = fn();
       if (typeof rawResult !== "number" || !isFinite(rawResult)) {
@@ -125,7 +123,6 @@ export default function NormalCalculator({ onCalculate }: Props) {
     }
   }, [expression, display, onCalculate]);
 
-  // Keyboard support
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -144,24 +141,24 @@ export default function NormalCalculator({ onCalculate }: Props) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [handleDigit, handleDecimal, handleOperator, evaluate, clear, handleBackspace, handlePercent]);
 
-  const buttons = [
+  const buttons: { label: string; action: () => void; style: string; icon?: boolean; wide?: boolean }[] = [
     { label: "C", action: clear, style: "fn" },
-    { label: "±", action: handleToggleSign, style: "fn" },
+    { label: "\u00b1", action: handleToggleSign, style: "fn" },
     { label: "%", action: handlePercent, style: "fn" },
-    { label: "÷", action: () => handleOperator("/"), style: "op" },
+    { label: "\u00f7", action: () => handleOperator("/"), style: "op" },
     { label: "7", action: () => handleDigit("7"), style: "num" },
     { label: "8", action: () => handleDigit("8"), style: "num" },
     { label: "9", action: () => handleDigit("9"), style: "num" },
-    { label: "×", action: () => handleOperator("*"), style: "op" },
+    { label: "\u00d7", action: () => handleOperator("*"), style: "op" },
     { label: "4", action: () => handleDigit("4"), style: "num" },
     { label: "5", action: () => handleDigit("5"), style: "num" },
     { label: "6", action: () => handleDigit("6"), style: "num" },
-    { label: "−", action: () => handleOperator("-"), style: "op" },
+    { label: "\u2212", action: () => handleOperator("-"), style: "op" },
     { label: "1", action: () => handleDigit("1"), style: "num" },
     { label: "2", action: () => handleDigit("2"), style: "num" },
     { label: "3", action: () => handleDigit("3"), style: "num" },
     { label: "+", action: () => handleOperator("+"), style: "op" },
-    { label: "⌫", action: handleBackspace, style: "num", icon: true },
+    { label: "\u232b", action: handleBackspace, style: "num", icon: true },
     { label: "0", action: () => handleDigit("0"), style: "num" },
     { label: ".", action: handleDecimal, style: "num" },
     { label: "=", action: evaluate, style: "eq" },
@@ -169,10 +166,9 @@ export default function NormalCalculator({ onCalculate }: Props) {
 
   return (
     <div className="w-full max-w-sm mx-auto" data-testid="normal-calculator">
-      {/* Display */}
       <div className="bg-card border border-card-border rounded-xl p-4 mb-3">
         <div className="text-xs text-muted-foreground font-mono h-5 text-right truncate" data-testid="text-expression">
-          {expression || "\u00A0"}
+          {expression || "\u00a0"}
         </div>
         <div
           className="text-3xl font-semibold font-mono text-right truncate mt-1"
@@ -182,7 +178,6 @@ export default function NormalCalculator({ onCalculate }: Props) {
         </div>
       </div>
 
-      {/* Buttons */}
       <div className="grid grid-cols-4 gap-2">
         {buttons.map((btn, i) => (
           <button

@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Analytics } from "@vercel/analytics/react";
 import {
   Calculator,
   FlaskConical,
@@ -18,8 +19,12 @@ import {
 import { useState, useCallback } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useHistory } from "@/hooks/use-history";
+import { useLocaleState, LocaleContext } from "@/hooks/use-locale";
+import { useLocale } from "@/hooks/use-locale";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { PerplexityAttribution } from "@/components/PerplexityAttribution";
+import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import type { TranslationKey } from "@/lib/i18n";
 
 import HomePage from "@/pages/Home";
 import NormalCalculator from "@/pages/NormalCalculator";
@@ -27,16 +32,17 @@ import ScientificCalculator from "@/pages/ScientificCalculator";
 import FaraidCalculator from "@/pages/FaraidCalculator";
 import NotFound from "@/pages/not-found";
 
-const navItems = [
-  { href: "/", label: "Home", icon: HomeIcon },
-  { href: "/normal", label: "Basic", icon: Calculator },
-  { href: "/scientific", label: "Scientific", icon: FlaskConical },
-  { href: "/faraid", label: "Faraid", icon: Scale },
+const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
+  { href: "/", labelKey: "nav.home", icon: HomeIcon },
+  { href: "/normal", labelKey: "nav.basic", icon: Calculator },
+  { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
+  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
 ];
 
 function Layout() {
   const { theme, toggle } = useTheme();
   const history = useHistory();
+  const { t } = useLocale();
   const [showHistory, setShowHistory] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [location] = useLocation();
@@ -84,7 +90,7 @@ function Layout() {
                 </svg>
               </div>
               <span className="text-sm font-semibold hidden sm:inline" data-testid="text-site-title">
-                Online Calculators
+                {t("site.title")}
               </span>
             </Link>
           </div>
@@ -103,7 +109,7 @@ function Layout() {
                     }`}
                   >
                     <item.icon className="w-3.5 h-3.5" />
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </Link>
               );
@@ -111,6 +117,7 @@ function Layout() {
           </nav>
 
           <div className="flex items-center gap-1">
+            <LocaleSwitcher />
             <button
               onClick={() => setShowHistory(!showHistory)}
               className={`p-2 rounded-md transition-colors ${
@@ -146,7 +153,7 @@ function Layout() {
                     }`}
                   >
                     <item.icon className="w-4 h-4" />
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </Link>
               );
@@ -177,7 +184,7 @@ function Layout() {
         {showHistory && (
           <aside className="w-72 lg:w-80 border-l bg-card/50 p-4 hidden md:block overflow-y-auto max-h-[calc(100vh-3rem)]">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold">History</h2>
+              <h2 className="text-sm font-semibold">{t("common.history")}</h2>
               <button
                 onClick={() => setShowHistory(false)}
                 className="p-1 rounded hover:bg-muted"
@@ -201,7 +208,7 @@ function Layout() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowHistory(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background border-l p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold">History</h2>
+              <h2 className="text-sm font-semibold">{t("common.history")}</h2>
               <button
                 onClick={() => setShowHistory(false)}
                 className="p-1.5 rounded hover:bg-muted"
@@ -225,20 +232,27 @@ function Layout() {
           <PerplexityAttribution />
         </div>
       </footer>
+
+      {/* Vercel Analytics */}
+      <Analytics />
     </div>
   );
 }
 
 function App() {
+  const localeState = useLocaleState();
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router hook={useHashLocation}>
-          <Layout />
-        </Router>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <LocaleContext.Provider value={localeState}>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Router hook={useHashLocation}>
+            <Layout />
+          </Router>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </LocaleContext.Provider>
   );
 }
 

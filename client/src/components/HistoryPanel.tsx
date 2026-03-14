@@ -2,6 +2,7 @@ import { Clock, Trash2, Calculator, FlaskConical, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { HistoryEntry } from "@/lib/history";
+import { useLocale } from "@/hooks/use-locale";
 
 const calcIcon: Record<HistoryEntry["calculator"], typeof Calculator> = {
   normal: Calculator,
@@ -15,16 +16,16 @@ const calcLabel: Record<HistoryEntry["calculator"], string> = {
   faraid: "Faraid",
 };
 
-function formatTime(ts: number): string {
+function formatTime(ts: number, locale: string): string {
   const d = new Date(ts);
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return "Just now";
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 1) return locale === "id" ? "Baru saja" : "Just now";
+  if (diffMin < 60) return locale === "id" ? `${diffMin}m lalu` : `${diffMin}m ago`;
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  if (diffHr < 24) return locale === "id" ? `${diffHr}j lalu` : `${diffHr}h ago`;
+  return d.toLocaleDateString(locale === "id" ? "id-ID" : "en-US", { month: "short", day: "numeric" });
 }
 
 interface Props {
@@ -35,12 +36,14 @@ interface Props {
 }
 
 export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) {
+  const { t, locale } = useLocale();
+
   if (entries.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
         <Clock className="w-8 h-8 mb-3 opacity-40" />
-        <p className="text-sm">No history yet</p>
-        <p className="text-xs mt-1 opacity-60">Your calculations will appear here</p>
+        <p className="text-sm">{t("common.noHistory")}</p>
+        <p className="text-xs mt-1 opacity-60">{t("common.historyHint")}</p>
       </div>
     );
   }
@@ -49,7 +52,7 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-1 pb-3">
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          History ({entries.length})
+          {t("common.history")} ({entries.length})
         </span>
         <Button
           variant="ghost"
@@ -59,7 +62,7 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
           data-testid="button-clear-history"
         >
           <Trash2 className="w-3 h-3 mr-1" />
-          Clear
+          {t("common.clear")}
         </Button>
       </div>
       <ScrollArea className="flex-1 -mx-1">
@@ -88,7 +91,7 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
                       {calcLabel[entry.calculator]}
                     </span>
                     <span className="text-[10px] text-muted-foreground/40">
-                      {formatTime(entry.timestamp)}
+                      {formatTime(entry.timestamp, locale)}
                     </span>
                   </div>
                 </div>

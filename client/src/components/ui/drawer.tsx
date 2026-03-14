@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
@@ -53,7 +51,7 @@ const DrawerContent = React.forwardRef<
     </DrawerPrimitive.Content>
   </DrawerPortal>
 ))
-DrawerContent.displayName = "DrawerContent"
+DrawerContent.displayName = DrawerPrimitive.Content.displayName
 
 const DrawerHeader = ({
   className,

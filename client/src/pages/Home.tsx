@@ -1,57 +1,52 @@
 import { Link } from "wouter";
 import { Calculator, FlaskConical, Scale, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLocale } from "@/hooks/use-locale";
 
-const tools = [
+const calculators = [
   {
-    title: "Basic Calculator",
-    description: "Standard arithmetic operations — addition, subtraction, multiplication, and division.",
-    icon: Calculator,
     href: "/normal",
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-500/10",
+    icon: Calculator,
+    titleKey: "home.basic.title",
+    descKey: "home.basic.desc",
   },
   {
-    title: "Scientific Calculator",
-    description: "Trigonometric functions, logarithms, powers, factorials, and more.",
-    icon: FlaskConical,
     href: "/scientific",
-    color: "text-purple-600 dark:text-purple-400",
-    bg: "bg-purple-500/10",
+    icon: FlaskConical,
+    titleKey: "home.scientific.title",
+    descKey: "home.scientific.desc",
   },
   {
-    title: "Faraid Calculator",
-    description: "Simplified Islamic inheritance distribution — prototype for basic estate scenarios.",
-    icon: Scale,
     href: "/faraid",
-    color: "text-emerald-600 dark:text-emerald-400",
-    bg: "bg-emerald-500/10",
+    icon: Scale,
+    titleKey: "home.faraid.title",
+    descKey: "home.faraid.desc",
   },
-];
+] as const;
 
-export default function Home() {
+export default function HomePage() {
+  const { t } = useLocale();
+
   return (
-    <div className="max-w-2xl mx-auto" data-testid="page-home">
-      <div className="mb-8">
-        <h1 className="text-xl font-bold tracking-tight">Online Calculators</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Free browser-based calculators with history saved locally.
-        </p>
+    <div className="max-w-2xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">{t("home.title")}</h1>
+        <p className="text-muted-foreground text-sm mt-1">{t("home.subtitle")}</p>
       </div>
 
       <div className="grid gap-3">
-        {tools.map((tool) => (
-          <Link key={tool.href} href={tool.href}>
-            <Card className="group cursor-pointer border-card-border hover:border-primary/30 transition-colors" data-testid={`card-${tool.href.slice(1)}`}>
+        {calculators.map(({ href, icon: Icon, titleKey, descKey }) => (
+          <Link key={href} href={href}>
+            <Card className="group hover:border-primary/50 hover:shadow-sm transition-all cursor-pointer">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-lg ${tool.bg} flex items-center justify-center flex-shrink-0`}>
-                  <tool.icon className={`w-5 h-5 ${tool.color}`} />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 transition-colors">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-sm font-semibold">{tool.title}</h2>
-                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{tool.description}</p>
+                  <h2 className="text-sm font-semibold">{t(titleKey)}</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{t(descKey)}</p>
                 </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors flex-shrink-0" />
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
               </CardContent>
             </Card>
           </Link>

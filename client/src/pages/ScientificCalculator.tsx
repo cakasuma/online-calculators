@@ -5,299 +5,288 @@ interface Props {
   onCalculate: (expression: string, result: string) => void;
 }
 
-type AngleMode = "deg" | "rad";
+type Mode = "deg" | "rad";
+
+const scientificFunctions = [
+  "sin", "cos", "tan",
+  "asin", "acos", "atan",
+  "log", "ln", "√",
+  "x²", "xʸ", "1/x",
+  "|", "n!", "π",
+  "e", "(", ")",
+];
+
+const numpadButtons = [
+  "7", "8", "9", "/",
+  "4", "5", "6", "*",
+  "1", "2", "3", "-",
+  "0", ".", "⌫", "+",
+  "C", "±", "%", "=",
+];
+
+function factorial(n: number): number {
+  if (n < 0 || !Number.isInteger(n)) return NaN;
+  if (n === 0 || n === 1) return 1;
+  if (n > 170) return Infinity;
+  let result = 1;
+  for (let i = 2; i <= n; i++) result *= i;
+  return result;
+}
 
 export default function ScientificCalculator({ onCalculate }: Props) {
   const [display, setDisplay] = useState("0");
   const [expression, setExpression] = useState("");
-  const [lastResult, setLastResult] = useState<string | null>(null);
-  const [waitingForOperand, setWaitingForOperand] = useState(false);
-  const [angleMode, setAngleMode] = useState<AngleMode>("deg");
-  const [showInverse, setShowInverse] = useState(false);
+  const [mode, setMode] = useState<Mode>("deg");
+  const [justEvaluated, setJustEvaluated] = useState(false);
 
-  const toRad = useCallback(
-    (val: number) => (angleMode === "deg" ? (val * Math.PI) / 180 : val),
-    [angleMode]
-  );
-  const fromRad = useCallback(
-    (val: number) => (angleMode === "deg" ? (val * 180) / Math.PI : val),
-    [angleMode]
-  );
+  function toRad(deg: number) {
+    return (deg * Math.PI) / 180;
+  }
 
-  const clear = useCallback(() => {
-    setDisplay("0");
-    setExpression("");
-    setLastResult(null);
-    setWaitingForOperand(false);
-  }, []);
-
-  const handleDigit = useCallback(
-    (digit: string) => {
-      if (lastResult !== null) {
-        setDisplay(digit);
-        setExpression("");
-        setLastResult(null);
-        setWaitingForOperand(false);
-        return;
-      }
-      if (waitingForOperand) {
-        setDisplay(digit);
-        setWaitingForOperand(false);
-      } else {
-        setDisplay((prev) => (prev === "0" ? digit : prev + digit));
-      }
-    },
-    [waitingForOperand, lastResult]
-  );
-
-  const handleDecimal = useCallback(() => {
-    if (lastResult !== null) {
-      setDisplay("0.");
-      setExpression("");
-      setLastResult(null);
-      setWaitingForOperand(false);
-      return;
-    }
-    if (waitingForOperand) {
-      setDisplay("0.");
-      setWaitingForOperand(false);
-      return;
-    }
-    if (!display.includes(".")) {
-      setDisplay((prev) => prev + ".");
-    }
-  }, [display, waitingForOperand, lastResult]);
-
-  const handleOperator = useCallback(
-    (op: string) => {
-      const displaySymbol = op === "*" ? "\u00d7" : op === "/" ? "\u00f7" : op;
-      if (lastResult !== null) {
-        setExpression(lastResult + " " + displaySymbol + " ");
-        setLastResult(null);
-        setWaitingForOperand(true);
-        return;
-      }
-      setExpression((prev) => prev + display + " " + displaySymbol + " ");
-      setWaitingForOperand(true);
-    },
-    [display, lastResult]
-  );
-
-  const handleBackspace = useCallback(() => {
-    if (lastResult !== null) {
-      clear();
-      return;
-    }
-    setDisplay((prev) => {
-      if (prev.length <= 1 || (prev.length === 2 && prev.startsWith("-"))) return "0";
-      return prev.slice(0, -1);
-    });
-  }, [lastResult, clear]);
-
-  const applyUnaryFn = useCallback(
-    (fnName: string, fn: (x: number) => number) => {
-      const val = parseFloat(display);
-      if (isNaN(val)) return;
-      try {
-        const result = fn(val);
-        if (!isFinite(result)) {
-          setDisplay("Error");
-          return;
-        }
-        const resultStr = parseFloat(result.toPrecision(12)).toString();
-        onCalculate(`${fnName}(${val})`, resultStr);
-        setDisplay(resultStr);
-        setLastResult(resultStr);
-        setWaitingForOperand(false);
-        setExpression("");
-      } catch {
-        setDisplay("Error");
-      }
-    },
-    [display, onCalculate]
-  );
-
-  const evaluate = useCallback(() => {
-    const fullExpr = expression + display;
-    const evalExpr = fullExpr
-      .replace(/\u00d7/g, "*")
-      .replace(/\u00f7/g, "/")
-      .replace(/[^0-9+\-*/.() ]/g, "");
+  function evaluate(expr: string): string {
     try {
-      const fn = new Function(`"use strict"; return (${evalExpr});`);
-      const rawResult = fn();
-      if (typeof rawResult !== "number" || !isFinite(rawResult)) {
-        setDisplay("Error");
+      let e = expr
+        .replace(/×/g, "*")
+        .replace(/÷/g, "/")
+        .replace(/π/g, String(Math.PI))
+        .replace(/e(?![0-9])/g, String(Math.E));
+
+      // Handle functions
+      const degMode = mode === "deg";
+      e = e.replace(/sin\(([^)]+)\)/g, (_, a) =>
+        String(Math.sin(degMode ? toRad(parseFloat(a)) : parseFloat(a)))
+      );
+      e = e.replace(/cos\(([^)]+)\)/g, (_, a) =>
+        String(Math.cos(degMode ? toRad(parseFloat(a)) : parseFloat(a)))
+      );
+      e = e.replace(/tan\(([^)]+)\)/g, (_, a) =>
+        String(Math.tan(degMode ? toRad(parseFloat(a)) : parseFloat(a)))
+      );
+      e = e.replace(/asin\(([^)]+)\)/g, (_, a) =>
+        String(degMode ? (Math.asin(parseFloat(a)) * 180) / Math.PI : Math.asin(parseFloat(a)))
+      );
+      e = e.replace(/acos\(([^)]+)\)/g, (_, a) =>
+        String(degMode ? (Math.acos(parseFloat(a)) * 180) / Math.PI : Math.acos(parseFloat(a)))
+      );
+      e = e.replace(/atan\(([^)]+)\)/g, (_, a) =>
+        String(degMode ? (Math.atan(parseFloat(a)) * 180) / Math.PI : Math.atan(parseFloat(a)))
+      );
+      e = e.replace(/log\(([^)]+)\)/g, (_, a) => String(Math.log10(parseFloat(a))));
+      e = e.replace(/ln\(([^)]+)\)/g, (_, a) => String(Math.log(parseFloat(a))));
+      e = e.replace(/√\(([^)]+)\)/g, (_, a) => String(Math.sqrt(parseFloat(a))));
+      e = e.replace(/([0-9.]+)!\s*/g, (_, n) => String(factorial(parseFloat(n))));
+      e = e.replace(/\|([^|]+)\|/g, (_, a) => String(Math.abs(parseFloat(a))));
+
+      if (!/^[0-9+\-*/.() e+\-]+$/.test(e)) return "Error";
+      // eslint-disable-next-line no-new-func
+      const result = new Function("return " + e)();
+      if (!isFinite(result)) return result === Infinity ? "∞" : "Error";
+      return parseFloat(result.toFixed(10)).toString();
+    } catch {
+      return "Error";
+    }
+  }
+
+  const handleSciFn = useCallback(
+    (fn: string) => {
+      const val = display === "0" ? "" : display;
+      switch (fn) {
+        case "x²":
+          setDisplay((d) => String(parseFloat(d) ** 2));
+          setJustEvaluated(true);
+          break;
+        case "1/x":
+          setDisplay((d) => String(1 / parseFloat(d)));
+          setJustEvaluated(true);
+          break;
+        case "xʸ":
+          setExpression(expression + display + "**");
+          setDisplay("0");
+          setJustEvaluated(false);
+          break;
+        case "π":
+          setDisplay(String(Math.PI));
+          setJustEvaluated(true);
+          break;
+        case "e":
+          setDisplay(String(Math.E));
+          setJustEvaluated(true);
+          break;
+        case "(":
+          setExpression((ex) => ex + display + "(");
+          setDisplay("0");
+          break;
+        case ")":
+          setExpression((ex) => ex + display + ")");
+          setDisplay("0");
+          break;
+        case "n!":
+          setDisplay((d) => String(factorial(parseFloat(d))));
+          setJustEvaluated(true);
+          break;
+        case "|": {
+          const abs = Math.abs(parseFloat(display));
+          setDisplay(String(abs));
+          setJustEvaluated(true);
+          break;
+        }
+        default:
+          // Trig/log/sqrt — append function call
+          setExpression((ex) => ex + fn + "(");
+          setDisplay(val || "0");
+          break;
+      }
+    },
+    [display, expression]
+  );
+
+  const handleKey = useCallback(
+    (key: string) => {
+      if (key === "C") {
+        setDisplay("0");
         setExpression("");
+        setJustEvaluated(false);
         return;
       }
-      const result = parseFloat(rawResult.toPrecision(12)).toString();
-      onCalculate(fullExpr.trim(), result);
-      setDisplay(result);
-      setExpression("");
-      setLastResult(result);
-      setWaitingForOperand(false);
-    } catch {
-      setDisplay("Error");
-      setExpression("");
-    }
-  }, [expression, display, onCalculate]);
+      if (key === "⌫") {
+        if (justEvaluated) {
+          setDisplay("0");
+          setExpression("");
+          setJustEvaluated(false);
+        } else {
+          setDisplay((d) => (d.length > 1 ? d.slice(0, -1) : "0"));
+        }
+        return;
+      }
+      if (key === "=") {
+        const expr = expression + display;
+        const result = evaluate(expr);
+        onCalculate(expr, result);
+        setExpression("");
+        setDisplay(result);
+        setJustEvaluated(true);
+        return;
+      }
+      if (key === "±") {
+        setDisplay((d) => (d.startsWith("-") ? d.slice(1) : "-" + d));
+        return;
+      }
+      if (key === "%") {
+        setDisplay((d) => String(parseFloat(d) / 100));
+        return;
+      }
+      const isOperator = ["+", "-", "*", "/"].includes(key);
+      if (isOperator) {
+        if (justEvaluated) {
+          setExpression(display + key);
+          setDisplay("0");
+          setJustEvaluated(false);
+        } else {
+          setExpression(expression + display + key);
+          setDisplay("0");
+        }
+        return;
+      }
+      if (justEvaluated) {
+        setDisplay(key === "." ? "0." : key);
+        setExpression("");
+        setJustEvaluated(false);
+        return;
+      }
+      if (key === ".") {
+        if (!display.includes(".")) setDisplay((d) => d + ".");
+        return;
+      }
+      setDisplay((d) => (d === "0" ? key : d + key));
+    },
+    [display, expression, justEvaluated, onCalculate, mode]
+  );
 
   useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      const key = e.key;
-      if (key >= "0" && key <= "9") handleDigit(key);
-      else if (key === ".") handleDecimal();
-      else if (key === "+" || key === "-") handleOperator(key);
-      else if (key === "*") handleOperator("*");
-      else if (key === "/") { e.preventDefault(); handleOperator("/"); }
-      else if (key === "Enter" || key === "=") evaluate();
-      else if (key === "Escape") clear();
-      else if (key === "Backspace") handleBackspace();
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [handleDigit, handleDecimal, handleOperator, evaluate, clear, handleBackspace]);
+    const handler = (e: KeyboardEvent) => {
+      const map: Record<string, string> = {
+        "0": "0", "1": "1", "2": "2", "3": "3", "4": "4",
+        "5": "5", "6": "6", "7": "7", "8": "8", "9": "9",
+        "+": "+", "-": "-", "*": "*", "/": "/",
+        ".": ".", ",": ".",
+        "Enter": "=", "=": "=",
+        "Backspace": "⌫",
+        "Escape": "C",
+        "%": "%",
+      };
+      if (map[e.key]) {
+        e.preventDefault();
+        handleKey(map[e.key]);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleKey]);
 
-  const scientificFns = showInverse
-    ? [
-        { label: "sin\u207b\u00b9", action: () => applyUnaryFn("asin", (x) => fromRad(Math.asin(x))) },
-        { label: "cos\u207b\u00b9", action: () => applyUnaryFn("acos", (x) => fromRad(Math.acos(x))) },
-        { label: "tan\u207b\u00b9", action: () => applyUnaryFn("atan", (x) => fromRad(Math.atan(x))) },
-        { label: "e\u02e3", action: () => applyUnaryFn("exp", Math.exp) },
-        { label: "10\u02e3", action: () => applyUnaryFn("10^", (x) => Math.pow(10, x)) },
-      ]
-    : [
-        { label: "sin", action: () => applyUnaryFn("sin", (x) => Math.sin(toRad(x))) },
-        { label: "cos", action: () => applyUnaryFn("cos", (x) => Math.cos(toRad(x))) },
-        { label: "tan", action: () => applyUnaryFn("tan", (x) => Math.tan(toRad(x))) },
-        { label: "ln", action: () => applyUnaryFn("ln", Math.log) },
-        { label: "log", action: () => applyUnaryFn("log", Math.log10) },
-      ];
-
-  const scientificExtra = [
-    { label: "x\u00b2", action: () => applyUnaryFn("sqr", (x) => x * x) },
-    { label: "\u221ax", action: () => applyUnaryFn("sqrt", Math.sqrt) },
-    { label: "x\u02b8", action: () => handleOperator("**"), isOp: true },
-    { label: "\u03c0", action: () => { setDisplay(Math.PI.toString()); setLastResult(null); setWaitingForOperand(false); } },
-    { label: "e", action: () => { setDisplay(Math.E.toString()); setLastResult(null); setWaitingForOperand(false); } },
-    { label: "1/x", action: () => applyUnaryFn("1/", (x) => 1 / x) },
-    { label: "|x|", action: () => applyUnaryFn("abs", Math.abs) },
-    { label: "x!", action: () => applyUnaryFn("fact", factorial) },
-  ];
-
-  const numButtons: { label: string; action: () => void; style: string; icon?: boolean; wide?: boolean }[] = [
-    { label: "C", action: clear, style: "fn" },
-    { label: "(", action: () => setDisplay((p) => p === "0" ? "(" : p + "("), style: "fn" },
-    { label: ")", action: () => setDisplay((p) => p + ")"), style: "fn" },
-    { label: "\u00f7", action: () => handleOperator("/"), style: "op" },
-    { label: "7", action: () => handleDigit("7"), style: "num" },
-    { label: "8", action: () => handleDigit("8"), style: "num" },
-    { label: "9", action: () => handleDigit("9"), style: "num" },
-    { label: "\u00d7", action: () => handleOperator("*"), style: "op" },
-    { label: "4", action: () => handleDigit("4"), style: "num" },
-    { label: "5", action: () => handleDigit("5"), style: "num" },
-    { label: "6", action: () => handleDigit("6"), style: "num" },
-    { label: "\u2212", action: () => handleOperator("-"), style: "op" },
-    { label: "1", action: () => handleDigit("1"), style: "num" },
-    { label: "2", action: () => handleDigit("2"), style: "num" },
-    { label: "3", action: () => handleDigit("3"), style: "num" },
-    { label: "+", action: () => handleOperator("+"), style: "op" },
-    { label: "\u232b", action: handleBackspace, style: "num", icon: true },
-    { label: "0", action: () => handleDigit("0"), style: "num" },
-    { label: ".", action: handleDecimal, style: "num" },
-    { label: "=", action: evaluate, style: "eq" },
-  ];
+  const sciBtnClass =
+    "calc-btn h-9 text-xs rounded-lg bg-muted/60 hover:bg-muted border transition-all active:scale-95";
+  const numBtnClass = (key: string) => {
+    const base = "calc-btn h-11 text-sm rounded-xl transition-all active:scale-95";
+    if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90`;
+    if (["+", "-", "*", "/"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
+    if (["C", "±", "%"].includes(key)) return `${base} bg-muted hover:bg-muted/80 text-muted-foreground`;
+    if (key === "⌫") return `${base} bg-muted hover:bg-muted/80 text-destructive`;
+    return `${base} bg-card hover:bg-muted/50 border`;
+  };
 
   return (
-    <div className="w-full max-w-lg mx-auto" data-testid="scientific-calculator">
-      <div className="bg-card border border-card-border rounded-xl p-4 mb-3">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setAngleMode((m) => (m === "deg" ? "rad" : "deg"))}
-              className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
-              data-testid="button-angle-mode"
-            >
-              {angleMode}
-            </button>
-            <button
-              onClick={() => setShowInverse((s) => !s)}
-              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
-                showInverse
-                  ? "bg-primary/15 text-primary"
-                  : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
-              }`}
-              data-testid="button-inverse"
-            >
-              INV
-            </button>
-          </div>
+    <div className="max-w-sm mx-auto">
+      {/* Display */}
+      <div className="mb-3 p-4 rounded-2xl bg-card border min-h-[80px] flex flex-col justify-end items-end overflow-hidden">
+        <div className="flex items-center gap-2 mb-1">
+          <button
+            onClick={() => setMode(mode === "deg" ? "rad" : "deg")}
+            className="text-[10px] px-2 py-0.5 rounded-full border bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+          >
+            {mode.toUpperCase()}
+          </button>
+          {expression && (
+            <p className="text-xs text-muted-foreground font-mono truncate max-w-[200px]">
+              {expression}
+            </p>
+          )}
         </div>
-        <div className="text-xs text-muted-foreground font-mono h-5 text-right truncate" data-testid="text-sci-expression">
-          {expression || "\u00a0"}
-        </div>
-        <div className="text-3xl font-semibold font-mono text-right truncate mt-1" data-testid="text-sci-display">
+        <p
+          className="font-mono font-semibold text-right break-all"
+          style={{ fontSize: display.length > 12 ? "1.1rem" : display.length > 8 ? "1.5rem" : "2rem" }}
+          data-testid="sci-display-main"
+        >
           {display}
-        </div>
+        </p>
       </div>
 
-      <div className="grid grid-cols-5 gap-1.5 mb-2">
-        {scientificFns.map((fn, i) => (
+      {/* Scientific function grid */}
+      <div className="grid grid-cols-6 gap-1.5 mb-2">
+        {scientificFunctions.map((fn) => (
           <button
-            key={i}
-            onClick={fn.action}
-            className="calc-btn h-10 text-xs bg-accent/50 hover:bg-accent text-accent-foreground font-medium rounded-lg"
-            data-testid={`button-sci-${fn.label}`}
+            key={fn}
+            onClick={() => handleSciFn(fn)}
+            className={sciBtnClass}
+            data-testid={`sci-btn-${fn}`}
           >
-            {fn.label}
+            {fn}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5 mb-3">
-        {scientificExtra.map((fn, i) => (
+      {/* Numpad */}
+      <div className="grid grid-cols-4 gap-1.5">
+        {numpadButtons.map((key) => (
           <button
-            key={i}
-            onClick={fn.action}
-            className="calc-btn h-10 text-xs bg-accent/50 hover:bg-accent text-accent-foreground font-medium rounded-lg"
-            data-testid={`button-sci-${fn.label}`}
+            key={key}
+            onClick={() => handleKey(key)}
+            className={numBtnClass(key)}
+            data-testid={`btn-${key}`}
           >
-            {fn.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-4 gap-2">
-        {numButtons.map((btn, i) => (
-          <button
-            key={i}
-            onClick={btn.action}
-            className={`
-              calc-btn h-12 text-sm
-              ${btn.wide ? "col-span-2" : ""}
-              ${btn.style === "num" ? "bg-card border border-card-border hover:bg-muted/60 text-foreground" : ""}
-              ${btn.style === "fn" ? "bg-muted hover:bg-muted/80 text-foreground font-medium" : ""}
-              ${btn.style === "op" ? "bg-primary/10 hover:bg-primary/20 text-primary font-semibold" : ""}
-              ${btn.style === "eq" ? "bg-primary hover:bg-primary/90 text-primary-foreground font-semibold" : ""}
-            `}
-            data-testid={`button-sci-calc-${btn.label}`}
-          >
-            {btn.icon ? <Delete className="w-4 h-4" /> : btn.label}
+            {key === "⌫" ? <Delete className="w-4 h-4" /> : key}
           </button>
         ))}
       </div>
     </div>
   );
-}
-
-function factorial(n: number): number {
-  if (n < 0) return NaN;
-  if (n === 0 || n === 1) return 1;
-  if (n > 170) return Infinity;
-  if (n !== Math.floor(n)) return NaN;
-  let result = 1;
-  for (let i = 2; i <= n; i++) result *= i;
-  return result;
 }

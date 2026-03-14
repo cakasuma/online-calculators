@@ -5,13 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useLocale } from "@/hooks/use-locale";
+import { TermTooltip } from "@/components/TermTooltip";
 
 interface Props {
   onCalculate: (expression: string, result: string) => void;
 }
 
 interface Heir {
-  label: string;
+  labelKey: string;
   key: string;
   share: string;
   amount: number;
@@ -29,10 +31,17 @@ interface FormState {
   daughters: number;
 }
 
+interface ValidationErrors {
+  totalEstate?: string;
+  debtsAndExpenses?: string;
+  wasiyyah?: string;
+  heirs?: string;
+}
+
 const initialForm: FormState = {
   totalEstate: "",
-  debtsAndExpenses: "0",
-  wasiyyah: "0",
+  debtsAndExpenses: "",
+  wasiyyah: "",
   hasHusband: false,
   hasWife: false,
   hasFather: false,
@@ -42,383 +51,373 @@ const initialForm: FormState = {
 };
 
 export default function FaraidCalculator({ onCalculate }: Props) {
+  const { t, locale } = useLocale();
   const [form, setForm] = useState<FormState>(initialForm);
   const [result, setResult] = useState<Heir[] | null>(null);
   const [netEstate, setNetEstate] = useState(0);
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
-  const update = useCallback(
-    <K extends keyof FormState>(key: K, value: FormState[K]) => {
-      setForm((prev) => {
-        const next = { ...prev, [key]: value };
-        // Husband and wife are mutually exclusive
-        if (key === "hasHusband" && value === true) next.hasWife = false;
-        if (key === "hasWife" && value === true) next.hasHusband = false;
-        return next;
-      });
-      setResult(null);
-    },
-    []
-  );
+  // Parse locale-aware number input
+  function parseInput(val: string): number {
+    if (!val || val.trim() === "") return 0;
+    // Remove locale-specific thousand separators
+    const cleaned = locale === "id"
+      ? val.replace(/\./g, "").replace(",", ".")
+      : val.replace(/,/g, "");
+    return parseFloat(cleaned) || 0;
+  }
+
+  function validate(): boolean {
+    const errs: ValidationErrors = {};
+    const estate = parseInput(form.totalEstate);
+    const debts = parseInput(form.debtsAndExpenses);
+    const wasiyyah = parseInput(form.wasiyyah);
+
+    if (!form.totalEstate.trim()) {
+      errs.totalEstate = t("validation.required");
+    } else if (isNaN(estate) || estate <= 0) {
+      errs.totalEstate = t("validation.positiveNumber");
+    }
+
+    if (form.debtsAndExpenses.trim() && (isNaN(debts) || debts < 0)) {
+      errs.debtsAndExpenses = t("validation.positiveNumber");
+    }
+
+    if (estate > 0 && debts >= estate) {
+      errs.debtsAndExpenses = t("validation.debtsExceedEstate");
+    }
+
+    const netEst = estate - debts;
+    if (form.wasiyyah.trim() && (isNaN(wasiyyah) || wasiyyah < 0)) {
+      errs.wasiyyah = t("validation.positiveNumber");
+    } else if (wasiyyah > netEst / 3) {
+      errs.wasiyyah = t("validation.wasiyyahExceeds");
+    }
+
+    const hasHeirs =
+      form.hasHusband || form.hasWife || form.hasFather ||
+      form.hasMother || form.sons > 0 || form.daughters > 0;
+    if (!hasHeirs) {
+      errs.heirs = t("validation.noHeirs");
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
 
   const calculate = useCallback(() => {
-    const total = parseFloat(form.totalEstate) || 0;
-    const debts = parseFloat(form.debtsAndExpenses) || 0;
-    const wasiyyahInput = parseFloat(form.wasiyyah) || 0;
-    if (total <= 0) return;
+    if (!validate()) return;
 
-    const afterDebts = Math.max(0, total - debts);
-    // Wasiyyah capped at 1/3
-    const maxWasiyyah = afterDebts / 3;
-    const wasiyyah = Math.min(wasiyyahInput, maxWasiyyah);
-    const net = afterDebts - wasiyyah;
+    const estate = parseInput(form.totalEstate);
+    const debts = parseInput(form.debtsAndExpenses);
+    const wasiyyah = parseInput(form.wasiyyah);
+    const net = estate - debts - wasiyyah;
     setNetEstate(net);
 
     const heirs: Heir[] = [];
-    let totalFixedShare = 0;
-    const hasChildren = form.sons > 0 || form.daughters > 0;
+    let remaining = net;
 
-    // Spouse share
+    // Spouse shares
+    const hasChildren = form.sons > 0 || form.daughters > 0;
     if (form.hasHusband) {
-      const share = hasChildren ? 1 / 4 : 1 / 2;
-      const label = hasChildren ? "1/4" : "1/2";
-      totalFixedShare += share;
-      heirs.push({ label: "Husband", key: "husband", share: label, amount: net * share });
+      const fraction = hasChildren ? 1 / 4 : 1 / 2;
+      const amount = net * fraction;
+      remaining -= amount;
+      heirs.push({
+        labelKey: t("faraid.husband"),
+        key: "husband",
+        share: hasChildren ? "1/4" : "1/2",
+        amount,
+      });
     }
     if (form.hasWife) {
-      const share = hasChildren ? 1 / 8 : 1 / 4;
-      const label = hasChildren ? "1/8" : "1/4";
-      totalFixedShare += share;
-      heirs.push({ label: "Wife", key: "wife", share: label, amount: net * share });
+      const fraction = hasChildren ? 1 / 8 : 1 / 4;
+      const amount = net * fraction;
+      remaining -= amount;
+      heirs.push({
+        labelKey: t("faraid.wife"),
+        key: "wife",
+        share: hasChildren ? "1/8" : "1/4",
+        amount,
+      });
     }
 
     // Father
     if (form.hasFather) {
       if (hasChildren) {
-        const share = 1 / 6;
-        totalFixedShare += share;
-        heirs.push({ label: "Father", key: "father", share: "1/6", amount: net * share });
-      } else {
-        // Father gets residual (asabah) — handled below
-        // but first gives him 1/6 if there are daughters only with no sons
-        if (form.daughters > 0 && form.sons === 0) {
-          const share = 1 / 6;
-          totalFixedShare += share;
-          heirs.push({ label: "Father (fixed)", key: "father-fixed", share: "1/6", amount: net * share });
-          // Father also gets residual, added below
-        }
-        // if no children at all, father is asabah (gets residual)
+        const amount = net * (1 / 6);
+        remaining -= amount;
+        heirs.push({
+          labelKey: t("faraid.fatherFixed"),
+          key: "father",
+          share: "1/6",
+          amount,
+        });
       }
+      // else father is asabah — handled below
     }
 
     // Mother
     if (form.hasMother) {
-      const share = hasChildren ? 1 / 6 : 1 / 3;
-      const label = hasChildren ? "1/6" : "1/3";
-      totalFixedShare += share;
-      heirs.push({ label: "Mother", key: "mother", share: label, amount: net * share });
+      const fraction = hasChildren ? 1 / 6 : 1 / 3;
+      const amount = net * fraction;
+      remaining -= amount;
+      heirs.push({
+        labelKey: t("faraid.mother"),
+        key: "mother",
+        share: hasChildren ? "1/6" : "1/3",
+        amount,
+      });
     }
 
-    const remainder = net * (1 - totalFixedShare);
-
-    // Children
-    if (form.sons > 0) {
-      // Sons and daughters as asabah, male=2x female
-      const totalShares = form.sons * 2 + form.daughters;
-      const perShare = totalShares > 0 ? remainder / totalShares : 0;
-      if (form.sons > 0) {
+    // Children — asabah
+    if (hasChildren) {
+      const totalParts = form.sons * 2 + form.daughters * 1;
+      for (let i = 0; i < form.sons; i++) {
+        const share = remaining * (2 / totalParts);
         heirs.push({
-          label: `Son${form.sons > 1 ? "s" : ""} (${form.sons})`,
-          key: "sons",
-          share: "Residual (2x)",
-          amount: perShare * 2 * form.sons,
+          labelKey: `${t("faraid.son")} ${i + 1}`,
+          key: `son_${i}`,
+          share: "asabah",
+          amount: share,
         });
       }
-      if (form.daughters > 0) {
+      for (let i = 0; i < form.daughters; i++) {
+        const share = remaining * (1 / totalParts);
         heirs.push({
-          label: `Daughter${form.daughters > 1 ? "s" : ""} (${form.daughters})`,
-          key: "daughters",
-          share: "Residual (1x)",
-          amount: perShare * form.daughters,
+          labelKey: `${t("faraid.daughter")} ${i + 1}`,
+          key: `daughter_${i}`,
+          share: "asabah",
+          amount: share,
         });
       }
-      // Father residual (if no sons, handled above)
-      if (form.hasFather && !hasChildren) {
-        // already pushed fixed share, rest is asabah — not applicable here since hasChildren is true
-      }
-    } else if (form.daughters > 0) {
-      // Daughters only (no sons) — fixed shares
-      if (form.daughters === 1) {
-        const share = 1 / 2;
-        const amt = net * share;
-        if (totalFixedShare + share <= 1) {
-          heirs.push({ label: "Daughter", key: "daughters", share: "1/2", amount: amt });
-          totalFixedShare += share;
-        } else {
-          heirs.push({ label: "Daughter", key: "daughters", share: "1/2*", amount: amt });
-        }
-      } else {
-        const share = 2 / 3;
-        const amt = net * share;
-        heirs.push({
-          label: `Daughters (${form.daughters})`,
-          key: "daughters",
-          share: "2/3",
-          amount: amt,
-        });
-        totalFixedShare += share;
-      }
-      // Father gets residual if present
-      if (form.hasFather) {
-        const fatherResidue = Math.max(0, net - heirs.reduce((s, h) => s + h.amount, 0));
-        if (fatherResidue > 0) {
-          heirs.push({
-            label: "Father (residual)",
-            key: "father-residual",
-            share: "Residual",
-            amount: fatherResidue,
-          });
-        }
-      }
-    } else {
-      // No children — father gets residual
-      if (form.hasFather) {
-        heirs.push({
-          label: "Father",
-          key: "father",
-          share: "Residual",
-          amount: remainder,
-        });
-      }
+      remaining = 0;
+    } else if (!hasChildren && form.hasFather) {
+      // Father gets residual
+      const fatherAsabah = remaining;
+      heirs.push({
+        labelKey: t("faraid.fatherResidual"),
+        key: "father_asabah",
+        share: "asabah",
+        amount: fatherAsabah,
+      });
+      remaining = 0;
     }
+
+    // Record to history
+    const expr = `Faraid: ${form.totalEstate} - ${form.debtsAndExpenses || "0"} - ${form.wasiyyah || "0"}`;
+    const res = `Net: ${net.toLocaleString(locale === "id" ? "id-ID" : "en-US", { maximumFractionDigits: 2 })}`;
+    onCalculate(expr, res);
 
     setResult(heirs);
+  }, [form, t, locale, onCalculate]);
 
-    // Build summary for history
-    const parts = heirs.map((h) => `${h.label}: ${formatCurrency(h.amount)}`).join(", ");
-    onCalculate(
-      `Faraid: Estate ${formatCurrency(net)}`,
-      parts
-    );
-  }, [form, onCalculate]);
-
-  const reset = useCallback(() => {
-    setForm(initialForm);
-    setResult(null);
-    setNetEstate(0);
-  }, []);
+  const formatAmount = (n: number) =>
+    n.toLocaleString(locale === "id" ? "id-ID" : "en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
   return (
-    <div className="w-full max-w-lg mx-auto space-y-4" data-testid="faraid-calculator">
+    <div className="max-w-2xl mx-auto space-y-4">
       {/* Disclaimer */}
-      <div className="flex gap-2.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-sm">
-        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+      <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-sm">
+        <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium text-amber-700 dark:text-amber-300 text-xs">Prototype Only</p>
-          <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-0.5">
-            This is a simplified Faraid calculator. It covers basic inheritance scenarios only. Always consult a qualified Islamic scholar for actual estate distribution.
+          <p className="font-medium text-amber-800 dark:text-amber-300">
+            {t("faraid.disclaimer.title")}
+          </p>
+          <p className="text-amber-700 dark:text-amber-400 mt-0.5">
+            {t("faraid.disclaimer.text")}
           </p>
         </div>
       </div>
 
-      {/* Estate Input */}
       <Card>
         <CardContent className="pt-5 space-y-4">
-          <h3 className="text-sm font-semibold flex items-center gap-2">
-            <Info className="w-3.5 h-3.5 text-primary" /> Estate Details
-          </h3>
-          <div className="grid gap-3">
-            <div>
-              <Label htmlFor="totalEstate" className="text-xs text-muted-foreground">Total Estate Value</Label>
-              <Input
-                id="totalEstate"
-                type="number"
-                placeholder="e.g. 100000"
-                value={form.totalEstate}
-                onChange={(e) => update("totalEstate", e.target.value)}
-                className="font-mono mt-1"
-                data-testid="input-total-estate"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="debts" className="text-xs text-muted-foreground">Debts & Expenses</Label>
-                <Input
-                  id="debts"
-                  type="number"
-                  placeholder="0"
-                  value={form.debtsAndExpenses}
-                  onChange={(e) => update("debtsAndExpenses", e.target.value)}
-                  className="font-mono mt-1"
-                  data-testid="input-debts"
-                />
-              </div>
-              <div>
-                <Label htmlFor="wasiyyah" className="text-xs text-muted-foreground">Wasiyyah (max 1/3)</Label>
-                <Input
-                  id="wasiyyah"
-                  type="number"
-                  placeholder="0"
-                  value={form.wasiyyah}
-                  onChange={(e) => update("wasiyyah", e.target.value)}
-                  className="font-mono mt-1"
-                  data-testid="input-wasiyyah"
-                />
-              </div>
-            </div>
+          <h2 className="text-sm font-semibold">{t("faraid.estateDetails")}</h2>
+
+          {/* Total Estate */}
+          <div className="space-y-1">
+            <Label htmlFor="total-estate" className="text-xs">
+              <TermTooltip termKey="tooltip.totalEstate">
+                {t("faraid.totalEstate")}
+              </TermTooltip>
+            </Label>
+            <Input
+              id="total-estate"
+              type="text"
+              inputMode="decimal"
+              value={form.totalEstate}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, totalEstate: e.target.value }));
+                setErrors((e2) => ({ ...e2, totalEstate: undefined }));
+              }}
+              placeholder={t("faraid.totalEstate.placeholder")}
+              className={errors.totalEstate ? "border-destructive" : ""}
+            />
+            {errors.totalEstate && (
+              <p className="text-xs text-destructive">{errors.totalEstate}</p>
+            )}
+          </div>
+
+          {/* Debts */}
+          <div className="space-y-1">
+            <Label htmlFor="debts" className="text-xs">
+              <TermTooltip termKey="tooltip.debts">
+                {t("faraid.debts")}
+              </TermTooltip>
+            </Label>
+            <Input
+              id="debts"
+              type="text"
+              inputMode="decimal"
+              value={form.debtsAndExpenses}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, debtsAndExpenses: e.target.value }));
+                setErrors((e2) => ({ ...e2, debtsAndExpenses: undefined }));
+              }}
+              placeholder="0"
+              className={errors.debtsAndExpenses ? "border-destructive" : ""}
+            />
+            {errors.debtsAndExpenses && (
+              <p className="text-xs text-destructive">{errors.debtsAndExpenses}</p>
+            )}
+          </div>
+
+          {/* Wasiyyah */}
+          <div className="space-y-1">
+            <Label htmlFor="wasiyyah" className="text-xs">
+              <TermTooltip termKey="tooltip.wasiyyah">
+                {t("faraid.wasiyyah")}
+              </TermTooltip>
+            </Label>
+            <Input
+              id="wasiyyah"
+              type="text"
+              inputMode="decimal"
+              value={form.wasiyyah}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, wasiyyah: e.target.value }));
+                setErrors((e2) => ({ ...e2, wasiyyah: undefined }));
+              }}
+              placeholder="0"
+              className={errors.wasiyyah ? "border-destructive" : ""}
+            />
+            {errors.wasiyyah && (
+              <p className="text-xs text-destructive">{errors.wasiyyah}</p>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Heirs Selection */}
       <Card>
-        <CardContent className="pt-5 space-y-4">
-          <h3 className="text-sm font-semibold">Heirs</h3>
+        <CardContent className="pt-5 space-y-3">
+          <h2 className="text-sm font-semibold">{t("faraid.heirs")}</h2>
+          {errors.heirs && (
+            <p className="text-xs text-destructive flex items-center gap-1">
+              <Info className="w-3 h-3" /> {errors.heirs}
+            </p>
+          )}
 
-          {/* Spouse */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="husband" className="text-sm">Husband</Label>
-              <Switch
-                id="husband"
-                checked={form.hasHusband}
-                onCheckedChange={(v) => update("hasHusband", v)}
-                data-testid="switch-husband"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="wife" className="text-sm">Wife</Label>
-              <Switch
-                id="wife"
-                checked={form.hasWife}
-                onCheckedChange={(v) => update("hasWife", v)}
-                data-testid="switch-wife"
-              />
-            </div>
+          {/* Spouse toggles */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { key: "hasHusband", labelKey: "faraid.husband", tooltipKey: "tooltip.husband" },
+              { key: "hasWife", labelKey: "faraid.wife", tooltipKey: "tooltip.wife" },
+              { key: "hasFather", labelKey: "faraid.father", tooltipKey: "tooltip.father" },
+              { key: "hasMother", labelKey: "faraid.mother", tooltipKey: "tooltip.mother" },
+            ].map(({ key, labelKey, tooltipKey }) => (
+              <div key={key} className="flex items-center justify-between p-2 rounded-lg border bg-card">
+                <Label htmlFor={key} className="text-xs cursor-pointer">
+                  <TermTooltip termKey={tooltipKey as any}>
+                    {t(labelKey as any)}
+                  </TermTooltip>
+                </Label>
+                <Switch
+                  id={key}
+                  checked={form[key as keyof FormState] as boolean}
+                  onCheckedChange={(v) => {
+                    setForm((f) => ({ ...f, [key]: v }));
+                    setErrors((e2) => ({ ...e2, heirs: undefined }));
+                  }}
+                />
+              </div>
+            ))}
           </div>
 
-          <div className="h-px bg-border" />
-
-          {/* Parents */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="father" className="text-sm">Father</Label>
-              <Switch
-                id="father"
-                checked={form.hasFather}
-                onCheckedChange={(v) => update("hasFather", v)}
-                data-testid="switch-father"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="mother" className="text-sm">Mother</Label>
-              <Switch
-                id="mother"
-                checked={form.hasMother}
-                onCheckedChange={(v) => update("hasMother", v)}
-                data-testid="switch-mother"
-              />
-            </div>
-          </div>
-
-          <div className="h-px bg-border" />
-
-          {/* Children */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Sons</Label>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => update("sons", Math.max(0, form.sons - 1))}
-                  className="w-7 h-7 rounded-md bg-muted hover:bg-muted/80 flex items-center justify-center text-sm font-medium"
-                  data-testid="button-sons-minus"
-                >
-                  −
-                </button>
-                <span className="w-6 text-center text-sm font-mono" data-testid="text-sons-count">{form.sons}</span>
-                <button
-                  onClick={() => update("sons", Math.min(20, form.sons + 1))}
-                  className="w-7 h-7 rounded-md bg-muted hover:bg-muted/80 flex items-center justify-center text-sm font-medium"
-                  data-testid="button-sons-plus"
-                >
-                  +
-                </button>
+          {/* Children counts */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { key: "sons", labelKey: "faraid.sons", tooltipKey: "tooltip.sons" },
+              { key: "daughters", labelKey: "faraid.daughters", tooltipKey: "tooltip.daughters" },
+            ].map(({ key, labelKey, tooltipKey }) => (
+              <div key={key} className="space-y-1">
+                <Label className="text-xs">
+                  <TermTooltip termKey={tooltipKey as any}>
+                    {t(labelKey as any)}
+                  </TermTooltip>
+                </Label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((f) => ({ ...f, [key]: Math.max(0, (f[key as keyof FormState] as number) - 1) }));
+                      setErrors((e2) => ({ ...e2, heirs: undefined }));
+                    }}
+                    className="w-7 h-7 rounded-md border flex items-center justify-center hover:bg-muted text-sm"
+                  >
+                    −
+                  </button>
+                  <span className="text-sm font-mono w-6 text-center">
+                    {form[key as keyof FormState] as number}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((f) => ({ ...f, [key]: (f[key as keyof FormState] as number) + 1 }));
+                      setErrors((e2) => ({ ...e2, heirs: undefined }));
+                    }}
+                    className="w-7 h-7 rounded-md border flex items-center justify-center hover:bg-muted text-sm"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Daughters</Label>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => update("daughters", Math.max(0, form.daughters - 1))}
-                  className="w-7 h-7 rounded-md bg-muted hover:bg-muted/80 flex items-center justify-center text-sm font-medium"
-                  data-testid="button-daughters-minus"
-                >
-                  −
-                </button>
-                <span className="w-6 text-center text-sm font-mono" data-testid="text-daughters-count">{form.daughters}</span>
-                <button
-                  onClick={() => update("daughters", Math.min(20, form.daughters + 1))}
-                  className="w-7 h-7 rounded-md bg-muted hover:bg-muted/80 flex items-center justify-center text-sm font-medium"
-                  data-testid="button-daughters-plus"
-                >
-                  +
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Actions */}
-      <div className="flex gap-2">
-        <Button onClick={calculate} className="flex-1" data-testid="button-calculate-faraid">
-          Calculate Distribution
-        </Button>
-        <Button variant="outline" onClick={reset} data-testid="button-reset-faraid">
-          Reset
-        </Button>
-      </div>
+      <Button onClick={calculate} className="w-full">
+        {t("faraid.calculateDist")}
+      </Button>
 
-      {/* Results */}
       {result && (
         <Card>
-          <CardContent className="pt-5">
-            <h3 className="text-sm font-semibold mb-1">Distribution Results</h3>
-            <p className="text-xs text-muted-foreground mb-4">
-              Net estate: <span className="font-mono font-medium text-foreground">{formatCurrency(netEstate)}</span>
+          <CardContent className="pt-5 space-y-3">
+            <h2 className="text-sm font-semibold">{t("faraid.results")}</h2>
+            <p className="text-xs text-muted-foreground">
+              {t("faraid.netEstate")}: <span className="font-mono font-medium">{formatAmount(netEstate)}</span>
             </p>
             <div className="space-y-2">
               {result.map((heir) => (
-                <div
-                  key={heir.key}
-                  className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30"
-                  data-testid={`result-heir-${heir.key}`}
-                >
+                <div key={heir.key} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/40">
                   <div>
-                    <p className="text-sm font-medium">{heir.label}</p>
-                    <p className="text-xs text-muted-foreground">Share: {heir.share}</p>
+                    <p className="text-sm font-medium">{heir.labelKey}</p>
+                    <p className="text-xs text-muted-foreground">{t("faraid.share")}: {heir.share}</p>
                   </div>
-                  <p className="text-sm font-semibold font-mono text-primary">
-                    {formatCurrency(heir.amount)}
-                  </p>
+                  <p className="text-sm font-mono font-semibold">{formatAmount(heir.amount)}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-3 pt-3 border-t flex items-center justify-between">
-              <span className="text-sm font-medium">Total Distributed</span>
-              <span className="text-sm font-semibold font-mono">
-                {formatCurrency(result.reduce((s, h) => s + h.amount, 0))}
-              </span>
+            <div className="pt-2 border-t flex justify-between text-xs text-muted-foreground">
+              <span>{t("faraid.totalDistributed")}</span>
+              <span className="font-mono">{formatAmount(result.reduce((s, h) => s + h.amount, 0))}</span>
             </div>
           </CardContent>
         </Card>
       )}
     </div>
   );
-}
-
-function formatCurrency(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n);
 }

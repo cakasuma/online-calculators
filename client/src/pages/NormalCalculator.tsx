@@ -5,195 +5,172 @@ interface Props {
   onCalculate: (expression: string, result: string) => void;
 }
 
+type CalcKey =
+  | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+  | "." | "+" | "-" | "*" | "/" | "=" | "C" | "⌫" | "±" | "%";
+
+const BUTTONS: CalcKey[][] = [
+  ["C", "±", "%", "/"],
+  ["7", "8", "9", "*"],
+  ["4", "5", "6", "-"],
+  ["1", "2", "3", "+"],
+  ["0", ".", "⌫", "="],
+];
+
+function safeEval(expr: string): string {
+  try {
+    // Replace × and ÷ for display
+    const clean = expr.replace(/×/g, "*").replace(/÷/g, "/");
+    // Only allow safe characters
+    if (!/^[0-9+\-*/.() %]+$/.test(clean)) return "Error";
+    // eslint-disable-next-line no-new-func
+    const result = new Function("return " + clean)();
+    if (!isFinite(result)) return "Error";
+    // Format: avoid floating point issues
+    const str = parseFloat(result.toFixed(10)).toString();
+    return str;
+  } catch {
+    return "Error";
+  }
+}
+
 export default function NormalCalculator({ onCalculate }: Props) {
   const [display, setDisplay] = useState("0");
   const [expression, setExpression] = useState("");
-  const [lastResult, setLastResult] = useState<string | null>(null);
-  const [waitingForOperand, setWaitingForOperand] = useState(false);
+  const [justEvaluated, setJustEvaluated] = useState(false);
 
-  const clear = useCallback(() => {
-    setDisplay("0");
-    setExpression("");
-    setLastResult(null);
-    setWaitingForOperand(false);
-  }, []);
-
-  const handleDigit = useCallback(
-    (digit: string) => {
-      if (lastResult !== null) {
-        setDisplay(digit);
+  const handleKey = useCallback(
+    (key: CalcKey) => {
+      if (key === "C") {
+        setDisplay("0");
         setExpression("");
-        setLastResult(null);
-        setWaitingForOperand(false);
+        setJustEvaluated(false);
         return;
       }
-      if (waitingForOperand) {
-        setDisplay(digit);
-        setWaitingForOperand(false);
-      } else {
-        setDisplay((prev) => (prev === "0" ? digit : prev + digit));
+
+      if (key === "⌫") {
+        if (justEvaluated) {
+          setDisplay("0");
+          setExpression("");
+          setJustEvaluated(false);
+        } else {
+          setDisplay((d) => (d.length > 1 ? d.slice(0, -1) : "0"));
+        }
+        return;
       }
+
+      if (key === "=") {
+        const expr = expression + display;
+        const result = safeEval(expr);
+        onCalculate(expr, result);
+        setExpression("");
+        setDisplay(result);
+        setJustEvaluated(true);
+        return;
+      }
+
+      if (key === "±") {
+        setDisplay((d) => (d.startsWith("-") ? d.slice(1) : "-" + d));
+        return;
+      }
+
+      if (key === "%") {
+        const val = parseFloat(display);
+        if (!isNaN(val)) setDisplay((val / 100).toString());
+        return;
+      }
+
+      const isOperator = ["+", "-", "*", "/"].includes(key);
+
+      if (isOperator) {
+        if (justEvaluated) {
+          setExpression(display + key);
+          setDisplay("0");
+          setJustEvaluated(false);
+        } else {
+          setExpression(expression + display + key);
+          setDisplay("0");
+        }
+        return;
+      }
+
+      // Digit or decimal
+      if (justEvaluated) {
+        setDisplay(key === "." ? "0." : key);
+        setExpression("");
+        setJustEvaluated(false);
+        return;
+      }
+
+      if (key === ".") {
+        if (!display.includes(".")) setDisplay((d) => d + ".");
+        return;
+      }
+
+      setDisplay((d) => (d === "0" ? key : d + key));
     },
-    [waitingForOperand, lastResult]
+    [display, expression, justEvaluated, onCalculate]
   );
 
-  const handleDecimal = useCallback(() => {
-    if (lastResult !== null) {
-      setDisplay("0.");
-      setExpression("");
-      setLastResult(null);
-      setWaitingForOperand(false);
-      return;
-    }
-    if (waitingForOperand) {
-      setDisplay("0.");
-      setWaitingForOperand(false);
-      return;
-    }
-    if (!display.includes(".")) {
-      setDisplay((prev) => prev + ".");
-    }
-  }, [display, waitingForOperand, lastResult]);
-
-  const handleOperator = useCallback(
-    (op: string) => {
-      const displaySymbol = op === "*" ? "\u00d7" : op === "/" ? "\u00f7" : op;
-      if (lastResult !== null) {
-        setExpression(lastResult + " " + displaySymbol + " ");
-        setLastResult(null);
-        setWaitingForOperand(true);
-        return;
-      }
-      setExpression((prev) => prev + display + " " + displaySymbol + " ");
-      setWaitingForOperand(true);
-    },
-    [display, lastResult]
-  );
-
-  const handlePercent = useCallback(() => {
-    const val = parseFloat(display);
-    if (!isNaN(val)) {
-      const result = val / 100;
-      setDisplay(String(result));
-    }
-  }, [display]);
-
-  const handleToggleSign = useCallback(() => {
-    setDisplay((prev) => {
-      if (prev === "0") return prev;
-      return prev.startsWith("-") ? prev.slice(1) : "-" + prev;
-    });
-  }, []);
-
-  const handleBackspace = useCallback(() => {
-    if (lastResult !== null) {
-      clear();
-      return;
-    }
-    setDisplay((prev) => {
-      if (prev.length <= 1 || (prev.length === 2 && prev.startsWith("-"))) return "0";
-      return prev.slice(0, -1);
-    });
-  }, [lastResult, clear]);
-
-  const evaluate = useCallback(() => {
-    const fullExpr = expression + display;
-    const evalExpr = fullExpr
-      .replace(/\u00d7/g, "*")
-      .replace(/\u00f7/g, "/")
-      .replace(/[^0-9+\-*/.() ]/g, "");
-
-    try {
-      const fn = new Function(`"use strict"; return (${evalExpr});`);
-      const rawResult = fn();
-      if (typeof rawResult !== "number" || !isFinite(rawResult)) {
-        setDisplay("Error");
-        setExpression("");
-        return;
-      }
-      const result = parseFloat(rawResult.toPrecision(12)).toString();
-      onCalculate(fullExpr.trim(), result);
-      setDisplay(result);
-      setExpression("");
-      setLastResult(result);
-      setWaitingForOperand(false);
-    } catch {
-      setDisplay("Error");
-      setExpression("");
-    }
-  }, [expression, display, onCalculate]);
-
+  // Keyboard support
   useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      const key = e.key;
-      if (key >= "0" && key <= "9") handleDigit(key);
-      else if (key === ".") handleDecimal();
-      else if (key === "+" || key === "-") handleOperator(key);
-      else if (key === "*") handleOperator("*");
-      else if (key === "/") { e.preventDefault(); handleOperator("/"); }
-      else if (key === "Enter" || key === "=") evaluate();
-      else if (key === "Escape") clear();
-      else if (key === "Backspace") handleBackspace();
-      else if (key === "%") handlePercent();
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [handleDigit, handleDecimal, handleOperator, evaluate, clear, handleBackspace, handlePercent]);
+    const handler = (e: KeyboardEvent) => {
+      const map: Record<string, CalcKey> = {
+        "0": "0", "1": "1", "2": "2", "3": "3", "4": "4",
+        "5": "5", "6": "6", "7": "7", "8": "8", "9": "9",
+        "+": "+", "-": "-", "*": "*", "/": "/",
+        ".": ".", ",": ".",
+        "Enter": "=", "=": "=",
+        "Backspace": "⌫",
+        "Escape": "C",
+        "%": "%",
+      };
+      if (map[e.key]) {
+        e.preventDefault();
+        handleKey(map[e.key]);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleKey]);
 
-  const buttons: { label: string; action: () => void; style: string; icon?: boolean; wide?: boolean }[] = [
-    { label: "C", action: clear, style: "fn" },
-    { label: "\u00b1", action: handleToggleSign, style: "fn" },
-    { label: "%", action: handlePercent, style: "fn" },
-    { label: "\u00f7", action: () => handleOperator("/"), style: "op" },
-    { label: "7", action: () => handleDigit("7"), style: "num" },
-    { label: "8", action: () => handleDigit("8"), style: "num" },
-    { label: "9", action: () => handleDigit("9"), style: "num" },
-    { label: "\u00d7", action: () => handleOperator("*"), style: "op" },
-    { label: "4", action: () => handleDigit("4"), style: "num" },
-    { label: "5", action: () => handleDigit("5"), style: "num" },
-    { label: "6", action: () => handleDigit("6"), style: "num" },
-    { label: "\u2212", action: () => handleOperator("-"), style: "op" },
-    { label: "1", action: () => handleDigit("1"), style: "num" },
-    { label: "2", action: () => handleDigit("2"), style: "num" },
-    { label: "3", action: () => handleDigit("3"), style: "num" },
-    { label: "+", action: () => handleOperator("+"), style: "op" },
-    { label: "\u232b", action: handleBackspace, style: "num", icon: true },
-    { label: "0", action: () => handleDigit("0"), style: "num" },
-    { label: ".", action: handleDecimal, style: "num" },
-    { label: "=", action: evaluate, style: "eq" },
-  ];
+  const btnClass = (key: CalcKey) => {
+    const base = "calc-btn h-14 text-sm font-medium rounded-xl transition-all active:scale-95";
+    if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90 col-span-1`;
+    if (["+", "-", "*", "/"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
+    if (["C", "±", "%"].includes(key)) return `${base} bg-muted hover:bg-muted/80 text-muted-foreground`;
+    if (key === "⌫") return `${base} bg-muted hover:bg-muted/80 text-destructive`;
+    return `${base} bg-card hover:bg-muted/50 border`;
+  };
 
   return (
-    <div className="w-full max-w-sm mx-auto" data-testid="normal-calculator">
-      <div className="bg-card border border-card-border rounded-xl p-4 mb-3">
-        <div className="text-xs text-muted-foreground font-mono h-5 text-right truncate" data-testid="text-expression">
-          {expression || "\u00a0"}
-        </div>
-        <div
-          className="text-3xl font-semibold font-mono text-right truncate mt-1"
-          data-testid="text-display"
+    <div className="max-w-xs mx-auto">
+      {/* Display */}
+      <div className="mb-3 p-4 rounded-2xl bg-card border min-h-[80px] flex flex-col justify-end items-end overflow-hidden">
+        {expression && (
+          <p className="text-xs text-muted-foreground font-mono mb-1 truncate max-w-full">
+            {expression}
+          </p>
+        )}
+        <p
+          className="font-mono font-semibold text-right break-all"
+          style={{ fontSize: display.length > 12 ? "1.25rem" : display.length > 8 ? "1.75rem" : "2.25rem" }}
+          data-testid="display-main"
         >
           {display}
-        </div>
+        </p>
       </div>
 
+      {/* Buttons */}
       <div className="grid grid-cols-4 gap-2">
-        {buttons.map((btn, i) => (
+        {BUTTONS.flat().map((key) => (
           <button
-            key={i}
-            onClick={btn.action}
-            className={`
-              calc-btn h-14 text-base
-              ${btn.wide ? "col-span-2" : ""}
-              ${btn.style === "num" ? "bg-card border border-card-border hover:bg-muted/60 text-foreground" : ""}
-              ${btn.style === "fn" ? "bg-muted hover:bg-muted/80 text-foreground font-medium" : ""}
-              ${btn.style === "op" ? "bg-primary/10 hover:bg-primary/20 text-primary font-semibold" : ""}
-              ${btn.style === "eq" ? "bg-primary hover:bg-primary/90 text-primary-foreground font-semibold" : ""}
-            `}
-            data-testid={`button-calc-${btn.label}`}
+            key={key}
+            onClick={() => handleKey(key)}
+            className={btnClass(key)}
+            data-testid={`btn-${key}`}
           >
-            {btn.icon ? <Delete className="w-5 h-5" /> : btn.label}
+            {key === "⌫" ? <Delete className="w-4 h-4" /> : key}
           </button>
         ))}
       </div>

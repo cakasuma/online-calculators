@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { TermTooltip } from "@/components/TermTooltip";
+import { formatInputValue } from "@/lib/i18n";
 
 interface Props {
   onCalculate: (expression: string, result: string) => void;
@@ -250,7 +251,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               inputMode="decimal"
               value={form.totalEstate}
               onChange={(e) => {
-                setForm((f) => ({ ...f, totalEstate: e.target.value }));
+                setForm((f) => ({ ...f, totalEstate: formatInputValue(e.target.value, locale) }));
                 setErrors((e2) => ({ ...e2, totalEstate: undefined }));
               }}
               placeholder={t("faraid.totalEstate.placeholder")}
@@ -274,7 +275,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               inputMode="decimal"
               value={form.debtsAndExpenses}
               onChange={(e) => {
-                setForm((f) => ({ ...f, debtsAndExpenses: e.target.value }));
+                setForm((f) => ({ ...f, debtsAndExpenses: formatInputValue(e.target.value, locale) }));
                 setErrors((e2) => ({ ...e2, debtsAndExpenses: undefined }));
               }}
               placeholder="0"
@@ -298,7 +299,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               inputMode="decimal"
               value={form.wasiyyah}
               onChange={(e) => {
-                setForm((f) => ({ ...f, wasiyyah: e.target.value }));
+                setForm((f) => ({ ...f, wasiyyah: formatInputValue(e.target.value, locale) }));
                 setErrors((e2) => ({ ...e2, wasiyyah: undefined }));
               }}
               placeholder="0"

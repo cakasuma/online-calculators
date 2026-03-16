@@ -1,5 +1,5 @@
 import { useState, useContext, createContext } from "react";
-import { t as translate, type Locale, type TranslationKey } from "@/lib/i18n";
+import { t as translate, type Locale, type TranslationKey, getSavedLocale, saveLocale } from "@/lib/i18n";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -14,9 +14,10 @@ export const LocaleContext = createContext<LocaleContextValue>({
 });
 
 export function useLocaleState(): LocaleContextValue {
-  const [locale, setLocaleRaw] = useState<Locale>("en");
+  const [locale, setLocaleRaw] = useState<Locale>(getSavedLocale);
 
   const setLocale = (l: Locale) => {
+    saveLocale(l);
     setLocaleRaw(l);
   };
 

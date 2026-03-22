@@ -1,5 +1,6 @@
 import { Switch, Route, Router, Link, useLocation } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
+import type { Locale } from "@/lib/i18n";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -30,6 +31,44 @@ import NormalCalculator from "@/pages/NormalCalculator";
 import ScientificCalculator from "@/pages/ScientificCalculator";
 import FaraidCalculator from "@/pages/FaraidCalculator";
 import NotFound from "@/pages/not-found";
+
+// ─── Localized Hash Location ──────────────────────────────────────────────────
+// Wraps useHashLocation to strip/add the /:lang prefix transparently.
+// URL format: /#/en/faraid  /#/id/normal  etc.
+const SUPPORTED_LOCALES: Locale[] = ["en", "id"];
+
+function getCurrentUrlLang(): Locale {
+  try {
+    const hash = window.location.hash;
+    const path = hash.startsWith("#/") ? hash.slice(2) : "";
+    const first = path.split("/")[0] as Locale;
+    if (SUPPORTED_LOCALES.includes(first)) return first;
+  } catch { /* noop */ }
+  try {
+    const saved = localStorage.getItem("calc_locale") as Locale;
+    if (SUPPORTED_LOCALES.includes(saved)) return saved;
+  } catch { /* noop */ }
+  const nav = navigator.language?.toLowerCase() || "";
+  return nav.startsWith("id") || nav.startsWith("ms") ? "id" : "en";
+}
+
+function useLocalizedHashLocation(): [string, (to: string) => void] {
+  const [hashPath, setHashPath] = useHashLocation();
+
+  // Strip the leading /:lang segment so the Router sees clean paths
+  const segments = hashPath.split("/").filter(Boolean);
+  const hasLangPrefix = segments.length > 0 && SUPPORTED_LOCALES.includes(segments[0] as Locale);
+  const cleanPath = hasLangPrefix
+    ? "/" + segments.slice(1).join("/") || "/"
+    : hashPath;
+
+  const navigate = (to: string) => {
+    const lang = getCurrentUrlLang();
+    setHashPath("/" + lang + (to === "/" ? "" : to));
+  };
+
+  return [cleanPath || "/", navigate];
+}
 
 const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
   { href: "/", labelKey: "nav.home", icon: HomeIcon },
@@ -245,7 +284,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
-          <Router hook={useHashLocation}>
+          <Router hook={useLocalizedHashLocation}>
             <Layout />
           </Router>
         </TooltipProvider>

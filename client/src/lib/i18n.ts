@@ -6,12 +6,26 @@ export type Locale = "en" | "id";
 
 export const LOCALE_STORAGE_KEY = "calc_locale";
 
+export function getLocaleFromUrl(): Locale | null {
+  try {
+    const hash = window.location.hash; // e.g. "#/id/faraid" or "#/en/"
+    const path = hash.startsWith("#/") ? hash.slice(2) : hash.slice(1);
+    const firstSegment = path.split("/")[0];
+    if (firstSegment === "en" || firstSegment === "id") return firstSegment;
+  } catch { /* noop */ }
+  return null;
+}
+
 export function getSavedLocale(): Locale {
+  // Priority 1: URL lang prefix (enables shareable URLs)
+  const urlLocale = getLocaleFromUrl();
+  if (urlLocale) return urlLocale;
+  // Priority 2: localStorage
   try {
     const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
     if (saved === "en" || saved === "id") return saved;
   } catch { /* noop */ }
-  // Auto-detect from browser
+  // Priority 3: Auto-detect from browser
   const nav = navigator.language?.toLowerCase() || "";
   if (nav.startsWith("id") || nav.startsWith("ms")) return "id";
   return "en";

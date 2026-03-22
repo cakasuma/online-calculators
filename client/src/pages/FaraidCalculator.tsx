@@ -59,7 +59,8 @@ interface FormState {
 
 interface ComputedHeir {
   key: string;
-  name: string;
+  nameKey: string;
+  nameNum?: number;
   share: string;
   fraction: number;
   amount: number;
@@ -68,8 +69,8 @@ interface ComputedHeir {
 }
 
 interface BlockedHeir {
-  name: string;
-  blockedBy: string;
+  nameKey: string;
+  blockedByKey: string;
 }
 
 interface DistributionResult {
@@ -131,28 +132,28 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
 
   // Track blocked heirs
   if (form.hasPaternalGrandfather && grandfatherBlocked) {
-    blockedHeirs.push({ name: "Paternal Grandfather", blockedBy: "Father" });
+    blockedHeirs.push({ nameKey: "faraid.grandfather", blockedByKey: "faraid.blocked.father" });
   }
   if ((form.fullBrothers > 0 || form.fullSisters > 0) && siblingsBlocked) {
-    const blocker = form.hasFather
-      ? "Father"
+    const blockerKey = form.hasFather
+      ? "faraid.blocked.father"
       : form.hasPaternalGrandfather
-      ? "Paternal Grandfather"
-      : "Sons";
+      ? "faraid.blocked.grandfather"
+      : "faraid.blocked.sons";
     if (form.fullBrothers > 0)
-      blockedHeirs.push({ name: "Full Brothers", blockedBy: blocker });
+      blockedHeirs.push({ nameKey: "faraid.fullBrothers", blockedByKey: blockerKey });
     if (form.fullSisters > 0)
-      blockedHeirs.push({ name: "Full Sisters", blockedBy: blocker });
+      blockedHeirs.push({ nameKey: "faraid.fullSisters", blockedByKey: blockerKey });
   }
 
   // ── Fixed-share heirs ──
-  type FixedEntry = { key: string; name: string; frac: number; share: string };
+  type FixedEntry = { key: string; nameKey: string; nameNum?: number; frac: number; share: string };
   const fixedEntries: FixedEntry[] = [];
 
   // Husband
   if (form.hasHusband) {
     const frac = hasChildren ? 1 / 4 : 1 / 2;
-    fixedEntries.push({ key: "husband", name: "Husband", frac, share: hasChildren ? "1/4" : "1/2" });
+    fixedEntries.push({ key: "husband", nameKey: "faraid.husband", frac, share: hasChildren ? "1/4" : "1/2" });
   }
 
   // Wives
@@ -160,13 +161,14 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
     const totalFrac = hasChildren ? 1 / 8 : 1 / 4;
     const baseShare = hasChildren ? "1/8" : "1/4";
     if (form.numberOfWives === 1) {
-      fixedEntries.push({ key: "wife_1", name: "Wife", frac: totalFrac, share: baseShare });
+      fixedEntries.push({ key: "wife_1", nameKey: "faraid.wife", frac: totalFrac, share: baseShare });
     } else {
       const perWife = totalFrac / form.numberOfWives;
       for (let i = 0; i < form.numberOfWives; i++) {
         fixedEntries.push({
           key: `wife_${i + 1}`,
-          name: `Wife ${i + 1}`,
+          nameKey: "faraid.wife",
+          nameNum: i + 1,
           frac: perWife,
           share: `${baseShare} ÷ ${form.numberOfWives}`,
         });
@@ -178,7 +180,7 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
   let fatherIsAsabah = false;
   if (form.hasFather) {
     if (hasChildren) {
-      fixedEntries.push({ key: "father", name: "Father", frac: 1 / 6, share: "1/6" });
+      fixedEntries.push({ key: "father", nameKey: "faraid.father", frac: 1 / 6, share: "1/6" });
     } else {
       fatherIsAsabah = true;
     }
@@ -188,7 +190,7 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
   let grandfatherIsAsabah = false;
   if (form.hasPaternalGrandfather && !grandfatherBlocked) {
     if (hasChildren) {
-      fixedEntries.push({ key: "grandfather", name: "Paternal Grandfather", frac: 1 / 6, share: "1/6" });
+      fixedEntries.push({ key: "grandfather", nameKey: "faraid.grandfather", frac: 1 / 6, share: "1/6" });
     } else {
       grandfatherIsAsabah = true;
     }
@@ -199,20 +201,19 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
   if (form.hasMother) {
     const totalSiblings = form.fullBrothers + form.fullSisters;
     let frac: number;
-    let share: string;
+    let shareKey: string;
     if (hasChildren || totalSiblings >= 2) {
       frac = 1 / 6;
-      share = "1/6";
+      shareKey = "1/6";
     } else if (form.hasFather && hasSpouse && !hasChildren) {
-      // Umariyyatain: mother gets 1/3 of remainder after spouse deduction
       frac = (1 - spouseFraction) / 3;
-      share = "1/3 of remainder";
+      shareKey = "REMAINDER_THIRD";
       hasUmariyyatain = true;
     } else {
       frac = 1 / 3;
-      share = "1/3";
+      shareKey = "1/3";
     }
-    fixedEntries.push({ key: "mother", name: "Mother", frac, share });
+    fixedEntries.push({ key: "mother", nameKey: "faraid.mother", frac, share: shareKey });
   }
 
   // Daughters only (no sons) → fixed shares
@@ -228,7 +229,8 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
     for (let i = 0; i < form.daughters; i++) {
       fixedEntries.push({
         key: `daughter_${i}`,
-        name: form.daughters === 1 ? "Daughter" : `Daughter ${i + 1}`,
+        nameKey: "faraid.daughter",
+        nameNum: form.daughters === 1 ? undefined : i + 1,
         frac: perDaughter,
         share: shareLabel,
       });
@@ -253,7 +255,8 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
     for (let i = 0; i < form.fullSisters; i++) {
       fixedEntries.push({
         key: `sister_${i}`,
-        name: form.fullSisters === 1 ? "Full Sister" : `Full Sister ${i + 1}`,
+        nameKey: "faraid.fullSister",
+        nameNum: form.fullSisters === 1 ? undefined : i + 1,
         frac: perSister,
         share: shareLabel,
       });
@@ -271,8 +274,9 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
     const amount = net * effectiveFrac;
     heirs.push({
       key: e.key,
-      name: e.name,
-      share: e.share + (hasAwl ? ` (reduced)` : ""),
+      nameKey: e.nameKey,
+      nameNum: e.nameNum,
+      share: e.share + (hasAwl ? ` (REDUCED)` : ""),
       fraction: effectiveFrac,
       amount,
       percentage: effectiveFrac * 100,
@@ -291,7 +295,8 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
       const amount = (remaining * 2) / totalParts;
       heirs.push({
         key: `son_${i}`,
-        name: form.sons === 1 ? "Son" : `Son ${i + 1}`,
+        nameKey: "faraid.son",
+        nameNum: form.sons === 1 ? undefined : i + 1,
         share: "asabah (2:1)",
         fraction: amount / net,
         amount,
@@ -303,7 +308,8 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
       const amount = remaining / totalParts;
       heirs.push({
         key: `daughter_asabah_${i}`,
-        name: form.daughters === 1 ? "Daughter" : `Daughter ${i + 1}`,
+        nameKey: "faraid.daughter",
+        nameNum: form.daughters === 1 ? undefined : i + 1,
         share: "asabah (1:2)",
         fraction: amount / net,
         amount,
@@ -320,16 +326,15 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
         heirs[fatherIdx].amount += remaining;
         heirs[fatherIdx].fraction = heirs[fatherIdx].amount / net;
         heirs[fatherIdx].percentage = heirs[fatherIdx].fraction * 100;
-        heirs[fatherIdx].share = "1/6 + residual";
+        heirs[fatherIdx].share = "SIXTH_PLUS_RESIDUAL";
         heirs[fatherIdx].type = "fixed+asabah";
       }
       remaining = 0;
     }
   } else if (fatherIsAsabah) {
-    // No children: father takes all remaining
     heirs.push({
       key: "father_asabah",
-      name: "Father",
+      nameKey: "faraid.father",
       share: "asabah",
       fraction: remaining / net,
       amount: remaining,
@@ -340,7 +345,7 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
   } else if (grandfatherIsAsabah) {
     heirs.push({
       key: "grandfather_asabah",
-      name: "Paternal Grandfather",
+      nameKey: "faraid.grandfather",
       share: "asabah",
       fraction: remaining / net,
       amount: remaining,
@@ -355,7 +360,8 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
       const amount = (remaining * 2) / totalParts;
       heirs.push({
         key: `brother_${i}`,
-        name: form.fullBrothers === 1 ? "Full Brother" : `Full Brother ${i + 1}`,
+        nameKey: "faraid.fullBrother",
+        nameNum: form.fullBrothers === 1 ? undefined : i + 1,
         share: "asabah (2:1)",
         fraction: amount / net,
         amount,
@@ -367,7 +373,8 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
       const amount = remaining / totalParts;
       heirs.push({
         key: `sister_asabah_${i}`,
-        name: form.fullSisters === 1 ? "Full Sister" : `Full Sister ${i + 1}`,
+        nameKey: "faraid.fullSister",
+        nameNum: form.fullSisters === 1 ? undefined : i + 1,
         share: "asabah (1:2)",
         fraction: amount / net,
         amount,
@@ -423,6 +430,20 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   const [showRefs, setShowRefs] = useState(false);
 
   const currencySymbol = CURRENCIES.find((c) => c.code === form.currency)?.symbol ?? "RM";
+
+  // Translate heir name (key + optional number suffix)
+  const heirName = (heir: ComputedHeir) => {
+    const base = t(heir.nameKey as any);
+    return heir.nameNum !== undefined ? `${base} ${heir.nameNum}` : base;
+  };
+
+  // Translate share sentinel tokens injected by computeDistribution
+  const translateShare = (share: string) =>
+    share
+      .replace("REMAINDER_THIRD", t("faraid.share.thirdOfRemainder"))
+      .replace("SIXTH_PLUS_RESIDUAL", t("faraid.share.sixthPlusResidual"))
+      .replace("(REDUCED)", `(${t("faraid.share.reduced")})`);
+
 
   function parseInput(val: string): number {
     if (!val || val.trim() === "") return 0;
@@ -504,7 +525,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
       `Net Estate: ${formatAmount(result.netEstate)}`,
       ``,
       ...result.heirs.map(
-        (h) => `• ${h.name}: ${formatAmount(h.amount)} (${h.percentage.toFixed(1)}%)`
+        (h) => `• ${heirName(h)}: ${formatAmount(h.amount)} (${h.percentage.toFixed(1)}%)`
       ),
     ];
     const text = encodeURIComponent(lines.join("\n"));
@@ -757,7 +778,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             </div>
             {form.hasHusband && form.numberOfWives > 0 && (
               <p className="text-xs text-destructive flex items-center gap-1">
-                <Info className="w-3 h-3" /> Deceased cannot have both a husband and wives.
+                <Info className="w-3 h-3" /> {t("faraid.spouseBothError")}
               </p>
             )}
           </section>
@@ -786,7 +807,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
               {/* Paternal Grandfather */}
               <div
-                className={`flex items-center justify-between p-2.5 rounded-lg border bg-card col-span-2 ${
+                className={`flex items-center justify-between p-2.5 rounded-lg border bg-card col-span-1 sm:col-span-2 ${
                   form.hasFather ? "opacity-50" : ""
                 }`}
               >
@@ -839,12 +860,12 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             {(form.hasFather || form.hasPaternalGrandfather || form.sons > 0) && (
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <Info className="w-3 h-3 flex-shrink-0" />
-                Siblings are blocked (hajb) by{" "}
+                {t("faraid.siblingsBlockedBy")}{" "}
                 {form.hasFather
-                  ? "Father"
+                  ? t("faraid.blocked.father")
                   : form.hasPaternalGrandfather
-                  ? "Paternal Grandfather"
-                  : "Sons"}
+                  ? t("faraid.blocked.grandfather")
+                  : t("faraid.blocked.sons")}
                 .
               </p>
             )}
@@ -883,7 +904,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
       {/* Results */}
       {result && (
         <>
-          <Card className="print:shadow-none">
+          <Card className="print:shadow-none overflow-hidden">
             <CardHeader className="pb-2 print:pb-1">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">{t("faraid.results")}</CardTitle>
@@ -925,27 +946,27 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 {result.heirs.map((heir, idx) => (
                   <div
                     key={heir.key}
-                    className="p-2.5 rounded-lg bg-muted/40 space-y-1"
+                    className="p-2.5 rounded-lg bg-muted/40 space-y-1 min-w-0"
                   >
                     {/* Row 1: name + percentage */}
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center justify-between gap-2 min-w-0">
                       <div className="flex items-center gap-2 min-w-0">
                         <div
                           className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                           style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
                         />
-                        <span className="text-xs font-medium leading-tight truncate">{heir.name}</span>
+                        <span className="text-xs font-medium leading-tight truncate">{heirName(heir)}</span>
                       </div>
                       <span className="text-xs text-muted-foreground font-mono flex-shrink-0">
                         {heir.percentage.toFixed(1)}%
                       </span>
                     </div>
                     {/* Row 2: share badge + amount */}
-                    <div className="flex items-center justify-between gap-2 pl-[18px]">
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 flex-shrink-0">
-                        {heir.share}
+                    <div className="flex items-center justify-between gap-2 pl-[18px] min-w-0">
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 flex-shrink-0 max-w-[55%] truncate">
+                        {translateShare(heir.share)}
                       </Badge>
-                      <span className="text-xs font-mono font-semibold">
+                      <span className="text-xs font-mono font-semibold flex-shrink-0">
                         {formatAmount(heir.amount)}
                       </span>
                     </div>
@@ -962,11 +983,11 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                   {result.blockedHeirs.map((b, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted/20 border border-dashed opacity-60"
+                      className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/20 border border-dashed opacity-60"
                     >
-                      <span className="text-xs text-muted-foreground line-through">{b.name}</span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {t("faraid.blockedNote")}: {b.blockedBy}
+                      <span className="text-xs text-muted-foreground line-through">{t(b.nameKey as any)}</span>
+                      <span className="text-[10px] text-muted-foreground flex-shrink-0">
+                        {t("faraid.blockedNote")}: {t(b.blockedByKey as any)}
                       </span>
                     </div>
                   ))}
@@ -1000,7 +1021,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={result.heirs.map((h) => ({ name: h.name, value: h.amount }))}
+                          data={result.heirs.map((h) => ({ name: heirName(h), value: h.amount }))}
                           cx="50%"
                           cy="45%"
                           outerRadius={70}
@@ -1014,7 +1035,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                           ))}
                         </Pie>
                         <RechartsTooltip
-                          formatter={(value: number) => [formatAmount(value), "Amount"]}
+                          formatter={(value: number) => [formatAmount(value), t("faraid.chart.amount")]}
                         />
                         <Legend
                           iconType="circle"

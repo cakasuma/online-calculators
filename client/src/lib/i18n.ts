@@ -186,6 +186,18 @@ const translations = {
   "faraid.blocked.father": { en: "Father", id: "Ayah" },
   "faraid.blocked.grandfather": { en: "Paternal Grandfather", id: "Kakek" },
   "faraid.blocked.sons": { en: "Sons", id: "Anak Laki-laki" },
+  "faraid.spouseBothError": {
+    en: "Deceased cannot have both a husband and wives.",
+    id: "Almarhum tidak bisa memiliki suami dan istri sekaligus.",
+  },
+  "faraid.siblingsBlockedBy": {
+    en: "Siblings are blocked (hajb) by",
+    id: "Saudara kandung terhalang (hajb) oleh",
+  },
+  "faraid.share.thirdOfRemainder": { en: "1/3 of remainder", id: "1/3 dari sisa" },
+  "faraid.share.sixthPlusResidual": { en: "1/6 + residual", id: "1/6 + sisa" },
+  "faraid.share.reduced": { en: "reduced", id: "dikurangi" },
+  "faraid.chart.amount": { en: "Amount", id: "Jumlah" },
   "faraid.umariyyatainNote": {
     en: "Mother's share calculated using umariyyatain rule (1/3 of remainder after spouse).",
     id: "Bagian ibu dihitung menggunakan aturan umariyyatain (1/3 sisa setelah pasangan).",

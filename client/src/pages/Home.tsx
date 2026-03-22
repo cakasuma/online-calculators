@@ -60,7 +60,7 @@ export default function HomePage() {
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
           {t("home.tools.title")}
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {[
             { href: "/normal", icon: Calculator, titleKey: "home.basic.title", descKey: "home.basic.desc" },
             { href: "/scientific", icon: FlaskConical, titleKey: "home.scientific.title", descKey: "home.scientific.desc" },

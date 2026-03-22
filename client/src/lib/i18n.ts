@@ -27,11 +27,18 @@ export function saveLocale(locale: Locale): void {
 // English: 1,234,567.89   Indonesian: 1.234.567,89
 
 export function formatNumber(n: number, locale: Locale, decimals = 2): string {
-  const loc = locale === "id" ? "id-ID" : "en-US";
-  return new Intl.NumberFormat(loc, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(n);
+  // Manual formatter — avoids Intl locale-data gaps in some environments.
+  // Indonesian: 1.234.567,89  (dot thousands, comma decimal)
+  // English:    1,234,567.89  (comma thousands, dot decimal)
+  const sign = n < 0 ? "-" : "";
+  const fixed = Math.abs(n).toFixed(decimals);
+  const [intPart, decPart] = fixed.split(".");
+  if (locale === "id") {
+    const thousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return `${sign}${thousands}${decPart !== undefined ? `,${decPart}` : ""}`;
+  }
+  const thousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return `${sign}${thousands}${decPart !== undefined ? `.${decPart}` : ""}`;
 }
 
 export function formatCurrency(n: number, locale: Locale): string {

@@ -724,7 +724,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {t("faraid.spouseSection")}
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {/* Husband */}
               <div className="flex items-center justify-between p-2.5 rounded-lg border bg-card">
                 <Label htmlFor="hasHusband" className="text-xs cursor-pointer">
@@ -767,7 +767,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {t("faraid.parentsSection")}
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 { key: "hasFather", labelKey: "faraid.father", tooltipKey: "tooltip.father" },
                 { key: "hasMother", labelKey: "faraid.mother", tooltipKey: "tooltip.mother" },
@@ -848,7 +848,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 .
               </p>
             )}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 { key: "fullBrothers", labelKey: "faraid.fullBrothers", tooltipKey: "tooltip.fullBrothers" },
                 { key: "fullSisters", labelKey: "faraid.fullSisters", tooltipKey: "tooltip.fullSisters" },
@@ -922,35 +922,33 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
               {/* Heirs table */}
               <div className="space-y-1.5">
-                <div className="grid grid-cols-12 text-[10px] text-muted-foreground px-2.5 pb-1 font-medium">
-                  <span className="col-span-4">{t("faraid.heirs")}</span>
-                  <span className="col-span-3 text-center">{t("faraid.share")}</span>
-                  <span className="col-span-3 text-right">{t("faraid.amount")}</span>
-                  <span className="col-span-2 text-right">{t("faraid.percentage")}</span>
-                </div>
                 {result.heirs.map((heir, idx) => (
                   <div
                     key={heir.key}
-                    className="grid grid-cols-12 items-center p-2.5 rounded-lg bg-muted/40"
+                    className="p-2.5 rounded-lg bg-muted/40 space-y-1"
                   >
-                    <div className="col-span-4 flex items-center gap-2">
-                      <div
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
-                      />
-                      <span className="text-xs font-medium leading-tight">{heir.name}</span>
+                    {/* Row 1: name + percentage */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div
+                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
+                        />
+                        <span className="text-xs font-medium leading-tight truncate">{heir.name}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground font-mono flex-shrink-0">
+                        {heir.percentage.toFixed(1)}%
+                      </span>
                     </div>
-                    <div className="col-span-3 text-center">
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                    {/* Row 2: share badge + amount */}
+                    <div className="flex items-center justify-between gap-2 pl-[18px]">
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 flex-shrink-0">
                         {heir.share}
                       </Badge>
+                      <span className="text-xs font-mono font-semibold">
+                        {formatAmount(heir.amount)}
+                      </span>
                     </div>
-                    <span className="col-span-3 text-right text-xs font-mono font-semibold">
-                      {formatAmount(heir.amount)}
-                    </span>
-                    <span className="col-span-2 text-right text-xs text-muted-foreground font-mono">
-                      {heir.percentage.toFixed(1)}%
-                    </span>
                   </div>
                 ))}
               </div>
@@ -998,19 +996,15 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               {result.heirs.length > 0 && (
                 <div className="pt-2">
                   <p className="text-xs font-medium mb-2">{t("faraid.distribution")}</p>
-                  <div className="h-56">
+                  <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={result.heirs.map((h) => ({ name: h.name, value: h.amount }))}
                           cx="50%"
-                          cy="50%"
-                          outerRadius={80}
+                          cy="45%"
+                          outerRadius={70}
                           dataKey="value"
-                          label={({ name, percent }) =>
-                            `${name} ${(percent * 100).toFixed(0)}%`
-                          }
-                          labelLine={false}
                         >
                           {result.heirs.map((_, idx) => (
                             <Cell

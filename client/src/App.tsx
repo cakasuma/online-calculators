@@ -34,9 +34,9 @@ import NotFound from "@/pages/not-found";
 
 const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
   { href: "/", labelKey: "nav.home", icon: HomeIcon },
+  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
   { href: "/normal", labelKey: "nav.basic", icon: Calculator },
   { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
-  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
 ];
 
 function Layout() {

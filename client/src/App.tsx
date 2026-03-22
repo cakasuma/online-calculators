@@ -22,7 +22,6 @@ import { useHistory } from "@/hooks/use-history";
 import { useLocaleState, LocaleContext } from "@/hooks/use-locale";
 import { useLocale } from "@/hooks/use-locale";
 import { HistoryPanel } from "@/components/HistoryPanel";
-import { PerplexityAttribution } from "@/components/PerplexityAttribution";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -34,9 +33,9 @@ import NotFound from "@/pages/not-found";
 
 const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
   { href: "/", labelKey: "nav.home", icon: HomeIcon },
+  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
   { href: "/normal", labelKey: "nav.basic", icon: Calculator },
   { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
-  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
 ];
 
 function Layout() {
@@ -229,7 +228,6 @@ function Layout() {
       <footer className="border-t py-4 px-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>&copy; {new Date().getFullYear()} amammustofa.com</span>
-          <PerplexityAttribution />
         </div>
       </footer>
 

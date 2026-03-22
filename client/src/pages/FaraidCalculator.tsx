@@ -383,6 +383,22 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
       });
     }
     remaining = 0;
+  } else if (!siblingsBlocked && form.fullSisters > 0 && form.fullBrothers === 0 && form.daughters > 0) {
+    // Sisters become asabah bil-ghair when daughters exist without sons
+    for (let i = 0; i < form.fullSisters; i++) {
+      const amount = remaining / form.fullSisters;
+      heirs.push({
+        key: `sister_asabah_${i}`,
+        nameKey: "faraid.fullSister",
+        nameNum: form.fullSisters === 1 ? undefined : i + 1,
+        share: "asabah bil-ghair",
+        fraction: amount / net,
+        amount,
+        percentage: (amount / net) * 100,
+        type: "asabah",
+      });
+    }
+    remaining = 0;
   }
 
   const undistributed = remaining > 0.001 ? remaining : 0;

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { AlertTriangle, Info, Printer, Users, BookOpen, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -428,6 +428,11 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   const [result, setResult] = useState<DistributionResult | null>(null);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showRefs, setShowRefs] = useState(false);
+
+  // Auto-set currency when locale changes
+  useEffect(() => {
+    setForm((f) => ({ ...f, currency: locale === "id" ? "IDR" : "MYR" }));
+  }, [locale]);
 
   const currencySymbol = CURRENCIES.find((c) => c.code === form.currency)?.symbol ?? "RM";
 
@@ -906,9 +911,9 @@ export default function FaraidCalculator({ onCalculate }: Props) {
         <>
           <Card className="print:shadow-none overflow-hidden">
             <CardHeader className="pb-2 print:pb-1">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <CardTitle className="text-base">{t("faraid.results")}</CardTitle>
-                <div className="flex gap-2 print:hidden">
+                <div className="flex gap-2 print:hidden flex-wrap">
                   <Button variant="outline" size="sm" onClick={handleShareWhatsApp} className="gap-1.5 text-xs">
                     <Share2 className="w-3.5 h-3.5" />
                     {t("faraid.shareResults")}
@@ -922,7 +927,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Net estate summary */}
-              <div className="rounded-lg bg-primary/5 border border-primary/20 p-3 flex justify-between items-center">
+              <div className="rounded-lg bg-primary/5 border border-primary/20 p-3 flex flex-wrap justify-between items-center gap-1">
                 <span className="text-sm font-medium">{t("faraid.netEstate")}</span>
                 <span className="font-mono font-bold text-primary">{formatAmount(result.netEstate)}</span>
               </div>
@@ -946,11 +951,11 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 {result.heirs.map((heir, idx) => (
                   <div
                     key={heir.key}
-                    className="p-2.5 rounded-lg bg-muted/40 space-y-1 min-w-0"
+                    className="p-2.5 rounded-lg bg-muted/40 space-y-1 overflow-hidden"
                   >
                     {/* Row 1: name + percentage */}
-                    <div className="flex items-center justify-between gap-2 min-w-0">
-                      <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
                         <div
                           className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                           style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
@@ -962,11 +967,11 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                       </span>
                     </div>
                     {/* Row 2: share badge + amount */}
-                    <div className="flex items-center justify-between gap-2 pl-[18px] min-w-0">
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 flex-shrink-0 max-w-[55%] truncate">
+                    <div className="flex items-center justify-between gap-2 pl-[18px] flex-wrap">
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                         {translateShare(heir.share)}
                       </Badge>
-                      <span className="text-xs font-mono font-semibold flex-shrink-0">
+                      <span className="text-xs font-mono font-semibold">
                         {formatAmount(heir.amount)}
                       </span>
                     </div>
@@ -983,10 +988,10 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                   {result.blockedHeirs.map((b, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/20 border border-dashed opacity-60"
+                      className="flex flex-wrap items-center justify-between gap-1 p-2 rounded-lg bg-muted/20 border border-dashed opacity-60"
                     >
                       <span className="text-xs text-muted-foreground line-through">{t(b.nameKey as any)}</span>
-                      <span className="text-[10px] text-muted-foreground flex-shrink-0">
+                      <span className="text-[10px] text-muted-foreground">
                         {t("faraid.blockedNote")}: {t(b.blockedByKey as any)}
                       </span>
                     </div>
@@ -997,7 +1002,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               {/* Undistributed */}
               {result.undistributed > 0 && (
                 <div className="p-2.5 rounded-lg bg-muted/30 border border-dashed space-y-1">
-                  <div className="flex justify-between text-xs">
+                  <div className="flex flex-wrap justify-between text-xs gap-1">
                     <span className="text-muted-foreground">{t("faraid.undistributed")}</span>
                     <span className="font-mono font-medium">{formatAmount(result.undistributed)}</span>
                   </div>
@@ -1006,7 +1011,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               )}
 
               {/* Total distributed */}
-              <div className="pt-1 border-t flex justify-between text-xs">
+              <div className="pt-1 border-t flex flex-wrap justify-between text-xs gap-1">
                 <span className="text-muted-foreground font-medium">{t("faraid.totalDistributed")}</span>
                 <span className="font-mono font-semibold">
                   {formatAmount(result.heirs.reduce((s, h) => s + h.amount, 0))}

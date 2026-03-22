@@ -11,9 +11,9 @@ export default function HomePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Hero */}
-      <div>
+      <div className="mb-2">
         <h1 className="text-2xl font-bold tracking-tight">{t("home.title")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">{t("home.subtitle")}</p>
+        <p className="text-muted-foreground text-sm mt-2">{t("home.subtitle")}</p>
       </div>
 
       {/* Featured: Faraid Calculator */}

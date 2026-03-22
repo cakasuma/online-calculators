@@ -184,6 +184,29 @@ const translations = {
     id: "Bagian ibu dihitung menggunakan aturan umariyyatain (1/3 sisa setelah pasangan).",
   },
 
+  // ── Faraid References ──
+  "faraid.references.title": { en: "Quranic & Hadith References", id: "Referensi Al-Quran & Hadis" },
+  "faraid.references.quran411": { en: "Surah An-Nisa 4:11", id: "Surah An-Nisa 4:11" },
+  "faraid.references.quran411.text": {
+    en: "Allah instructs you concerning your children: for the male, what is equal to the share of two females. But if there are only daughters, two or more, for them is two-thirds of one's estate. And if there is only one, for her is half. And for one's parents, to each one of them is a sixth of his estate if he left children. But if he had no children and the parents alone inherit from him, then for his mother is one third…",
+    id: "Allah mensyariatkan (mewajibkan) kepadamu tentang (pembagian warisan untuk) anak-anakmu, (yaitu) bagian seorang anak laki-laki sama dengan bagian dua orang anak perempuan. Dan jika anak itu semuanya perempuan yang jumlahnya lebih dari dua, maka bagian mereka dua pertiga dari harta yang ditinggalkan. Jika dia (anak perempuan) itu seorang saja, maka dia memperoleh setengah (harta yang ditinggalkan). Dan untuk kedua ibu-bapak, bagian masing-masing seperenam dari harta yang ditinggalkan, jika dia (yang meninggal) mempunyai anak…",
+  },
+  "faraid.references.quran412": { en: "Surah An-Nisa 4:12", id: "Surah An-Nisa 4:12" },
+  "faraid.references.quran412.text": {
+    en: "And for you is half of what your wives leave if they have no child. But if they have a child, for you is one fourth of what they leave, after any bequest they may have made or debt. And for the wives is one fourth if you leave no child. But if you leave a child, then for them is an eighth of what you leave, after any bequest you may have made or debt…",
+    id: "Dan bagianmu (suami-suami) adalah setengah dari harta yang ditinggalkan oleh istri-istrimu, jika mereka tidak mempunyai anak. Jika mereka (istri-istrimu) itu mempunyai anak, maka kamu mendapat seperempat dari harta yang ditinggalkannya sesudah dipenuhi wasiat yang mereka buat atau (dan) sesudah dibayar utangnya. Para istri memperoleh seperempat harta yang kamu tinggalkan jika kamu tidak mempunyai anak. Jika kamu mempunyai anak, maka para istri memperoleh seperdelapan dari harta yang kamu tinggalkan sesudah dipenuhi wasiat yang kamu buat atau (dan) sesudah dibayar utang-utangmu…",
+  },
+  "faraid.references.quran4176": { en: "Surah An-Nisa 4:176", id: "Surah An-Nisa 4:176" },
+  "faraid.references.quran4176.text": {
+    en: "They ask you for a ruling. Say, 'Allah gives you a ruling concerning one who dies without children [kalalah]: If a man dies, leaving no child but a sister, she will have half of what he left. And he inherits from her if she has no child. But if there are two sisters, they will have two-thirds of what he left. If there are brothers and sisters, the male will have the share of two females…'",
+    id: "Mereka meminta fatwa kepadamu (tentang kalalah). Katakanlah, 'Allah memberi fatwa kepadamu tentang kalalah, yaitu jika seseorang meninggal dunia, dan dia tidak mempunyai anak tetapi mempunyai saudara perempuan, maka bagiannya (saudara perempuannya itu) seperdua dari harta yang ditinggalkannya, dan saudaranya yang laki-laki mewarisi (seluruh harta saudara perempuan), jika dia tidak mempunyai anak. Tetapi jika saudara perempuan itu dua orang, maka bagi keduanya dua pertiga dari harta yang ditinggalkan. Dan jika mereka (ahli waris itu terdiri dari) saudara-saudara laki-laki dan perempuan, maka bagian seorang saudara laki-laki sama dengan bagian dua orang saudara perempuan…'",
+  },
+  "faraid.references.hadith": { en: "Hadith — Ibn Majah 2719", id: "Hadis — Ibnu Majah 2719" },
+  "faraid.references.hadith.text": {
+    en: "\"Learn the rules of inheritance and teach them to the people, for it is half of knowledge, and it is the first thing to be forgotten and the first thing to be taken away from my nation.\" — Prophet Muhammad ﷺ (Ibn Majah 2719)",
+    id: "\"Pelajarilah ilmu faraid dan ajarkan kepada manusia, karena ia adalah setengah dari ilmu pengetahuan, dan ia adalah ilmu yang pertama kali dilupakan dan pertama kali dicabut dari umatku.\" — Nabi Muhammad ﷺ (Ibnu Majah 2719)",
+  },
+
   // ── Faraid Tooltips ──
   "tooltip.numberOfWives": {
     en: "Islam permits up to 4 wives. If multiple wives exist, they share the wife's portion equally (1/4 or 1/8 split between them).",

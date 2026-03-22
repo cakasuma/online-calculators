@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { AlertTriangle, Info, Printer, Users, BookOpen, Share2 } from "lucide-react";
+import { AlertTriangle, Info, Printer, Users, BookOpen, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
-import { formatInputValue } from "@/lib/i18n";
+import { formatInputValue, formatCurrency } from "@/lib/i18n";
 import {
   PieChart,
   Pie,
@@ -420,6 +420,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   const [form, setForm] = useState<FormState>(initialForm);
   const [result, setResult] = useState<DistributionResult | null>(null);
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [showRefs, setShowRefs] = useState(false);
 
   const currencySymbol = CURRENCIES.find((c) => c.code === form.currency)?.symbol ?? "RM";
 
@@ -490,14 +491,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, locale, onCalculate]);
 
-  const formatAmount = (n: number) => {
-    const locStr = locale === "id" ? "id-ID" : "en-US";
-    return (
-      currencySymbol +
-      " " +
-      n.toLocaleString(locStr, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    );
-  };
+  const formatAmount = (n: number) => `${currencySymbol} ${formatCurrency(n, locale)}`;
 
   function handlePrint() {
     window.print();
@@ -541,6 +535,42 @@ export default function FaraidCalculator({ onCalculate }: Props) {
           </p>
         </div>
       </div>
+
+      {/* Quranic & Hadith References */}
+      <Card className="print:hidden">
+        <CardContent className="pt-3 pb-3">
+          <button
+            type="button"
+            onClick={() => setShowRefs((v) => !v)}
+            className="w-full flex items-center justify-between text-xs font-medium hover:text-primary transition-colors"
+          >
+            <span className="flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-primary" />
+              {t("faraid.references.title")}
+            </span>
+            {showRefs ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+          {showRefs && (
+            <div className="mt-3 space-y-3 border-t pt-3">
+              {[
+                { citationKey: "faraid.references.quran411", textKey: "faraid.references.quran411.text" },
+                { citationKey: "faraid.references.quran412", textKey: "faraid.references.quran412.text" },
+                { citationKey: "faraid.references.quran4176", textKey: "faraid.references.quran4176.text" },
+                { citationKey: "faraid.references.hadith", textKey: "faraid.references.hadith.text" },
+              ].map(({ citationKey, textKey }) => (
+                <div key={citationKey} className="space-y-1">
+                  <p className="text-[11px] font-semibold text-primary">
+                    {t(citationKey as any)}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    {t(textKey as any)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Currency selector */}
       <Card>

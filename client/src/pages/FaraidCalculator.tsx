@@ -1554,31 +1554,31 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
       {/* Quranic & Hadith References */}
       <Card className="print:hidden">
-        <CardContent className="pt-3 pb-3">
+        <CardContent className="pt-5 pb-3">
           <button
             type="button"
             onClick={() => setShowRefs((v) => !v)}
-            className="w-full flex items-center justify-between text-xs font-medium hover:text-primary transition-colors"
+            className="w-full flex items-center justify-between text-sm font-semibold hover:text-primary transition-colors"
           >
-            <span className="flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-primary" />
+            <span className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-primary" />
               {t("faraid.references.title")}
             </span>
-            {showRefs ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            {showRefs ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
           {showRefs && (
-            <div className="mt-3 space-y-3 border-t pt-3">
+            <div className="mt-4 space-y-4 border-t pt-4">
               {[
                 { citationKey: "faraid.references.quran411", textKey: "faraid.references.quran411.text" },
                 { citationKey: "faraid.references.quran412", textKey: "faraid.references.quran412.text" },
                 { citationKey: "faraid.references.quran4176", textKey: "faraid.references.quran4176.text" },
                 { citationKey: "faraid.references.hadith", textKey: "faraid.references.hadith.text" },
               ].map(({ citationKey, textKey }) => (
-                <div key={citationKey} className="space-y-1">
-                  <p className="text-xs font-semibold text-primary">
+                <div key={citationKey} className="space-y-1.5">
+                  <p className="text-sm font-semibold text-primary">
                     {t(citationKey as any)}
                   </p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {t(textKey as any)}
                   </p>
                 </div>
@@ -1590,9 +1590,9 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
       {/* FAQ */}
       <Card className="print:hidden">
-        <CardContent className="pt-4 pb-2">
-          <p className="text-xs font-semibold mb-1 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-primary" />
+        <CardContent className="pt-5 pb-3">
+          <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
             {t("faraid.faq.title")}
           </p>
           <Accordion type="multiple" className="w-full">
@@ -1603,10 +1603,10 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               { q: "faraid.faq.wasiyyah.q", a: "faraid.faq.wasiyyah.a" },
             ] as const).map(({ q, a }) => (
               <AccordionItem key={q} value={q}>
-                <AccordionTrigger className="text-xs text-left font-medium py-3 hover:no-underline hover:text-primary">
+                <AccordionTrigger className="text-sm text-left font-medium py-4 hover:no-underline hover:text-primary">
                   {t(q)}
                 </AccordionTrigger>
-                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-2">
                   {t(a)}
                 </AccordionContent>
               </AccordionItem>

@@ -1247,7 +1247,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                       form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0 ? "opacity-50" : ""
                     }`}
                   >
-                    <Label className="text-xs">
+                    <Label className="text-sm">
                       <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
                     </Label>
                     <Counter
@@ -1285,7 +1285,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                       { key: "paternalSisters", labelKey: "faraid.paternalSisters", tooltipKey: "tooltip.paternalSisters" },
                     ].map(({ key, labelKey, tooltipKey }) => (
                       <div key={key} className={`space-y-1 ${psBlocked ? "opacity-50" : ""}`}>
-                        <Label className="text-xs">
+                        <Label className="text-sm">
                           <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
                         </Label>
                         <Counter
@@ -1322,7 +1322,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                       { key: "maternalSisters", labelKey: "faraid.maternalSisters", tooltipKey: "tooltip.maternalSisters" },
                     ].map(({ key, labelKey, tooltipKey }) => (
                       <div key={key} className={`space-y-1 ${mbBlocked ? "opacity-50" : ""}`}>
-                        <Label className="text-xs">
+                        <Label className="text-sm">
                           <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
                         </Label>
                         <Counter

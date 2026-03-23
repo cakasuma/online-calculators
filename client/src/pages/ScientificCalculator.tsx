@@ -224,36 +224,36 @@ export default function ScientificCalculator({ onCalculate }: Props) {
   }, [handleKey]);
 
   const sciBtnClass =
-    "calc-btn h-9 text-xs rounded-lg bg-muted/60 hover:bg-muted border transition-all active:scale-95";
+    "calc-btn h-11 text-xs font-medium rounded-xl bg-muted/60 hover:bg-muted border transition-all active:scale-95";
   const numBtnClass = (key: string) => {
-    const base = "calc-btn h-11 text-sm rounded-xl transition-all active:scale-95";
-    if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90`;
+    const base = "calc-btn h-14 text-base font-semibold rounded-xl transition-all active:scale-95";
+    if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm`;
     if (["+", "-", "*", "/"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
     if (["C", "±", "%"].includes(key)) return `${base} bg-muted hover:bg-muted/80 text-muted-foreground`;
     if (key === "⌫") return `${base} bg-muted hover:bg-muted/80 text-destructive`;
-    return `${base} bg-card hover:bg-muted/50 border`;
+    return `${base} bg-card hover:bg-muted/50 border text-foreground`;
   };
 
   return (
-    <div className="max-w-sm mx-auto">
+    <div className="max-w-sm mx-auto w-full">
       {/* Display */}
-      <div className="mb-3 p-4 rounded-2xl bg-card border min-h-[80px] flex flex-col justify-end items-end overflow-hidden">
-        <div className="flex items-center gap-2 mb-1">
+      <div className="mb-3 p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
+        <div className="flex items-center gap-2 mb-1.5">
           <button
             onClick={() => setMode(mode === "deg" ? "rad" : "deg")}
-            className="text-[10px] px-2 py-0.5 rounded-full border bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+            className="text-xs px-2.5 py-1 rounded-full border bg-muted text-muted-foreground hover:bg-muted/80 transition-colors font-medium"
           >
             {mode.toUpperCase()}
           </button>
           {expression && (
-            <p className="text-xs text-muted-foreground font-mono truncate max-w-[200px]">
+            <p className="text-sm text-muted-foreground font-mono truncate max-w-[200px]">
               {expression}
             </p>
           )}
         </div>
         <p
           className="font-mono font-semibold text-right break-all"
-          style={{ fontSize: display.length > 12 ? "1.1rem" : display.length > 8 ? "1.5rem" : "2rem" }}
+          style={{ fontSize: display.length > 12 ? "1.35rem" : display.length > 8 ? "1.75rem" : "2.5rem" }}
           data-testid="sci-display-main"
         >
           {display}
@@ -275,7 +275,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
       </div>
 
       {/* Numpad */}
-      <div className="grid grid-cols-4 gap-1.5">
+      <div className="grid grid-cols-4 gap-2">
         {numpadButtons.map((key) => (
           <button
             key={key}
@@ -283,7 +283,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
             className={numBtnClass(key)}
             data-testid={`btn-${key}`}
           >
-            {key === "⌫" ? <Delete className="w-4 h-4" /> : key}
+            {key === "⌫" ? <Delete className="w-5 h-5" /> : key}
           </button>
         ))}
       </div>

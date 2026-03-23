@@ -97,20 +97,20 @@ function Layout() {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
-        <div className="max-w-6xl mx-auto px-4 h-12 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 h-14 md:h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
-              className="md:hidden p-1.5 rounded-md hover:bg-muted"
+              className="md:hidden p-2.5 rounded-lg hover:bg-muted active:bg-muted/80"
               data-testid="button-mobile-menu"
             >
-              <Menu className="w-4 h-4" />
+              <Menu className="w-5 h-5" />
             </button>
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
                 <svg
                   viewBox="0 0 24 24"
-                  className="w-4 h-4 text-primary-foreground"
+                  className="w-4.5 h-4.5 text-primary-foreground"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -127,7 +127,7 @@ function Layout() {
                   <line x1="8" y1="18" x2="16" y2="18" />
                 </svg>
               </div>
-              <span className="text-sm font-semibold hidden sm:inline" data-testid="text-site-title">
+              <span className="text-base font-bold hidden sm:inline" data-testid="text-site-title">
                 {t("site.title")}
               </span>
             </Link>
@@ -140,13 +140,13 @@ function Layout() {
               return (
                 <Link key={item.href} href={item.href}>
                   <span
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                       isActive
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     }`}
                   >
-                    <item.icon className="w-3.5 h-3.5" />
+                    <item.icon className="w-4 h-4" />
                     {t(item.labelKey)}
                   </span>
                 </Link>
@@ -158,39 +158,39 @@ function Layout() {
             <LocaleSwitcher />
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`p-2 rounded-md transition-colors ${
+              className={`p-2.5 rounded-lg transition-colors ${
                 showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
               }`}
               data-testid="button-toggle-history"
             >
-              <History className="w-4 h-4" />
+              <History className="w-5 h-5" />
             </button>
             <button
               onClick={toggle}
-              className="p-2 rounded-md hover:bg-muted text-muted-foreground"
+              className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground"
               data-testid="button-theme-toggle"
             >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
         {/* Mobile nav dropdown */}
         {showMobileNav && (
-          <div className="md:hidden border-t bg-background px-4 py-2 space-y-1" data-testid="nav-mobile">
+          <div className="md:hidden border-t bg-background px-4 py-3 space-y-1" data-testid="nav-mobile">
             {navItems.map((item) => {
               const isActive = location === item.href;
               return (
                 <Link key={item.href} href={item.href}>
                   <span
                     onClick={() => setShowMobileNav(false)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium cursor-pointer transition-colors ${
                       isActive
-                        ? "bg-primary/10 text-primary font-medium"
+                        ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     }`}
                   >
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className="w-5 h-5" />
                     {t(item.labelKey)}
                   </span>
                 </Link>
@@ -202,7 +202,7 @@ function Layout() {
 
       {/* Main content area */}
       <div className="flex-1 flex">
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/normal">
@@ -222,13 +222,13 @@ function Layout() {
         {showHistory && (
           <aside className="w-72 lg:w-80 border-l bg-card/50 p-4 hidden md:block overflow-y-auto max-h-[calc(100vh-3rem)]">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold">{t("common.history")}</h2>
+              <h2 className="text-base font-semibold">{t("common.history")}</h2>
               <button
                 onClick={() => setShowHistory(false)}
-                className="p-1 rounded hover:bg-muted"
+                className="p-1.5 rounded-lg hover:bg-muted"
                 data-testid="button-close-history"
               >
-                <X className="w-3.5 h-3.5 text-muted-foreground" />
+                <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
             <HistoryPanel
@@ -246,12 +246,12 @@ function Layout() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowHistory(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background border-l p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold">{t("common.history")}</h2>
+              <h2 className="text-base font-semibold">{t("common.history")}</h2>
               <button
                 onClick={() => setShowHistory(false)}
-                className="p-1.5 rounded hover:bg-muted"
+                className="p-2 rounded-lg hover:bg-muted"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             <HistoryPanel
@@ -264,8 +264,8 @@ function Layout() {
       )}
 
       {/* Footer */}
-      <footer className="border-t py-4 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+      <footer className="border-t py-5 px-4">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
           <span>&copy; {new Date().getFullYear()} amammustofa.com</span>
         </div>
       </footer>

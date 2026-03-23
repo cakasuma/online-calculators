@@ -94,7 +94,7 @@ function Layout() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`min-h-screen flex flex-col${location === "/faraid" ? " theme-faraid" : ""}`}>
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
         <div className="max-w-6xl mx-auto px-4 h-14 md:h-14 flex items-center justify-between">

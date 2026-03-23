@@ -165,6 +165,51 @@ const translations = {
   "faraid.fullBrother": { en: "Full Brother", id: "Saudara Laki-laki Kandung" },
   "faraid.fullSisters": { en: "Full Sisters", id: "Saudara Perempuan Kandung" },
   "faraid.fullSister": { en: "Full Sister", id: "Saudara Perempuan Kandung" },
+  "faraid.paternalGrandmother": { en: "Paternal Grandmother", id: "Nenek (dari Ayah)" },
+  "faraid.maternalGrandmother": { en: "Maternal Grandmother", id: "Nenek (dari Ibu)" },
+  "faraid.grandsons": { en: "Grandsons", id: "Cucu Laki-laki" },
+  "faraid.grandson": { en: "Grandson", id: "Cucu Laki-laki" },
+  "faraid.granddaughters": { en: "Granddaughters", id: "Cucu Perempuan" },
+  "faraid.granddaughter": { en: "Granddaughter", id: "Cucu Perempuan" },
+  "faraid.paternalBrothers": { en: "Paternal Brothers", id: "Saudara Laki-laki Seayah" },
+  "faraid.paternalBrother": { en: "Paternal Brother", id: "Saudara Laki-laki Seayah" },
+  "faraid.paternalSisters": { en: "Paternal Sisters", id: "Saudara Perempuan Seayah" },
+  "faraid.paternalSister": { en: "Paternal Sister", id: "Saudara Perempuan Seayah" },
+  "faraid.maternalBrothers": { en: "Maternal Brothers", id: "Saudara Laki-laki Seibu" },
+  "faraid.maternalBrother": { en: "Maternal Brother", id: "Saudara Laki-laki Seibu" },
+  "faraid.maternalSisters": { en: "Maternal Sisters", id: "Saudara Perempuan Seibu" },
+  "faraid.maternalSister": { en: "Maternal Sister", id: "Saudara Perempuan Seibu" },
+  "faraid.consanguineMale": { en: "Consanguine (Agnate Relative)", id: "Kerabat Asabah (Paman/Sepupu)" },
+  "faraid.grandchildrenSection": { en: "Grandchildren", id: "Cucu" },
+  "faraid.fullSiblingsSection": { en: "Full Siblings", id: "Saudara Kandung" },
+  "faraid.paternalSiblingsSection": { en: "Paternal Siblings (half, father's side)", id: "Saudara Seayah (setengah, dari ayah)" },
+  "faraid.maternalSiblingsSection": { en: "Maternal Siblings (uterine)", id: "Saudara Seibu (uterus)" },
+  "faraid.otherRelativesSection": { en: "Other Relatives", id: "Kerabat Lainnya" },
+  "faraid.distantKindredNote": { en: "Distant Kindred (dhawi al-arham) are not calculated here — consult a qualified Islamic scholar for complex cases.", id: "Kerabat jauh (dzawi al-arham) tidak dihitung di sini — konsultasikan dengan ulama untuk kasus kompleks." },
+
+  // ── Faraid FAQ ──
+  "faraid.faq.title": { en: "Frequently Asked Questions", id: "Pertanyaan yang Sering Ditanyakan" },
+  "faraid.faq.noMaternalGrandfather.q": { en: "Why is there no Maternal Grandfather?", id: "Mengapa tidak ada Kakek dari Ibu?" },
+  "faraid.faq.noMaternalGrandfather.a": {
+    en: "This is intentional and correct in Sunni Islamic law. The maternal grandfather (mother's father) is not a primary heir — he falls under Distant Kindred (dhawi al-arham) and only inherits when no primary heirs exist at all. In Sunni fiqh, male relatives who connect to the deceased through a female link are classified as distant kindred. The paternal grandfather (father's father) is a primary heir because he is in the direct male (agnatic) lineage. Interestingly, both grandmothers are exceptions — they are explicitly recognised as sharers in hadith traditions despite connecting through a female in some cases.",
+    id: "Hal ini disengaja dan benar dalam hukum Islam Sunni. Kakek dari pihak ibu (ayah dari ibu) bukan ahli waris utama — ia termasuk dalam Kerabat Jauh (dzawi al-arham) dan hanya mewarisi jika tidak ada ahli waris utama sama sekali. Dalam fikih Sunni, kerabat laki-laki yang terhubung kepada pewaris melalui jalur perempuan diklasifikasikan sebagai kerabat jauh. Kakek dari pihak ayah adalah ahli waris utama karena ia berada dalam jalur laki-laki (asabah) langsung. Menariknya, kedua nenek merupakan pengecualian — mereka secara eksplisit diakui sebagai ashab al-furud dalam tradisi hadis.",
+  },
+  "faraid.faq.awl.q": { en: "What happens when total fixed shares exceed 100%?", id: "Apa yang terjadi jika total bagian tetap melebihi 100%?" },
+  "faraid.faq.awl.a": {
+    en: "This is resolved by Awl (proportional reduction). Each heir's fixed share is reduced proportionally so that the total equals 100%. For example, if fixed shares add up to 7/6, each heir receives their share divided by 7/6. This ruling was established by Caliph Umar ibn al-Khattab (RA) and agreed upon by the companions.",
+    id: "Hal ini diselesaikan dengan Awl (pengurangan proporsional). Bagian tetap setiap ahli waris dikurangi secara proporsional agar totalnya sama dengan 100%. Misalnya, jika bagian tetap berjumlah 7/6, setiap ahli waris menerima bagiannya dibagi 7/6. Putusan ini ditetapkan oleh Khalifah Umar ibn al-Khattab (RA) dan disepakati oleh para sahabat.",
+  },
+  "faraid.faq.hajb.q": { en: "What does 'Blocked (Hajb)' mean?", id: "Apa arti 'Terhalang (Hajb)'?" },
+  "faraid.faq.hajb.a": {
+    en: "Hajb means a closer heir prevents a more distant one from inheriting. There are two types: Hajb Hirman (complete exclusion, e.g. the father blocks the paternal grandfather) and Hajb Nuqsan (partial reduction, e.g. children reduce the spouse's share). A blocked heir receives nothing, but their presence in the family is still noted.",
+    id: "Hajb berarti ahli waris yang lebih dekat mencegah ahli waris yang lebih jauh untuk mewarisi. Ada dua jenis: Hajb Hirman (pengecualian penuh, mis. ayah menghalangi kakek dari ayah) dan Hajb Nuqsan (pengurangan sebagian, mis. anak-anak mengurangi bagian pasangan). Ahli waris yang terhalang tidak menerima apa-apa, tetapi kehadirannya dalam keluarga tetap dicatat.",
+  },
+  "faraid.faq.wasiyyah.q": { en: "Why is Wasiyyah capped at 1/3?", id: "Mengapa Wasiat dibatasi 1/3?" },
+  "faraid.faq.wasiyyah.a": {
+    en: "The Prophet Muhammad ﷺ instructed that a bequest (wasiyyah) must not exceed one-third of the estate, as recorded in Sahih Bukhari and Muslim. The remainder must be distributed to legal heirs according to Faraid rules. Additionally, a wasiyyah cannot be made in favour of a legal heir — heirs receive their shares through Faraid, not through bequest.",
+    id: "Nabi Muhammad ﷺ memerintahkan agar wasiat tidak melebihi sepertiga harta, sebagaimana tercatat dalam Sahih Bukhari dan Muslim. Sisanya harus dibagikan kepada ahli waris yang sah sesuai ketentuan Faraid. Selain itu, wasiat tidak boleh diberikan kepada ahli waris yang sah — ahli waris menerima bagian mereka melalui Faraid, bukan melalui wasiat.",
+  },
+
   "faraid.calculateDist": { en: "Calculate Distribution", id: "Hitung Pembagian" },
   "faraid.results": { en: "Distribution Results", id: "Hasil Pembagian" },
   "faraid.netEstate": { en: "Net Estate", id: "Harta Bersih" },
@@ -199,7 +244,11 @@ const translations = {
   "faraid.consultCTA.button": { en: "Find a Consultant", id: "Cari Konsultan" },
   "faraid.blocked.father": { en: "Father", id: "Ayah" },
   "faraid.blocked.grandfather": { en: "Paternal Grandfather", id: "Kakek" },
+  "faraid.blocked.mother": { en: "Mother", id: "Ibu" },
   "faraid.blocked.sons": { en: "Sons", id: "Anak Laki-laki" },
+  "faraid.blocked.daughters": { en: "2 or more Daughters", id: "2 atau lebih Anak Perempuan" },
+  "faraid.blocked.grandsons": { en: "Grandsons", id: "Cucu Laki-laki" },
+  "faraid.blocked.fullBrothers": { en: "Full Brothers", id: "Saudara Kandung Laki-laki" },
   "faraid.spouseBothError": {
     en: "Deceased cannot have both a husband and wives.",
     id: "Almarhum tidak bisa memiliki suami dan istri sekaligus.",
@@ -304,6 +353,42 @@ const translations = {
   "tooltip.daughters": {
     en: "One daughter receives 1/2 of the estate; two or more daughters share 2/3. When sons are present, daughters become asabah (son gets 2x daughter's share).",
     id: "Satu anak perempuan menerima 1/2 harta; dua atau lebih berbagi 2/3. Jika ada anak laki-laki, anak perempuan menjadi asabah (laki-laki mendapat 2x bagian perempuan).",
+  },
+  "tooltip.paternalGrandmother": {
+    en: "Paternal Grandmother (father's mother). Gets 1/6 fixed share, shared equally with maternal grandmother if both are present. Blocked by the mother, father, or paternal grandfather.",
+    id: "Nenek dari pihak ayah (ibu dari ayah). Mendapat 1/6 bagian tetap, dibagi rata dengan nenek dari ibu jika keduanya ada. Terhalang oleh ibu, ayah, atau kakek dari ayah.",
+  },
+  "tooltip.maternalGrandmother": {
+    en: "Maternal Grandmother (mother's mother). Gets 1/6 fixed share, shared equally with paternal grandmother if both are present. Blocked only by the mother.",
+    id: "Nenek dari pihak ibu (ibu dari ibu). Mendapat 1/6 bagian tetap, dibagi rata dengan nenek dari ayah jika keduanya ada. Hanya terhalang oleh ibu.",
+  },
+  "tooltip.grandsons": {
+    en: "Grandsons (son's sons) are residuary heirs (asabah) taking the place of sons. Blocked by direct sons. When granddaughters are also present, grandsons receive twice their share (2:1 ratio).",
+    id: "Cucu laki-laki (dari anak laki-laki) adalah ahli waris asabah. Terhalang oleh anak laki-laki. Jika ada cucu perempuan, cucu laki-laki mendapat 2x bagian (rasio 2:1).",
+  },
+  "tooltip.granddaughters": {
+    en: "Granddaughters (son's daughters). Get 1/2 (one alone), 2/3 (two or more), or 1/6 complementary share when one daughter exists. Blocked by sons, or 2+ daughters (unless grandsons are present).",
+    id: "Cucu perempuan (dari anak laki-laki). Mendapat 1/2 (seorang), 2/3 (dua atau lebih), atau 1/6 pelengkap jika ada satu anak perempuan. Terhalang oleh anak laki-laki atau 2+ anak perempuan tanpa cucu laki-laki.",
+  },
+  "tooltip.paternalBrothers": {
+    en: "Paternal Brothers (half-siblings, same father different mother). Residuary heirs (asabah). Blocked by father, grandfather, sons, grandsons, or full brothers.",
+    id: "Saudara laki-laki seayah (ayah sama, ibu berbeda). Ahli waris asabah. Terhalang oleh ayah, kakek, anak laki-laki, cucu laki-laki, atau saudara kandung laki-laki.",
+  },
+  "tooltip.paternalSisters": {
+    en: "Paternal Sisters (half-siblings, same father different mother). Get 1/2 (one), 2/3 (two+), or 1/6 alongside one full sister. Become asabah when a paternal brother is present. Blocked by father, grandfather, sons, grandsons, full brothers.",
+    id: "Saudara perempuan seayah. Mendapat 1/2 (seorang), 2/3 (dua+), atau 1/6 jika ada satu saudara kandung perempuan. Menjadi asabah jika ada saudara laki-laki seayah. Terhalang oleh ayah, kakek, anak/cucu laki-laki, saudara kandung laki-laki.",
+  },
+  "tooltip.maternalBrothers": {
+    en: "Maternal Brothers (uterine, same mother different father). Fixed share: 1/6 for one, 1/3 shared equally among all maternal siblings (brothers and sisters together). Blocked by any children or grandchildren, father, or grandfather.",
+    id: "Saudara laki-laki seibu (ibu sama, ayah berbeda). Bagian tetap: 1/6 untuk satu orang, 1/3 dibagi rata semua saudara seibu (laki dan perempuan bersama). Terhalang oleh anak/cucu (laki/perempuan), ayah, atau kakek.",
+  },
+  "tooltip.maternalSisters": {
+    en: "Maternal Sisters (uterine, same mother different father). Same shares as maternal brothers — together they share 1/6 (one total sibling) or 1/3 (two or more total). Blocked by any children or grandchildren, father, or grandfather.",
+    id: "Saudara perempuan seibu. Bagian sama dengan saudara laki-laki seibu — bersama mereka berbagi 1/6 (satu orang total) atau 1/3 (dua atau lebih). Terhalang oleh anak/cucu (laki/perempuan), ayah, atau kakek.",
+  },
+  "tooltip.consanguineMale": {
+    en: "Consanguine Agnate Relative (e.g. paternal uncle, son of paternal uncle). Inherits the residual estate after all closer heirs. Blocked by all brothers and paternal brothers.",
+    id: "Kerabat asabah jauh (mis. paman dari ayah, anak paman dari ayah). Mewarisi sisa harta setelah semua ahli waris lebih dekat. Terhalang oleh semua saudara laki-laki.",
   },
 
   // ── Validation Messages ──

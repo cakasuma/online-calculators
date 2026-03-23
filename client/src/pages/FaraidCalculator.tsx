@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency } from "@/lib/i18n";
 import {
   PieChart,
@@ -50,11 +51,20 @@ interface FormState {
   numberOfWives: number;
   hasFather: boolean;
   hasPaternalGrandfather: boolean;
+  hasPaternalGrandmother: boolean;
   hasMother: boolean;
+  hasMaternalGrandmother: boolean;
   sons: number;
   daughters: number;
+  grandsons: number;
+  granddaughters: number;
   fullBrothers: number;
   fullSisters: number;
+  paternalBrothers: number;
+  paternalSisters: number;
+  maternalBrothers: number;
+  maternalSisters: number;
+  hasConsanguineMale: boolean;
 }
 
 interface ComputedHeir {
@@ -100,11 +110,20 @@ const initialForm: FormState = {
   numberOfWives: 0,
   hasFather: false,
   hasPaternalGrandfather: false,
+  hasPaternalGrandmother: false,
   hasMother: false,
+  hasMaternalGrandmother: false,
   sons: 0,
   daughters: 0,
+  grandsons: 0,
+  granddaughters: 0,
   fullBrothers: 0,
   fullSisters: 0,
+  paternalBrothers: 0,
+  paternalSisters: 0,
+  maternalBrothers: 0,
+  maternalSisters: 0,
+  hasConsanguineMale: false,
 };
 
 // ─── Calculation engine ───────────────────────────────────────────────────────
@@ -114,6 +133,8 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
   const notes: string[] = [];
 
   const hasChildren = form.sons > 0 || form.daughters > 0;
+  const hasGrandchildren = form.grandsons > 0 || form.granddaughters > 0;
+  const hasDescendants = hasChildren || hasGrandchildren;
   const hasSpouse = form.hasHusband || form.numberOfWives > 0;
 
   // Spouse fraction (for umariyyatain)
@@ -125,25 +146,78 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
 
   // Blocking rules
   const grandfatherBlocked = form.hasFather;
-  const siblingsBlocked =
-    form.hasFather ||
-    form.hasPaternalGrandfather ||
-    form.sons > 0;
+  const paternalGrandmotherBlocked = form.hasMother || form.hasFather || form.hasPaternalGrandfather;
+  const maternalGrandmotherBlocked = form.hasMother;
+  const grandsonsBlocked = form.sons > 0;
+  const granddaughtersBlocked = form.sons > 0 || (form.daughters >= 2 && form.grandsons === 0);
+  const fullSiblingsBlocked =
+    form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0;
+  // For backward compat, keep old name as alias
+  const siblingsBlocked = fullSiblingsBlocked;
+  const paternalSiblingsBlocked = fullSiblingsBlocked || form.fullBrothers > 0;
+  const maternalSiblingsBlocked =
+    hasDescendants || form.hasFather || form.hasPaternalGrandfather;
+  const consanguineBlocked =
+    paternalSiblingsBlocked || form.paternalBrothers > 0;
 
   // Track blocked heirs
   if (form.hasPaternalGrandfather && grandfatherBlocked) {
     blockedHeirs.push({ nameKey: "faraid.grandfather", blockedByKey: "faraid.blocked.father" });
+  }
+  if (form.hasPaternalGrandmother && paternalGrandmotherBlocked) {
+    const pgmBlockerKey = form.hasMother
+      ? "faraid.blocked.mother"
+      : form.hasFather
+      ? "faraid.blocked.father"
+      : "faraid.blocked.grandfather";
+    blockedHeirs.push({ nameKey: "faraid.paternalGrandmother", blockedByKey: pgmBlockerKey });
+  }
+  if (form.hasMaternalGrandmother && maternalGrandmotherBlocked) {
+    blockedHeirs.push({ nameKey: "faraid.maternalGrandmother", blockedByKey: "faraid.blocked.mother" });
+  }
+  if (form.grandsons > 0 && grandsonsBlocked) {
+    blockedHeirs.push({ nameKey: "faraid.grandsons", blockedByKey: "faraid.blocked.sons" });
+  }
+  if (form.granddaughters > 0 && granddaughtersBlocked) {
+    const gdBlockerKey = form.sons > 0 ? "faraid.blocked.sons" : "faraid.blocked.daughters";
+    blockedHeirs.push({ nameKey: "faraid.granddaughters", blockedByKey: gdBlockerKey });
   }
   if ((form.fullBrothers > 0 || form.fullSisters > 0) && siblingsBlocked) {
     const blockerKey = form.hasFather
       ? "faraid.blocked.father"
       : form.hasPaternalGrandfather
       ? "faraid.blocked.grandfather"
+      : form.grandsons > 0
+      ? "faraid.blocked.grandsons"
       : "faraid.blocked.sons";
     if (form.fullBrothers > 0)
       blockedHeirs.push({ nameKey: "faraid.fullBrothers", blockedByKey: blockerKey });
     if (form.fullSisters > 0)
       blockedHeirs.push({ nameKey: "faraid.fullSisters", blockedByKey: blockerKey });
+  }
+  if ((form.paternalBrothers > 0 || form.paternalSisters > 0) && paternalSiblingsBlocked) {
+    const pbBlockerKey = form.hasFather
+      ? "faraid.blocked.father"
+      : form.hasPaternalGrandfather
+      ? "faraid.blocked.grandfather"
+      : form.sons > 0 || form.grandsons > 0
+      ? "faraid.blocked.sons"
+      : "faraid.blocked.fullBrothers";
+    if (form.paternalBrothers > 0)
+      blockedHeirs.push({ nameKey: "faraid.paternalBrothers", blockedByKey: pbBlockerKey });
+    if (form.paternalSisters > 0)
+      blockedHeirs.push({ nameKey: "faraid.paternalSisters", blockedByKey: pbBlockerKey });
+  }
+  if ((form.maternalBrothers > 0 || form.maternalSisters > 0) && maternalSiblingsBlocked) {
+    const mbBlockerKey = form.hasFather
+      ? "faraid.blocked.father"
+      : form.hasPaternalGrandfather
+      ? "faraid.blocked.grandfather"
+      : "faraid.blocked.sons";
+    if (form.maternalBrothers > 0)
+      blockedHeirs.push({ nameKey: "faraid.maternalBrothers", blockedByKey: mbBlockerKey });
+    if (form.maternalSisters > 0)
+      blockedHeirs.push({ nameKey: "faraid.maternalSisters", blockedByKey: mbBlockerKey });
   }
 
   // ── Fixed-share heirs ──
@@ -263,6 +337,121 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
     }
   }
 
+  // Grandmothers — share 1/6 between unblocked grandmothers
+  const activePGM = form.hasPaternalGrandmother && !paternalGrandmotherBlocked;
+  const activeMGM = form.hasMaternalGrandmother && !maternalGrandmotherBlocked;
+  const activeGrandmothers = (activePGM ? 1 : 0) + (activeMGM ? 1 : 0);
+  if (activeGrandmothers > 0) {
+    const perGM = (1 / 6) / activeGrandmothers;
+    const gmShare = activeGrandmothers === 2 ? "1/12" : "1/6";
+    if (activePGM)
+      fixedEntries.push({ key: "paternalGrandmother", nameKey: "faraid.paternalGrandmother", frac: perGM, share: gmShare });
+    if (activeMGM)
+      fixedEntries.push({ key: "maternalGrandmother", nameKey: "faraid.maternalGrandmother", frac: perGM, share: gmShare });
+  }
+
+  // Granddaughters (DS) — fixed share when no grandsons and not blocked
+  if (form.granddaughters > 0 && !granddaughtersBlocked && form.grandsons === 0) {
+    if (form.daughters === 1 && form.sons === 0) {
+      // Complementary 1/6 to bring total daughters tier to 2/3
+      const perGD = (1 / 6) / form.granddaughters;
+      const gdShare = form.granddaughters === 1 ? "1/6" : `1/6 ÷ ${form.granddaughters}`;
+      for (let i = 0; i < form.granddaughters; i++) {
+        fixedEntries.push({
+          key: `granddaughter_${i}`,
+          nameKey: "faraid.granddaughter",
+          nameNum: form.granddaughters === 1 ? undefined : i + 1,
+          frac: perGD,
+          share: gdShare,
+        });
+      }
+    } else if (form.daughters === 0 && form.sons === 0) {
+      // Standalone: 1 GD → 1/2; 2+ → 2/3
+      const totalFrac = form.granddaughters === 1 ? 1 / 2 : 2 / 3;
+      const perGD = totalFrac / form.granddaughters;
+      const gdShare =
+        form.granddaughters === 1
+          ? "1/2"
+          : form.granddaughters === 2
+          ? "1/3 each (2/3 total)"
+          : `2/3 ÷ ${form.granddaughters}`;
+      for (let i = 0; i < form.granddaughters; i++) {
+        fixedEntries.push({
+          key: `granddaughter_${i}`,
+          nameKey: "faraid.granddaughter",
+          nameNum: form.granddaughters === 1 ? undefined : i + 1,
+          frac: perGD,
+          share: gdShare,
+        });
+      }
+    }
+  }
+
+  // Paternal Sisters (PS) — fixed share when no paternal brothers, not blocked, no children
+  if (!paternalSiblingsBlocked && form.paternalSisters > 0 && form.paternalBrothers === 0 && !hasChildren && !hasGrandchildren) {
+    if (form.fullSisters === 1 && form.fullBrothers === 0) {
+      // Complementary 1/6 alongside 1 full sister
+      const perPS = (1 / 6) / form.paternalSisters;
+      const psShare = form.paternalSisters === 1 ? "1/6" : `1/6 ÷ ${form.paternalSisters}`;
+      for (let i = 0; i < form.paternalSisters; i++) {
+        fixedEntries.push({
+          key: `paternalSister_${i}`,
+          nameKey: "faraid.paternalSister",
+          nameNum: form.paternalSisters === 1 ? undefined : i + 1,
+          frac: perPS,
+          share: psShare,
+        });
+      }
+    } else if (form.fullSisters === 0 && form.fullBrothers === 0) {
+      // Standalone: 1 PS → 1/2; 2+ → 2/3
+      const totalFrac = form.paternalSisters === 1 ? 1 / 2 : 2 / 3;
+      const perPS = totalFrac / form.paternalSisters;
+      const psShare =
+        form.paternalSisters === 1
+          ? "1/2"
+          : form.paternalSisters === 2
+          ? "1/3 each (2/3 total)"
+          : `2/3 ÷ ${form.paternalSisters}`;
+      for (let i = 0; i < form.paternalSisters; i++) {
+        fixedEntries.push({
+          key: `paternalSister_${i}`,
+          nameKey: "faraid.paternalSister",
+          nameNum: form.paternalSisters === 1 ? undefined : i + 1,
+          frac: perPS,
+          share: psShare,
+        });
+      }
+    }
+  }
+
+  // Maternal siblings (MB + MS) — fixed 1/6 (one) or 1/3 (two+), split equally
+  if (!maternalSiblingsBlocked) {
+    const totalMaternalSiblings = form.maternalBrothers + form.maternalSisters;
+    if (totalMaternalSiblings > 0) {
+      const poolFrac = totalMaternalSiblings === 1 ? 1 / 6 : 1 / 3;
+      const perSibling = poolFrac / totalMaternalSiblings;
+      const mShare = totalMaternalSiblings === 1 ? (poolFrac === 1 / 6 ? "1/6" : "1/3") : `${totalMaternalSiblings === 2 ? "1/3" : "1/3"} ÷ ${totalMaternalSiblings}`;
+      for (let i = 0; i < form.maternalBrothers; i++) {
+        fixedEntries.push({
+          key: `maternalBrother_${i}`,
+          nameKey: "faraid.maternalBrother",
+          nameNum: form.maternalBrothers === 1 ? undefined : i + 1,
+          frac: perSibling,
+          share: mShare,
+        });
+      }
+      for (let i = 0; i < form.maternalSisters; i++) {
+        fixedEntries.push({
+          key: `maternalSister_${i}`,
+          nameKey: "faraid.maternalSister",
+          nameNum: form.maternalSisters === 1 ? undefined : i + 1,
+          frac: perSibling,
+          share: mShare,
+        });
+      }
+    }
+  }
+
   // ── Awl check ─────────────────────────────────────────────────────────────
   const fixedTotal = fixedEntries.reduce((s, e) => s + e.frac, 0);
   const hasAwl = fixedTotal > 1 + 1e-9;
@@ -316,6 +505,39 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
         percentage: (amount / net) * 100,
         type: "asabah",
       });
+    }
+    remaining = 0;
+  } else if (form.grandsons > 0 && !grandsonsBlocked) {
+    // Grandsons + granddaughters share remainder 2:1
+    const gdAsabah = !granddaughtersBlocked ? form.granddaughters : 0;
+    const totalParts = form.grandsons * 2 + gdAsabah;
+    for (let i = 0; i < form.grandsons; i++) {
+      const amount = (remaining * 2) / totalParts;
+      heirs.push({
+        key: `grandson_${i}`,
+        nameKey: "faraid.grandson",
+        nameNum: form.grandsons === 1 ? undefined : i + 1,
+        share: "asabah (2:1)",
+        fraction: amount / net,
+        amount,
+        percentage: (amount / net) * 100,
+        type: "asabah",
+      });
+    }
+    if (gdAsabah > 0) {
+      for (let i = 0; i < gdAsabah; i++) {
+        const amount = remaining / totalParts;
+        heirs.push({
+          key: `granddaughter_asabah_${i}`,
+          nameKey: "faraid.granddaughter",
+          nameNum: gdAsabah === 1 ? undefined : i + 1,
+          share: "asabah (1:2)",
+          fraction: amount / net,
+          amount,
+          percentage: (amount / net) * 100,
+          type: "asabah",
+        });
+      }
     }
     remaining = 0;
   } else if (hasChildren && form.hasFather && form.daughters > 0) {
@@ -398,6 +620,63 @@ function computeDistribution(form: FormState, net: number): DistributionResult {
         type: "asabah",
       });
     }
+    remaining = 0;
+  } else if (!paternalSiblingsBlocked && form.paternalBrothers > 0) {
+    // Paternal brothers + paternal sisters as asabah (2:1)
+    const totalParts = form.paternalBrothers * 2 + form.paternalSisters;
+    for (let i = 0; i < form.paternalBrothers; i++) {
+      const amount = (remaining * 2) / totalParts;
+      heirs.push({
+        key: `paternalBrother_${i}`,
+        nameKey: "faraid.paternalBrother",
+        nameNum: form.paternalBrothers === 1 ? undefined : i + 1,
+        share: "asabah (2:1)",
+        fraction: amount / net,
+        amount,
+        percentage: (amount / net) * 100,
+        type: "asabah",
+      });
+    }
+    for (let i = 0; i < form.paternalSisters; i++) {
+      const amount = remaining / totalParts;
+      heirs.push({
+        key: `paternalSister_asabah_${i}`,
+        nameKey: "faraid.paternalSister",
+        nameNum: form.paternalSisters === 1 ? undefined : i + 1,
+        share: "asabah (1:2)",
+        fraction: amount / net,
+        amount,
+        percentage: (amount / net) * 100,
+        type: "asabah",
+      });
+    }
+    remaining = 0;
+  } else if (!paternalSiblingsBlocked && form.paternalSisters > 0 && form.paternalBrothers === 0 && (form.daughters > 0 || form.granddaughters > 0)) {
+    // Paternal sisters become asabah bil-ghair when daughters/granddaughters exist
+    for (let i = 0; i < form.paternalSisters; i++) {
+      const amount = remaining / form.paternalSisters;
+      heirs.push({
+        key: `paternalSister_asabah_${i}`,
+        nameKey: "faraid.paternalSister",
+        nameNum: form.paternalSisters === 1 ? undefined : i + 1,
+        share: "asabah bil-ghair",
+        fraction: amount / net,
+        amount,
+        percentage: (amount / net) * 100,
+        type: "asabah",
+      });
+    }
+    remaining = 0;
+  } else if (!consanguineBlocked && form.hasConsanguineMale) {
+    heirs.push({
+      key: "consanguineMale",
+      nameKey: "faraid.consanguineMale",
+      share: "asabah",
+      fraction: remaining / net,
+      amount: remaining,
+      percentage: (remaining / net) * 100,
+      type: "asabah",
+    });
     remaining = 0;
   }
 
@@ -504,11 +783,20 @@ export default function FaraidCalculator({ onCalculate }: Props) {
       form.numberOfWives > 0 ||
       form.hasFather ||
       form.hasPaternalGrandfather ||
+      form.hasPaternalGrandmother ||
       form.hasMother ||
+      form.hasMaternalGrandmother ||
       form.sons > 0 ||
       form.daughters > 0 ||
+      form.grandsons > 0 ||
+      form.granddaughters > 0 ||
       form.fullBrothers > 0 ||
-      form.fullSisters > 0;
+      form.fullSisters > 0 ||
+      form.paternalBrothers > 0 ||
+      form.paternalSisters > 0 ||
+      form.maternalBrothers > 0 ||
+      form.maternalSisters > 0 ||
+      form.hasConsanguineMale;
     if (!hasHeirs) {
       errs.heirs = t("validation.noHeirs");
     }
@@ -577,42 +865,6 @@ export default function FaraidCalculator({ onCalculate }: Props) {
           </p>
         </div>
       </div>
-
-      {/* Quranic & Hadith References */}
-      <Card className="print:hidden">
-        <CardContent className="pt-3 pb-3">
-          <button
-            type="button"
-            onClick={() => setShowRefs((v) => !v)}
-            className="w-full flex items-center justify-between text-xs font-medium hover:text-primary transition-colors"
-          >
-            <span className="flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-primary" />
-              {t("faraid.references.title")}
-            </span>
-            {showRefs ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
-          {showRefs && (
-            <div className="mt-3 space-y-3 border-t pt-3">
-              {[
-                { citationKey: "faraid.references.quran411", textKey: "faraid.references.quran411.text" },
-                { citationKey: "faraid.references.quran412", textKey: "faraid.references.quran412.text" },
-                { citationKey: "faraid.references.quran4176", textKey: "faraid.references.quran4176.text" },
-                { citationKey: "faraid.references.hadith", textKey: "faraid.references.hadith.text" },
-              ].map(({ citationKey, textKey }) => (
-                <div key={citationKey} className="space-y-1">
-                  <p className="text-[11px] font-semibold text-primary">
-                    {t(citationKey as any)}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    {t(textKey as any)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Currency selector */}
       <Card>
@@ -828,7 +1080,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
               {/* Paternal Grandfather */}
               <div
-                className={`flex items-center justify-between p-2.5 rounded-lg border bg-card col-span-1 sm:col-span-2 ${
+                className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${
                   form.hasFather ? "opacity-50" : ""
                 }`}
               >
@@ -847,6 +1099,57 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                   onCheckedChange={(v) => setField("hasPaternalGrandfather", v)}
                 />
               </div>
+
+              {/* Paternal Grandmother (MF) */}
+              {(() => {
+                const pgmBlocked = form.hasMother || form.hasFather || form.hasPaternalGrandfather;
+                const pgmBlockerKey = form.hasMother
+                  ? "faraid.blocked.mother"
+                  : form.hasFather
+                  ? "faraid.blocked.father"
+                  : "faraid.blocked.grandfather";
+                return (
+                  <div className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${pgmBlocked ? "opacity-50" : ""}`}>
+                    <Label htmlFor="hasPaternalGrandmother" className="text-xs cursor-pointer flex-1">
+                      <TermTooltip termKey="tooltip.paternalGrandmother">{t("faraid.paternalGrandmother")}</TermTooltip>
+                      {pgmBlocked && (
+                        <span className="ml-2 text-muted-foreground text-[10px]">
+                          ({t("faraid.blockedNote")} {t(pgmBlockerKey as any)})
+                        </span>
+                      )}
+                    </Label>
+                    <Switch
+                      id="hasPaternalGrandmother"
+                      checked={form.hasPaternalGrandmother}
+                      disabled={pgmBlocked}
+                      onCheckedChange={(v) => setField("hasPaternalGrandmother", v)}
+                    />
+                  </div>
+                );
+              })()}
+
+              {/* Maternal Grandmother (MM) */}
+              {(() => {
+                const mgmBlocked = form.hasMother;
+                return (
+                  <div className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${mgmBlocked ? "opacity-50" : ""}`}>
+                    <Label htmlFor="hasMaternalGrandmother" className="text-xs cursor-pointer flex-1">
+                      <TermTooltip termKey="tooltip.maternalGrandmother">{t("faraid.maternalGrandmother")}</TermTooltip>
+                      {mgmBlocked && (
+                        <span className="ml-2 text-muted-foreground text-[10px]">
+                          ({t("faraid.blockedNote")} {t("faraid.blocked.mother")})
+                        </span>
+                      )}
+                    </Label>
+                    <Switch
+                      id="hasMaternalGrandmother"
+                      checked={form.hasMaternalGrandmother}
+                      disabled={mgmBlocked}
+                      onCheckedChange={(v) => setField("hasMaternalGrandmother", v)}
+                    />
+                  </div>
+                );
+              })()}
             </div>
           </section>
 
@@ -873,34 +1176,23 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             </div>
           </section>
 
-          {/* Siblings */}
+          {/* Grandchildren */}
           <section className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {t("faraid.siblingsSection")}
+              {t("faraid.grandchildrenSection")}
             </p>
-            {(form.hasFather || form.hasPaternalGrandfather || form.sons > 0) && (
+            {form.sons > 0 && (
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <Info className="w-3 h-3 flex-shrink-0" />
-                {t("faraid.siblingsBlockedBy")}{" "}
-                {form.hasFather
-                  ? t("faraid.blocked.father")
-                  : form.hasPaternalGrandfather
-                  ? t("faraid.blocked.grandfather")
-                  : t("faraid.blocked.sons")}
-                .
+                {t("faraid.siblingsBlockedBy")} {t("faraid.blocked.sons")}.
               </p>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {[
-                { key: "fullBrothers", labelKey: "faraid.fullBrothers", tooltipKey: "tooltip.fullBrothers" },
-                { key: "fullSisters", labelKey: "faraid.fullSisters", tooltipKey: "tooltip.fullSisters" },
-              ].map(({ key, labelKey, tooltipKey }) => (
-                <div
-                  key={key}
-                  className={`space-y-1 ${
-                    form.hasFather || form.hasPaternalGrandfather || form.sons > 0 ? "opacity-50" : ""
-                  }`}
-                >
+                { key: "grandsons", labelKey: "faraid.grandsons", tooltipKey: "tooltip.grandsons", blocked: form.sons > 0 },
+                { key: "granddaughters", labelKey: "faraid.granddaughters", tooltipKey: "tooltip.granddaughters", blocked: form.sons > 0 || (form.daughters >= 2 && form.grandsons === 0) },
+              ].map(({ key, labelKey, tooltipKey, blocked }) => (
+                <div key={key} className={`space-y-1 ${blocked ? "opacity-50" : ""}`}>
                   <Label className="text-xs">
                     <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
                   </Label>
@@ -911,6 +1203,159 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 </div>
               ))}
             </div>
+          </section>
+
+          {/* Siblings */}
+          <section className="space-y-3">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              {t("faraid.siblingsSection")}
+            </p>
+
+            {/* Full siblings */}
+            <div className="space-y-2">
+              <p className="text-[11px] font-medium text-muted-foreground">{t("faraid.fullSiblingsSection")}</p>
+              {(form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0) && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Info className="w-3 h-3 flex-shrink-0" />
+                  {t("faraid.siblingsBlockedBy")}{" "}
+                  {form.hasFather
+                    ? t("faraid.blocked.father")
+                    : form.hasPaternalGrandfather
+                    ? t("faraid.blocked.grandfather")
+                    : form.grandsons > 0
+                    ? t("faraid.blocked.grandsons")
+                    : t("faraid.blocked.sons")}
+                  .
+                </p>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { key: "fullBrothers", labelKey: "faraid.fullBrothers", tooltipKey: "tooltip.fullBrothers" },
+                  { key: "fullSisters", labelKey: "faraid.fullSisters", tooltipKey: "tooltip.fullSisters" },
+                ].map(({ key, labelKey, tooltipKey }) => (
+                  <div
+                    key={key}
+                    className={`space-y-1 ${
+                      form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0 ? "opacity-50" : ""
+                    }`}
+                  >
+                    <Label className="text-xs">
+                      <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
+                    </Label>
+                    <Counter
+                      value={form[key as keyof FormState] as number}
+                      onChange={(n) => setField(key as keyof FormState, n as any)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Paternal siblings (half, father's side) */}
+            {(() => {
+              const psBlocked = form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0 || form.fullBrothers > 0;
+              return (
+                <div className="space-y-2">
+                  <p className="text-[11px] font-medium text-muted-foreground">{t("faraid.paternalSiblingsSection")}</p>
+                  {psBlocked && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Info className="w-3 h-3 flex-shrink-0" />
+                      {t("faraid.siblingsBlockedBy")}{" "}
+                      {form.hasFather
+                        ? t("faraid.blocked.father")
+                        : form.hasPaternalGrandfather
+                        ? t("faraid.blocked.grandfather")
+                        : form.sons > 0 || form.grandsons > 0
+                        ? t("faraid.blocked.sons")
+                        : t("faraid.blocked.fullBrothers")}
+                      .
+                    </p>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {[
+                      { key: "paternalBrothers", labelKey: "faraid.paternalBrothers", tooltipKey: "tooltip.paternalBrothers" },
+                      { key: "paternalSisters", labelKey: "faraid.paternalSisters", tooltipKey: "tooltip.paternalSisters" },
+                    ].map(({ key, labelKey, tooltipKey }) => (
+                      <div key={key} className={`space-y-1 ${psBlocked ? "opacity-50" : ""}`}>
+                        <Label className="text-xs">
+                          <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
+                        </Label>
+                        <Counter
+                          value={form[key as keyof FormState] as number}
+                          onChange={(n) => setField(key as keyof FormState, n as any)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Maternal siblings (uterine) */}
+            {(() => {
+              const mbBlocked = form.sons > 0 || form.daughters > 0 || form.grandsons > 0 || form.granddaughters > 0 || form.hasFather || form.hasPaternalGrandfather;
+              const mbBlockerKey = form.hasFather
+                ? "faraid.blocked.father"
+                : form.hasPaternalGrandfather
+                ? "faraid.blocked.grandfather"
+                : "faraid.blocked.sons";
+              return (
+                <div className="space-y-2">
+                  <p className="text-[11px] font-medium text-muted-foreground">{t("faraid.maternalSiblingsSection")}</p>
+                  {mbBlocked && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Info className="w-3 h-3 flex-shrink-0" />
+                      {t("faraid.siblingsBlockedBy")} {t(mbBlockerKey as any)}.
+                    </p>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {[
+                      { key: "maternalBrothers", labelKey: "faraid.maternalBrothers", tooltipKey: "tooltip.maternalBrothers" },
+                      { key: "maternalSisters", labelKey: "faraid.maternalSisters", tooltipKey: "tooltip.maternalSisters" },
+                    ].map(({ key, labelKey, tooltipKey }) => (
+                      <div key={key} className={`space-y-1 ${mbBlocked ? "opacity-50" : ""}`}>
+                        <Label className="text-xs">
+                          <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
+                        </Label>
+                        <Counter
+                          value={form[key as keyof FormState] as number}
+                          onChange={(n) => setField(key as keyof FormState, n as any)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </section>
+
+          {/* Other Relatives */}
+          <section className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              {t("faraid.otherRelativesSection")}
+            </p>
+            {/* Consanguine male */}
+            {(() => {
+              const cBlocked = form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0 || form.fullBrothers > 0 || form.paternalBrothers > 0;
+              return (
+                <div className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${cBlocked ? "opacity-50" : ""}`}>
+                  <Label htmlFor="hasConsanguineMale" className="text-xs cursor-pointer flex-1">
+                    <TermTooltip termKey="tooltip.consanguineMale">{t("faraid.consanguineMale")}</TermTooltip>
+                  </Label>
+                  <Switch
+                    id="hasConsanguineMale"
+                    checked={form.hasConsanguineMale}
+                    disabled={cBlocked}
+                    onCheckedChange={(v) => setField("hasConsanguineMale", v)}
+                  />
+                </div>
+              );
+            })()}
+            {/* Distant Kindred note */}
+            <p className="text-[11px] text-muted-foreground flex items-start gap-1">
+              <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
+              {t("faraid.distantKindredNote")}
+            </p>
           </section>
         </CardContent>
       </Card>
@@ -1098,6 +1543,69 @@ export default function FaraidCalculator({ onCalculate }: Props) {
           <AdSlot id="ad-after-results" variant="rectangle" className="print:hidden" />
         </>
       )}
+
+      {/* Quranic & Hadith References */}
+      <Card className="print:hidden">
+        <CardContent className="pt-3 pb-3">
+          <button
+            type="button"
+            onClick={() => setShowRefs((v) => !v)}
+            className="w-full flex items-center justify-between text-xs font-medium hover:text-primary transition-colors"
+          >
+            <span className="flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-primary" />
+              {t("faraid.references.title")}
+            </span>
+            {showRefs ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+          {showRefs && (
+            <div className="mt-3 space-y-3 border-t pt-3">
+              {[
+                { citationKey: "faraid.references.quran411", textKey: "faraid.references.quran411.text" },
+                { citationKey: "faraid.references.quran412", textKey: "faraid.references.quran412.text" },
+                { citationKey: "faraid.references.quran4176", textKey: "faraid.references.quran4176.text" },
+                { citationKey: "faraid.references.hadith", textKey: "faraid.references.hadith.text" },
+              ].map(({ citationKey, textKey }) => (
+                <div key={citationKey} className="space-y-1">
+                  <p className="text-[11px] font-semibold text-primary">
+                    {t(citationKey as any)}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    {t(textKey as any)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* FAQ */}
+      <Card className="print:hidden">
+        <CardContent className="pt-4 pb-2">
+          <p className="text-xs font-semibold mb-1 flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5 text-primary" />
+            {t("faraid.faq.title")}
+          </p>
+          <Accordion type="multiple" className="w-full">
+            {([
+              { q: "faraid.faq.noMaternalGrandfather.q", a: "faraid.faq.noMaternalGrandfather.a" },
+              { q: "faraid.faq.awl.q", a: "faraid.faq.awl.a" },
+              { q: "faraid.faq.hajb.q", a: "faraid.faq.hajb.a" },
+              { q: "faraid.faq.wasiyyah.q", a: "faraid.faq.wasiyyah.a" },
+            ] as const).map(({ q, a }) => (
+              <AccordionItem key={q} value={q}>
+                <AccordionTrigger className="text-xs text-left font-medium py-3 hover:no-underline hover:text-primary">
+                  {t(q)}
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  {t(a)}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
     </div>
   );
 }

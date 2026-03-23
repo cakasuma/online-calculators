@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency } from "@/lib/i18n";
 import {
   PieChart,
@@ -898,6 +899,33 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* FAQ */}
+      <Card className="print:hidden">
+        <CardContent className="pt-4 pb-2">
+          <p className="text-xs font-semibold mb-1 flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5 text-primary" />
+            {t("faraid.faq.title")}
+          </p>
+          <Accordion type="multiple" className="w-full">
+            {([
+              { q: "faraid.faq.noMaternalGrandfather.q", a: "faraid.faq.noMaternalGrandfather.a" },
+              { q: "faraid.faq.awl.q", a: "faraid.faq.awl.a" },
+              { q: "faraid.faq.hajb.q", a: "faraid.faq.hajb.a" },
+              { q: "faraid.faq.wasiyyah.q", a: "faraid.faq.wasiyyah.a" },
+            ] as const).map(({ q, a }) => (
+              <AccordionItem key={q} value={q}>
+                <AccordionTrigger className="text-xs text-left font-medium py-3 hover:no-underline hover:text-primary">
+                  {t(q)}
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  {t(a)}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </CardContent>
       </Card>
 

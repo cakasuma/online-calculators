@@ -186,6 +186,30 @@ const translations = {
   "faraid.maternalSiblingsSection": { en: "Maternal Siblings (uterine)", id: "Saudara Seibu (uterus)" },
   "faraid.otherRelativesSection": { en: "Other Relatives", id: "Kerabat Lainnya" },
   "faraid.distantKindredNote": { en: "Distant Kindred (dhawi al-arham) are not calculated here — consult a qualified Islamic scholar for complex cases.", id: "Kerabat jauh (dzawi al-arham) tidak dihitung di sini — konsultasikan dengan ulama untuk kasus kompleks." },
+
+  // ── Faraid FAQ ──
+  "faraid.faq.title": { en: "Frequently Asked Questions", id: "Pertanyaan yang Sering Ditanyakan" },
+  "faraid.faq.noMaternalGrandfather.q": { en: "Why is there no Maternal Grandfather?", id: "Mengapa tidak ada Kakek dari Ibu?" },
+  "faraid.faq.noMaternalGrandfather.a": {
+    en: "This is intentional and correct in Sunni Islamic law. The maternal grandfather (mother's father) is not a primary heir — he falls under Distant Kindred (dhawi al-arham) and only inherits when no primary heirs exist at all. In Sunni fiqh, male relatives who connect to the deceased through a female link are classified as distant kindred. The paternal grandfather (father's father) is a primary heir because he is in the direct male (agnatic) lineage. Interestingly, both grandmothers are exceptions — they are explicitly recognised as sharers in hadith traditions despite connecting through a female in some cases.",
+    id: "Hal ini disengaja dan benar dalam hukum Islam Sunni. Kakek dari pihak ibu (ayah dari ibu) bukan ahli waris utama — ia termasuk dalam Kerabat Jauh (dzawi al-arham) dan hanya mewarisi jika tidak ada ahli waris utama sama sekali. Dalam fikih Sunni, kerabat laki-laki yang terhubung kepada pewaris melalui jalur perempuan diklasifikasikan sebagai kerabat jauh. Kakek dari pihak ayah adalah ahli waris utama karena ia berada dalam jalur laki-laki (asabah) langsung. Menariknya, kedua nenek merupakan pengecualian — mereka secara eksplisit diakui sebagai ashab al-furud dalam tradisi hadis.",
+  },
+  "faraid.faq.awl.q": { en: "What happens when total fixed shares exceed 100%?", id: "Apa yang terjadi jika total bagian tetap melebihi 100%?" },
+  "faraid.faq.awl.a": {
+    en: "This is resolved by Awl (proportional reduction). Each heir's fixed share is reduced proportionally so that the total equals 100%. For example, if fixed shares add up to 7/6, each heir receives their share divided by 7/6. This ruling was established by Caliph Umar ibn al-Khattab (RA) and agreed upon by the companions.",
+    id: "Hal ini diselesaikan dengan Awl (pengurangan proporsional). Bagian tetap setiap ahli waris dikurangi secara proporsional agar totalnya sama dengan 100%. Misalnya, jika bagian tetap berjumlah 7/6, setiap ahli waris menerima bagiannya dibagi 7/6. Putusan ini ditetapkan oleh Khalifah Umar ibn al-Khattab (RA) dan disepakati oleh para sahabat.",
+  },
+  "faraid.faq.hajb.q": { en: "What does 'Blocked (Hajb)' mean?", id: "Apa arti 'Terhalang (Hajb)'?" },
+  "faraid.faq.hajb.a": {
+    en: "Hajb means a closer heir prevents a more distant one from inheriting. There are two types: Hajb Hirman (complete exclusion, e.g. the father blocks the paternal grandfather) and Hajb Nuqsan (partial reduction, e.g. children reduce the spouse's share). A blocked heir receives nothing, but their presence in the family is still noted.",
+    id: "Hajb berarti ahli waris yang lebih dekat mencegah ahli waris yang lebih jauh untuk mewarisi. Ada dua jenis: Hajb Hirman (pengecualian penuh, mis. ayah menghalangi kakek dari ayah) dan Hajb Nuqsan (pengurangan sebagian, mis. anak-anak mengurangi bagian pasangan). Ahli waris yang terhalang tidak menerima apa-apa, tetapi kehadirannya dalam keluarga tetap dicatat.",
+  },
+  "faraid.faq.wasiyyah.q": { en: "Why is Wasiyyah capped at 1/3?", id: "Mengapa Wasiat dibatasi 1/3?" },
+  "faraid.faq.wasiyyah.a": {
+    en: "The Prophet Muhammad ﷺ instructed that a bequest (wasiyyah) must not exceed one-third of the estate, as recorded in Sahih Bukhari and Muslim. The remainder must be distributed to legal heirs according to Faraid rules. Additionally, a wasiyyah cannot be made in favour of a legal heir — heirs receive their shares through Faraid, not through bequest.",
+    id: "Nabi Muhammad ﷺ memerintahkan agar wasiat tidak melebihi sepertiga harta, sebagaimana tercatat dalam Sahih Bukhari dan Muslim. Sisanya harus dibagikan kepada ahli waris yang sah sesuai ketentuan Faraid. Selain itu, wasiat tidak boleh diberikan kepada ahli waris yang sah — ahli waris menerima bagian mereka melalui Faraid, bukan melalui wasiat.",
+  },
+
   "faraid.calculateDist": { en: "Calculate Distribution", id: "Hitung Pembagian" },
   "faraid.results": { en: "Distribution Results", id: "Hasil Pembagian" },
   "faraid.netEstate": { en: "Net Estate", id: "Harta Bersih" },

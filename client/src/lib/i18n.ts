@@ -118,9 +118,9 @@ const translations = {
 
   // ── Home Page ──
   "home.title": { en: "Islamic Inheritance Calculator", id: "Kalkulator Warisan Islam" },
-  "home.subtitle": { en: "Accurately calculate Faraid (Islamic inheritance) distribution based on Quran and Sunnah.", id: "Hitung pembagian Faraid (waris Islam) secara akurat berdasarkan Al-Quran dan Sunnah." },
+  "home.subtitle": { en: "Accurately calculate Faraid (Islamic inheritance) distribution based on the Quran and Sunnah.", id: "Hitung pembagian Faraid (waris Islam) secara akurat berdasarkan Al-Quran dan Sunnah." },
   "home.faraid.title": { en: "Faraid Calculator", id: "Kalkulator Faraid" },
-  "home.faraid.desc": { en: "Full Islamic inheritance distribution with pie chart visualization, multiple heirs, and detailed breakdown.", id: "Pembagian waris Islam lengkap dengan visualisasi diagram, berbagai ahli waris, dan rincian detail." },
+  "home.faraid.desc": { en: "Full Islamic inheritance distribution with pie chart visualization, support for multiple heirs, and a detailed breakdown.", id: "Pembagian waris Islam lengkap dengan visualisasi diagram, dukungan untuk berbagai ahli waris, dan rincian yang lengkap." },
   "home.faraid.badge": { en: "Featured", id: "Unggulan" },
   "home.tools.title": { en: "Other Tools", id: "Alat Lainnya" },
   "home.basic.title": { en: "Basic Calculator", id: "Kalkulator Dasar" },
@@ -128,16 +128,17 @@ const translations = {
   "home.scientific.title": { en: "Scientific Calculator", id: "Kalkulator Ilmiah" },
   "home.scientific.desc": { en: "Trigonometric functions, logarithms, powers, factorials, and more.", id: "Fungsi trigonometri, logaritma, pangkat, faktorial, dan lainnya." },
   "home.about.title": { en: "What is Faraid?", id: "Apa itu Faraid?" },
+  "home.openCalculator": { en: "Open Calculator", id: "Buka Kalkulator" },
   "home.about.text": {
     en: "Faraid (فرائض) is the Islamic law of inheritance derived from the Quran and Sunnah. It defines the precise shares each heir receives from a deceased person's estate after settling debts and fulfilling any bequest (wasiyyah). This calculator covers primary heirs including spouses, parents, children, grandparents, and siblings.",
-    id: "Faraid (فرائض) adalah hukum waris Islam yang berasal dari Al-Quran dan Sunnah. Ini mendefinisikan bagian tepat yang diterima setiap ahli waris dari harta seseorang yang meninggal setelah melunasi utang dan memenuhi wasiat. Kalkulator ini mencakup ahli waris utama termasuk pasangan, orang tua, anak-anak, kakek-nenek, dan saudara kandung.",
+    id: "Faraid (فرائض) adalah hukum waris Islam yang berasal dari Al-Quran dan Sunnah. Faraid menetapkan bagian tepat yang diterima setiap ahli waris dari harta seseorang yang meninggal setelah melunasi utang dan memenuhi wasiat. Kalkulator ini mencakup ahli waris utama termasuk pasangan, orang tua, anak-anak, kakek-nenek, dan saudara kandung.",
   },
 
   // ── Faraid Calculator ──
   "faraid.disclaimer.title": { en: "Educational Tool", id: "Alat Edukasi" },
   "faraid.disclaimer.text": {
     en: "This calculator covers primary Faraid scenarios based on mainstream Islamic jurisprudence. Always consult a qualified Islamic scholar or certified estate planner for official distribution.",
-    id: "Kalkulator ini mencakup skenario Faraid utama berdasarkan fikih Islam arus utama. Selalu konsultasikan dengan ulama atau perencana warisan bersertifikat untuk pembagian resmi.",
+    id: "Kalkulator ini mencakup skenario Faraid utama berdasarkan fikih Islam arus utama. Selalu konsultasikan dengan ulama Islam atau perencana waris bersertifikat untuk pembagian resmi.",
   },
   "faraid.currency": { en: "Currency", id: "Mata Uang" },
   "faraid.estateDetails": { en: "Estate Details", id: "Detail Harta" },
@@ -145,7 +146,7 @@ const translations = {
   "faraid.totalEstate": { en: "Total Estate Value", id: "Total Nilai Harta" },
   "faraid.totalEstate.placeholder": { en: "e.g. 100,000", id: "cth. 100.000" },
   "faraid.debts": { en: "Debts & Funeral Expenses", id: "Utang & Biaya Pemakaman" },
-  "faraid.wasiyyah": { en: "Wasiyyah / Bequest (max 1/3)", id: "Wasiat (maks 1/3)" },
+  "faraid.wasiyyah": { en: "Wasiyyah / Bequest (max 1/3)", id: "Wasiyyah / Wasiat (maks 1/3)" },
   "faraid.heirs": { en: "Heirs", id: "Ahli Waris" },
   "faraid.spouseSection": { en: "Spouse", id: "Pasangan" },
   "faraid.parentsSection": { en: "Parents & Grandparents", id: "Orang Tua & Kakek-Nenek" },
@@ -194,15 +195,15 @@ const translations = {
   "faraid.consultCTA.title": { en: "Need Professional Advice?", id: "Butuh Saran Profesional?" },
   "faraid.consultCTA.text": {
     en: "For legally binding estate distribution, consult a certified Islamic estate planner or faraid practitioner.",
-    id: "Untuk pembagian harta yang sah secara hukum, konsultasikan dengan perencana warisan Islam bersertifikat atau praktisi faraid.",
+    id: "Untuk pembagian harta yang sah secara hukum, konsultasikan dengan perencana waris Islam bersertifikat atau praktisi faraid.",
   },
   "faraid.consultCTA.button": { en: "Find a Consultant", id: "Cari Konsultan" },
   "faraid.blocked.father": { en: "Father", id: "Ayah" },
   "faraid.blocked.grandfather": { en: "Paternal Grandfather", id: "Kakek" },
   "faraid.blocked.sons": { en: "Sons", id: "Anak Laki-laki" },
   "faraid.spouseBothError": {
-    en: "Deceased cannot have both a husband and wives.",
-    id: "Almarhum tidak bisa memiliki suami dan istri sekaligus.",
+    en: "The deceased cannot have both a husband and wives.",
+    id: "Pewaris tidak dapat memiliki suami dan istri sekaligus.",
   },
   "faraid.siblingsBlockedBy": {
     en: "Siblings are blocked (hajb) by",
@@ -267,7 +268,7 @@ const translations = {
   },
   "tooltip.totalEstate": {
     en: "The total value of all assets owned by the deceased, including property, savings, investments, and personal belongings.",
-    id: "Total nilai seluruh aset milik almarhum, termasuk properti, tabungan, investasi, dan barang pribadi.",
+    id: "Total nilai seluruh aset milik pewaris, termasuk properti, tabungan, investasi, dan barang pribadi.",
   },
   "tooltip.debts": {
     en: "All outstanding debts and funeral/burial expenses that must be settled before inheritance distribution.",
@@ -291,11 +292,11 @@ const translations = {
   },
   "tooltip.father": {
     en: "The father receives 1/6 as a fixed share if the deceased has children. If no children, he becomes asabah (residuary heir).",
-    id: "Ayah menerima 1/6 sebagai bagian tetap jika almarhum memiliki anak. Jika tidak ada anak, dia menjadi asabah (ahli waris sisa).",
+    id: "Ayah menerima 1/6 sebagai bagian tetap jika pewaris memiliki anak. Jika tidak ada anak, dia menjadi asabah (ahli waris sisa).",
   },
   "tooltip.mother": {
     en: "The mother receives 1/6 if the deceased has children, or 1/3 if there are no children.",
-    id: "Ibu menerima 1/6 jika almarhum memiliki anak, atau 1/3 jika tidak ada anak.",
+    id: "Ibu menerima 1/6 jika pewaris memiliki anak, atau 1/3 jika tidak ada anak.",
   },
   "tooltip.sons": {
     en: "Sons are asabah (residuary heirs) who receive the remaining estate. A son's share is twice that of a daughter when both are present.",
@@ -320,6 +321,15 @@ const translations = {
     id: "Utang dan biaya melebihi total nilai harta",
   },
   "validation.wivesMax": { en: "Maximum 4 wives permitted in Islam", id: "Maksimal 4 istri diperbolehkan dalam Islam" },
+
+  // ── Not Found Page ──
+  "notFound.title": { en: "Page not found", id: "Halaman tidak ditemukan" },
+  "notFound.desc": { en: "The page you're looking for doesn't exist.", id: "Halaman yang Anda cari tidak ada." },
+
+  // ── Calculator Labels ──
+  "calc.normal": { en: "Basic", id: "Dasar" },
+  "calc.scientific": { en: "Scientific", id: "Ilmiah" },
+  "calc.faraid": { en: "Faraid", id: "Faraid" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

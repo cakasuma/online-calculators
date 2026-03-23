@@ -861,7 +861,15 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             {t("faraid.disclaimer.title")}
           </p>
           <p className="text-amber-700 dark:text-amber-400 mt-0.5 text-xs">
-            {t("faraid.disclaimer.text")}
+            {t("faraid.disclaimer.text")}{" "}
+            <a
+              href="https://wassiyyah.com/blog/islamic-inheritance-table"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-amber-900 dark:hover:text-amber-200"
+            >
+              {t("faraid.disclaimer.reference")}
+            </a>
           </p>
         </div>
       </div>

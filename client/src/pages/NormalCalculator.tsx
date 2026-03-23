@@ -135,26 +135,26 @@ export default function NormalCalculator({ onCalculate }: Props) {
   }, [handleKey]);
 
   const btnClass = (key: CalcKey) => {
-    const base = "calc-btn h-14 text-sm font-medium rounded-xl transition-all active:scale-95";
-    if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90 col-span-1`;
+    const base = "calc-btn h-16 text-base font-semibold rounded-xl transition-all active:scale-95";
+    if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90 col-span-1 shadow-sm`;
     if (["+", "-", "*", "/"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
     if (["C", "±", "%"].includes(key)) return `${base} bg-muted hover:bg-muted/80 text-muted-foreground`;
     if (key === "⌫") return `${base} bg-muted hover:bg-muted/80 text-destructive`;
-    return `${base} bg-card hover:bg-muted/50 border`;
+    return `${base} bg-card hover:bg-muted/50 border text-foreground`;
   };
 
   return (
-    <div className="max-w-xs mx-auto">
+    <div className="max-w-sm mx-auto w-full">
       {/* Display */}
-      <div className="mb-3 p-4 rounded-2xl bg-card border min-h-[80px] flex flex-col justify-end items-end overflow-hidden">
+      <div className="mb-3 p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
         {expression && (
-          <p className="text-xs text-muted-foreground font-mono mb-1 truncate max-w-full">
+          <p className="text-sm text-muted-foreground font-mono mb-1 truncate max-w-full">
             {expression}
           </p>
         )}
         <p
           className="font-mono font-semibold text-right break-all"
-          style={{ fontSize: display.length > 12 ? "1.25rem" : display.length > 8 ? "1.75rem" : "2.25rem" }}
+          style={{ fontSize: display.length > 12 ? "1.5rem" : display.length > 8 ? "2rem" : "2.75rem" }}
           data-testid="display-main"
         >
           {display}
@@ -162,7 +162,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
       </div>
 
       {/* Buttons */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2.5">
         {BUTTONS.flat().map((key) => (
           <button
             key={key}
@@ -170,7 +170,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
             className={btnClass(key)}
             data-testid={`btn-${key}`}
           >
-            {key === "⌫" ? <Delete className="w-4 h-4" /> : key}
+            {key === "⌫" ? <Delete className="w-5 h-5" /> : key}
           </button>
         ))}
       </div>

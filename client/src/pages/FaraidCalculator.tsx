@@ -1554,31 +1554,31 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
       {/* Quranic & Hadith References */}
       <Card className="print:hidden">
-        <CardContent className="pt-3 pb-3">
+        <CardContent className="pt-5 pb-3">
           <button
             type="button"
             onClick={() => setShowRefs((v) => !v)}
-            className="w-full flex items-center justify-between text-xs font-medium hover:text-primary transition-colors"
+            className="w-full flex items-center justify-between text-sm font-semibold hover:text-primary transition-colors"
           >
-            <span className="flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-primary" />
+            <span className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-primary" />
               {t("faraid.references.title")}
             </span>
-            {showRefs ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            {showRefs ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
           {showRefs && (
-            <div className="mt-3 space-y-3 border-t pt-3">
+            <div className="mt-4 space-y-4 border-t pt-4">
               {[
                 { citationKey: "faraid.references.quran411", textKey: "faraid.references.quran411.text" },
                 { citationKey: "faraid.references.quran412", textKey: "faraid.references.quran412.text" },
                 { citationKey: "faraid.references.quran4176", textKey: "faraid.references.quran4176.text" },
                 { citationKey: "faraid.references.hadith", textKey: "faraid.references.hadith.text" },
               ].map(({ citationKey, textKey }) => (
-                <div key={citationKey} className="space-y-1">
-                  <p className="text-xs font-semibold text-primary">
+                <div key={citationKey} className="space-y-1.5">
+                  <p className="text-sm font-semibold text-primary">
                     {t(citationKey as any)}
                   </p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {t(textKey as any)}
                   </p>
                 </div>

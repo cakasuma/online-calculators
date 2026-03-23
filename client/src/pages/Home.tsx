@@ -34,7 +34,7 @@ export default function HomePage() {
                 </p>
                 <div className="mt-3">
                   <Button size="sm" className="gap-1.5 text-xs pointer-events-none">
-                    Open Calculator
+                    {t("home.openCalculator")}
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
                 </div>

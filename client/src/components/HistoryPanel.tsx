@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { HistoryEntry } from "@/lib/history";
 import { useLocale } from "@/hooks/use-locale";
+import type { TranslationKey } from "@/lib/i18n";
 
 const calcIcon: Record<HistoryEntry["calculator"], typeof Calculator> = {
   normal: Calculator,
@@ -10,10 +11,10 @@ const calcIcon: Record<HistoryEntry["calculator"], typeof Calculator> = {
   faraid: Scale,
 };
 
-const calcLabel: Record<HistoryEntry["calculator"], string> = {
-  normal: "Basic",
-  scientific: "Scientific",
-  faraid: "Faraid",
+const calcLabelKey: Record<HistoryEntry["calculator"], TranslationKey> = {
+  normal: "calc.normal",
+  scientific: "calc.scientific",
+  faraid: "calc.faraid",
 };
 
 function formatTime(ts: number, locale: string): string {
@@ -88,7 +89,7 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[10px] text-muted-foreground/60">
-                      {calcLabel[entry.calculator]}
+                      {t(calcLabelKey[entry.calculator])}
                     </span>
                     <span className="text-[10px] text-muted-foreground/40">
                       {formatTime(entry.timestamp, locale)}

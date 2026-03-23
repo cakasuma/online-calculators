@@ -224,7 +224,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
   }, [handleKey]);
 
   const sciBtnClass =
-    "calc-btn h-11 text-xs font-medium rounded-xl bg-muted/60 hover:bg-muted border transition-all active:scale-95";
+    "calc-btn h-12 text-xs font-medium rounded-xl bg-muted/60 hover:bg-muted border transition-all active:scale-95";
   const numBtnClass = (key: string) => {
     const base = "calc-btn h-14 text-base font-semibold rounded-xl transition-all active:scale-95";
     if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm`;

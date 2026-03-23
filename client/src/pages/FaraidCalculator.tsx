@@ -700,15 +700,15 @@ function Counter({
       <button
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-7 h-7 rounded-md border flex items-center justify-center hover:bg-muted text-sm font-medium"
+        className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold"
       >
         −
       </button>
-      <span className="text-sm font-mono w-6 text-center">{value}</span>
+      <span className="text-base font-mono w-7 text-center font-semibold">{value}</span>
       <button
         type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
-        className="w-7 h-7 rounded-md border flex items-center justify-center hover:bg-muted text-sm font-medium"
+        className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold"
       >
         +
       </button>
@@ -878,14 +878,14 @@ export default function FaraidCalculator({ onCalculate }: Props) {
       <Card>
         <CardContent className="pt-4 pb-3">
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs font-medium text-muted-foreground">{t("faraid.currency")}:</span>
-            <div className="flex flex-wrap gap-1.5">
+            <span className="text-sm font-medium text-muted-foreground">{t("faraid.currency")}:</span>
+            <div className="flex flex-wrap gap-2">
               {CURRENCIES.map((c) => (
                 <button
                   key={c.code}
                   type="button"
                   onClick={() => setField("currency", c.code)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  className={`px-3 py-2 rounded-full text-sm font-medium border transition-colors ${
                     form.currency === c.code
                       ? "bg-primary text-primary-foreground border-primary"
                       : "border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
@@ -902,10 +902,10 @@ export default function FaraidCalculator({ onCalculate }: Props) {
       {/* Estate Details */}
       <Card>
         <CardContent className="pt-5 space-y-4">
-          <h2 className="text-sm font-semibold">{t("faraid.estateDetails")}</h2>
+          <h2 className="text-base font-semibold">{t("faraid.estateDetails")}</h2>
 
-          <div className="space-y-1">
-            <Label htmlFor="total-estate" className="text-xs">
+          <div className="space-y-1.5">
+            <Label htmlFor="total-estate" className="text-sm">
               <TermTooltip termKey="tooltip.totalEstate">{t("faraid.totalEstate")}</TermTooltip>
             </Label>
             <div className="relative">
@@ -930,8 +930,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             )}
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="debts" className="text-xs">
+          <div className="space-y-1.5">
+            <Label htmlFor="debts" className="text-sm">
               <TermTooltip termKey="tooltip.debts">{t("faraid.debts")}</TermTooltip>
             </Label>
             <div className="relative">
@@ -956,8 +956,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             )}
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="wasiyyah" className="text-xs">
+          <div className="space-y-1.5">
+            <Label htmlFor="wasiyyah" className="text-sm">
               <TermTooltip termKey="tooltip.wasiyyah">{t("faraid.wasiyyah")}</TermTooltip>
             </Label>
             <div className="relative">
@@ -1014,7 +1014,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
       {/* Heirs */}
       <Card>
         <CardContent className="pt-5 space-y-5">
-          <h2 className="text-sm font-semibold">{t("faraid.heirs")}</h2>
+          <h2 className="text-base font-semibold">{t("faraid.heirs")}</h2>
           {errors.heirs && (
             <p className="text-xs text-destructive flex items-center gap-1">
               <Info className="w-3 h-3" /> {errors.heirs}
@@ -1028,8 +1028,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {/* Husband */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border bg-card">
-                <Label htmlFor="hasHusband" className="text-xs cursor-pointer">
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+                <Label htmlFor="hasHusband" className="text-sm cursor-pointer">
                   <TermTooltip termKey="tooltip.husband">{t("faraid.husband")}</TermTooltip>
                 </Label>
                 <Switch
@@ -1043,8 +1043,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               </div>
 
               {/* Wives count */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border bg-card">
-                <Label className="text-xs">
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+                <Label className="text-sm">
                   <TermTooltip termKey="tooltip.numberOfWives">{t("faraid.numberOfWives")}</TermTooltip>
                 </Label>
                 <Counter
@@ -1074,8 +1074,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 { key: "hasFather", labelKey: "faraid.father", tooltipKey: "tooltip.father" },
                 { key: "hasMother", labelKey: "faraid.mother", tooltipKey: "tooltip.mother" },
               ].map(({ key, labelKey, tooltipKey }) => (
-                <div key={key} className="flex items-center justify-between p-2.5 rounded-lg border bg-card">
-                  <Label htmlFor={key} className="text-xs cursor-pointer">
+                <div key={key} className="flex items-center justify-between p-3 rounded-lg border bg-card">
+                  <Label htmlFor={key} className="text-sm cursor-pointer">
                     <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
                   </Label>
                   <Switch
@@ -1088,14 +1088,14 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
               {/* Paternal Grandfather */}
               <div
-                className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${
+                className={`flex items-center justify-between p-3 rounded-lg border bg-card ${
                   form.hasFather ? "opacity-50" : ""
                 }`}
               >
-                <Label htmlFor="hasPaternalGrandfather" className="text-xs cursor-pointer flex-1">
+                <Label htmlFor="hasPaternalGrandfather" className="text-sm cursor-pointer flex-1">
                   <TermTooltip termKey="tooltip.grandfather">{t("faraid.grandfather")}</TermTooltip>
                   {form.hasFather && (
-                    <span className="ml-2 text-muted-foreground text-[10px]">
+                    <span className="ml-2 text-muted-foreground text-xs">
                       ({t("faraid.blockedNote")} {t("faraid.blocked.father")})
                     </span>
                   )}
@@ -1117,11 +1117,11 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                   ? "faraid.blocked.father"
                   : "faraid.blocked.grandfather";
                 return (
-                  <div className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${pgmBlocked ? "opacity-50" : ""}`}>
-                    <Label htmlFor="hasPaternalGrandmother" className="text-xs cursor-pointer flex-1">
+                  <div className={`flex items-center justify-between p-3 rounded-lg border bg-card ${pgmBlocked ? "opacity-50" : ""}`}>
+                    <Label htmlFor="hasPaternalGrandmother" className="text-sm cursor-pointer flex-1">
                       <TermTooltip termKey="tooltip.paternalGrandmother">{t("faraid.paternalGrandmother")}</TermTooltip>
                       {pgmBlocked && (
-                        <span className="ml-2 text-muted-foreground text-[10px]">
+                        <span className="ml-2 text-muted-foreground text-xs">
                           ({t("faraid.blockedNote")} {t(pgmBlockerKey as any)})
                         </span>
                       )}
@@ -1140,11 +1140,11 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               {(() => {
                 const mgmBlocked = form.hasMother;
                 return (
-                  <div className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${mgmBlocked ? "opacity-50" : ""}`}>
-                    <Label htmlFor="hasMaternalGrandmother" className="text-xs cursor-pointer flex-1">
+                  <div className={`flex items-center justify-between p-3 rounded-lg border bg-card ${mgmBlocked ? "opacity-50" : ""}`}>
+                    <Label htmlFor="hasMaternalGrandmother" className="text-sm cursor-pointer flex-1">
                       <TermTooltip termKey="tooltip.maternalGrandmother">{t("faraid.maternalGrandmother")}</TermTooltip>
                       {mgmBlocked && (
-                        <span className="ml-2 text-muted-foreground text-[10px]">
+                        <span className="ml-2 text-muted-foreground text-xs">
                           ({t("faraid.blockedNote")} {t("faraid.blocked.mother")})
                         </span>
                       )}
@@ -1172,7 +1172,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 { key: "daughters", labelKey: "faraid.daughters", tooltipKey: "tooltip.daughters" },
               ].map(({ key, labelKey, tooltipKey }) => (
                 <div key={key} className="space-y-1">
-                  <Label className="text-xs">
+                  <Label className="text-sm">
                     <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
                   </Label>
                   <Counter
@@ -1201,7 +1201,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 { key: "granddaughters", labelKey: "faraid.granddaughters", tooltipKey: "tooltip.granddaughters", blocked: form.sons > 0 || (form.daughters >= 2 && form.grandsons === 0) },
               ].map(({ key, labelKey, tooltipKey, blocked }) => (
                 <div key={key} className={`space-y-1 ${blocked ? "opacity-50" : ""}`}>
-                  <Label className="text-xs">
+                  <Label className="text-sm">
                     <TermTooltip termKey={tooltipKey as any}>{t(labelKey as any)}</TermTooltip>
                   </Label>
                   <Counter
@@ -1221,7 +1221,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
             {/* Full siblings */}
             <div className="space-y-2">
-              <p className="text-[11px] font-medium text-muted-foreground">{t("faraid.fullSiblingsSection")}</p>
+              <p className="text-xs font-medium text-muted-foreground">{t("faraid.fullSiblingsSection")}</p>
               {(form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0) && (
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Info className="w-3 h-3 flex-shrink-0" />
@@ -1264,7 +1264,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               const psBlocked = form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0 || form.fullBrothers > 0;
               return (
                 <div className="space-y-2">
-                  <p className="text-[11px] font-medium text-muted-foreground">{t("faraid.paternalSiblingsSection")}</p>
+                  <p className="text-xs font-medium text-muted-foreground">{t("faraid.paternalSiblingsSection")}</p>
                   {psBlocked && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Info className="w-3 h-3 flex-shrink-0" />
@@ -1309,7 +1309,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 : "faraid.blocked.sons";
               return (
                 <div className="space-y-2">
-                  <p className="text-[11px] font-medium text-muted-foreground">{t("faraid.maternalSiblingsSection")}</p>
+                  <p className="text-xs font-medium text-muted-foreground">{t("faraid.maternalSiblingsSection")}</p>
                   {mbBlocked && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Info className="w-3 h-3 flex-shrink-0" />
@@ -1346,8 +1346,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             {(() => {
               const cBlocked = form.hasFather || form.hasPaternalGrandfather || form.sons > 0 || form.grandsons > 0 || form.fullBrothers > 0 || form.paternalBrothers > 0;
               return (
-                <div className={`flex items-center justify-between p-2.5 rounded-lg border bg-card ${cBlocked ? "opacity-50" : ""}`}>
-                  <Label htmlFor="hasConsanguineMale" className="text-xs cursor-pointer flex-1">
+                <div className={`flex items-center justify-between p-3 rounded-lg border bg-card ${cBlocked ? "opacity-50" : ""}`}>
+                  <Label htmlFor="hasConsanguineMale" className="text-sm cursor-pointer flex-1">
                     <TermTooltip termKey="tooltip.consanguineMale">{t("faraid.consanguineMale")}</TermTooltip>
                   </Label>
                   <Switch
@@ -1360,7 +1360,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               );
             })()}
             {/* Distant Kindred note */}
-            <p className="text-[11px] text-muted-foreground flex items-start gap-1">
+            <p className="text-xs text-muted-foreground flex items-start gap-1">
               <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
               {t("faraid.distantKindredNote")}
             </p>
@@ -1403,13 +1403,13 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
               {/* Notes */}
               {result.hasAwl && (
-                <div className="flex items-start gap-2 p-2.5 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 text-xs">
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 text-sm">
                   <AlertTriangle className="w-3.5 h-3.5 text-orange-500 flex-shrink-0 mt-0.5" />
                   <span className="text-orange-800 dark:text-orange-300">{t("faraid.awlNote")}</span>
                 </div>
               )}
               {result.hasUmariyyatain && (
-                <div className="flex items-start gap-2 p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs">
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-sm">
                   <Info className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
                   <span className="text-blue-800 dark:text-blue-300">{t("faraid.umariyyatainNote")}</span>
                 </div>
@@ -1420,7 +1420,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 {result.heirs.map((heir, idx) => (
                   <div
                     key={heir.key}
-                    className="p-2.5 rounded-lg bg-muted/40 space-y-1 overflow-hidden"
+                    className="p-3 rounded-lg bg-muted/40 space-y-1.5 overflow-hidden"
                   >
                     {/* Row 1: name + percentage */}
                     <div className="flex items-center justify-between gap-2">
@@ -1429,18 +1429,18 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                           className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                           style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
                         />
-                        <span className="text-xs font-medium leading-tight truncate">{heirName(heir)}</span>
+                        <span className="text-sm font-medium leading-tight truncate">{heirName(heir)}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground font-mono flex-shrink-0">
+                      <span className="text-sm text-muted-foreground font-mono flex-shrink-0">
                         {heir.percentage.toFixed(1)}%
                       </span>
                     </div>
                     {/* Row 2: share badge + amount */}
                     <div className="flex items-center justify-between gap-2 pl-[18px] flex-wrap">
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                      <Badge variant="secondary" className="text-xs px-2 py-0.5">
                         {translateShare(heir.share)}
                       </Badge>
-                      <span className="text-xs font-mono font-semibold">
+                      <span className="text-sm font-mono font-semibold">
                         {formatAmount(heir.amount)}
                       </span>
                     </div>
@@ -1459,8 +1459,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                       key={i}
                       className="flex flex-wrap items-center justify-between gap-1 p-2 rounded-lg bg-muted/20 border border-dashed opacity-60"
                     >
-                      <span className="text-xs text-muted-foreground line-through">{t(b.nameKey as any)}</span>
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-sm text-muted-foreground line-through">{t(b.nameKey as any)}</span>
+                      <span className="text-xs text-muted-foreground">
                         {t("faraid.blockedNote")}: {t(b.blockedByKey as any)}
                       </span>
                     </div>
@@ -1475,7 +1475,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                     <span className="text-muted-foreground">{t("faraid.undistributed")}</span>
                     <span className="font-mono font-medium">{formatAmount(result.undistributed)}</span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground">{t("faraid.undistributedNote")}</p>
+                  <p className="text-xs text-muted-foreground">{t("faraid.undistributedNote")}</p>
                 </div>
               )}
 
@@ -1575,10 +1575,10 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 { citationKey: "faraid.references.hadith", textKey: "faraid.references.hadith.text" },
               ].map(({ citationKey, textKey }) => (
                 <div key={citationKey} className="space-y-1">
-                  <p className="text-[11px] font-semibold text-primary">
+                  <p className="text-xs font-semibold text-primary">
                     {t(citationKey as any)}
                   </p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     {t(textKey as any)}
                   </p>
                 </div>

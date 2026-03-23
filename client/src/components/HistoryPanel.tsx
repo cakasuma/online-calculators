@@ -43,7 +43,7 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
         <Clock className="w-8 h-8 mb-3 opacity-40" />
         <p className="text-sm">{t("common.noHistory")}</p>
-        <p className="text-xs mt-1 opacity-60">{t("common.historyHint")}</p>
+        <p className="text-xs mt-1.5 opacity-60">{t("common.historyHint")}</p>
       </div>
     );
   }
@@ -58,10 +58,10 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
           variant="ghost"
           size="sm"
           onClick={onClear}
-          className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
+          className="text-xs text-muted-foreground hover:text-destructive h-8 px-2"
           data-testid="button-clear-history"
         >
-          <Trash2 className="w-3 h-3 mr-1" />
+          <Trash2 className="w-3.5 h-3.5 mr-1" />
           {t("common.clear")}
         </Button>
       </div>
@@ -72,12 +72,12 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
             return (
               <div
                 key={entry.id}
-                className="group flex items-start gap-2.5 p-2.5 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                className="group flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => onUseEntry?.(entry)}
                 data-testid={`history-entry-${entry.id}`}
               >
-                <div className="flex-shrink-0 w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center mt-0.5">
-                  <Icon className="w-3.5 h-3.5 text-primary" />
+                <div className="flex-shrink-0 w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center mt-0.5">
+                  <Icon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground truncate font-mono">
@@ -86,11 +86,11 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
                   <p className="text-sm font-semibold font-mono truncate">
                     = {entry.result}
                   </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[10px] text-muted-foreground/60">
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-muted-foreground/60">
                       {calcLabel[entry.calculator]}
                     </span>
-                    <span className="text-[10px] text-muted-foreground/40">
+                    <span className="text-xs text-muted-foreground/40">
                       {formatTime(entry.timestamp, locale)}
                     </span>
                   </div>
@@ -100,10 +100,10 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
                     e.stopPropagation();
                     onRemove(entry.id);
                   }}
-                  className="opacity-0 group-hover:opacity-100 flex-shrink-0 p-1 rounded hover:bg-destructive/10 hover:text-destructive transition-all"
+                  className="opacity-40 hover:opacity-100 flex-shrink-0 p-1.5 rounded-md hover:bg-destructive/10 hover:text-destructive transition-all"
                   data-testid={`button-remove-${entry.id}`}
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             );

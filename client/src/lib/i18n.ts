@@ -137,7 +137,7 @@ const translations = {
   "faraid.disclaimer.title": { en: "Educational Tool", id: "Alat Edukasi" },
   "faraid.disclaimer.text": {
     en: "This calculator covers primary Faraid scenarios based on mainstream Islamic jurisprudence. Always consult a qualified Islamic scholar or certified estate planner for official distribution.",
-    id: "Kalkulator ini mencakup skenario Faraid utama berdasarkan fikih Islam arus utama. Selalu konsultasikan dengan ulama atau perencana warisan bersertifikat untuk pembagian resmi.",
+    id: "Kalkulator ini mencakup skenario Faraid utama berdasarkan fikih Islam yang muktabar. Selalu konsultasikan dengan ulama atau perencana warisan bersertifikat untuk pembagian resmi.",
   },
   "faraid.disclaimer.reference": { en: "Learn more about Islamic inheritance.", id: "Pelajari lebih lanjut tentang waris Islam." },
   "faraid.currency": { en: "Currency", id: "Mata Uang" },

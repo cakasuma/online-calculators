@@ -1590,9 +1590,9 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
       {/* FAQ */}
       <Card className="print:hidden">
-        <CardContent className="pt-4 pb-2">
-          <p className="text-xs font-semibold mb-1 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-primary" />
+        <CardContent className="pt-5 pb-3">
+          <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
             {t("faraid.faq.title")}
           </p>
           <Accordion type="multiple" className="w-full">
@@ -1603,10 +1603,10 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               { q: "faraid.faq.wasiyyah.q", a: "faraid.faq.wasiyyah.a" },
             ] as const).map(({ q, a }) => (
               <AccordionItem key={q} value={q}>
-                <AccordionTrigger className="text-xs text-left font-medium py-3 hover:no-underline hover:text-primary">
+                <AccordionTrigger className="text-sm text-left font-medium py-4 hover:no-underline hover:text-primary">
                   {t(q)}
                 </AccordionTrigger>
-                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-2">
                   {t(a)}
                 </AccordionContent>
               </AccordionItem>

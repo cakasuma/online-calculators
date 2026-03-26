@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Calculator, FlaskConical, Scale, ArrowRight, BookOpen, FileText } from "lucide-react";
+import { Calculator, FlaskConical, Scale, ArrowRight, BookOpen, FileText, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,6 +65,34 @@ export default function HomePage() {
                 <div className="mt-4">
                   <Button size="sm" variant="outline" className="gap-2 text-sm pointer-events-none h-9 px-4 border-emerald-500/40 text-emerald-700 dark:text-emerald-400">
                     {t("home.wasiat.cta")}
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+
+      {/* Featured: Zakat Calculator */}
+      <Link href="/zakat">
+        <Card className="group hover:border-amber-500/60 hover:shadow-md transition-all cursor-pointer border-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20">
+          <CardContent className="p-5 sm:p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-500/20 transition-colors">
+                <Star className="w-7 h-7 text-amber-700 dark:text-amber-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <h2 className="text-lg font-semibold">{t("home.zakat.title")}</h2>
+                  <Badge variant="secondary" className="text-xs px-2 py-0.5">{t("home.zakat.badge")}</Badge>
+                </div>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {t("home.zakat.desc")}
+                </p>
+                <div className="mt-4">
+                  <Button size="sm" variant="outline" className="gap-2 text-sm pointer-events-none h-9 px-4 border-amber-500/40 text-amber-700 dark:text-amber-400">
+                    {t("home.zakat.cta")}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { Link } from "wouter";
 import { AlertTriangle, Info, Printer, Users, BookOpen, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -723,11 +724,38 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   const [result, setResult] = useState<DistributionResult | null>(null);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showRefs, setShowRefs] = useState(false);
+  const [wasiatLoaded, setWasiatLoaded] = useState(false);
 
   // Auto-set currency when locale changes
   useEffect(() => {
     setForm((f) => ({ ...f, currency: locale === "id" ? "IDR" : "MYR" }));
   }, [locale]);
+
+  // Load wasiat plan from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("wasiat-plan");
+    if (saved) {
+      try {
+        const plan = JSON.parse(saved);
+        const bequests: Array<{ type: string; amount: string }> = plan.bequests ?? [];
+        const estateNum = parseFloat((plan.estateValue ?? "").replace(/,/g, "")) || 0;
+        const total = bequests.reduce((sum: number, b) => {
+          const amt = parseFloat((b.amount ?? "").replace(/,/g, "")) || 0;
+          if (b.type === "percentage") {
+            return sum + (estateNum > 0 ? (amt / 100) * estateNum : 0);
+          }
+          return sum + amt;
+        }, 0);
+        if (total > 0) {
+          setForm((f) => ({ ...f, wasiyyah: String(Math.round(total)) }));
+          setWasiatLoaded(true);
+        }
+      } catch {
+        // ignore invalid data
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const currencySymbol = CURRENCIES.find((c) => c.code === form.currency)?.symbol ?? "RM";
 
@@ -979,6 +1007,32 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             </div>
             {errors.wasiyyah && (
               <p className="text-xs text-destructive">{errors.wasiyyah}</p>
+            )}
+            {wasiatLoaded && (
+              <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-primary/10 border border-primary/20 text-xs print:hidden">
+                <span className="text-foreground flex items-center gap-1">
+                  <Info className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                  Loaded from your Wasiat plan.{" "}
+                  <Link href="/wasiat">
+                    <span className="text-primary underline cursor-pointer">Edit it</span>
+                  </Link>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setWasiatLoaded(false)}
+                  className="text-muted-foreground hover:text-foreground transition-colors ml-1"
+                  aria-label="Dismiss"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            {!wasiatLoaded && (
+              <Link href="/wasiat">
+                <span className="inline-flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors cursor-pointer print:hidden">
+                  {t("wasiat.planCTA")}
+                </span>
+              </Link>
             )}
           </div>
 

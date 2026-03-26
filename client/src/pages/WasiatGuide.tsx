@@ -143,6 +143,7 @@ export default function WasiatGuide() {
   }
 
   function generatePDF() {
+    const sym = CURRENCIES.find((c) => c.code === form.currency)?.symbol ?? form.currency;
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
     const margin = 20;
@@ -168,13 +169,13 @@ export default function WasiatGuide() {
     y += 6;
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Name: ${form.fullName || "—"}`, margin, y); y += 5;
-    doc.text(`IC / Passport: ${form.ic || "—"}`, margin, y); y += 5;
+    doc.text(`Name: ${form.fullName || "\u2014"}`, margin, y); y += 5;
+    doc.text(`IC / Passport: ${form.ic || "\u2014"}`, margin, y); y += 5;
     const formattedDate = form.date
       ? new Date(form.date + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-      : "—";
+      : "\u2014";
     doc.text(`Date: ${formattedDate}`, margin, y); y += 5;
-    doc.text(`Estimated Estate: ${currencySymbol} ${form.estateValue || "0"}`, margin, y); y += 10;
+    doc.text(`Estimated Estate: ${sym} ${form.estateValue || "0"}`, margin, y); y += 10;
 
     // Bequests
     doc.setFontSize(12);
@@ -187,8 +188,8 @@ export default function WasiatGuide() {
       doc.text("No bequests specified.", margin, y); y += 5;
     } else {
       form.bequests.forEach((b, i) => {
-        const amtStr = b.type === "percentage" ? `${b.amount}%` : `${currencySymbol} ${b.amount}`;
-        const line = `${i + 1}. ${b.recipient || "—"}${b.relationship ? ` (${b.relationship})` : ""} — ${b.type}: ${amtStr}`;
+        const amtStr = b.type === "percentage" ? `${b.amount}%` : `${sym} ${b.amount}`;
+        const line = `${i + 1}. ${b.recipient || "\u2014"}${b.relationship ? ` (${b.relationship})` : ""} \u2014 ${b.type}: ${amtStr}`;
         const lines = doc.splitTextToSize(line, contentW);
         doc.text(lines, margin, y);
         y += lines.length * 5;
@@ -492,13 +493,13 @@ export default function WasiatGuide() {
             <div className="space-y-1.5">
               <Label htmlFor="wasiatDate" className="text-sm">{t("wasiat.form.date")}</Label>
               <div className="w-full overflow-hidden">
-                <Input
+                <input
                   id="wasiatDate"
                   type="date"
                   value={form.date}
                   onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-                  className="w-full block min-w-0"
-                  style={{ maxWidth: "100%" }}
+                  className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  style={{ maxWidth: "100%", boxSizing: "border-box" }}
                 />
               </div>
             </div>

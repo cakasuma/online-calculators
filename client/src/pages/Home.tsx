@@ -9,14 +9,16 @@ export default function HomePage() {
   const { t } = useLocale();
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-4">
       {/* Hero */}
-      <div className="mb-2">
+      <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("home.title")}</h1>
         <p className="text-muted-foreground text-base mt-2 leading-relaxed">{t("home.subtitle")}</p>
       </div>
 
-      {/* Featured: Faraid Calculator */}
+      {/* Featured Islamic Tools */}
+      <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Islamic Tools</p>
+      <div className="flex flex-col gap-4">
       <Link href="/faraid">
         <Card className="group hover:border-primary/60 hover:shadow-md transition-all cursor-pointer border-primary/30 bg-primary/5">
           <CardContent className="p-5 sm:p-6">
@@ -71,6 +73,7 @@ export default function HomePage() {
           </CardContent>
         </Card>
       </Link>
+      </div>
 
       {/* About Faraid */}
       <Card className="bg-muted/30">

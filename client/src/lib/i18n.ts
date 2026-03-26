@@ -438,7 +438,7 @@ const translations = {
   "wasiat.form.fullname.placeholder": { en: "e.g. Ahmad bin Abdullah", id: "mis. Ahmad bin Abdullah" },
   "wasiat.form.ic": { en: "IC / Passport Number", id: "No. KTP / Paspor" },
   "wasiat.form.ic.placeholder": { en: "e.g. 800101-14-5678", id: "mis. 800101-14-5678" },
-  "wasiat.form.date": { en: "Date", id: "Tanggal" },
+  "wasiat.form.date": { en: "Date of Wasiat Declaration", id: "Tanggal Pernyataan Wasiat" },
   "wasiat.form.estate.title": { en: "Estate Details", id: "Detail Harta" },
   "wasiat.form.estateValue": { en: "Total Estimated Estate Value", id: "Perkiraan Total Nilai Harta" },
   "wasiat.form.bequests.title": { en: "Bequests", id: "Daftar Wasiat" },

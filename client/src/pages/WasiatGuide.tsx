@@ -471,9 +471,12 @@ export default function WasiatGuide() {
                         <Label className="text-xs">{t("wasiat.form.bequests.type")}</Label>
                         <select
                           value={b.type}
-                          onChange={(e) =>
-                            updateBequest(b.id, "type", e.target.value as Bequest["type"])
-                          }
+                          onChange={(e) => {
+                            const newType = e.target.value as Bequest["type"];
+                            updateBequest(b.id, "type", newType);
+                            // Clear amount when type changes to avoid misinterpreting formatted values
+                            updateBequest(b.id, "amount", "");
+                          }}
                           className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                         >
                           <option value="cash">{t("wasiat.form.bequests.type.cash")}</option>

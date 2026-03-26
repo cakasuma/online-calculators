@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { Link } from "wouter";
 import { AlertTriangle, Info, Printer, Users, BookOpen, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -980,6 +981,11 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             {errors.wasiyyah && (
               <p className="text-xs text-destructive">{errors.wasiyyah}</p>
             )}
+            <Link href="/wasiat">
+              <span className="inline-flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors cursor-pointer print:hidden">
+                {t("wasiat.planCTA")}
+              </span>
+            </Link>
           </div>
 
           {/* Live estate breakdown */}

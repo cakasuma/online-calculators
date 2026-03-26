@@ -30,6 +30,7 @@ import HomePage from "@/pages/Home";
 import NormalCalculator from "@/pages/NormalCalculator";
 import ScientificCalculator from "@/pages/ScientificCalculator";
 import FaraidCalculator from "@/pages/FaraidCalculator";
+import WasiatGuide from "@/pages/WasiatGuide";
 import NotFound from "@/pages/not-found";
 
 // ─── Localized Hash Location ──────────────────────────────────────────────────
@@ -214,6 +215,7 @@ function Layout() {
             <Route path="/faraid">
               <FaraidCalculator onCalculate={handleCalculate("faraid")} />
             </Route>
+            <Route path="/wasiat" component={WasiatGuide} />
             <Route component={NotFound} />
           </Switch>
         </main>

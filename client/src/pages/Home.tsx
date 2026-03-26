@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Calculator, FlaskConical, Scale, ArrowRight, BookOpen } from "lucide-react";
+import { Calculator, FlaskConical, Scale, ArrowRight, BookOpen, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,34 @@ export default function HomePage() {
                 <div className="mt-4">
                   <Button size="sm" className="gap-2 text-sm pointer-events-none h-9 px-4">
                     Open Calculator
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+
+      {/* Featured: Wasiat Guide */}
+      <Link href="/wasiat">
+        <Card className="group hover:border-emerald-500/60 hover:shadow-md transition-all cursor-pointer border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20">
+          <CardContent className="p-5 sm:p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-500/20 transition-colors">
+                <FileText className="w-7 h-7 text-emerald-700 dark:text-emerald-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <h2 className="text-lg font-semibold">{t("home.wasiat.title")}</h2>
+                  <Badge variant="secondary" className="text-xs px-2 py-0.5">{t("home.wasiat.badge")}</Badge>
+                </div>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {t("home.wasiat.desc")}
+                </p>
+                <div className="mt-4">
+                  <Button size="sm" variant="outline" className="gap-2 text-sm pointer-events-none h-9 px-4 border-emerald-500/40 text-emerald-700 dark:text-emerald-400">
+                    {t("home.wasiat.cta")}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>

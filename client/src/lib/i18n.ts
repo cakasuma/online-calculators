@@ -466,7 +466,7 @@ const translations = {
   "wasiat.lawyer.title": { en: "Lawyer & Registration Checklist", id: "Daftar Periksa Notaris & Pendaftaran" },
   "wasiat.lawyer.witnesses": { en: "Sign in the presence of 2 adult Muslim witnesses", id: "Tanda tangan di hadapan 2 saksi Muslim dewasa" },
   "wasiat.lawyer.solicitor": { en: "Sign in front of a licensed solicitor / notary public", id: "Tanda tangan di hadapan pengacara / notaris berlisensi" },
-  "wasiat.lawyer.register": { en: "Register with Amanah Raya Berhad (Malaysia) or the relevant authority", id: "Daftarkan ke Amanah Raya Berhad (Malaysia) atau otoritas terkait" },
+  "wasiat.lawyer.register": { en: "Register with a will registry or relevant authority in your jurisdiction", id: "Daftarkan ke lembaga pendaftaran wasiat atau otoritas terkait di yurisdiksi Anda" },
   "wasiat.lawyer.copy": { en: "Keep one copy with your executor and one with your solicitor", id: "Simpan satu salinan dengan eksekutor dan satu dengan pengacara Anda" },
   "wasiat.print": { en: "Print / Save PDF", id: "Cetak / Simpan PDF" },
   "wasiat.backToFaraid": { en: "Back to Faraid Calculator", id: "Kembali ke Kalkulator Faraid" },

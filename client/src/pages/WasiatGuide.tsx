@@ -6,7 +6,6 @@ import {
   Trash2,
   CheckCircle2,
   AlertTriangle,
-  Scale,
   ArrowRight,
   ArrowLeft,
   FileText,
@@ -166,6 +165,7 @@ export default function WasiatGuide() {
         {steps.map((s, i) => (
           <div key={s.num} className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
             <button
+              type="button"
               onClick={() => {
                 if (s.num < step || (s.num === 3 && step === 2 && validateStep2())) {
                   setStep(s.num);
@@ -337,6 +337,7 @@ export default function WasiatGuide() {
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                className="min-w-0 max-w-full"
               />
             </div>
           </CardContent>
@@ -355,6 +356,7 @@ export default function WasiatGuide() {
                 {CURRENCIES.map((c) => (
                   <button
                     key={c.code}
+                    type="button"
                     onClick={() => setForm((f) => ({ ...f, currency: c.code }))}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                       form.currency === c.code
@@ -435,6 +437,7 @@ export default function WasiatGuide() {
                         #{idx + 1}
                       </span>
                       <button
+                        type="button"
                         onClick={() => removeBequest(b.id)}
                         className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                         aria-label={t("wasiat.form.bequests.remove")}
@@ -712,7 +715,7 @@ export default function WasiatGuide() {
 
         <Link href="/faraid" className="print:hidden">
           <Button variant="ghost" className="w-full gap-2 h-10 text-sm text-muted-foreground">
-            <Scale className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" />
             {t("wasiat.backToFaraid")}
           </Button>
         </Link>
@@ -740,13 +743,13 @@ export default function WasiatGuide() {
         </div>
       </div>
 
-      <StepIndicator />
+      {StepIndicator()}
 
       <AdSlot id="wasiat-top" variant="banner" className="print:hidden" />
 
-      {step === 1 && <Step1 />}
-      {step === 2 && <Step2 />}
-      {step === 3 && <Step3 />}
+      {step === 1 && Step1()}
+      {step === 2 && Step2()}
+      {step === 3 && Step3()}
     </div>
   );
 }

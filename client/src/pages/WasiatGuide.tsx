@@ -78,9 +78,8 @@ const initialForm: WasiatForm = {
   specialWishes: "",
 };
 
-let nextId = 1;
 function makeId() {
-  return String(nextId++);
+  return crypto.randomUUID();
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────

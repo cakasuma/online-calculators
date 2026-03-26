@@ -18,7 +18,7 @@ export default function HomePage() {
 
       {/* Featured Islamic Tools */}
       <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Islamic Tools</p>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-4">
       <Link href="/faraid">
         <Card className="group hover:border-primary/60 hover:shadow-md transition-all cursor-pointer border-primary/30 bg-primary/5">
           <CardContent className="p-5 sm:p-6">

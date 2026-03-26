@@ -321,9 +321,9 @@ export default function WasiatGuide() {
       { num: 3, label: t("wasiat.step3.title") },
     ];
     return (
-      <div className="flex justify-center items-center gap-1 sm:gap-2 print:hidden mb-6">
+      <div className="flex justify-center items-center print:hidden mb-6">
         {steps.map((s, i) => (
-          <div key={s.num} className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+          <div key={s.num} className="flex items-center">
             <button
               type="button"
               onClick={() => {
@@ -333,7 +333,7 @@ export default function WasiatGuide() {
                   setStep(s.num);
                 }
               }}
-              className={`flex items-center gap-1.5 min-w-0 group ${
+              className={`flex items-center gap-1.5 group ${
                 s.num <= step ? "cursor-pointer" : "cursor-default"
               }`}
             >
@@ -349,7 +349,7 @@ export default function WasiatGuide() {
                 {step > s.num ? <CheckCircle2 className="w-4 h-4" /> : s.num}
               </div>
               <span
-                className={`text-xs font-medium hidden sm:block truncate transition-colors ${
+                className={`text-xs font-medium hidden sm:block transition-colors ${
                   step === s.num
                     ? "text-foreground"
                     : step > s.num
@@ -362,7 +362,7 @@ export default function WasiatGuide() {
             </button>
             {i < steps.length - 1 && (
               <div
-                className={`flex-1 h-0.5 mx-1 rounded transition-colors ${
+                className={`w-8 sm:w-14 h-0.5 mx-2 rounded flex-shrink-0 transition-colors ${
                   step > s.num ? "bg-primary/40" : "bg-muted"
                 }`}
               />
@@ -498,7 +498,7 @@ export default function WasiatGuide() {
                   type="date"
                   value={form.date}
                   onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-                  className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="block h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   style={{ maxWidth: "100%", boxSizing: "border-box" }}
                 />
               </div>

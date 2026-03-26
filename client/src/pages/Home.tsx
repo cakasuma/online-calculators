@@ -11,7 +11,7 @@ export default function HomePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Hero */}
-      <div className="mb-2">
+      <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("home.title")}</h1>
         <p className="text-muted-foreground text-base mt-2 leading-relaxed">{t("home.subtitle")}</p>
       </div>

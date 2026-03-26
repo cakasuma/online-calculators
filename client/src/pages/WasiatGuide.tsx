@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
+// @ts-ignore
 import jsPDF from "jspdf";
 import {
   Printer,
@@ -94,6 +95,9 @@ export default function WasiatGuide() {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [savedBanner, setSavedBanner] = useState(false);
   const [saveToast, setSaveToast] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState(false);
+  const [printLoading, setPrintLoading] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("wasiat-plan");
@@ -123,6 +127,19 @@ export default function WasiatGuide() {
     localStorage.setItem("wasiat-plan", JSON.stringify(form));
     setSaveToast(true);
     setTimeout(() => setSaveToast(false), 2000);
+  }
+
+  async function handleGeneratePDF() {
+    setPdfLoading(true);
+    setPdfError(false);
+    try {
+      generatePDF();
+    } catch {
+      setPdfError(true);
+      setTimeout(() => setPdfError(false), 3000);
+    } finally {
+      setPdfLoading(false);
+    }
   }
 
   function generatePDF() {
@@ -223,6 +240,14 @@ export default function WasiatGuide() {
     doc.save(filename);
   }
 
+  function handlePrint() {
+    setPrintLoading(true);
+    setTimeout(() => {
+      window.print();
+      setPrintLoading(false);
+    }, 300);
+  }
+
   const currencySymbol =
     CURRENCIES.find((c) => c.code === form.currency)?.symbol ?? form.currency;
 
@@ -295,7 +320,7 @@ export default function WasiatGuide() {
       { num: 3, label: t("wasiat.step3.title") },
     ];
     return (
-      <div className="flex items-center gap-1 sm:gap-2 print:hidden mb-6">
+      <div className="flex justify-center items-center gap-1 sm:gap-2 print:hidden mb-6">
         {steps.map((s, i) => (
           <div key={s.num} className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
             <button
@@ -473,6 +498,7 @@ export default function WasiatGuide() {
                   value={form.date}
                   onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
                   className="w-full block min-w-0"
+                  style={{ maxWidth: "100%" }}
                 />
               </div>
             </div>
@@ -846,21 +872,29 @@ export default function WasiatGuide() {
         <AdSlot id="wasiat-bottom" variant="rectangle" className="print:hidden" />
 
         {/* Actions */}
+        {pdfError && (
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive print:hidden">
+            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+            Failed to generate PDF. Please try again.
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row gap-3 print:hidden">
           <Button
-            onClick={generatePDF}
+            onClick={handleGeneratePDF}
+            disabled={pdfLoading}
             className="gap-2 h-11 flex-1"
           >
             <Download className="w-4 h-4" />
-            Download PDF
+            {pdfLoading ? "Generating..." : "Download PDF"}
           </Button>
           <Button
             variant="outline"
-            onClick={() => window.print()}
+            onClick={handlePrint}
+            disabled={printLoading}
             className="gap-2 h-11 flex-1"
           >
             <Printer className="w-4 h-4" />
-            Print
+            {printLoading ? "Preparing..." : "Print"}
           </Button>
           <Button variant="outline" onClick={() => goToStep(2)} className="gap-2 h-11 flex-1">
             <ArrowLeft className="w-4 h-4" />

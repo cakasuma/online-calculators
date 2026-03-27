@@ -24,22 +24,22 @@ const CURRENCIES = [
 
 // Default silver prices per gram by currency (approximate, user should update)
 const DEFAULT_SILVER_PRICES: Record<string, string> = {
-  MYR: "4.50",
-  IDR: "55000",
-  USD: "0.95",
-  SAR: "3.56",
-  SGD: "1.28",
-  GBP: "0.75",
+  MYR: "8.87",
+  IDR: "36000",
+  USD: "2.22",
+  SAR: "8.32",
+  SGD: "2.96",
+  GBP: "1.73",
 };
 
 // Default gold prices per gram by currency (approximate)
 const DEFAULT_GOLD_PRICES: Record<string, string> = {
-  MYR: "400",
+  MYR: "390",
   IDR: "1600000",
-  USD: "95",
-  SAR: "356",
-  SGD: "128",
-  GBP: "75",
+  USD: "98",
+  SAR: "367",
+  SGD: "130",
+  GBP: "76",
 };
 
 // ─── State ─────────────────────────────────────────────────────────────────────
@@ -128,20 +128,15 @@ export default function ZakatCalculator() {
     let cancelled = false;
     setLivePricesLoading(true);
     Promise.all([
-      fetch("https://api.metals.live/v1/spot").then((r) => r.json()),
+      fetch("https://query1.finance.yahoo.com/v8/finance/chart/SI%3DF?interval=1d&range=1d").then((r) => r.json()),
+      fetch("https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d").then((r) => r.json()),
       fetch("https://open.er-api.com/v6/latest/USD").then((r) => r.json()),
     ])
-      .then(([metals, fx]) => {
+      .then(([silverData, goldData, fx]) => {
         if (cancelled) return;
-        // metals is an array of single-key objects: [{gold: ...}, {silver: ...}, ...]
-        let goldUsd = 0;
-        let silverUsd = 0;
-        if (Array.isArray(metals)) {
-          for (const item of metals) {
-            if (item.gold !== undefined) goldUsd = Number(item.gold);
-            if (item.silver !== undefined) silverUsd = Number(item.silver);
-          }
-        }
+        // Yahoo Finance chart API: data.chart.result[0].meta.regularMarketPrice (USD per troy oz)
+        const silverUsd: number = silverData?.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0;
+        const goldUsd: number = goldData?.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0;
         const rates: Record<string, number> = fx?.rates ?? {};
         if (goldUsd > 0 && silverUsd > 0) {
           liveUsdPrices.current = { goldUsd, silverUsd };

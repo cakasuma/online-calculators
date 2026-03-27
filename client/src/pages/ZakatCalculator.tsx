@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "wouter";
-import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil } from "lucide-react";
+import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -379,30 +379,33 @@ export default function ZakatCalculator() {
           <div className="space-y-1">
             <div className="flex items-center gap-1.5">
               <Label className="text-sm font-medium">{t("zakat.silverPrice.label")}</Label>
-              {livePricesLoading && (
-                <span className="text-xs text-muted-foreground animate-pulse">Fetching live prices…</span>
-              )}
-              {livePricesLoaded && !livePricesLoading && !silverPriceOverride && (
+              {livePricesLoading ? (
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Fetching…
+                </span>
+              ) : livePricesLoaded && !silverPriceOverride ? (
                 <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
-              )}
-              {livePricesLoaded && silverPriceOverride && (
+              ) : livePricesLoaded && silverPriceOverride ? (
                 <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Manual</span>
-              )}
-              {livePricesLoaded && !livePricesLoading && (
-                <button
-                  type="button"
-                  onClick={() => setSilverPriceOverride((v) => !v)}
-                  className={`ml-1 p-1 rounded hover:bg-muted transition-colors ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                  title={silverPriceOverride ? "Lock to live price" : "Override price manually"}
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-              )}
+              ) : null}
+              <button
+                type="button"
+                onClick={() => setSilverPriceOverride((v) => !v)}
+                className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
+                title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
+                disabled={livePricesLoading}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
             </div>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
                 {currSym}
               </span>
+              {livePricesLoading && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+              )}
               <Input
                 type="text"
                 inputMode="decimal"
@@ -410,10 +413,10 @@ export default function ZakatCalculator() {
                 onChange={(e) =>
                   set("silverPricePerGram", formatInputValue(e.target.value, locale))
                 }
-                className={`pl-9 bg-white/70 dark:bg-white/5 ${livePricesLoaded && !silverPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
+                className={`pl-9 bg-white/70 dark:bg-white/5 ${livePricesLoading ? "pr-9" : ""} ${!silverPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
                 placeholder="0.95"
-                readOnly={livePricesLoaded && !silverPriceOverride}
-                disabled={livePricesLoaded && !silverPriceOverride}
+                readOnly={!silverPriceOverride}
+                disabled={!silverPriceOverride}
               />
             </div>
             <p className="text-xs text-teal-700 dark:text-teal-400 leading-relaxed">
@@ -560,30 +563,33 @@ export default function ZakatCalculator() {
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
                   <Label className="text-sm font-medium">{t("zakat.gold.goldPrice")}</Label>
-                  {livePricesLoading && (
-                    <span className="text-xs text-muted-foreground animate-pulse">Fetching live prices…</span>
-                  )}
-                  {livePricesLoaded && !livePricesLoading && !goldPriceOverride && (
+                  {livePricesLoading ? (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Fetching…
+                    </span>
+                  ) : livePricesLoaded && !goldPriceOverride ? (
                     <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
-                  )}
-                  {livePricesLoaded && goldPriceOverride && (
+                  ) : livePricesLoaded && goldPriceOverride ? (
                     <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Manual</span>
-                  )}
-                  {livePricesLoaded && !livePricesLoading && (
-                    <button
-                      type="button"
-                      onClick={() => setGoldPriceOverride((v) => !v)}
-                      className={`ml-1 p-1 rounded hover:bg-muted transition-colors ${goldPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                      title={goldPriceOverride ? "Lock to live price" : "Override price manually"}
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setGoldPriceOverride((v) => !v)}
+                    className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${goldPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
+                    title={goldPriceOverride ? "Lock to live price" : "Edit price manually"}
+                    disabled={livePricesLoading}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
                 </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
                     {currSym}
                   </span>
+                  {livePricesLoading && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+                  )}
                   <Input
                     type="text"
                     inputMode="decimal"
@@ -591,9 +597,9 @@ export default function ZakatCalculator() {
                     onChange={(e) =>
                       set("goldPricePerGram", formatInputValue(e.target.value, locale))
                     }
-                    className={`pl-9 ${livePricesLoaded && !goldPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
-                    readOnly={livePricesLoaded && !goldPriceOverride}
-                    disabled={livePricesLoaded && !goldPriceOverride}
+                    className={`pl-9 ${livePricesLoading ? "pr-9" : ""} ${!goldPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
+                    readOnly={!goldPriceOverride}
+                    disabled={!goldPriceOverride}
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">{t("zakat.gold.goldPrice.help")}</p>
@@ -625,30 +631,33 @@ export default function ZakatCalculator() {
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
                   <Label className="text-sm font-medium">{t("zakat.silverPrice.label")}</Label>
-                  {livePricesLoading && (
-                    <span className="text-xs text-muted-foreground animate-pulse">…</span>
-                  )}
-                  {livePricesLoaded && !livePricesLoading && !silverPriceOverride && (
+                  {livePricesLoading ? (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Fetching…
+                    </span>
+                  ) : livePricesLoaded && !silverPriceOverride ? (
                     <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
-                  )}
-                  {livePricesLoaded && silverPriceOverride && (
+                  ) : livePricesLoaded && silverPriceOverride ? (
                     <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Manual</span>
-                  )}
-                  {livePricesLoaded && !livePricesLoading && (
-                    <button
-                      type="button"
-                      onClick={() => setSilverPriceOverride((v) => !v)}
-                      className={`ml-1 p-1 rounded hover:bg-muted transition-colors ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                      title={silverPriceOverride ? "Lock to live price" : "Override price manually"}
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setSilverPriceOverride((v) => !v)}
+                    className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
+                    title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
+                    disabled={livePricesLoading}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
                 </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
                     {currSym}
                   </span>
+                  {livePricesLoading && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+                  )}
                   <Input
                     type="text"
                     inputMode="decimal"
@@ -656,10 +665,10 @@ export default function ZakatCalculator() {
                     onChange={(e) =>
                       set("silverPricePerGram", formatInputValue(e.target.value, locale))
                     }
-                    className={`pl-9 ${livePricesLoaded && !silverPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
+                    className={`pl-9 ${livePricesLoading ? "pr-9" : ""} ${!silverPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
                     placeholder="0.95"
-                    readOnly={livePricesLoaded && !silverPriceOverride}
-                    disabled={livePricesLoaded && !silverPriceOverride}
+                    readOnly={!silverPriceOverride}
+                    disabled={!silverPriceOverride}
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">{t("zakat.gold.goldPrice.help")}</p>

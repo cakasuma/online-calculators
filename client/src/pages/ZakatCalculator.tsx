@@ -362,64 +362,70 @@ export default function ZakatCalculator() {
         </CardContent>
       </Card>
 
-      {/* Currency + Silver Price */}
+      {/* Currency selector — only */}
       <Card>
-        <CardContent className="p-4 sm:p-5 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            {/* Currency */}
-            <div className="space-y-1">
-              <Label className="text-sm font-medium">{t("zakat.currency")}</Label>
-              <select
-                value={state.currency}
-                onChange={(e) => handleCurrencyChange(e.target.value)}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.code} ({c.symbol})
-                  </option>
-                ))}
-              </select>
-            </div>
-            {/* Silver price — used for Nisab threshold AND silver asset valuation */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5">
-                <Label className="text-sm font-medium">{t("zakat.silverPrice.label")}</Label>
-                {livePricesLoading && (
-                  <span className="text-xs text-muted-foreground animate-pulse">Fetching live prices…</span>
-                )}
-                {livePricesLoaded && !livePricesLoading && (
-                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
-                )}
-              </div>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
-                  {currSym}
-                </span>
-                <Input
-                  type="text"
-                  inputMode="decimal"
-                  value={state.silverPricePerGram}
-                  onChange={(e) =>
-                    set("silverPricePerGram", formatInputValue(e.target.value, locale))
-                  }
-                  className="pl-9"
-                  placeholder="0.95"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Used for Nisab threshold (595 g × price) and silver asset valuation.
-              </p>
-            </div>
+        <CardContent className="p-4 sm:p-5">
+          <div className="space-y-1">
+            <Label className="text-sm font-medium">{t("zakat.currency")}</Label>
+            <select
+              value={state.currency}
+              onChange={(e) => handleCurrencyChange(e.target.value)}
+              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.code} ({c.symbol})
+                </option>
+              ))}
+            </select>
           </div>
+        </CardContent>
+      </Card>
 
+      {/* Nisab Threshold card */}
+      <Card className="border-teal-400/40 bg-teal-50/60 dark:bg-teal-950/20">
+        <CardContent className="p-4 sm:p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-base">📏</span>
+            <p className="text-sm font-semibold text-teal-800 dark:text-teal-300">Nisab Threshold</p>
+          </div>
+          {/* Silver price input */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5">
+              <Label className="text-sm font-medium">{t("zakat.silverPrice.label")}</Label>
+              {livePricesLoading && (
+                <span className="text-xs text-muted-foreground animate-pulse">Fetching live prices…</span>
+              )}
+              {livePricesLoaded && !livePricesLoading && (
+                <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
+              )}
+            </div>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
+                {currSym}
+              </span>
+              <Input
+                type="text"
+                inputMode="decimal"
+                value={state.silverPricePerGram}
+                onChange={(e) =>
+                  set("silverPricePerGram", formatInputValue(e.target.value, locale))
+                }
+                className="pl-9 bg-white/70 dark:bg-white/5"
+                placeholder="0.95"
+              />
+            </div>
+            <p className="text-xs text-teal-700 dark:text-teal-400 leading-relaxed">
+              Nisab = 595 g of silver. Enter the current silver price per gram to calculate the Nisab threshold for your currency.
+            </p>
+          </div>
           {/* Nisab preview */}
           {result.nisab > 0 && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 text-sm text-teal-800 dark:text-teal-300 bg-teal-100/60 dark:bg-teal-900/30 rounded-lg px-3 py-2">
               <Info className="w-4 h-4 flex-shrink-0" />
               <span>
                 {t("zakat.summary.nisab")}:{" "}
-                <span className="font-semibold text-foreground">
+                <span className="font-semibold">
                   {currSym} {formatCurrency(result.nisab, locale)}
                 </span>
               </span>
@@ -588,20 +594,56 @@ export default function ZakatCalculator() {
               </p>
             )}
             {/* Silver */}
-            <div className="space-y-1">
-              <Label className="text-sm font-medium">{t("zakat.gold.silverGrams")}</Label>
-              <Input
-                type="text"
-                inputMode="decimal"
-                value={state.silverGrams}
-                onChange={(e) => handleNumericInput("silverGrams", e.target.value)}
-                placeholder="0"
-              />
-              <p className="text-xs text-muted-foreground">{t("zakat.gold.silverGrams.help")}</p>
-              <p className="text-xs text-muted-foreground italic">
-                Silver price per gram is set at the top of the page (also used for Nisab calculation).
-              </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium">{t("zakat.gold.silverGrams")}</Label>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  value={state.silverGrams}
+                  onChange={(e) => handleNumericInput("silverGrams", e.target.value)}
+                  placeholder="0"
+                />
+                <p className="text-xs text-muted-foreground">{t("zakat.gold.silverGrams.help")}</p>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Label className="text-sm font-medium">{t("zakat.silverPrice.label")}</Label>
+                  {livePricesLoading && (
+                    <span className="text-xs text-muted-foreground animate-pulse">…</span>
+                  )}
+                  {livePricesLoaded && !livePricesLoading && (
+                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
+                  )}
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
+                    {currSym}
+                  </span>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    value={state.silverPricePerGram}
+                    onChange={(e) =>
+                      set("silverPricePerGram", formatInputValue(e.target.value, locale))
+                    }
+                    className="pl-9"
+                    placeholder="0.95"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">{t("zakat.gold.goldPrice.help")}</p>
+              </div>
             </div>
+            {/* Silver value preview */}
+            {parseVal(state.silverGrams, locale) > 0 && parseVal(state.silverPricePerGram, locale) > 0 && (
+              <p className="text-xs text-muted-foreground pl-1">
+                Silver value: {currSym}{" "}
+                {formatCurrency(
+                  parseVal(state.silverGrams, locale) * parseVal(state.silverPricePerGram, locale),
+                  locale
+                )}
+              </p>
+            )}
           </AccordionContent>
         </AccordionItem>
 

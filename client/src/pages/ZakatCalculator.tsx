@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "wouter";
 import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -120,38 +120,19 @@ export default function ZakatCalculator() {
   const [livePricesLoaded, setLivePricesLoaded] = useState(false);
   const [goldPriceOverride, setGoldPriceOverride] = useState(false);
   const [silverPriceOverride, setSilverPriceOverride] = useState(false);
-  // Store raw USD spot prices so we can re-convert when currency changes
-  const liveUsdPrices = useRef<{ goldUsd: number; silverUsd: number } | null>(null);
-  const liveRates = useRef<Record<string, number> | null>(null);
-
   useEffect(() => {
     let cancelled = false;
     setLivePricesLoading(true);
-    Promise.all([
-      fetch("https://query1.finance.yahoo.com/v8/finance/chart/SI%3DF?interval=1d&range=1d").then((r) => r.json()),
-      fetch("https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d").then((r) => r.json()),
-      fetch("https://open.er-api.com/v6/latest/USD").then((r) => r.json()),
-    ])
-      .then(([silverData, goldData, fx]) => {
+    fetch(`/api/metal-prices?currency=${state.currency}`)
+      .then((r) => r.json())
+      .then((data: { silverPerGram: number; goldPerGram: number; currency: string; fxRate: number }) => {
         if (cancelled) return;
-        // Yahoo Finance chart API: data.chart.result[0].meta.regularMarketPrice (USD per troy oz)
-        const silverUsd: number = silverData?.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0;
-        const goldUsd: number = goldData?.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0;
-        const rates: Record<string, number> = fx?.rates ?? {};
-        if (goldUsd > 0 && silverUsd > 0) {
-          liveUsdPrices.current = { goldUsd, silverUsd };
-          liveRates.current = rates;
-          setState((prev) => {
-            const rate = rates[prev.currency] ?? 1;
-            // troy oz → grams: 1 troy oz = 31.1035 g
-            const goldPerGram = (goldUsd / 31.1035) * rate;
-            const silverPerGram = (silverUsd / 31.1035) * rate;
-            return {
-              ...prev,
-              goldPricePerGram: goldPerGram.toFixed(2),
-              silverPricePerGram: silverPerGram.toFixed(4),
-            };
-          });
+        if (data.goldPerGram > 0 && data.silverPerGram > 0) {
+          setState((prev) => ({
+            ...prev,
+            goldPricePerGram: data.goldPerGram.toFixed(2),
+            silverPricePerGram: data.silverPerGram.toFixed(4),
+          }));
           setLivePricesLoaded(true);
         }
       })
@@ -175,31 +156,34 @@ export default function ZakatCalculator() {
   }
 
   function handleCurrencyChange(code: string) {
-    setState((prev) => {
-      // If we have live prices, re-convert to the new currency
-      if (liveUsdPrices.current && liveRates.current) {
-        const rate = liveRates.current[code] ?? 1;
-        const goldPerGram = (liveUsdPrices.current.goldUsd / 31.1035) * rate;
-        const silverPerGram = (liveUsdPrices.current.silverUsd / 31.1035) * rate;
-        return {
-          ...prev,
-          currency: code,
-          goldPricePerGram: goldPerGram.toFixed(2),
-          silverPricePerGram: silverPerGram.toFixed(4),
-        };
-      }
-      return {
-        ...prev,
-        currency: code,
-        goldPricePerGram: DEFAULT_GOLD_PRICES[code] ?? prev.goldPricePerGram,
-        silverPricePerGram: DEFAULT_SILVER_PRICES[code] ?? prev.silverPricePerGram,
-      };
-    });
-    // Re-lock price fields when live prices are available
-    if (liveUsdPrices.current) {
-      setGoldPriceOverride(false);
-      setSilverPriceOverride(false);
-    }
+    setState((prev) => ({
+      ...prev,
+      currency: code,
+      goldPricePerGram: DEFAULT_GOLD_PRICES[code] ?? prev.goldPricePerGram,
+      silverPricePerGram: DEFAULT_SILVER_PRICES[code] ?? prev.silverPricePerGram,
+    }));
+    setLivePricesLoaded(false);
+    setLivePricesLoading(true);
+    fetch(`/api/metal-prices?currency=${code}`)
+      .then((r) => r.json())
+      .then((data: { silverPerGram: number; goldPerGram: number; currency: string; fxRate: number }) => {
+        if (data.goldPerGram > 0 && data.silverPerGram > 0) {
+          setState((prev) => ({
+            ...prev,
+            goldPricePerGram: data.goldPerGram.toFixed(2),
+            silverPricePerGram: data.silverPerGram.toFixed(4),
+          }));
+          setLivePricesLoaded(true);
+          setGoldPriceOverride(false);
+          setSilverPriceOverride(false);
+        }
+      })
+      .catch(() => {
+        // fall back to static defaults already set above
+      })
+      .finally(() => {
+        setLivePricesLoading(false);
+      });
   }
 
   // ─── Computation ─────────────────────────────────────────────────────────────

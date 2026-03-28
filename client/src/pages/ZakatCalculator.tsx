@@ -113,11 +113,21 @@ function parseVal(s: string, locale: string): number {
 }
 
 // ─── ZakatCalculator ────────────────────────────────────────────────────────────
+interface MetalPriceResponse {
+  silverPerGram: number;
+  goldPerGram: number;
+  currency: string;
+  fxRate: number;
+  source?: string;
+  sourceUrl?: string;
+}
+
 export default function ZakatCalculator() {
   const { t, locale } = useLocale();
   const [state, setState] = useState<ZakatState>(makeInitialState("MYR"));
   const [livePricesLoading, setLivePricesLoading] = useState(false);
   const [livePricesLoaded, setLivePricesLoaded] = useState(false);
+  const [priceSource, setPriceSource] = useState<{ name: string; url: string } | null>(null);
   const [goldPriceOverride, setGoldPriceOverride] = useState(false);
   const [silverPriceOverride, setSilverPriceOverride] = useState(false);
   useEffect(() => {
@@ -125,7 +135,7 @@ export default function ZakatCalculator() {
     setLivePricesLoading(true);
     fetch(`/api/metal-prices?currency=${state.currency}`)
       .then((r) => r.json())
-      .then((data: { silverPerGram: number; goldPerGram: number; currency: string; fxRate: number }) => {
+      .then((data: MetalPriceResponse) => {
         if (cancelled) return;
         if (data.goldPerGram > 0 && data.silverPerGram > 0) {
           setState((prev) => ({
@@ -134,6 +144,9 @@ export default function ZakatCalculator() {
             silverPricePerGram: data.silverPerGram.toFixed(4),
           }));
           setLivePricesLoaded(true);
+          if (data.source && data.sourceUrl) {
+            setPriceSource({ name: data.source, url: data.sourceUrl });
+          }
         }
       })
       .catch(() => {
@@ -164,9 +177,10 @@ export default function ZakatCalculator() {
     }));
     setLivePricesLoaded(false);
     setLivePricesLoading(true);
+    setPriceSource(null);
     fetch(`/api/metal-prices?currency=${code}`)
       .then((r) => r.json())
-      .then((data: { silverPerGram: number; goldPerGram: number; currency: string; fxRate: number }) => {
+      .then((data: MetalPriceResponse) => {
         if (data.goldPerGram > 0 && data.silverPerGram > 0) {
           setState((prev) => ({
             ...prev,
@@ -176,6 +190,9 @@ export default function ZakatCalculator() {
           setLivePricesLoaded(true);
           setGoldPriceOverride(false);
           setSilverPriceOverride(false);
+          if (data.source && data.sourceUrl) {
+            setPriceSource({ name: data.source, url: data.sourceUrl });
+          }
         }
       })
       .catch(() => {
@@ -423,6 +440,29 @@ export default function ZakatCalculator() {
               Nisab = 595 g of silver. Enter the current silver price per gram to calculate the Nisab threshold for your currency.
             </p>
           </div>
+          {/* Price source attribution */}
+          {livePricesLoaded && priceSource && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span>Price via</span>
+              <a
+                href={priceSource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-foreground transition-colors"
+              >
+                {priceSource.name}
+              </a>
+              <span>·</span>
+              <a
+                href="https://www.metalsdaily.com/live-prices/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-foreground transition-colors"
+              >
+                Verify on Metals Daily ↗
+              </a>
+            </div>
+          )}
           {/* Nisab preview */}
           {result.nisab > 0 && (
             <div className="flex items-center gap-2 text-sm text-teal-800 dark:text-teal-300 bg-teal-100/60 dark:bg-teal-900/30 rounded-lg px-3 py-2">

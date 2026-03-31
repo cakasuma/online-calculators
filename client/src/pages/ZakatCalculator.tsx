@@ -112,6 +112,103 @@ function parseVal(s: string, locale: string): number {
   return isNaN(n) || n < 0 ? 0 : n;
 }
 
+// ─── Shared Field Components ────────────────────────────────────────────────────
+// Defined at module level so React never unmounts/remounts them on state change,
+// which would dismiss the mobile keyboard.
+
+interface NumFieldProps {
+  label: string;
+  help?: string;
+  value: string;
+  onChange: (val: string) => void;
+  onBlur: (val: string) => void;
+  currSym: string;
+  placeholder?: string;
+}
+function NumField({ label, help, value, onChange, onBlur, currSym, placeholder }: NumFieldProps) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-sm font-medium">{label}</Label>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none pointer-events-none">
+          {currSym}
+        </span>
+        <Input
+          type="text"
+          inputMode="decimal"
+          autoComplete="off"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={(e) => onBlur(e.target.value)}
+          placeholder={placeholder ?? "0"}
+          className="pl-9"
+        />
+      </div>
+      {help && <p className="text-xs text-muted-foreground leading-relaxed">{help}</p>}
+    </div>
+  );
+}
+
+interface GramFieldProps {
+  label: string;
+  help?: string;
+  value: string;
+  onChange: (val: string) => void;
+  onBlur: (val: string) => void;
+}
+function GramField({ label, help, value, onChange, onBlur }: GramFieldProps) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-sm font-medium">{label}</Label>
+      <div className="relative">
+        <Input
+          type="text"
+          inputMode="decimal"
+          autoComplete="off"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={(e) => onBlur(e.target.value)}
+          placeholder="0"
+          className="pr-8"
+        />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground select-none pointer-events-none">
+          g
+        </span>
+      </div>
+      {help && <p className="text-xs text-muted-foreground leading-relaxed">{help}</p>}
+    </div>
+  );
+}
+
+interface HawlToggleProps {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  help: string;
+}
+function HawlToggle({ checked, onChange, label, help }: HawlToggleProps) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-muted">
+      <Switch checked={checked} onCheckedChange={onChange} className="mt-0.5" />
+      <div>
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{help}</p>
+      </div>
+    </div>
+  );
+}
+
+function PriceBadge({ loading, loaded, override }: { loading: boolean; loaded: boolean; override: boolean }) {
+  if (loading) return (
+    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+      <Loader2 className="w-3 h-3 animate-spin" />Fetching…
+    </span>
+  );
+  if (loaded && !override) return <span className="text-xs text-green-600 dark:text-green-400 font-medium">● Live</span>;
+  if (loaded && override) return <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Manual</span>;
+  return null;
+}
+
 // ─── ZakatCalculator ────────────────────────────────────────────────────────────
 interface MetalPriceResponse {
   silverPerGram: number;
@@ -164,7 +261,13 @@ export default function ZakatCalculator() {
     setState((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleNumericInput(key: keyof ZakatState, raw: string) {
+  // Store raw value while typing — no reformatting prevents cursor jump & keyboard dismiss
+  function handleChange(key: keyof ZakatState, raw: string) {
+    set(key, raw as ZakatState[typeof key]);
+  }
+
+  // Format the value when the user leaves the field
+  function handleBlur(key: keyof ZakatState, raw: string) {
     set(key, formatInputValue(raw, locale) as ZakatState[typeof key]);
   }
 
@@ -283,59 +386,6 @@ export default function ZakatCalculator() {
     ? "text-amber-700 dark:text-amber-400"
     : "text-muted-foreground";
 
-  // ─── Shared field renderer ────────────────────────────────────────────────────
-  function NumField({
-    label,
-    help,
-    fieldKey,
-    placeholder,
-  }: {
-    label: string;
-    help: string;
-    fieldKey: keyof ZakatState;
-    placeholder?: string;
-  }) {
-    return (
-      <div className="space-y-1">
-        <Label className="text-sm font-medium">{label}</Label>
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
-            {currSym}
-          </span>
-          <Input
-            type="text"
-            inputMode="decimal"
-            value={state[fieldKey] as string}
-            onChange={(e) => handleNumericInput(fieldKey, e.target.value)}
-            placeholder={placeholder ?? "0"}
-            className="pl-9"
-          />
-        </div>
-        <p className="text-xs text-muted-foreground leading-relaxed">{help}</p>
-      </div>
-    );
-  }
-
-  function HawlToggle({
-    checked,
-    onChange,
-  }: {
-    checked: boolean;
-    onChange: (v: boolean) => void;
-  }) {
-    return (
-      <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-muted">
-        <Switch checked={checked} onCheckedChange={onChange} className="mt-0.5" />
-        <div>
-          <p className="text-sm font-medium">{t("zakat.hawl.label")}</p>
-          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-            {t("zakat.hawl.help")}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-2xl mx-auto space-y-5">
@@ -385,93 +435,115 @@ export default function ZakatCalculator() {
         </CardContent>
       </Card>
 
-      {/* Nisab Threshold card */}
+      {/* Metal Prices & Nisab Threshold */}
       <Card className="border-teal-400/40 bg-teal-50/60 dark:bg-teal-950/20">
-        <CardContent className="p-4 sm:p-5 space-y-3">
+        <CardContent className="p-4 sm:p-5 space-y-4">
           <div className="flex items-center gap-2">
             <span className="text-base">📏</span>
-            <p className="text-sm font-semibold text-teal-800 dark:text-teal-300">Nisab Threshold</p>
+            <p className="text-sm font-semibold text-teal-800 dark:text-teal-300">Metal Prices &amp; Nisab Threshold</p>
           </div>
-          {/* Silver price input */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5">
-              <Label className="text-sm font-medium">{t("zakat.silverPrice.label")}</Label>
-              {livePricesLoading ? (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  Fetching…
+          <p className="text-xs text-teal-700 dark:text-teal-400 leading-relaxed">
+            Prices are fetched live. Nisab = 595 g × silver price. Click <Pencil className="w-3 h-3 inline-block mx-0.5" /> to override manually.
+          </p>
+
+          {/* Silver + Gold prices side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Silver price */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-1">
+                <Label className="text-sm font-medium">Silver / gram</Label>
+                <PriceBadge loading={livePricesLoading} loaded={livePricesLoaded} override={silverPriceOverride} />
+                <button
+                  type="button"
+                  onClick={() => setSilverPriceOverride((v) => !v)}
+                  className={`ml-auto p-1 rounded hover:bg-muted/50 transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
+                  title={silverPriceOverride ? "Reset to live price" : "Edit price manually"}
+                  disabled={livePricesLoading}
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none pointer-events-none">
+                  {currSym}
                 </span>
-              ) : livePricesLoaded && !silverPriceOverride ? (
-                <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
-              ) : livePricesLoaded && silverPriceOverride ? (
-                <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Manual</span>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => setSilverPriceOverride((v) => !v)}
-                className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
-                disabled={livePricesLoading}
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
+                {livePricesLoading && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+                )}
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={state.silverPricePerGram}
+                  onChange={(e) => handleChange("silverPricePerGram", e.target.value)}
+                  onBlur={(e) => handleBlur("silverPricePerGram", e.target.value)}
+                  className={`pl-9 bg-white/70 dark:bg-white/5 ${livePricesLoading ? "pr-9" : ""} ${!silverPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
+                  placeholder="—"
+                  readOnly={!silverPriceOverride}
+                  disabled={!silverPriceOverride}
+                />
+              </div>
             </div>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
-                {currSym}
-              </span>
-              {livePricesLoading && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
-              )}
-              <Input
-                type="text"
-                inputMode="decimal"
-                value={state.silverPricePerGram}
-                onChange={(e) =>
-                  set("silverPricePerGram", formatInputValue(e.target.value, locale))
-                }
-                className={`pl-9 bg-white/70 dark:bg-white/5 ${livePricesLoading ? "pr-9" : ""} ${!silverPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
-                placeholder="0.95"
-                readOnly={!silverPriceOverride}
-                disabled={!silverPriceOverride}
-              />
+
+            {/* Gold price */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-1">
+                <Label className="text-sm font-medium">Gold / gram</Label>
+                <PriceBadge loading={livePricesLoading} loaded={livePricesLoaded} override={goldPriceOverride} />
+                <button
+                  type="button"
+                  onClick={() => setGoldPriceOverride((v) => !v)}
+                  className={`ml-auto p-1 rounded hover:bg-muted/50 transition-colors disabled:opacity-40 ${goldPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
+                  title={goldPriceOverride ? "Reset to live price" : "Edit price manually"}
+                  disabled={livePricesLoading}
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none pointer-events-none">
+                  {currSym}
+                </span>
+                {livePricesLoading && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+                )}
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={state.goldPricePerGram}
+                  onChange={(e) => handleChange("goldPricePerGram", e.target.value)}
+                  onBlur={(e) => handleBlur("goldPricePerGram", e.target.value)}
+                  className={`pl-9 bg-white/70 dark:bg-white/5 ${livePricesLoading ? "pr-9" : ""} ${!goldPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
+                  placeholder="—"
+                  readOnly={!goldPriceOverride}
+                  disabled={!goldPriceOverride}
+                />
+              </div>
             </div>
-            <p className="text-xs text-teal-700 dark:text-teal-400 leading-relaxed">
-              Nisab = 595 g of silver. Enter the current silver price per gram to calculate the Nisab threshold for your currency.
-            </p>
           </div>
+
           {/* Price source attribution */}
           {livePricesLoaded && priceSource && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
               <span>Price via</span>
-              <a
-                href={priceSource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline underline-offset-2 hover:text-foreground transition-colors"
-              >
+              <a href={priceSource.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground transition-colors">
                 {priceSource.name}
               </a>
               <span>·</span>
-              <a
-                href="https://www.metalsdaily.com/live-prices/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline underline-offset-2 hover:text-foreground transition-colors"
-              >
+              <a href="https://www.metalsdaily.com/live-prices/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground transition-colors">
                 Verify on Metals Daily ↗
               </a>
             </div>
           )}
+
           {/* Nisab preview */}
           {result.nisab > 0 && (
             <div className="flex items-center gap-2 text-sm text-teal-800 dark:text-teal-300 bg-teal-100/60 dark:bg-teal-900/30 rounded-lg px-3 py-2">
               <Info className="w-4 h-4 flex-shrink-0" />
               <span>
                 {t("zakat.summary.nisab")}:{" "}
-                <span className="font-semibold">
-                  {currSym} {formatCurrency(result.nisab, locale)}
-                </span>
+                <span className="font-semibold">{currSym} {formatCurrency(result.nisab, locale)}</span>
               </span>
             </div>
           )}
@@ -506,21 +578,32 @@ export default function ZakatCalculator() {
             <HawlToggle
               checked={state.cashHawl}
               onChange={(v) => set("cashHawl", v)}
+              label={t("zakat.hawl.label")}
+              help={t("zakat.hawl.help")}
             />
             <NumField
               label={t("zakat.cash.onHand")}
               help={t("zakat.cash.onHand.help")}
-              fieldKey="cashOnHand"
+              value={state.cashOnHand}
+              onChange={(v) => handleChange("cashOnHand", v)}
+              onBlur={(v) => handleBlur("cashOnHand", v)}
+              currSym={currSym}
             />
             <NumField
               label={t("zakat.cash.bankSavings")}
               help={t("zakat.cash.bankSavings.help")}
-              fieldKey="bankSavings"
+              value={state.bankSavings}
+              onChange={(v) => handleChange("bankSavings", v)}
+              onBlur={(v) => handleBlur("bankSavings", v)}
+              currSym={currSym}
             />
             <NumField
               label={t("zakat.cash.fixedDeposits")}
               help={t("zakat.cash.fixedDeposits.help")}
-              fieldKey="fixedDeposits"
+              value={state.fixedDeposits}
+              onChange={(v) => handleChange("fixedDeposits", v)}
+              onBlur={(v) => handleBlur("fixedDeposits", v)}
+              currSym={currSym}
             />
             {/* EPF toggle */}
             <div className="space-y-3">
@@ -540,8 +623,10 @@ export default function ZakatCalculator() {
               {state.includeEPF && (
                 <NumField
                   label={t("zakat.cash.epfAmount")}
-                  help=""
-                  fieldKey="epfBalance"
+                  value={state.epfBalance}
+                  onChange={(v) => handleChange("epfBalance", v)}
+                  onBlur={(v) => handleBlur("epfBalance", v)}
+                  currSym={currSym}
                 />
               )}
             </div>
@@ -572,6 +657,8 @@ export default function ZakatCalculator() {
             <HawlToggle
               checked={state.goldHawl}
               onChange={(v) => set("goldHawl", v)}
+              label={t("zakat.hawl.label")}
+              help={t("zakat.hawl.help")}
             />
             {/* Jewelry toggle */}
             <div className="flex items-start gap-3">
@@ -587,141 +674,32 @@ export default function ZakatCalculator() {
                 </p>
               </div>
             </div>
-            {/* Gold */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">{t("zakat.gold.goldGrams")}</Label>
-                <Input
-                  type="text"
-                  inputMode="decimal"
-                  value={state.goldGrams}
-                  onChange={(e) => handleNumericInput("goldGrams", e.target.value)}
-                  placeholder="0"
-                />
-                <p className="text-xs text-muted-foreground">{t("zakat.gold.goldGrams.help")}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <Label className="text-sm font-medium">{t("zakat.gold.goldPrice")}</Label>
-                  {livePricesLoading ? (
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                      Fetching…
-                    </span>
-                  ) : livePricesLoaded && !goldPriceOverride ? (
-                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
-                  ) : livePricesLoaded && goldPriceOverride ? (
-                    <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Manual</span>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => setGoldPriceOverride((v) => !v)}
-                    className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${goldPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                    title={goldPriceOverride ? "Lock to live price" : "Edit price manually"}
-                    disabled={livePricesLoading}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
-                    {currSym}
-                  </span>
-                  {livePricesLoading && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
-                  )}
-                  <Input
-                    type="text"
-                    inputMode="decimal"
-                    value={state.goldPricePerGram}
-                    onChange={(e) =>
-                      set("goldPricePerGram", formatInputValue(e.target.value, locale))
-                    }
-                    className={`pl-9 ${livePricesLoading ? "pr-9" : ""} ${!goldPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
-                    readOnly={!goldPriceOverride}
-                    disabled={!goldPriceOverride}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">{t("zakat.gold.goldPrice.help")}</p>
-              </div>
-            </div>
-            {/* Gold value preview */}
+            {/* Gold grams */}
+            <GramField
+              label={t("zakat.gold.goldGrams")}
+              help={t("zakat.gold.goldGrams.help")}
+              value={state.goldGrams}
+              onChange={(v) => handleChange("goldGrams", v)}
+              onBlur={(v) => handleBlur("goldGrams", v)}
+            />
             {parseVal(state.goldGrams, locale) > 0 && parseVal(state.goldPricePerGram, locale) > 0 && (
               <p className="text-xs text-muted-foreground pl-1">
-                Gold value: {currSym}{" "}
-                {formatCurrency(
-                  parseVal(state.goldGrams, locale) * parseVal(state.goldPricePerGram, locale),
-                  locale
-                )}
+                ≈ {currSym} {formatCurrency(parseVal(state.goldGrams, locale) * parseVal(state.goldPricePerGram, locale), locale)}
+                {" "}at {currSym}{state.goldPricePerGram}/g
               </p>
             )}
-            {/* Silver */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">{t("zakat.gold.silverGrams")}</Label>
-                <Input
-                  type="text"
-                  inputMode="decimal"
-                  value={state.silverGrams}
-                  onChange={(e) => handleNumericInput("silverGrams", e.target.value)}
-                  placeholder="0"
-                />
-                <p className="text-xs text-muted-foreground">{t("zakat.gold.silverGrams.help")}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <Label className="text-sm font-medium">{t("zakat.silverPrice.label")}</Label>
-                  {livePricesLoading ? (
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                      Fetching…
-                    </span>
-                  ) : livePricesLoaded && !silverPriceOverride ? (
-                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">🔄 Live</span>
-                  ) : livePricesLoaded && silverPriceOverride ? (
-                    <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Manual</span>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => setSilverPriceOverride((v) => !v)}
-                    className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                    title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
-                    disabled={livePricesLoading}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
-                    {currSym}
-                  </span>
-                  {livePricesLoading && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
-                  )}
-                  <Input
-                    type="text"
-                    inputMode="decimal"
-                    value={state.silverPricePerGram}
-                    onChange={(e) =>
-                      set("silverPricePerGram", formatInputValue(e.target.value, locale))
-                    }
-                    className={`pl-9 ${livePricesLoading ? "pr-9" : ""} ${!silverPriceOverride ? "opacity-60 cursor-not-allowed" : ""}`}
-                    placeholder="0.95"
-                    readOnly={!silverPriceOverride}
-                    disabled={!silverPriceOverride}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">{t("zakat.gold.goldPrice.help")}</p>
-              </div>
-            </div>
-            {/* Silver value preview */}
+            {/* Silver grams */}
+            <GramField
+              label={t("zakat.gold.silverGrams")}
+              help={t("zakat.gold.silverGrams.help")}
+              value={state.silverGrams}
+              onChange={(v) => handleChange("silverGrams", v)}
+              onBlur={(v) => handleBlur("silverGrams", v)}
+            />
             {parseVal(state.silverGrams, locale) > 0 && parseVal(state.silverPricePerGram, locale) > 0 && (
               <p className="text-xs text-muted-foreground pl-1">
-                Silver value: {currSym}{" "}
-                {formatCurrency(
-                  parseVal(state.silverGrams, locale) * parseVal(state.silverPricePerGram, locale),
-                  locale
-                )}
+                ≈ {currSym} {formatCurrency(parseVal(state.silverGrams, locale) * parseVal(state.silverPricePerGram, locale), locale)}
+                {" "}at {currSym}{state.silverPricePerGram}/g
               </p>
             )}
           </AccordionContent>
@@ -751,16 +729,24 @@ export default function ZakatCalculator() {
             <HawlToggle
               checked={state.investHawl}
               onChange={(v) => set("investHawl", v)}
+              label={t("zakat.hawl.label")}
+              help={t("zakat.hawl.help")}
             />
             <NumField
               label={t("zakat.investments.stocks")}
               help={t("zakat.investments.stocks.help")}
-              fieldKey="stocks"
+              value={state.stocks}
+              onChange={(v) => handleChange("stocks", v)}
+              onBlur={(v) => handleBlur("stocks", v)}
+              currSym={currSym}
             />
             <NumField
               label={t("zakat.investments.unitTrusts")}
               help={t("zakat.investments.unitTrusts.help")}
-              fieldKey="unitTrusts"
+              value={state.unitTrusts}
+              onChange={(v) => handleChange("unitTrusts", v)}
+              onBlur={(v) => handleBlur("unitTrusts", v)}
+              currSym={currSym}
             />
             {/* Crypto toggle */}
             <div className="space-y-3">
@@ -780,8 +766,10 @@ export default function ZakatCalculator() {
               {state.includeCrypto && (
                 <NumField
                   label={t("zakat.investments.cryptoAmount")}
-                  help=""
-                  fieldKey="cryptoAmount"
+                  value={state.cryptoAmount}
+                  onChange={(v) => handleChange("cryptoAmount", v)}
+                  onBlur={(v) => handleBlur("cryptoAmount", v)}
+                  currSym={currSym}
                 />
               )}
             </div>
@@ -812,21 +800,32 @@ export default function ZakatCalculator() {
             <HawlToggle
               checked={state.businessHawl}
               onChange={(v) => set("businessHawl", v)}
+              label={t("zakat.hawl.label")}
+              help={t("zakat.hawl.help")}
             />
             <NumField
               label={t("zakat.business.inventory")}
               help={t("zakat.business.inventory.help")}
-              fieldKey="inventory"
+              value={state.inventory}
+              onChange={(v) => handleChange("inventory", v)}
+              onBlur={(v) => handleBlur("inventory", v)}
+              currSym={currSym}
             />
             <NumField
               label={t("zakat.business.receivables")}
               help={t("zakat.business.receivables.help")}
-              fieldKey="receivables"
+              value={state.receivables}
+              onChange={(v) => handleChange("receivables", v)}
+              onBlur={(v) => handleBlur("receivables", v)}
+              currSym={currSym}
             />
             <NumField
               label={t("zakat.business.liabilities")}
               help={t("zakat.business.liabilities.help")}
-              fieldKey="liabilities"
+              value={state.liabilities}
+              onChange={(v) => handleChange("liabilities", v)}
+              onBlur={(v) => handleBlur("liabilities", v)}
+              currSym={currSym}
             />
           </AccordionContent>
         </AccordionItem>
@@ -855,16 +854,24 @@ export default function ZakatCalculator() {
             <HawlToggle
               checked={state.rentalHawl}
               onChange={(v) => set("rentalHawl", v)}
+              label={t("zakat.hawl.label")}
+              help={t("zakat.hawl.help")}
             />
             <NumField
               label={t("zakat.rental.annualIncome")}
               help={t("zakat.rental.annualIncome.help")}
-              fieldKey="rentalIncome"
+              value={state.rentalIncome}
+              onChange={(v) => handleChange("rentalIncome", v)}
+              onBlur={(v) => handleBlur("rentalIncome", v)}
+              currSym={currSym}
             />
             <NumField
               label={t("zakat.rental.expenses")}
               help={t("zakat.rental.expenses.help")}
-              fieldKey="rentalExpenses"
+              value={state.rentalExpenses}
+              onChange={(v) => handleChange("rentalExpenses", v)}
+              onBlur={(v) => handleBlur("rentalExpenses", v)}
+              currSym={currSym}
             />
           </AccordionContent>
         </AccordionItem>

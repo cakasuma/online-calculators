@@ -124,7 +124,10 @@ interface MetalPriceResponse {
 
 export default function ZakatCalculator() {
   const { t, locale } = useLocale();
-  const [state, setState] = useState<ZakatState>(makeInitialState("MYR"));
+  const [state, setState] = useState<ZakatState>(() => {
+    const saved = (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })();
+    return makeInitialState(saved);
+  });
   const [livePricesLoading, setLivePricesLoading] = useState(false);
   const [livePricesLoaded, setLivePricesLoaded] = useState(false);
   const [priceSource, setPriceSource] = useState<{ name: string; url: string } | null>(null);
@@ -169,6 +172,7 @@ export default function ZakatCalculator() {
   }
 
   function handleCurrencyChange(code: string) {
+    try { localStorage.setItem("calc_currency", code); } catch { /* noop */ }
     setState((prev) => ({
       ...prev,
       currency: code,

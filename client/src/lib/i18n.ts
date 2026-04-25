@@ -105,6 +105,8 @@ const translations = {
   "nav.basic": { en: "Basic", id: "Dasar" },
   "nav.scientific": { en: "Scientific", id: "Ilmiah" },
   "nav.faraid": { en: "Faraid", id: "Faraid" },
+  "nav.wasiat": { en: "Wasiat", id: "Wasiat" },
+  "nav.zakat": { en: "Zakat", id: "Zakat" },
   "common.history": { en: "History", id: "Riwayat" },
   "common.noHistory": { en: "No history yet", id: "Belum ada riwayat" },
   "common.historyHint": { en: "Your calculations will appear here", id: "Perhitungan Anda akan muncul di sini" },
@@ -122,6 +124,8 @@ const translations = {
   "home.faraid.title": { en: "Faraid Calculator", id: "Kalkulator Faraid" },
   "home.faraid.desc": { en: "Full Islamic inheritance distribution with pie chart visualization, multiple heirs, and detailed breakdown.", id: "Pembagian waris Islam lengkap dengan visualisasi diagram, berbagai ahli waris, dan rincian detail." },
   "home.faraid.badge": { en: "Featured", id: "Unggulan" },
+  "home.faraid.cta": { en: "Open Calculator", id: "Buka Kalkulator" },
+  "home.islamicTools": { en: "Islamic Tools", id: "Alat Islam" },
   "home.tools.title": { en: "Other Tools", id: "Alat Lainnya" },
   "home.basic.title": { en: "Basic Calculator", id: "Kalkulator Dasar" },
   "home.basic.desc": { en: "Standard arithmetic operations — addition, subtraction, multiplication, and division.", id: "Operasi aritmatika standar — penjumlahan, pengurangan, perkalian, dan pembagian." },
@@ -545,6 +549,23 @@ const translations = {
   "zakat.breakdown.invest": { en: "Investments", id: "Investasi" },
   "zakat.breakdown.business": { en: "Business Assets", id: "Aset Bisnis" },
   "zakat.breakdown.rental": { en: "Rental Income", id: "Pendapatan Sewa" },
+
+  // ── Footer ──
+  "footer.quickLinks": { en: "Quick Links", id: "Tautan Cepat" },
+
+  // ── Accessibility ──
+  "a11y.themeToggle.light": { en: "Switch to light mode", id: "Ganti ke mode terang" },
+  "a11y.themeToggle.dark": { en: "Switch to dark mode", id: "Ganti ke mode gelap" },
+  "a11y.historyToggle": { en: "Toggle history", id: "Tampilkan riwayat" },
+  "a11y.navToggle": { en: "Toggle navigation", id: "Tampilkan navigasi" },
+  "a11y.calc.multiply": { en: "multiply", id: "kali" },
+  "a11y.calc.divide": { en: "divide", id: "bagi" },
+  "a11y.calc.toggleSign": { en: "toggle sign", id: "ubah tanda" },
+  "a11y.calc.percent": { en: "percent", id: "persen" },
+  "a11y.calc.backspace": { en: "backspace", id: "hapus" },
+  "a11y.calc.clear": { en: "clear", id: "hapus semua" },
+  "a11y.calc.equals": { en: "equals", id: "sama dengan" },
+  "a11y.degRadToggle": { en: "angle mode", id: "mode sudut" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

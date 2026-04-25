@@ -72,8 +72,8 @@ export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) 
             return (
               <div
                 key={entry.id}
-                className="group flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                onClick={() => onUseEntry?.(entry)}
+                className={`group flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors${onUseEntry ? " cursor-pointer" : ""}`}
+                onClick={onUseEntry ? () => onUseEntry(entry) : undefined}
                 data-testid={`history-entry-${entry.id}`}
               >
                 <div className="flex-shrink-0 w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center mt-0.5">

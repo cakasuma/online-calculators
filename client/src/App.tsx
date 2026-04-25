@@ -16,6 +16,8 @@ import {
   Home as HomeIcon,
   X,
   Menu,
+  FileText,
+  Star,
 } from "lucide-react";
 import { useState, useCallback } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -75,6 +77,8 @@ function useLocalizedHashLocation(): [string, (to: string) => void] {
 const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
   { href: "/", labelKey: "nav.home", icon: HomeIcon },
   { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
+  { href: "/zakat", labelKey: "nav.zakat", icon: Star },
+  { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
   { href: "/normal", labelKey: "nav.basic", icon: Calculator },
   { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
 ];
@@ -104,6 +108,8 @@ function Layout() {
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
               className="md:hidden p-2.5 rounded-lg hover:bg-muted active:bg-muted/80"
+              aria-label={t("a11y.navToggle")}
+              aria-expanded={showMobileNav}
               data-testid="button-mobile-menu"
             >
               <Menu className="w-5 h-5" />
@@ -163,6 +169,8 @@ function Layout() {
               className={`p-2.5 rounded-lg transition-colors ${
                 showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
               }`}
+              aria-label={t("a11y.historyToggle")}
+              aria-expanded={showHistory}
               data-testid="button-toggle-history"
             >
               <History className="w-5 h-5" />
@@ -170,6 +178,7 @@ function Layout() {
             <button
               onClick={toggle}
               className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground"
+              aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")}
               data-testid="button-theme-toggle"
             >
               {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -177,9 +186,18 @@ function Layout() {
           </div>
         </div>
 
+        {/* Mobile nav backdrop — closes nav on outside tap */}
+        {showMobileNav && (
+          <div
+            className="md:hidden fixed inset-0 z-40 top-14"
+            onClick={() => setShowMobileNav(false)}
+            aria-hidden="true"
+          />
+        )}
+
         {/* Mobile nav dropdown */}
         {showMobileNav && (
-          <div className="md:hidden border-t bg-background px-4 py-3 space-y-1" data-testid="nav-mobile">
+          <div className="md:hidden border-t bg-background px-4 py-3 space-y-1 relative z-50" id="mobile-nav" data-testid="nav-mobile">
             {navItems.map((item) => {
               const isActive = location === item.href;
               return (
@@ -269,8 +287,17 @@ function Layout() {
 
       {/* Footer */}
       <footer className="border-t py-5 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <span>&copy; {new Date().getFullYear()} amammustofa.com</span>
+          <nav className="flex items-center gap-3 flex-wrap justify-center" aria-label={t("footer.quickLinks")}>
+            {navItems.filter((item) => item.href !== "/").map((item) => (
+              <Link key={item.href} href={item.href}>
+                <span className="hover:text-foreground transition-colors cursor-pointer">
+                  {t(item.labelKey)}
+                </span>
+              </Link>
+            ))}
+          </nav>
         </div>
       </footer>
 

@@ -17,12 +17,35 @@ const scientificFunctions = [
 ];
 
 const numpadButtons = [
-  "7", "8", "9", "/",
-  "4", "5", "6", "*",
+  "7", "8", "9", "÷",
+  "4", "5", "6", "×",
   "1", "2", "3", "-",
   "0", ".", "⌫", "+",
   "C", "±", "%", "=",
 ];
+
+const SCI_ARIA_LABELS: Record<string, string> = {
+  "×": "multiply",
+  "÷": "divide",
+  "±": "toggle sign",
+  "%": "percent",
+  "⌫": "backspace",
+  "C": "clear",
+  "=": "equals",
+  "x²": "x squared",
+  "xʸ": "x to the power y",
+  "1/x": "one over x",
+  "n!": "factorial",
+  "|": "absolute value",
+  "√": "square root",
+  "π": "pi",
+  "e": "Euler's number",
+  "(": "open parenthesis",
+  ")": "close parenthesis",
+  "asin": "arcsine",
+  "acos": "arccosine",
+  "atan": "arctangent",
+};
 
 function factorial(n: number): number {
   if (n < 0 || !Number.isInteger(n)) return NaN;
@@ -175,7 +198,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
         setDisplay((d) => String(parseFloat(d) / 100));
         return;
       }
-      const isOperator = ["+", "-", "*", "/"].includes(key);
+      const isOperator = ["+", "-", "×", "÷"].includes(key);
       if (isOperator) {
         if (justEvaluated) {
           setExpression(display + key);
@@ -207,7 +230,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
       const map: Record<string, string> = {
         "0": "0", "1": "1", "2": "2", "3": "3", "4": "4",
         "5": "5", "6": "6", "7": "7", "8": "8", "9": "9",
-        "+": "+", "-": "-", "*": "*", "/": "/",
+        "+": "+", "-": "-", "*": "×", "/": "÷",
         ".": ".", ",": ".",
         "Enter": "=", "=": "=",
         "Backspace": "⌫",
@@ -228,7 +251,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
   const numBtnClass = (key: string) => {
     const base = "calc-btn h-14 text-base font-semibold rounded-xl transition-all active:scale-95";
     if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm`;
-    if (["+", "-", "*", "/"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
+    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
     if (["C", "±", "%"].includes(key)) return `${base} bg-muted hover:bg-muted/80 text-muted-foreground`;
     if (key === "⌫") return `${base} bg-muted hover:bg-muted/80 text-destructive`;
     return `${base} bg-card hover:bg-muted/50 border text-foreground`;
@@ -239,16 +262,26 @@ export default function ScientificCalculator({ onCalculate }: Props) {
       {/* Display */}
       <div className="mb-3 p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
         <div className="flex items-center gap-2 mb-1.5">
-          <button
-            onClick={() => setMode(mode === "deg" ? "rad" : "deg")}
-            className="text-xs px-2.5 py-1 rounded-full border bg-muted text-muted-foreground hover:bg-muted/80 transition-colors font-medium"
-          >
-            {mode.toUpperCase()}
-          </button>
+          <div className="flex text-xs rounded-full border overflow-hidden shrink-0" aria-label="angle mode">
+            <button
+              onClick={() => setMode("deg")}
+              className={`px-2.5 py-1 font-medium transition-colors ${mode === "deg" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+              aria-pressed={mode === "deg"}
+            >
+              DEG
+            </button>
+            <button
+              onClick={() => setMode("rad")}
+              className={`px-2.5 py-1 font-medium transition-colors ${mode === "rad" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+              aria-pressed={mode === "rad"}
+            >
+              RAD
+            </button>
+          </div>
           {expression && (
-            <p className="text-sm text-muted-foreground font-mono truncate max-w-[200px]">
+            <div className="text-sm text-muted-foreground font-mono flex-1 overflow-x-auto text-right whitespace-nowrap scrollbar-none">
               {expression}
-            </p>
+            </div>
           )}
         </div>
         <p
@@ -267,6 +300,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
             key={fn}
             onClick={() => handleSciFn(fn)}
             className={sciBtnClass}
+            aria-label={SCI_ARIA_LABELS[fn] ?? undefined}
             data-testid={`sci-btn-${fn}`}
           >
             {fn}
@@ -281,9 +315,10 @@ export default function ScientificCalculator({ onCalculate }: Props) {
             key={key}
             onClick={() => handleKey(key)}
             className={numBtnClass(key)}
+            aria-label={SCI_ARIA_LABELS[key] ?? undefined}
             data-testid={`btn-${key}`}
           >
-            {key === "⌫" ? <Delete className="w-5 h-5" /> : key}
+            {key === "⌫" ? <Delete className="w-5 h-5" aria-hidden="true" /> : key}
           </button>
         ))}
       </div>

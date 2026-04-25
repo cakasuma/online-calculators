@@ -17,7 +17,7 @@ export default function HomePage() {
       </div>
 
       {/* Featured Islamic Tools */}
-      <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Islamic Tools</p>
+      <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("home.islamicTools")}</p>
       <div className="flex flex-col gap-4">
       <Link href="/faraid">
         <Card className="group hover:border-primary/60 hover:shadow-md transition-all cursor-pointer border-primary/30 bg-primary/5">
@@ -36,7 +36,7 @@ export default function HomePage() {
                 </p>
                 <div className="mt-4">
                   <Button size="sm" className="gap-2 text-sm pointer-events-none h-9 px-4">
-                    Open Calculator
+                    {t("home.faraid.cta")}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>

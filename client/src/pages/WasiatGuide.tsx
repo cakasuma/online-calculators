@@ -91,7 +91,10 @@ function makeId() {
 export default function WasiatGuide() {
   const { t, locale } = useLocale();
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState<WasiatForm>(initialForm);
+  const [form, setForm] = useState<WasiatForm>(() => ({
+    ...initialForm,
+    currency: (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })(),
+  }));
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [savedBanner, setSavedBanner] = useState(false);
   const [saveToast, setSaveToast] = useState(false);
@@ -678,7 +681,10 @@ export default function WasiatGuide() {
                   <button
                     key={c.code}
                     type="button"
-                    onClick={() => setForm((f) => ({ ...f, currency: c.code }))}
+                    onClick={() => {
+                      try { localStorage.setItem("calc_currency", c.code); } catch { /* noop */ }
+                      setForm((f) => ({ ...f, currency: c.code }));
+                    }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                       form.currency === c.code
                         ? "bg-primary text-primary-foreground border-primary"

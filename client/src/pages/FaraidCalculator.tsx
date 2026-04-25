@@ -720,15 +720,21 @@ function Counter({
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function FaraidCalculator({ onCalculate }: Props) {
   const { t, locale } = useLocale();
-  const [form, setForm] = useState<FormState>(initialForm);
+  const [form, setForm] = useState<FormState>(() => ({
+    ...initialForm,
+    currency: (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })(),
+  }));
   const [result, setResult] = useState<DistributionResult | null>(null);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showRefs, setShowRefs] = useState(false);
   const [wasiatLoaded, setWasiatLoaded] = useState(false);
 
-  // Auto-set currency when locale changes
+  // Auto-set currency when locale changes (only on first locale load, not on re-renders)
   useEffect(() => {
-    setForm((f) => ({ ...f, currency: locale === "id" ? "IDR" : "MYR" }));
+    const currency = locale === "id" ? "IDR" : "MYR";
+    setForm((f) => ({ ...f, currency }));
+    try { localStorage.setItem("calc_currency", currency); } catch { /* noop */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
 
   // Load wasiat plan from localStorage
@@ -872,6 +878,9 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   function setField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
     setErrors((e) => ({ ...e, heirs: undefined }));
+    if (key === "currency") {
+      try { localStorage.setItem("calc_currency", value as string); } catch { /* noop */ }
+    }
   }
 
   const estate = parseInput(form.totalEstate);

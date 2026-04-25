@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Delete } from "lucide-react";
+import { useLocale } from "@/hooks/use-locale";
 
 interface Props {
   onCalculate: (expression: string, result: string) => void;
@@ -7,15 +8,25 @@ interface Props {
 
 type CalcKey =
   | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-  | "." | "+" | "-" | "*" | "/" | "=" | "C" | "⌫" | "±" | "%";
+  | "." | "+" | "-" | "×" | "÷" | "=" | "C" | "⌫" | "±" | "%";
 
 const BUTTONS: CalcKey[][] = [
-  ["C", "±", "%", "/"],
-  ["7", "8", "9", "*"],
+  ["C", "±", "%", "÷"],
+  ["7", "8", "9", "×"],
   ["4", "5", "6", "-"],
   ["1", "2", "3", "+"],
   ["0", ".", "⌫", "="],
 ];
+
+const ARIA_LABELS: Partial<Record<CalcKey, string>> = {
+  "×": "multiply",
+  "÷": "divide",
+  "±": "toggle sign",
+  "%": "percent",
+  "⌫": "backspace",
+  "C": "clear",
+  "=": "equals",
+};
 
 function safeEval(expr: string): string {
   try {
@@ -34,7 +45,16 @@ function safeEval(expr: string): string {
   }
 }
 
+function formatDisplayResult(raw: string): string {
+  const n = parseFloat(raw);
+  if (isNaN(n) || raw === "Error" || raw === "∞") return raw;
+  const [intPart, decPart] = raw.split(".");
+  const thousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decPart !== undefined ? `${thousands}.${decPart}` : thousands;
+}
+
 export default function NormalCalculator({ onCalculate }: Props) {
+  const { t } = useLocale();
   const [display, setDisplay] = useState("0");
   const [expression, setExpression] = useState("");
   const [justEvaluated, setJustEvaluated] = useState(false);
@@ -80,7 +100,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
         return;
       }
 
-      const isOperator = ["+", "-", "*", "/"].includes(key);
+      const isOperator = ["+", "-", "×", "÷"].includes(key);
 
       if (isOperator) {
         if (justEvaluated) {
@@ -118,7 +138,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
       const map: Record<string, CalcKey> = {
         "0": "0", "1": "1", "2": "2", "3": "3", "4": "4",
         "5": "5", "6": "6", "7": "7", "8": "8", "9": "9",
-        "+": "+", "-": "-", "*": "*", "/": "/",
+        "+": "+", "-": "-", "*": "×", "/": "÷",
         ".": ".", ",": ".",
         "Enter": "=", "=": "=",
         "Backspace": "⌫",
@@ -137,7 +157,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
   const btnClass = (key: CalcKey) => {
     const base = "calc-btn h-16 text-base font-semibold rounded-xl transition-all active:scale-95";
     if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90 col-span-1 shadow-sm`;
-    if (["+", "-", "*", "/"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
+    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-secondary hover:bg-secondary/80 text-primary font-bold`;
     if (["C", "±", "%"].includes(key)) return `${base} bg-muted hover:bg-muted/80 text-muted-foreground`;
     if (key === "⌫") return `${base} bg-muted hover:bg-muted/80 text-destructive`;
     return `${base} bg-card hover:bg-muted/50 border text-foreground`;
@@ -148,16 +168,16 @@ export default function NormalCalculator({ onCalculate }: Props) {
       {/* Display */}
       <div className="mb-3 p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
         {expression && (
-          <p className="text-sm text-muted-foreground font-mono mb-1 truncate max-w-full">
+          <div className="text-sm text-muted-foreground font-mono mb-1 w-full overflow-x-auto text-right whitespace-nowrap scrollbar-none">
             {expression}
-          </p>
+          </div>
         )}
         <p
           className="font-mono font-semibold text-right break-all"
           style={{ fontSize: display.length > 12 ? "1.5rem" : display.length > 8 ? "2rem" : "2.75rem" }}
           data-testid="display-main"
         >
-          {display}
+          {justEvaluated ? formatDisplayResult(display) : display}
         </p>
       </div>
 
@@ -168,9 +188,10 @@ export default function NormalCalculator({ onCalculate }: Props) {
             key={key}
             onClick={() => handleKey(key)}
             className={btnClass(key)}
+            aria-label={ARIA_LABELS[key] ?? undefined}
             data-testid={`btn-${key}`}
           >
-            {key === "⌫" ? <Delete className="w-5 h-5" /> : key}
+            {key === "⌫" ? <Delete className="w-5 h-5" aria-hidden="true" /> : key}
           </button>
         ))}
       </div>

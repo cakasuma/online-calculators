@@ -18,6 +18,7 @@ import {
   Menu,
   FileText,
   Star,
+  Wallet,
 } from "lucide-react";
 import { useState, useCallback } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -34,11 +35,9 @@ import ScientificCalculator from "@/pages/ScientificCalculator";
 import FaraidCalculator from "@/pages/FaraidCalculator";
 import WasiatGuide from "@/pages/WasiatGuide";
 import ZakatCalculator from "@/pages/ZakatCalculator";
+import SalaryCalculator from "@/pages/SalaryCalculator";
 import NotFound from "@/pages/not-found";
 
-// ─── Localized Hash Location ──────────────────────────────────────────────────
-// Wraps useHashLocation to strip/add the /:lang prefix transparently.
-// URL format: /#/en/faraid  /#/id/normal  etc.
 const SUPPORTED_LOCALES: Locale[] = ["en", "id"];
 
 function getCurrentUrlLang(): Locale {
@@ -58,13 +57,9 @@ function getCurrentUrlLang(): Locale {
 
 function useLocalizedHashLocation(): [string, (to: string) => void] {
   const [hashPath, setHashPath] = useHashLocation();
-
-  // Strip the leading /:lang segment so the Router sees clean paths
   const segments = hashPath.split("/").filter(Boolean);
   const hasLangPrefix = segments.length > 0 && SUPPORTED_LOCALES.includes(segments[0] as Locale);
-  const cleanPath = hasLangPrefix
-    ? "/" + segments.slice(1).join("/") || "/"
-    : hashPath;
+  const cleanPath = hasLangPrefix ? "/" + segments.slice(1).join("/") || "/" : hashPath;
 
   const navigate = (to: string) => {
     const lang = getCurrentUrlLang();
@@ -76,11 +71,12 @@ function useLocalizedHashLocation(): [string, (to: string) => void] {
 
 const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
   { href: "/", labelKey: "nav.home", icon: HomeIcon },
+  { href: "/salary", labelKey: "nav.salary", icon: Wallet },
+  { href: "/normal", labelKey: "nav.basic", icon: Calculator },
+  { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
   { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
   { href: "/zakat", labelKey: "nav.zakat", icon: Star },
   { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
-  { href: "/normal", labelKey: "nav.basic", icon: Calculator },
-  { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
 ];
 
 function Layout() {
@@ -101,9 +97,8 @@ function Layout() {
 
   return (
     <div className={`min-h-screen flex flex-col${location === "/faraid" ? " theme-faraid" : ""}`}>
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
-        <div className="max-w-6xl mx-auto px-4 h-14 md:h-14 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
@@ -116,24 +111,7 @@ function Layout() {
             </button>
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="w-5 h-5 text-primary-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-label="Calculator logo"
-                >
-                  <rect x="4" y="2" width="16" height="20" rx="2" />
-                  <line x1="8" y1="6" x2="16" y2="6" />
-                  <line x1="8" y1="10" x2="10" y2="10" />
-                  <line x1="14" y1="10" x2="16" y2="10" />
-                  <line x1="8" y1="14" x2="10" y2="14" />
-                  <line x1="14" y1="14" x2="16" y2="14" />
-                  <line x1="8" y1="18" x2="16" y2="18" />
-                </svg>
+                <Calculator className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-base font-bold hidden sm:inline" data-testid="text-site-title">
                 {t("site.title")}
@@ -141,7 +119,6 @@ function Layout() {
             </Link>
           </div>
 
-          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1" data-testid="nav-desktop">
             {navItems.map((item) => {
               const isActive = location === item.href;
@@ -149,9 +126,7 @@ function Layout() {
                 <Link key={item.href} href={item.href}>
                   <span
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     }`}
                   >
                     <item.icon className="w-4 h-4" />
@@ -166,9 +141,7 @@ function Layout() {
             <LocaleSwitcher />
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`p-2.5 rounded-lg transition-colors ${
-                showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
-              }`}
+              className={`p-2.5 rounded-lg transition-colors ${showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"}`}
               aria-label={t("a11y.historyToggle")}
               aria-expanded={showHistory}
               data-testid="button-toggle-history"
@@ -186,16 +159,10 @@ function Layout() {
           </div>
         </div>
 
-        {/* Mobile nav backdrop — closes nav on outside tap */}
         {showMobileNav && (
-          <div
-            className="md:hidden fixed inset-0 z-40 top-14"
-            onClick={() => setShowMobileNav(false)}
-            aria-hidden="true"
-          />
+          <div className="md:hidden fixed inset-0 z-40 top-14" onClick={() => setShowMobileNav(false)} aria-hidden="true" />
         )}
 
-        {/* Mobile nav dropdown */}
         {showMobileNav && (
           <div className="md:hidden border-t bg-background px-4 py-3 space-y-1 relative z-50" id="mobile-nav" data-testid="nav-mobile">
             {navItems.map((item) => {
@@ -205,9 +172,7 @@ function Layout() {
                   <span
                     onClick={() => setShowMobileNav(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     }`}
                   >
                     <item.icon className="w-5 h-5" />
@@ -220,11 +185,11 @@ function Layout() {
         )}
       </header>
 
-      {/* Main content area */}
       <div className="flex-1 flex">
         <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
           <Switch>
             <Route path="/" component={HomePage} />
+            <Route path="/salary" component={SalaryCalculator} />
             <Route path="/normal">
               <NormalCalculator onCalculate={handleCalculate("normal")} />
             </Route>
@@ -240,68 +205,47 @@ function Layout() {
           </Switch>
         </main>
 
-        {/* History sidebar */}
         {showHistory && (
           <aside className="w-72 lg:w-80 border-l bg-card/50 p-4 hidden md:block overflow-y-auto max-h-[calc(100vh-3rem)]">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-base font-semibold">{t("common.history")}</h2>
-              <button
-                onClick={() => setShowHistory(false)}
-                className="p-1.5 rounded-lg hover:bg-muted"
-                data-testid="button-close-history"
-              >
+              <button onClick={() => setShowHistory(false)} className="p-1.5 rounded-lg hover:bg-muted" data-testid="button-close-history">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
-            <HistoryPanel
-              entries={history.entries}
-              onClear={history.clear}
-              onRemove={history.remove}
-            />
+            <HistoryPanel entries={history.entries} onClear={history.clear} onRemove={history.remove} />
           </aside>
         )}
       </div>
 
-      {/* Mobile history drawer */}
       {showHistory && (
         <div className="md:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowHistory(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background border-l p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-semibold">{t("common.history")}</h2>
-              <button
-                onClick={() => setShowHistory(false)}
-                className="p-2 rounded-lg hover:bg-muted"
-              >
+              <button onClick={() => setShowHistory(false)} className="p-2 rounded-lg hover:bg-muted">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <HistoryPanel
-              entries={history.entries}
-              onClear={history.clear}
-              onRemove={history.remove}
-            />
+            <HistoryPanel entries={history.entries} onClear={history.clear} onRemove={history.remove} />
           </div>
         </div>
       )}
 
-      {/* Footer */}
       <footer className="border-t py-5 px-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <span>&copy; {new Date().getFullYear()} amammustofa.com</span>
           <nav className="flex items-center gap-3 flex-wrap justify-center" aria-label={t("footer.quickLinks")}>
             {navItems.filter((item) => item.href !== "/").map((item) => (
               <Link key={item.href} href={item.href}>
-                <span className="hover:text-foreground transition-colors cursor-pointer">
-                  {t(item.labelKey)}
-                </span>
+                <span className="hover:text-foreground transition-colors cursor-pointer">{t(item.labelKey)}</span>
               </Link>
             ))}
           </nav>
         </div>
       </footer>
 
-      {/* Vercel Analytics */}
       <Analytics />
     </div>
   );

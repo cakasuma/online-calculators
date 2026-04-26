@@ -27,7 +27,6 @@ import { useLocaleState, LocaleContext } from "@/hooks/use-locale";
 import { useLocale } from "@/hooks/use-locale";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
-import type { TranslationKey } from "@/lib/i18n";
 
 import HomePage from "@/pages/Home";
 import NormalCalculator from "@/pages/NormalCalculator";
@@ -69,14 +68,14 @@ function useLocalizedHashLocation(): [string, (to: string) => void] {
   return [cleanPath || "/", navigate];
 }
 
-const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
-  { href: "/", labelKey: "nav.home", icon: HomeIcon },
-  { href: "/salary", labelKey: "nav.salary", icon: Wallet },
-  { href: "/normal", labelKey: "nav.basic", icon: Calculator },
-  { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
-  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
-  { href: "/zakat", labelKey: "nav.zakat", icon: Star },
-  { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
+const navItems = [
+  { href: "/", label: "Home", icon: HomeIcon },
+  { href: "/salary", label: "Salary", icon: Wallet },
+  { href: "/normal", label: "Basic", icon: Calculator },
+  { href: "/scientific", label: "Scientific", icon: FlaskConical },
+  { href: "/faraid", label: "Faraid", icon: Scale },
+  { href: "/zakat", label: "Zakat", icon: Star },
+  { href: "/wasiat", label: "Wasiat", icon: FileText },
 ];
 
 function Layout() {
@@ -114,7 +113,7 @@ function Layout() {
                 <Calculator className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-base font-bold hidden sm:inline" data-testid="text-site-title">
-                {t("site.title")}
+                ToolHub MY
               </span>
             </Link>
           </div>
@@ -124,13 +123,9 @@ function Layout() {
               const isActive = location === item.href;
               return (
                 <Link key={item.href} href={item.href}>
-                  <span
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-                  >
+                  <span className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
                     <item.icon className="w-4 h-4" />
-                    {t(item.labelKey)}
+                    {item.label}
                   </span>
                 </Link>
               );
@@ -139,29 +134,16 @@ function Layout() {
 
           <div className="flex items-center gap-1">
             <LocaleSwitcher />
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className={`p-2.5 rounded-lg transition-colors ${showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"}`}
-              aria-label={t("a11y.historyToggle")}
-              aria-expanded={showHistory}
-              data-testid="button-toggle-history"
-            >
+            <button onClick={() => setShowHistory(!showHistory)} className={`p-2.5 rounded-lg transition-colors ${showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"}`} aria-label={t("a11y.historyToggle")} aria-expanded={showHistory} data-testid="button-toggle-history">
               <History className="w-5 h-5" />
             </button>
-            <button
-              onClick={toggle}
-              className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground"
-              aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")}
-              data-testid="button-theme-toggle"
-            >
+            <button onClick={toggle} className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground" aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")} data-testid="button-theme-toggle">
               {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {showMobileNav && (
-          <div className="md:hidden fixed inset-0 z-40 top-14" onClick={() => setShowMobileNav(false)} aria-hidden="true" />
-        )}
+        {showMobileNav && <div className="md:hidden fixed inset-0 z-40 top-14" onClick={() => setShowMobileNav(false)} aria-hidden="true" />}
 
         {showMobileNav && (
           <div className="md:hidden border-t bg-background px-4 py-3 space-y-1 relative z-50" id="mobile-nav" data-testid="nav-mobile">
@@ -169,14 +151,9 @@ function Layout() {
               const isActive = location === item.href;
               return (
                 <Link key={item.href} href={item.href}>
-                  <span
-                    onClick={() => setShowMobileNav(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-                  >
+                  <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium cursor-pointer transition-colors ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
                     <item.icon className="w-5 h-5" />
-                    {t(item.labelKey)}
+                    {item.label}
                   </span>
                 </Link>
               );
@@ -190,15 +167,9 @@ function Layout() {
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/salary" component={SalaryCalculator} />
-            <Route path="/normal">
-              <NormalCalculator onCalculate={handleCalculate("normal")} />
-            </Route>
-            <Route path="/scientific">
-              <ScientificCalculator onCalculate={handleCalculate("scientific")} />
-            </Route>
-            <Route path="/faraid">
-              <FaraidCalculator onCalculate={handleCalculate("faraid")} />
-            </Route>
+            <Route path="/normal"><NormalCalculator onCalculate={handleCalculate("normal")} /></Route>
+            <Route path="/scientific"><ScientificCalculator onCalculate={handleCalculate("scientific")} /></Route>
+            <Route path="/faraid"><FaraidCalculator onCalculate={handleCalculate("faraid")} /></Route>
             <Route path="/wasiat" component={WasiatGuide} />
             <Route path="/zakat" component={ZakatCalculator} />
             <Route component={NotFound} />
@@ -224,9 +195,7 @@ function Layout() {
           <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background border-l p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-semibold">{t("common.history")}</h2>
-              <button onClick={() => setShowHistory(false)} className="p-2 rounded-lg hover:bg-muted">
-                <X className="w-5 h-5" />
-              </button>
+              <button onClick={() => setShowHistory(false)} className="p-2 rounded-lg hover:bg-muted"><X className="w-5 h-5" /></button>
             </div>
             <HistoryPanel entries={history.entries} onClear={history.clear} onRemove={history.remove} />
           </div>
@@ -235,11 +204,11 @@ function Layout() {
 
       <footer className="border-t py-5 px-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <span>&copy; {new Date().getFullYear()} amammustofa.com</span>
+          <span>&copy; {new Date().getFullYear()} ToolHub MY</span>
           <nav className="flex items-center gap-3 flex-wrap justify-center" aria-label={t("footer.quickLinks")}>
             {navItems.filter((item) => item.href !== "/").map((item) => (
               <Link key={item.href} href={item.href}>
-                <span className="hover:text-foreground transition-colors cursor-pointer">{t(item.labelKey)}</span>
+                <span className="hover:text-foreground transition-colors cursor-pointer">{item.label}</span>
               </Link>
             ))}
           </nav>
@@ -253,15 +222,12 @@ function Layout() {
 
 function App() {
   const localeState = useLocaleState();
-
   return (
     <LocaleContext.Provider value={localeState}>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
-          <Router hook={useLocalizedHashLocation}>
-            <Layout />
-          </Router>
+          <Router hook={useLocalizedHashLocation}><Layout /></Router>
         </TooltipProvider>
       </QueryClientProvider>
     </LocaleContext.Provider>

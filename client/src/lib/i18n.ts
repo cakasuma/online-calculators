@@ -106,7 +106,6 @@ const translations = {
   "nav.scientific": { en: "Scientific", id: "Ilmiah" },
   "nav.faraid": { en: "Faraid", id: "Faraid" },
   "nav.wasiat": { en: "Wasiat", id: "Wasiat" },
-  "nav.zakat": { en: "Zakat", id: "Zakat" },
   "common.history": { en: "History", id: "Riwayat" },
   "common.noHistory": { en: "No history yet", id: "Belum ada riwayat" },
   "common.historyHint": { en: "Your calculations will appear here", id: "Perhitungan Anda akan muncul di sini" },
@@ -412,11 +411,6 @@ const translations = {
   "validation.wivesMax": { en: "Maximum 4 wives permitted in Islam", id: "Maksimal 4 istri diperbolehkan dalam Islam" },
 
   // ── Wasiat Guide ──
-  "nav.wasiat": { en: "Wasiat Guide", id: "Panduan Wasiat" },
-  "home.wasiat.title": { en: "Wasiat (Will) Guide", id: "Panduan Wasiat Islam" },
-  "home.wasiat.desc": { en: "Step-by-step Islamic will guide: eligibility check, bequest planner, and printable summary with lawyer checklist.", id: "Panduan wasiat Islam langkah demi langkah: cek kelayakan, perencana wasiat, dan ringkasan yang dapat dicetak." },
-  "home.wasiat.badge": { en: "New", id: "Baru" },
-  "home.wasiat.cta": { en: "Plan Your Wasiat", id: "Rencanakan Wasiat" },
   "wasiat.title": { en: "Wasiat (Islamic Will) Guide", id: "Panduan Wasiat Islam" },
   "wasiat.disclaimer": { en: "This guide is for educational purposes only. Consult a qualified solicitor or Islamic estate planner for a legally binding will.", id: "Panduan ini hanya untuk tujuan edukasi. Konsultasikan dengan pengacara atau perencana warisan Islam untuk wasiat yang sah secara hukum." },
   "wasiat.step1.label": { en: "Step 1", id: "Langkah 1" },
@@ -479,11 +473,6 @@ const translations = {
   "wasiat.validation.estate": { en: "Estate value must be a positive number", id: "Nilai harta harus berupa angka positif" },
 
   // ── Zakat Calculator ──
-  "nav.zakat": { en: "Zakat", id: "Zakat" },
-  "home.zakat.title": { en: "Zakat Calculator", id: "Kalkulator Zakat" },
-  "home.zakat.desc": { en: "Calculate your annual Zakat obligation across cash, gold, investments, business assets, and rental income — with nisab threshold check.", id: "Hitung kewajiban Zakat tahunan Anda dari tunai, emas, investasi, aset bisnis, dan pendapatan sewa — dengan pemeriksaan nisab." },
-  "home.zakat.badge": { en: "New", id: "Baru" },
-  "home.zakat.cta": { en: "Calculate Zakat", id: "Hitung Zakat" },
   "zakat.title": { en: "Zakat Calculator", id: "Kalkulator Zakat" },
   "zakat.subtitle": { en: "Calculate your annual Zakat obligation based on Quran and Sunnah.", id: "Hitung kewajiban Zakat tahunan Anda berdasarkan Al-Quran dan Sunnah." },
   "zakat.disclaimer.title": { en: "Educational Tool", id: "Alat Edukasi" },

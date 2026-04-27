@@ -1,147 +1,89 @@
 import { Link } from "wouter";
-import { Calculator, FlaskConical, Scale, ArrowRight, BookOpen, FileText, Star } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useLocale } from "@/hooks/use-locale";
+import { toolBrand, toolCategories, tools } from "@/config/tools";
+
+const grouped = toolCategories.map((category) => ({
+  ...category,
+  items: tools.filter((tool) => tool.category === category.name),
+}));
 
 export default function HomePage() {
-  const { t } = useLocale();
+  const featured = tools.filter((tool) => tool.featured);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
-      {/* Hero */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("home.title")}</h1>
-        <p className="text-muted-foreground text-base mt-2 leading-relaxed">{t("home.subtitle")}</p>
-      </div>
-
-      {/* Featured Islamic Tools */}
-      <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("home.islamicTools")}</p>
-      <div className="flex flex-col gap-4">
-      <Link href="/faraid">
-        <Card className="group hover:border-primary/60 hover:shadow-md transition-all cursor-pointer border-primary/30 bg-primary/5">
-          <CardContent className="p-5 sm:p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-                <Scale className="w-7 h-7 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <h2 className="text-lg font-semibold">{t("home.faraid.title")}</h2>
-                  <Badge className="text-xs px-2 py-0.5">{t("home.faraid.badge")}</Badge>
-                </div>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  {t("home.faraid.desc")}
-                </p>
-                <div className="mt-4">
-                  <Button size="sm" className="gap-2 text-sm pointer-events-none h-9 px-4">
-                    {t("home.faraid.cta")}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-
-      {/* Featured: Wasiat Guide */}
-      <Link href="/wasiat">
-        <Card className="group hover:border-emerald-500/60 hover:shadow-md transition-all cursor-pointer border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20">
-          <CardContent className="p-5 sm:p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-500/20 transition-colors">
-                <FileText className="w-7 h-7 text-emerald-700 dark:text-emerald-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <h2 className="text-lg font-semibold">{t("home.wasiat.title")}</h2>
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5">{t("home.wasiat.badge")}</Badge>
-                </div>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  {t("home.wasiat.desc")}
-                </p>
-                <div className="mt-4">
-                  <Button size="sm" variant="outline" className="gap-2 text-sm pointer-events-none h-9 px-4 border-emerald-500/40 text-emerald-700 dark:text-emerald-400">
-                    {t("home.wasiat.cta")}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-
-      {/* Featured: Zakat Calculator */}
-      <Link href="/zakat">
-        <Card className="group hover:border-amber-500/60 hover:shadow-md transition-all cursor-pointer border-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20">
-          <CardContent className="p-5 sm:p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-500/20 transition-colors">
-                <Star className="w-7 h-7 text-amber-700 dark:text-amber-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <h2 className="text-lg font-semibold">{t("home.zakat.title")}</h2>
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5">{t("home.zakat.badge")}</Badge>
-                </div>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  {t("home.zakat.desc")}
-                </p>
-                <div className="mt-4">
-                  <Button size="sm" variant="outline" className="gap-2 text-sm pointer-events-none h-9 px-4 border-amber-500/40 text-amber-700 dark:text-amber-400">
-                    {t("home.zakat.cta")}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-      </div>
-
-      {/* About Faraid */}
-      <Card className="bg-muted/30">
-        <CardContent className="p-4 sm:p-5 flex items-start gap-3">
-          <BookOpen className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold mb-1">{t("home.about.title")}</p>
-            <p className="text-sm text-muted-foreground leading-relaxed">{t("home.about.text")}</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Other tools */}
-      <div>
-        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
-          {t("home.tools.title")}
+    <div className="max-w-6xl mx-auto space-y-8">
+      <section className="rounded-3xl border bg-gradient-to-br from-primary/10 via-background to-emerald-500/10 p-6 sm:p-8">
+        <Badge className="mb-3" variant="secondary">
+          <Sparkles className="w-3.5 h-3.5 mr-1" />
+          Modern utility tools hub
+        </Badge>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{toolBrand.name}</h1>
+        <p className="text-muted-foreground text-base mt-3 max-w-3xl leading-relaxed">
+          Your all-in-one calculator and planning suite for Malaysia. Use finance, math, Islamic, and
+          document tools in one fast, mobile-friendly workspace.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            { href: "/normal", icon: Calculator, titleKey: "home.basic.title", descKey: "home.basic.desc" },
-            { href: "/scientific", icon: FlaskConical, titleKey: "home.scientific.title", descKey: "home.scientific.desc" },
-          ].map(({ href, icon: Icon, titleKey, descKey }) => (
-            <Link key={href} href={href}>
-              <Card className="group hover:border-primary/50 hover:shadow-sm transition-all cursor-pointer h-full">
-                <CardContent className="p-4 flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 transition-colors">
-                    <Icon className="w-5 h-5 text-primary" />
+      </section>
+
+      <section className="space-y-3">
+        <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Featured tools</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {featured.map((tool) => (
+            <Link key={tool.slug} href={tool.href}>
+              <Card className="group h-full cursor-pointer border-primary/20 hover:border-primary/50 hover:shadow-md transition-all">
+                <CardContent className="p-5 flex gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <tool.icon className="w-6 h-6" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-sm font-semibold">{t(titleKey as any)}</h2>
-                    <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
-                      {t(descKey as any)}
-                    </p>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-semibold text-lg">{tool.name}</h2>
+                      {tool.badge ? <Badge variant="secondary">{tool.badge}</Badge> : null}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{tool.description}</p>
+                    <Button size="sm" className="mt-4 pointer-events-none">
+                      Open tool <ArrowRight className="w-4 h-4 ml-1" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
+
+      <section className="space-y-3">
+        <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Browse by category</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {grouped.map((category) => (
+            <Card key={category.name} className="h-full">
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <category.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{category.name}</h3>
+                    <p className="text-xs text-muted-foreground">{category.description}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {category.items.map((tool) => (
+                    <Link key={tool.slug} href={tool.href}>
+                      <div className="rounded-xl border p-3 hover:bg-muted/50 transition-colors cursor-pointer">
+                        <p className="font-medium text-sm">{tool.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{tool.description}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

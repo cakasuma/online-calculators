@@ -37,6 +37,8 @@ import FaraidCalculator from "@/pages/FaraidCalculator";
 import WasiatGuide from "@/pages/WasiatGuide";
 import ZakatCalculator from "@/pages/ZakatCalculator";
 import SalaryCalculator from "@/pages/SalaryCalculator";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfUse from "@/pages/TermsOfUse";
 import NotFound from "@/pages/not-found";
 
 const SUPPORTED_LOCALES: Locale[] = ["en", "id"];
@@ -117,6 +119,14 @@ const routeSeo: Record<string, { title: string; description: string }> = {
   "/wasiat": {
     title: "Wasiat Guide & Checklist | ToolHub MY",
     description: "Plan a practical Islamic will workflow with a printable checklist and action steps.",
+  },
+  "/privacy": {
+    title: "Privacy Policy | ToolHub MY",
+    description: "Read how ToolHub MY handles privacy, analytics, and advertising data.",
+  },
+  "/terms": {
+    title: "Terms of Use | ToolHub MY",
+    description: "Review ToolHub MY terms, scope, and usage responsibilities.",
   },
 };
 
@@ -281,6 +291,8 @@ function Layout() {
             </Route>
             <Route path="/wasiat" component={WasiatGuide} />
             <Route path="/zakat" component={ZakatCalculator} />
+            <Route path="/privacy" component={PrivacyPolicy} />
+            <Route path="/terms" component={TermsOfUse} />
             <Route component={NotFound} />
           </Switch>
         </main>
@@ -336,6 +348,12 @@ function Layout() {
                 <span className="hover:text-foreground transition-colors cursor-pointer">{item.name}</span>
               </Link>
             ))}
+            <Link href="/privacy">
+              <span className="hover:text-foreground transition-colors cursor-pointer">Privacy</span>
+            </Link>
+            <Link href="/terms">
+              <span className="hover:text-foreground transition-colors cursor-pointer">Terms</span>
+            </Link>
           </nav>
         </div>
       </footer>

@@ -39,6 +39,8 @@ const money = (value: number) =>
     maximumFractionDigits: 2,
   }).format(Number.isFinite(value) ? value : 0);
 
+const percent = (value: number) => `${value.toFixed(2)}%`;
+
 const TAX_BRACKETS = [
   { threshold: 0, rate: 0 },
   { threshold: 5000, rate: 0.01 },
@@ -53,7 +55,7 @@ const TAX_BRACKETS = [
 ];
 
 function toInputString(value: number): string {
-  return value === 0 ? "" : String(value);
+  return value === 0 ? "" : new Intl.NumberFormat("en-MY", { maximumFractionDigits: 2 }).format(value);
 }
 
 function parseNumberInput(value: string): number {
@@ -61,6 +63,17 @@ function parseNumberInput(value: string): number {
   const normalized = value.replace(/[,_\s]/g, "");
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+function formatInputNumber(value: string, maxDecimals = 2): string {
+  if (!value.trim()) return "";
+  const parsed = parseNumberInput(value);
+  if (!Number.isFinite(parsed)) return value;
+
+  return new Intl.NumberFormat("en-MY", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: maxDecimals,
+  }).format(parsed);
 }
 
 function progressiveTax(annualChargeableIncome: number) {
@@ -81,7 +94,7 @@ function progressiveTax(annualChargeableIncome: number) {
 
 function calculateSalary(input: SalaryInputs) {
   const annualGross = input.monthlySalary * 12 + input.annualBonus;
-  const epfRate = input.workerType === "foreigner" ? 0.02 : input.epfRate / 100;
+  const epfRate = input.epfRate / 100;
   const monthlyEpf = input.monthlySalary * epfRate;
   const bonusEpf = input.annualBonus * epfRate;
   const annualEpf = monthlyEpf * 12 + bonusEpf;
@@ -132,8 +145,12 @@ function validateInputs(input: SalaryInputs): InputErrors {
     errors.otherRelief = "Other annual relief cannot be negative.";
   }
 
-  if (input.workerType === "malaysian" && (input.epfRate < 0 || input.epfRate > 15)) {
-    errors.epfRate = "EPF employee rate must be between 0% and 15%.";
+  const minimumEpfRate = input.workerType === "foreigner" ? 2 : 0;
+  if (input.epfRate < minimumEpfRate || input.epfRate > 15) {
+    errors.epfRate =
+      input.workerType === "foreigner"
+        ? "EPF employee rate for foreign worker / expat must be between 2% and 15%."
+        : "EPF employee rate must be between 0% and 15%.";
   }
 
   return errors;
@@ -146,7 +163,7 @@ function NumberField({
   hint,
   error,
   placeholder,
-  disabled,
+  maxDecimals,
 }: {
   label: string;
   value: string;
@@ -154,7 +171,7 @@ function NumberField({
   hint?: string;
   error?: string;
   placeholder?: string;
-  disabled?: boolean;
+  maxDecimals?: number;
 }) {
   return (
     <label className="block space-y-2">
@@ -164,13 +181,13 @@ function NumberField({
         inputMode="decimal"
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={() => onChange(formatInputNumber(value, maxDecimals ?? 2))}
         placeholder={placeholder}
-        disabled={disabled}
         className={`w-full rounded-2xl border bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:ring-4 dark:bg-slate-950 ${
           error
             ? "border-red-400 focus:border-red-500 focus:ring-red-500/10 dark:border-red-500/70"
             : "border-slate-200 focus:border-primary focus:ring-primary/10 dark:border-slate-800"
-        } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+        }`}
       />
       {error ? <span className="text-xs text-red-500">{error}</span> : null}
       {!error && hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
@@ -191,7 +208,7 @@ export default function SalaryCalculator() {
       monthlySalary: Math.max(0, parseNumberInput(monthlySalaryInput) || 0),
       annualBonus: Math.max(0, parseNumberInput(annualBonusInput) || 0),
       otherRelief: Math.max(0, parseNumberInput(otherReliefInput) || 0),
-      epfRate: workerType === "foreigner" ? 2 : Math.max(0, parseNumberInput(epfRateInput) || 0),
+      epfRate: Math.max(0, parseNumberInput(epfRateInput) || 0),
       workerType,
       residentStatus,
     }),
@@ -212,6 +229,12 @@ export default function SalaryCalculator() {
       : 0;
 
   const hasNegativeTakeHome = result.monthlyNet < 0;
+
+  const taxRateFromGross = result.annualGross > 0 ? (result.annualIncomeTax / result.annualGross) * 100 : 0;
+  const monthlyEpfRate = parsedInput.monthlySalary > 0 ? (result.monthlyEpf / parsedInput.monthlySalary) * 100 : 0;
+  const monthlyTaxRate = parsedInput.monthlySalary > 0 ? (result.monthlyTax / parsedInput.monthlySalary) * 100 : 0;
+  const monthlySocsoRate = parsedInput.monthlySalary > 0 ? (result.monthlySocso / parsedInput.monthlySalary) * 100 : 0;
+  const monthlyEisRate = parsedInput.monthlySalary > 0 ? (result.monthlyEis / parsedInput.monthlySalary) * 100 : 0;
 
   function resetForm() {
     setMonthlySalaryInput(toInputString(DEFAULT_INPUTS.monthlySalary));
@@ -270,36 +293,36 @@ export default function SalaryCalculator() {
                 label="Monthly gross salary"
                 value={monthlySalaryInput}
                 onChange={setMonthlySalaryInput}
-                placeholder="e.g. 6000"
+                placeholder="e.g. 6,000"
                 error={errors.monthlySalary}
               />
               <NumberField
                 label="Annual bonus"
                 value={annualBonusInput}
                 onChange={setAnnualBonusInput}
-                placeholder="e.g. 12000"
+                placeholder="e.g. 12,000"
                 error={errors.annualBonus}
               />
               <NumberField
                 label="Other annual relief"
                 value={otherReliefInput}
                 onChange={setOtherReliefInput}
-                placeholder="e.g. 5000"
+                placeholder="e.g. 5,000"
                 hint="Lifestyle, spouse, child, insurance, and other claimable relief."
                 error={errors.otherRelief}
               />
               <NumberField
                 label="EPF employee rate (%)"
-                value={workerType === "foreigner" ? "2" : epfRateInput}
+                value={epfRateInput}
                 onChange={setEpfRateInput}
                 placeholder="e.g. 11"
+                maxDecimals={2}
                 hint={
                   workerType === "foreigner"
-                    ? "For quick estimate, foreign worker EPF is fixed to 2% in this calculator."
+                    ? "For foreign worker / expat, minimum EPF rate is 2%. You can set above 2%."
                     : "Typical default is 11% for Malaysian/PR employees."
                 }
                 error={errors.epfRate}
-                disabled={workerType === "foreigner"}
               />
             </div>
 
@@ -355,11 +378,11 @@ export default function SalaryCalculator() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              ["EPF / month", result.monthlyEpf, Wallet],
-              ["Estimated tax / month", result.monthlyTax, TrendingUp],
-              ["SOCSO / month", result.monthlySocso, Info],
-              ["EIS / month", result.monthlyEis, Info],
-            ].map(([label, value, Icon]) => {
+              ["EPF / month", result.monthlyEpf, percent(monthlyEpfRate), Wallet],
+              ["Estimated tax / month", result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
+              ["SOCSO / month", result.monthlySocso, percent(monthlySocsoRate), Info],
+              ["EIS / month", result.monthlyEis, percent(monthlyEisRate), Info],
+            ].map(([label, value, tooltipInfo, Icon]) => {
               const IconComponent = Icon as typeof Wallet;
               return (
                 <Card key={label as string} className="rounded-3xl shadow-sm">
@@ -368,6 +391,7 @@ export default function SalaryCalculator() {
                       <div>
                         <p className="text-sm text-muted-foreground">{label as string}</p>
                         <p className="mt-1 text-2xl font-bold">{money(isValid ? (value as number) : 0)}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">Rate estimate: {tooltipInfo as string}</p>
                       </div>
                       <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                         <IconComponent className="h-5 w-5" />
@@ -392,16 +416,19 @@ export default function SalaryCalculator() {
               </div>
               <div className="space-y-3">
                 {[
-                  ["Monthly take-home pay", result.monthlyNet],
-                  ["Annual gross", result.annualGross],
-                  ["Chargeable income estimate", result.chargeableIncome],
-                  ["Annual tax estimate", result.annualIncomeTax],
-                  ["Estimated monthly tax", result.monthlyTax],
-                  ["Monthly deductions", result.monthlyDeductions],
-                ].map(([label, value]) => (
-                  <div key={label as string} className="flex items-center justify-between rounded-2xl bg-muted/50 px-4 py-3">
-                    <span className="text-sm text-muted-foreground">{label as string}</span>
-                    <span className="font-semibold">{money(isValid ? (value as number) : 0)}</span>
+                  ["Monthly take-home pay", result.monthlyNet, `${takeHomeRatio.toFixed(2)}% of gross`],
+                  ["Annual gross", result.annualGross, "Before deductions"],
+                  ["Chargeable income estimate", result.chargeableIncome, "After reliefs and deductible items"],
+                  ["Annual tax estimate", result.annualIncomeTax, `Effective tax: ${percent(taxRateFromGross)}`],
+                  ["Estimated monthly tax", result.monthlyTax, `Approx monthly rate: ${percent(monthlyTaxRate)}`],
+                  ["Monthly deductions", result.monthlyDeductions, "EPF + SOCSO + EIS + tax"],
+                ].map(([label, value, helper]) => (
+                  <div key={label as string} className="rounded-2xl bg-muted/50 px-4 py-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm text-muted-foreground">{label as string}</span>
+                      <span className="font-semibold">{money(isValid ? (value as number) : 0)}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{helper as string}</p>
                   </div>
                 ))}
               </div>

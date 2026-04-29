@@ -7,6 +7,7 @@ import "./index.css";
 (function initLocaleHash() {
   const SUPPORTED = ["en", "id"];
   const DEFAULT_LOCALE = "en";
+  const withSearch = (path: string, search: string) => `#/${path}${search}`;
 
   function detectLocale(): string {
     try {
@@ -21,18 +22,18 @@ import "./index.css";
   if (!hash || hash === "#" || hash === "#/") {
     const pathname = window.location.pathname.replace(/^\/+|\/+$/g, "");
     if (!pathname) {
-      window.location.hash = "#/" + detectLocale() + search;
+      window.location.hash = withSearch(detectLocale(), search);
       return;
     }
 
     const segments = pathname.split("/").filter(Boolean);
     const firstSegment = segments[0];
     if (SUPPORTED.includes(firstSegment)) {
-      window.location.hash = "#/" + segments.join("/") + search;
+      window.location.hash = withSearch(segments.join("/"), search);
       return;
     }
 
-    window.location.hash = "#/" + DEFAULT_LOCALE + "/" + segments.join("/") + search;
+    window.location.hash = withSearch(`${DEFAULT_LOCALE}/${segments.join("/")}`, search);
     return;
   }
   // Check if existing hash already has a lang prefix

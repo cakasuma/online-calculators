@@ -3,12 +3,16 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AdSlot } from "@/components/AdSlot";
 import { toolBrand, toolCategories, tools } from "@/config/tools";
 
 const grouped = toolCategories.map((category) => ({
   ...category,
   items: tools.filter((tool) => tool.category === category.name),
 }));
+const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
+const adsenseSlotHome = import.meta.env.VITE_ADSENSE_SLOT_HOME?.trim() || "";
+const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
 export default function HomePage() {
   const featured = tools.filter((tool) => tool.featured);
@@ -82,6 +86,26 @@ export default function HomePage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </section>
+
+      <AdSlot id="home-mid-ad" client={adsenseClient} slot={adsenseSlotHome} enabled={adsenseEnabled} />
+
+      <section className="rounded-2xl border p-5 sm:p-6 bg-card">
+        <h2 className="text-xl font-semibold">Built by amammustofa</h2>
+        <p className="text-sm text-muted-foreground mt-2 max-w-3xl leading-relaxed">
+          This calculator suite is maintained by amammustofa. If you need custom finance tools, calculators, or SEO-ready web
+          products for your business, visit my main site.
+        </p>
+        <div className="mt-4">
+          <a
+            href="https://amammustofa.com"
+            target="_blank"
+            rel="noopener noreferrer me"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+          >
+            Visit amammustofa.com <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       </section>
     </div>

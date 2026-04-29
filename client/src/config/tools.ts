@@ -34,12 +34,12 @@ export const tools: ToolMeta[] = [
   {
     slug: "salary-calculator",
     href: "/salary",
-    name: "Malaysia Salary Calculator",
+    name: "Salary Calculator (Malaysia)",
     description: "Estimate monthly take-home pay with EPF, SOCSO, EIS, and income tax deductions.",
     category: "Finance",
     icon: CircleDollarSign,
     featured: true,
-    badge: "New",
+    badge: "Popular",
   },
   {
     slug: "normal-calculator",
@@ -87,6 +87,6 @@ export const tools: ToolMeta[] = [
 export const navTools = ["/salary", "/normal", "/scientific", "/faraid", "/zakat", "/wasiat"];
 
 export const toolBrand = {
-  name: "ToolHub MY",
-  tagline: "A modern utility hub for Malaysia",
+  name: "HelloKalku",
+  tagline: "Smart calculators for everyday decisions",
 };

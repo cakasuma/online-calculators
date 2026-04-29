@@ -100,7 +100,7 @@ export function formatInputValue(raw: string, locale: Locale): string {
 
 const translations = {
   // ── Common / Nav ──
-  "site.title": { en: "Faraid Calculator", id: "Kalkulator Faraid" },
+  "site.title": { en: "HelloKalku", id: "HelloKalku" },
   "nav.home": { en: "Home", id: "Beranda" },
   "nav.basic": { en: "Basic", id: "Dasar" },
   "nav.scientific": { en: "Scientific", id: "Ilmiah" },
@@ -118,8 +118,8 @@ const translations = {
   "common.error": { en: "Error", id: "Kesalahan" },
 
   // ── Home Page ──
-  "home.title": { en: "Islamic Inheritance Calculator", id: "Kalkulator Warisan Islam" },
-  "home.subtitle": { en: "Accurately calculate Faraid (Islamic inheritance) distribution based on Quran and Sunnah.", id: "Hitung pembagian Faraid (waris Islam) secara akurat berdasarkan Al-Quran dan Sunnah." },
+  "home.title": { en: "Islamic Inheritance Calculator", id: "Kalkulator Waris Islam" },
+  "home.subtitle": { en: "Accurately calculate Faraid (Islamic inheritance) distribution based on Quran and Sunnah.", id: "Hitung pembagian Faraid (waris Islam) secara akurat berdasarkan Al-Qur'an dan Sunnah." },
   "home.faraid.title": { en: "Faraid Calculator", id: "Kalkulator Faraid" },
   "home.faraid.desc": { en: "Full Islamic inheritance distribution with pie chart visualization, multiple heirs, and detailed breakdown.", id: "Pembagian waris Islam lengkap dengan visualisasi diagram, berbagai ahli waris, dan rincian detail." },
   "home.faraid.badge": { en: "Featured", id: "Unggulan" },
@@ -187,7 +187,7 @@ const translations = {
   "faraid.grandchildrenSection": { en: "Grandchildren", id: "Cucu" },
   "faraid.fullSiblingsSection": { en: "Full Siblings", id: "Saudara Kandung" },
   "faraid.paternalSiblingsSection": { en: "Paternal Siblings (half, father's side)", id: "Saudara Seayah (setengah, dari ayah)" },
-  "faraid.maternalSiblingsSection": { en: "Maternal Siblings (uterine)", id: "Saudara Seibu (uterus)" },
+  "faraid.maternalSiblingsSection": { en: "Maternal Siblings (uterine)", id: "Saudara Seibu (Uterine)" },
   "faraid.otherRelativesSection": { en: "Other Relatives", id: "Kerabat Lainnya" },
   "faraid.distantKindredNote": { en: "Distant Kindred (dhawi al-arham) are not calculated here — consult a qualified Islamic scholar for complex cases.", id: "Kerabat jauh (dzawi al-arham) tidak dihitung di sini — konsultasikan dengan ulama untuk kasus kompleks." },
 

@@ -13,8 +13,20 @@ ToolHub MY is a mobile-first utility tools web app built with Vite + React + wou
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
+
+## Environment Variables
+
+Monetization is controlled with Vite env vars:
+
+- `VITE_ADSENSE_CLIENT` – your AdSense publisher ID (e.g. `ca-pub-...`)
+- `VITE_ADSENSE_SLOT_TOP` – ad slot ID for the global top ad placement
+- `VITE_ADSENSE_SLOT_HOME` – ad slot ID for the homepage ad placement
+
+If these are empty, the UI shows a non-breaking placeholder ad container.
+AdSense network scripts/requests are only enabled in production builds (`import.meta.env.PROD`).
 
 ## Production Build
 
@@ -37,6 +49,10 @@ This repo is ready for Vercel deployment:
 3. Build command: `npm run build`.
 4. Output directory: `dist/public`.
 5. Install command: `npm install`.
+6. Add Production Environment Variables:
+   - `VITE_ADSENSE_CLIENT`
+   - `VITE_ADSENSE_SLOT_TOP`
+   - `VITE_ADSENSE_SLOT_HOME`
 
 ### Subdomain Connection Notes
 

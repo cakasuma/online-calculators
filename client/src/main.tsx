@@ -3,23 +3,36 @@ import App from "./App";
 import "./index.css";
 
 // Ensure the URL hash always contains a locale prefix (e.g. /#/en or /#/id/faraid).
-// This enables shareable URLs and browser language auto-detection on first visit.
+// Direct path visits such as /salary are normalized to /#/en/salary and preserve query params.
 (function initLocaleHash() {
   const SUPPORTED = ["en", "id"];
+  const DEFAULT_LOCALE = "en";
 
   function detectLocale(): string {
     try {
       const saved = localStorage.getItem("calc_locale");
       if (saved && SUPPORTED.includes(saved)) return saved;
     } catch { /* noop */ }
-    const nav = navigator.language?.toLowerCase() || "";
-    if (nav.startsWith("id") || nav.startsWith("ms")) return "id";
-    return "en";
+    return DEFAULT_LOCALE;
   }
 
   const hash = window.location.hash;
+  const search = window.location.search || "";
   if (!hash || hash === "#" || hash === "#/") {
-    window.location.hash = "#/" + detectLocale();
+    const pathname = window.location.pathname.replace(/^\/+|\/+$/g, "");
+    if (!pathname) {
+      window.location.hash = "#/" + detectLocale() + search;
+      return;
+    }
+
+    const segments = pathname.split("/").filter(Boolean);
+    const firstSegment = segments[0];
+    if (SUPPORTED.includes(firstSegment)) {
+      window.location.hash = "#/" + segments.join("/") + search;
+      return;
+    }
+
+    window.location.hash = "#/" + DEFAULT_LOCALE + "/" + segments.join("/") + search;
     return;
   }
   // Check if existing hash already has a lang prefix

@@ -92,41 +92,41 @@ const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
 const routeSeo: Record<string, { title: string; description: string }> = {
   "/": {
-    title: "Online Calculators for Malaysia | ToolHub MY by amammustofa",
+    title: "Online Calculators for Malaysia | HelloKalku",
     description:
       "Free calculators for salary, scientific math, faraid inheritance, zakat, and wasiat planning for Malaysia.",
   },
   "/salary": {
-    title: "Malaysia Salary Calculator | ToolHub MY",
+    title: "Malaysia Salary Calculator | HelloKalku",
     description: "Estimate take-home pay with EPF, SOCSO, EIS, and PCB deductions for Malaysia.",
   },
   "/normal": {
-    title: "Basic Calculator Online | ToolHub MY",
+    title: "Basic Calculator Online | HelloKalku",
     description: "Use a fast basic calculator for daily arithmetic with local history storage.",
   },
   "/scientific": {
-    title: "Scientific Calculator Online | ToolHub MY",
+    title: "Scientific Calculator Online | HelloKalku",
     description: "Solve advanced math equations with trigonometry, logarithms, powers, and constants.",
   },
   "/faraid": {
-    title: "Faraid Calculator (Islamic Inheritance) | ToolHub MY",
+    title: "Faraid Calculator (Islamic Inheritance) | HelloKalku",
     description: "Calculate inheritance shares using simplified faraid logic and heir distribution guidance.",
   },
   "/zakat": {
-    title: "Zakat Calculator Malaysia | ToolHub MY",
+    title: "Zakat Calculator Malaysia | HelloKalku",
     description: "Estimate yearly zakat obligations based on your assets and liabilities.",
   },
   "/wasiat": {
-    title: "Wasiat Guide & Checklist | ToolHub MY",
+    title: "Wasiat Guide & Checklist | HelloKalku",
     description: "Plan a practical Islamic will workflow with a printable checklist and action steps.",
   },
   "/privacy": {
-    title: "Privacy Policy | ToolHub MY",
-    description: "Read how ToolHub MY handles privacy, analytics, and advertising data.",
+    title: "Privacy Policy | HelloKalku",
+    description: "Read how HelloKalku handles privacy, analytics, and advertising data across calculator tools.",
   },
   "/terms": {
-    title: "Terms of Use | ToolHub MY",
-    description: "Review ToolHub MY terms, scope, and usage responsibilities.",
+    title: "Terms of Use | HelloKalku",
+    description: "Review HelloKalku terms, service scope, and user responsibilities.",
   },
 };
 
@@ -199,7 +199,7 @@ function Layout() {
                 <span className="text-base font-bold block leading-tight" data-testid="text-site-title">
                   {toolBrand.name}
                 </span>
-                <span className="text-[11px] uppercase tracking-wide text-muted-foreground">utility tools</span>
+                <span className="text-[11px] uppercase tracking-wide text-muted-foreground">hellokalku.com</span>
               </div>
             </Link>
           </div>

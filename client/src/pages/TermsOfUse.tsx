@@ -24,8 +24,8 @@ export default function TermsOfUse() {
         <h2 className="text-lg font-semibold text-foreground">Contact</h2>
         <p>
           For terms-related questions, visit{" "}
-          <a href="https://amammustofa.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-            amammustofa.com
+          <a href="https://hellokalku.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            hellokalku.com
           </a>
           .
         </p>

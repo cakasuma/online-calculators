@@ -1,0 +1,2 @@
+# Google AdSense placeholder - replace with your real publisher line before enabling ads
+# Format: google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

@@ -25,8 +25,8 @@ export default function PrivacyPolicy() {
         <h2 className="text-lg font-semibold text-foreground">Contact</h2>
         <p>
           For privacy questions, contact{" "}
-          <a href="https://amammustofa.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-            amammustofa.com
+          <a href="https://hellokalku.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            hellokalku.com
           </a>
           .
         </p>

@@ -20,13 +20,14 @@ import {
   Star,
   Wallet,
 } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useHistory } from "@/hooks/use-history";
 import { useLocaleState, LocaleContext } from "@/hooks/use-locale";
 import { useLocale } from "@/hooks/use-locale";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { AdSlot } from "@/components/AdSlot";
 import { tools, toolBrand } from "@/config/tools";
 
 import HomePage from "@/pages/Home";
@@ -36,6 +37,8 @@ import FaraidCalculator from "@/pages/FaraidCalculator";
 import WasiatGuide from "@/pages/WasiatGuide";
 import ZakatCalculator from "@/pages/ZakatCalculator";
 import SalaryCalculator from "@/pages/SalaryCalculator";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfUse from "@/pages/TermsOfUse";
 import NotFound from "@/pages/not-found";
 
 const SUPPORTED_LOCALES: Locale[] = ["en", "id"];
@@ -83,6 +86,50 @@ const navItems = [
   { href: "/wasiat", label: "Wasiat", icon: FileText },
 ];
 
+const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
+const adsenseSlotTop = import.meta.env.VITE_ADSENSE_SLOT_TOP?.trim() || "";
+const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
+
+const routeSeo: Record<string, { title: string; description: string }> = {
+  "/": {
+    title: "Online Calculators for Malaysia | ToolHub MY by amammustofa",
+    description:
+      "Free calculators for salary, scientific math, faraid inheritance, zakat, and wasiat planning for Malaysia.",
+  },
+  "/salary": {
+    title: "Malaysia Salary Calculator | ToolHub MY",
+    description: "Estimate take-home pay with EPF, SOCSO, EIS, and PCB deductions for Malaysia.",
+  },
+  "/normal": {
+    title: "Basic Calculator Online | ToolHub MY",
+    description: "Use a fast basic calculator for daily arithmetic with local history storage.",
+  },
+  "/scientific": {
+    title: "Scientific Calculator Online | ToolHub MY",
+    description: "Solve advanced math equations with trigonometry, logarithms, powers, and constants.",
+  },
+  "/faraid": {
+    title: "Faraid Calculator (Islamic Inheritance) | ToolHub MY",
+    description: "Calculate inheritance shares using simplified faraid logic and heir distribution guidance.",
+  },
+  "/zakat": {
+    title: "Zakat Calculator Malaysia | ToolHub MY",
+    description: "Estimate yearly zakat obligations based on your assets and liabilities.",
+  },
+  "/wasiat": {
+    title: "Wasiat Guide & Checklist | ToolHub MY",
+    description: "Plan a practical Islamic will workflow with a printable checklist and action steps.",
+  },
+  "/privacy": {
+    title: "Privacy Policy | ToolHub MY",
+    description: "Read how ToolHub MY handles privacy, analytics, and advertising data.",
+  },
+  "/terms": {
+    title: "Terms of Use | ToolHub MY",
+    description: "Review ToolHub MY terms, scope, and usage responsibilities.",
+  },
+};
+
 function Layout() {
   const { theme, toggle } = useTheme();
   const history = useHistory();
@@ -90,6 +137,37 @@ function Layout() {
   const [showHistory, setShowHistory] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [location] = useLocation();
+
+  useEffect(() => {
+    const seo = routeSeo[location] ?? routeSeo["/"];
+    document.title = seo.title;
+
+    const description = document.querySelector('meta[name="description"]');
+    if (description) {
+      description.setAttribute("content", seo.description);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (!adsenseEnabled) return;
+    let accountMeta = document.querySelector('meta[name="google-adsense-account"]');
+    if (!accountMeta) {
+      accountMeta = document.createElement("meta");
+      accountMeta.setAttribute("name", "google-adsense-account");
+      document.head.appendChild(accountMeta);
+    }
+    accountMeta.setAttribute("content", adsenseClient);
+
+    const existing = document.querySelector(`script[data-adsense-client="${adsenseClient}"]`);
+    if (existing) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.dataset.adsenseClient = adsenseClient;
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`;
+    document.head.appendChild(script);
+  }, [adsenseEnabled]);
 
   const handleCalculate = useCallback(
     (calculator: "normal" | "scientific" | "faraid") =>
@@ -198,6 +276,7 @@ function Layout() {
 
       <div className="flex-1 flex">
         <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+          <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/salary" component={SalaryCalculator} />
@@ -212,6 +291,8 @@ function Layout() {
             </Route>
             <Route path="/wasiat" component={WasiatGuide} />
             <Route path="/zakat" component={ZakatCalculator} />
+            <Route path="/privacy" component={PrivacyPolicy} />
+            <Route path="/terms" component={TermsOfUse} />
             <Route component={NotFound} />
           </Switch>
         </main>
@@ -249,6 +330,17 @@ function Layout() {
           <div>
             <span className="font-medium text-foreground">{toolBrand.name}</span>
             <p>{toolBrand.tagline}</p>
+            <p className="mt-1">
+              Built by{" "}
+              <a
+                href="https://amammustofa.com"
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="text-primary hover:underline underline-offset-2"
+              >
+                amammustofa.com
+              </a>
+            </p>
           </div>
           <nav className="flex items-center gap-3 flex-wrap justify-center" aria-label={t("footer.quickLinks")}>
             {tools.map((item) => (
@@ -256,6 +348,12 @@ function Layout() {
                 <span className="hover:text-foreground transition-colors cursor-pointer">{item.name}</span>
               </Link>
             ))}
+            <Link href="/privacy">
+              <span className="hover:text-foreground transition-colors cursor-pointer">Privacy</span>
+            </Link>
+            <Link href="/terms">
+              <span className="hover:text-foreground transition-colors cursor-pointer">Terms</span>
+            </Link>
           </nav>
         </div>
       </footer>

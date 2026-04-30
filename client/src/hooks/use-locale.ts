@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from "react";
+import { useState, useContext, createContext, useEffect } from "react";
 import { t as translate, type Locale, type TranslationKey, getSavedLocale, saveLocale } from "@/lib/i18n";
 
 type LocaleContextValue = {
@@ -29,6 +29,16 @@ function updateUrlLocale(locale: Locale): void {
 
 export function useLocaleState(): LocaleContextValue {
   const [locale, setLocaleRaw] = useState<Locale>(getSavedLocale);
+
+  useEffect(() => {
+    const syncLocaleFromUrl = () => {
+      const nextLocale = getSavedLocale();
+      setLocaleRaw((current) => (current === nextLocale ? current : nextLocale));
+    };
+
+    window.addEventListener("hashchange", syncLocaleFromUrl);
+    return () => window.removeEventListener("hashchange", syncLocaleFromUrl);
+  }, []);
 
   const setLocale = (l: Locale) => {
     saveLocale(l);

@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useLocale } from "@/hooks/use-locale";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -196,6 +197,8 @@ function NumberField({
 }
 
 export default function SalaryCalculator() {
+  const { locale } = useLocale();
+  const isId = locale === "id";
   const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(DEFAULT_INPUTS.monthlySalary));
   const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(DEFAULT_INPUTS.annualBonus));
   const [otherReliefInput, setOtherReliefInput] = useState(toInputString(DEFAULT_INPUTS.otherRelief));
@@ -252,23 +255,28 @@ export default function SalaryCalculator() {
         <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div className="space-y-4">
             <Badge className="w-fit border-white/15 bg-white/10 text-emerald-100 hover:bg-white/10">
-              Malaysia payroll estimator
+              {isId ? "Estimator gaji Malaysia" : "Malaysia payroll estimator"}
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">Malaysia Salary Calculator</h1>
+            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{isId ? "Kalkulator Gaji Malaysia" : "Malaysia Salary Calculator"}</h1>
             <p className="max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
-              Estimate monthly take-home pay after EPF, SOCSO, EIS, and Malaysian income tax. Useful for
-              salary negotiation, offer comparison, and monthly budgeting.
+              {isId
+                ? "Estimasi gaji bersih bulanan setelah EPF, SOCSO, EIS, dan pajak penghasilan Malaysia. Cocok untuk negosiasi gaji, membandingkan penawaran, dan budgeting bulanan."
+                : "Estimate monthly take-home pay after EPF, SOCSO, EIS, and Malaysian income tax. Useful for salary negotiation, offer comparison, and monthly budgeting."}
             </p>
           </div>
           <Card className="border-white/10 bg-white/10 text-white backdrop-blur">
             <CardContent className="p-6">
-              <p className="text-sm text-emerald-100">Estimated monthly take-home pay</p>
+              <p className="text-sm text-emerald-100">{isId ? "Estimasi gaji bersih bulanan" : "Estimated monthly take-home pay"}</p>
               <p className="mt-2 text-4xl font-bold">{money(isValid ? result.monthlyNet : 0)}</p>
               <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
                 <div className="h-full rounded-full bg-emerald-400" style={{ width: `${isValid ? takeHomeRatio : 0}%` }} />
               </div>
               <p className="mt-2 text-sm text-slate-300">
-                {isValid ? `${takeHomeRatio.toFixed(1)}% of monthly gross salary` : "Fix input errors to view estimate"}
+                {isValid
+                  ? `${takeHomeRatio.toFixed(1)}% ${isId ? "dari gaji kotor bulanan" : "of monthly gross salary"}`
+                  : isId
+                    ? "Perbaiki input yang error untuk melihat estimasi"
+                    : "Fix input errors to view estimate"}
               </p>
             </CardContent>
           </Card>

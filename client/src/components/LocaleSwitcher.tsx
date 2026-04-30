@@ -6,6 +6,7 @@ export function LocaleSwitcher() {
 
   return (
     <button
+      type="button"
       onClick={() => setLocale(locale === "en" ? "id" : "en")}
       className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg hover:bg-muted text-muted-foreground transition-colors text-sm font-medium"
       data-testid="button-locale-switch"

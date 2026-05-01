@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Delete } from "lucide-react";
 import { useLocale } from "@/hooks/use-locale";
+import type { TranslationKey } from "@/lib/i18n";
 
 interface Props {
   onCalculate: (expression: string, result: string) => void;
@@ -18,14 +19,14 @@ const BUTTONS: CalcKey[][] = [
   ["0", ".", "⌫", "="],
 ];
 
-const ARIA_LABELS: Partial<Record<CalcKey, string>> = {
-  "×": "multiply",
-  "÷": "divide",
-  "±": "toggle sign",
-  "%": "percent",
-  "⌫": "backspace",
-  "C": "clear",
-  "=": "equals",
+const ARIA_KEY_MAP: Partial<Record<CalcKey, TranslationKey>> = {
+  "×": "a11y.calc.multiply",
+  "÷": "a11y.calc.divide",
+  "±": "a11y.calc.toggleSign",
+  "%": "a11y.calc.percent",
+  "⌫": "a11y.calc.backspace",
+  "C": "a11y.calc.clear",
+  "=": "a11y.calc.equals",
 };
 
 function safeEval(expr: string): string {
@@ -188,7 +189,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
             key={key}
             onClick={() => handleKey(key)}
             className={btnClass(key)}
-            aria-label={ARIA_LABELS[key] ?? undefined}
+            aria-label={ARIA_KEY_MAP[key] ? t(ARIA_KEY_MAP[key]!) : undefined}
             data-testid={`btn-${key}`}
           >
             {key === "⌫" ? <Delete className="w-5 h-5" aria-hidden="true" /> : key}

@@ -1,6 +1,6 @@
 import { Switch, Route, Router, Link, useLocation } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
-import type { Locale } from "@/lib/i18n";
+import type { Locale, TranslationKey } from "@/lib/i18n";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -76,14 +76,14 @@ function useLocalizedHashLocation(): [string, (to: string) => void] {
   return [cleanPath || "/", navigate];
 }
 
-const navItems = [
-  { href: "/", label: "Home", icon: HomeIcon },
-  { href: "/salary", label: "Salary", icon: Wallet },
-  { href: "/normal", label: "Basic", icon: Calculator },
-  { href: "/scientific", label: "Scientific", icon: FlaskConical },
-  { href: "/faraid", label: "Faraid", icon: Scale },
-  { href: "/zakat", label: "Zakat", icon: Star },
-  { href: "/wasiat", label: "Wasiat", icon: FileText },
+const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
+  { href: "/", labelKey: "nav.home", icon: HomeIcon },
+  { href: "/salary", labelKey: "nav.salary", icon: Wallet },
+  { href: "/normal", labelKey: "nav.basic", icon: Calculator },
+  { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
+  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
+  { href: "/zakat", labelKey: "nav.zakat", icon: Star },
+  { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
 ];
 
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
@@ -217,7 +217,7 @@ function Layout() {
                     }`}
                   >
                     <item.icon className="w-4 h-4" />
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </Link>
               );
@@ -265,7 +265,7 @@ function Layout() {
                     }`}
                   >
                     <item.icon className="w-5 h-5" />
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </Link>
               );
@@ -329,9 +329,9 @@ function Layout() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm text-muted-foreground">
           <div>
             <span className="font-medium text-foreground">{toolBrand.name}</span>
-            <p>{toolBrand.tagline}</p>
+            <p>{t("brand.tagline")}</p>
             <p className="mt-1">
-              Built by{" "}
+              {t("footer.builtBy")}{" "}
               <a
                 href="https://amammustofa.com"
                 target="_blank"
@@ -345,14 +345,14 @@ function Layout() {
           <nav className="flex items-center gap-3 flex-wrap justify-center" aria-label={t("footer.quickLinks")}>
             {tools.map((item) => (
               <Link key={item.href} href={item.href}>
-                <span className="hover:text-foreground transition-colors cursor-pointer">{item.name}</span>
+                <span className="hover:text-foreground transition-colors cursor-pointer">{t(`tools.${item.slug}.name` as any)}</span>
               </Link>
             ))}
             <Link href="/privacy">
-              <span className="hover:text-foreground transition-colors cursor-pointer">Privacy</span>
+              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.privacy")}</span>
             </Link>
             <Link href="/terms">
-              <span className="hover:text-foreground transition-colors cursor-pointer">Terms</span>
+              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.terms")}</span>
             </Link>
           </nav>
         </div>

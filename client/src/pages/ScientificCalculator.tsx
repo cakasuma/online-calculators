@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Delete } from "lucide-react";
+import { useLocale } from "@/hooks/use-locale";
+import type { TranslationKey } from "@/lib/i18n";
 
 interface Props {
   onCalculate: (expression: string, result: string) => void;
@@ -24,27 +26,27 @@ const numpadButtons = [
   "C", "±", "%", "=",
 ];
 
-const SCI_ARIA_LABELS: Record<string, string> = {
-  "×": "multiply",
-  "÷": "divide",
-  "±": "toggle sign",
-  "%": "percent",
-  "⌫": "backspace",
-  "C": "clear",
-  "=": "equals",
-  "x²": "x squared",
-  "xʸ": "x to the power y",
-  "1/x": "one over x",
-  "n!": "factorial",
-  "|": "absolute value",
-  "√": "square root",
-  "π": "pi",
-  "e": "Euler's number",
-  "(": "open parenthesis",
-  ")": "close parenthesis",
-  "asin": "arcsine",
-  "acos": "arccosine",
-  "atan": "arctangent",
+const SCI_ARIA_KEY_MAP: Record<string, TranslationKey> = {
+  "×": "a11y.calc.multiply",
+  "÷": "a11y.calc.divide",
+  "±": "a11y.calc.toggleSign",
+  "%": "a11y.calc.percent",
+  "⌫": "a11y.calc.backspace",
+  "C": "a11y.calc.clear",
+  "=": "a11y.calc.equals",
+  "x²": "a11y.calc.xSquared",
+  "xʸ": "a11y.calc.xPowerY",
+  "1/x": "a11y.calc.oneOverX",
+  "n!": "a11y.calc.factorial",
+  "|": "a11y.calc.absoluteValue",
+  "√": "a11y.calc.squareRoot",
+  "π": "a11y.calc.pi",
+  "e": "a11y.calc.euler",
+  "(": "a11y.calc.openParen",
+  ")": "a11y.calc.closeParen",
+  "asin": "a11y.calc.arcsine",
+  "acos": "a11y.calc.arccosine",
+  "atan": "a11y.calc.arctangent",
 };
 
 function factorial(n: number): number {
@@ -57,6 +59,7 @@ function factorial(n: number): number {
 }
 
 export default function ScientificCalculator({ onCalculate }: Props) {
+  const { t } = useLocale();
   const [display, setDisplay] = useState("0");
   const [expression, setExpression] = useState("");
   const [mode, setMode] = useState<Mode>("deg");
@@ -300,7 +303,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
             key={fn}
             onClick={() => handleSciFn(fn)}
             className={sciBtnClass}
-            aria-label={SCI_ARIA_LABELS[fn] ?? undefined}
+            aria-label={SCI_ARIA_KEY_MAP[fn] ? t(SCI_ARIA_KEY_MAP[fn]) : undefined}
             data-testid={`sci-btn-${fn}`}
           >
             {fn}
@@ -315,7 +318,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
             key={key}
             onClick={() => handleKey(key)}
             className={numBtnClass(key)}
-            aria-label={SCI_ARIA_LABELS[key] ?? undefined}
+            aria-label={SCI_ARIA_KEY_MAP[key] ? t(SCI_ARIA_KEY_MAP[key]) : undefined}
             data-testid={`btn-${key}`}
           >
             {key === "⌫" ? <Delete className="w-5 h-5" aria-hidden="true" /> : key}

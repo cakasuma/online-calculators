@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
+import type { TranslationKey } from "@/lib/i18n";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -18,10 +19,10 @@ interface SalaryInputs {
 }
 
 interface InputErrors {
-  monthlySalary?: string;
-  annualBonus?: string;
-  otherRelief?: string;
-  epfRate?: string;
+  monthlySalary?: TranslationKey;
+  annualBonus?: TranslationKey;
+  otherRelief?: TranslationKey;
+  epfRate?: TranslationKey;
 }
 
 const DEFAULT_INPUTS: SalaryInputs = {
@@ -135,23 +136,23 @@ function validateInputs(input: SalaryInputs): InputErrors {
   const errors: InputErrors = {};
 
   if (input.monthlySalary <= 0) {
-    errors.monthlySalary = "Monthly gross salary must be greater than 0.";
+    errors.monthlySalary = "salary.validation.monthlySalary";
   }
 
   if (input.annualBonus < 0) {
-    errors.annualBonus = "Annual bonus cannot be negative.";
+    errors.annualBonus = "salary.validation.annualBonus";
   }
 
   if (input.otherRelief < 0) {
-    errors.otherRelief = "Other annual relief cannot be negative.";
+    errors.otherRelief = "salary.validation.otherRelief";
   }
 
   const minimumEpfRate = input.workerType === "foreigner" ? 2 : 0;
   if (input.epfRate < minimumEpfRate || input.epfRate > 15) {
     errors.epfRate =
       input.workerType === "foreigner"
-        ? "EPF employee rate for foreign worker / expat must be between 2% and 15%."
-        : "EPF employee rate must be between 0% and 15%.";
+        ? "salary.validation.epfForeigner"
+        : "salary.validation.epfLocal";
   }
 
   return errors;
@@ -197,8 +198,7 @@ function NumberField({
 }
 
 export default function SalaryCalculator() {
-  const { locale } = useLocale();
-  const isId = locale === "id";
+  const { t } = useLocale();
   const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(DEFAULT_INPUTS.monthlySalary));
   const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(DEFAULT_INPUTS.annualBonus));
   const [otherReliefInput, setOtherReliefInput] = useState(toInputString(DEFAULT_INPUTS.otherRelief));
@@ -255,28 +255,24 @@ export default function SalaryCalculator() {
         <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div className="space-y-4">
             <Badge className="w-fit border-white/15 bg-white/10 text-emerald-100 hover:bg-white/10">
-              {isId ? "Estimator gaji Malaysia" : "Malaysia payroll estimator"}
+              {t("salary.badge")}
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{isId ? "Kalkulator Gaji Malaysia" : "Malaysia Salary Calculator"}</h1>
+            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{t("salary.title")}</h1>
             <p className="max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
-              {isId
-                ? "Estimasi gaji bersih bulanan setelah EPF, SOCSO, EIS, dan pajak penghasilan Malaysia. Cocok untuk negosiasi gaji, membandingkan penawaran, dan budgeting bulanan."
-                : "Estimate monthly take-home pay after EPF, SOCSO, EIS, and Malaysian income tax. Useful for salary negotiation, offer comparison, and monthly budgeting."}
+              {t("salary.subtitle")}
             </p>
           </div>
           <Card className="border-white/10 bg-white/10 text-white backdrop-blur">
             <CardContent className="p-6">
-              <p className="text-sm text-emerald-100">{isId ? "Estimasi gaji bersih bulanan" : "Estimated monthly take-home pay"}</p>
+              <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
               <p className="mt-2 text-4xl font-bold">{money(isValid ? result.monthlyNet : 0)}</p>
               <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
                 <div className="h-full rounded-full bg-emerald-400" style={{ width: `${isValid ? takeHomeRatio : 0}%` }} />
               </div>
               <p className="mt-2 text-sm text-slate-300">
                 {isValid
-                  ? `${takeHomeRatio.toFixed(1)}% ${isId ? "dari gaji kotor bulanan" : "of monthly gross salary"}`
-                  : isId
-                    ? "Perbaiki input yang error untuk melihat estimasi"
-                    : "Fix input errors to view estimate"}
+                  ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
+                  : t("salary.fixInputErrors")}
               </p>
             </CardContent>
           </Card>
@@ -288,73 +284,73 @@ export default function SalaryCalculator() {
           <CardContent className="space-y-5 p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold">Inputs</h2>
-                <p className="text-sm text-muted-foreground">Set your employment and tax profile for a closer monthly estimate.</p>
+                <h2 className="text-xl font-semibold">{t("salary.inputs.title")}</h2>
+                <p className="text-sm text-muted-foreground">{t("salary.inputs.subtitle")}</p>
               </div>
               <Button variant="outline" className="rounded-xl" onClick={resetForm}>
-                Reset
+                {t("common.reset")}
               </Button>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <NumberField
-                label="Monthly gross salary"
+                label={t("salary.inputs.monthlySalary")}
                 value={monthlySalaryInput}
                 onChange={setMonthlySalaryInput}
                 placeholder="e.g. 6,000"
-                error={errors.monthlySalary}
+                error={errors.monthlySalary ? t(errors.monthlySalary) : undefined}
               />
               <NumberField
-                label="Annual bonus"
+                label={t("salary.inputs.annualBonus")}
                 value={annualBonusInput}
                 onChange={setAnnualBonusInput}
                 placeholder="e.g. 12,000"
-                error={errors.annualBonus}
+                error={errors.annualBonus ? t(errors.annualBonus) : undefined}
               />
               <NumberField
-                label="Other annual relief"
+                label={t("salary.inputs.otherRelief")}
                 value={otherReliefInput}
                 onChange={setOtherReliefInput}
                 placeholder="e.g. 5,000"
-                hint="Lifestyle, spouse, child, insurance, and other claimable relief."
-                error={errors.otherRelief}
+                hint={t("salary.inputs.otherRelief.hint")}
+                error={errors.otherRelief ? t(errors.otherRelief) : undefined}
               />
               <NumberField
-                label="EPF employee rate (%)"
+                label={t("salary.inputs.epfRate")}
                 value={epfRateInput}
                 onChange={setEpfRateInput}
                 placeholder="e.g. 11"
                 maxDecimals={2}
                 hint={
                   workerType === "foreigner"
-                    ? "For foreign worker / expat, minimum EPF rate is 2%. You can set above 2%."
-                    : "Typical default is 11% for Malaysian/PR employees."
+                    ? t("salary.inputs.epfRate.hint.foreign")
+                    : t("salary.inputs.epfRate.hint.local")
                 }
-                error={errors.epfRate}
+                error={errors.epfRate ? t(errors.epfRate) : undefined}
               />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-medium">Worker type</span>
+                <span className="text-sm font-medium">{t("salary.inputs.workerType")}</span>
                 <select
                   value={workerType}
                   onChange={(event) => setWorkerType(event.target.value as WorkerType)}
                   className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
                 >
-                  <option value="malaysian">Malaysian / PR</option>
-                  <option value="foreigner">Foreign worker / expat</option>
+                  <option value="malaysian">{t("salary.inputs.workerType.malaysian")}</option>
+                  <option value="foreigner">{t("salary.inputs.workerType.foreigner")}</option>
                 </select>
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-medium">Tax residency</span>
+                <span className="text-sm font-medium">{t("salary.inputs.taxResidency")}</span>
                 <select
                   value={residentStatus}
                   onChange={(event) => setResidentStatus(event.target.value as ResidentStatus)}
                   className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
                 >
-                  <option value="resident">Resident</option>
-                  <option value="non-resident">Non-resident</option>
+                  <option value="resident">{t("salary.inputs.resident")}</option>
+                  <option value="non-resident">{t("salary.inputs.nonResident")}</option>
                 </select>
               </label>
             </div>
@@ -362,10 +358,7 @@ export default function SalaryCalculator() {
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
               <div className="flex gap-2">
                 <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                <p>
-                  Estimate only. This is not official PCB/payroll/tax advice. SOCSO and EIS in real payroll should
-                  follow official contribution tables issued by authorities.
-                </p>
+                <p>{t("salary.disclaimer")}</p>
               </div>
             </div>
 
@@ -373,10 +366,7 @@ export default function SalaryCalculator() {
               <div className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300">
                 <div className="flex gap-2">
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                  <p>
-                    Estimated deductions are higher than monthly gross salary. Review EPF rate, reliefs, and residency
-                    settings.
-                  </p>
+                  <p>{t("salary.negativeWarning")}</p>
                 </div>
               </div>
             ) : null}
@@ -385,58 +375,55 @@ export default function SalaryCalculator() {
 
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              ["EPF / month", result.monthlyEpf, percent(monthlyEpfRate), Wallet],
-              ["Estimated tax / month", result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
-              ["SOCSO / month", result.monthlySocso, percent(monthlySocsoRate), Info],
-              ["EIS / month", result.monthlyEis, percent(monthlyEisRate), Info],
-            ].map(([label, value, tooltipInfo, Icon]) => {
-              const IconComponent = Icon as typeof Wallet;
-              return (
-                <Card key={label as string} className="rounded-3xl shadow-sm">
-                  <CardContent className="p-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{label as string}</p>
-                        <p className="mt-1 text-2xl font-bold">{money(isValid ? (value as number) : 0)}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">Rate estimate: {tooltipInfo as string}</p>
-                      </div>
-                      <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-                        <IconComponent className="h-5 w-5" />
-                      </div>
+            {([
+              [t("salary.epfMonth"), result.monthlyEpf, percent(monthlyEpfRate), Wallet],
+              [t("salary.taxMonth"), result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
+              [t("salary.socsoMonth"), result.monthlySocso, percent(monthlySocsoRate), Info],
+              [t("salary.eisMonth"), result.monthlyEis, percent(monthlyEisRate), Info],
+            ] as [string, number, string, typeof Wallet][]).map(([label, value, tooltipInfo, Icon]) => (
+              <Card key={label} className="rounded-3xl shadow-sm">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{label}</p>
+                      <p className="mt-1 text-2xl font-bold">{money(isValid ? value : 0)}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{t("salary.rateEstimate")} {tooltipInfo}</p>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           <Card className="rounded-3xl shadow-sm">
             <CardContent className="p-6">
               <div className="mb-5 flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold">Annual summary</h2>
-                  <p className="text-sm text-muted-foreground">High-level estimate for planning and comparison.</p>
+                  <h2 className="text-xl font-semibold">{t("salary.annual.title")}</h2>
+                  <p className="text-sm text-muted-foreground">{t("salary.annual.subtitle")}</p>
                 </div>
                 <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
-                  <Download className="h-4 w-4" /> Save
+                  <Download className="h-4 w-4" /> {t("salary.save")}
                 </Button>
               </div>
               <div className="space-y-3">
-                {[
-                  ["Monthly take-home pay", result.monthlyNet, `${takeHomeRatio.toFixed(2)}% of gross`],
-                  ["Annual gross", result.annualGross, "Before deductions"],
-                  ["Chargeable income estimate", result.chargeableIncome, "After reliefs and deductible items"],
-                  ["Annual tax estimate", result.annualIncomeTax, `Effective tax: ${percent(taxRateFromGross)}`],
-                  ["Estimated monthly tax", result.monthlyTax, `Approx monthly rate: ${percent(monthlyTaxRate)}`],
-                  ["Monthly deductions", result.monthlyDeductions, "EPF + SOCSO + EIS + tax"],
-                ].map(([label, value, helper]) => (
-                  <div key={label as string} className="rounded-2xl bg-muted/50 px-4 py-3">
+                {([
+                  [t("salary.monthlyTakeHome"), result.monthlyNet, `${takeHomeRatio.toFixed(2)}% ${t("salary.ofGross")}`],
+                  [t("salary.annualGross"), result.annualGross, t("salary.beforeDeductions")],
+                  [t("salary.chargeableIncome"), result.chargeableIncome, t("salary.afterReliefs")],
+                  [t("salary.annualTax"), result.annualIncomeTax, `${t("salary.effectiveTax")} ${percent(taxRateFromGross)}`],
+                  [t("salary.estimatedMonthlyTax"), result.monthlyTax, `${t("salary.approxMonthlyRate")} ${percent(monthlyTaxRate)}`],
+                  [t("salary.monthlyDeductions"), result.monthlyDeductions, t("salary.deductionItems")],
+                ] as [string, number, string][]).map(([label, value, helper]) => (
+                  <div key={label} className="rounded-2xl bg-muted/50 px-4 py-3">
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-sm text-muted-foreground">{label as string}</span>
-                      <span className="font-semibold">{money(isValid ? (value as number) : 0)}</span>
+                      <span className="text-sm text-muted-foreground">{label}</span>
+                      <span className="font-semibold">{money(isValid ? value : 0)}</span>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{helper as string}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
                   </div>
                 ))}
               </div>

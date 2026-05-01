@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_ADSENSE_CLIENT?: string;
   readonly VITE_ADSENSE_SLOT_TOP?: string;
   readonly VITE_ADSENSE_SLOT_HOME?: string;
+  readonly VITE_PLAUSIBLE_DOMAIN?: string;
+  readonly VITE_PLAUSIBLE_SCRIPT?: string;
 }
 
 interface ImportMeta {

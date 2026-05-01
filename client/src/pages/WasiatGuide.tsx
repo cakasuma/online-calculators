@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { AdSlot } from "@/components/AdSlot";
+import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { useLocale } from "@/hooks/use-locale";
 import {
   formatCurrency,
@@ -1033,6 +1034,27 @@ export default function WasiatGuide() {
             </ul>
           </CardContent>
         </Card>
+
+        <LeadCaptureCard
+          calculator="wasiat"
+          intent="consult"
+          source="wasiat-shariah-lawyer"
+          icon={<FileText className="w-4 h-4 text-primary" />}
+          title="Get a free 15-min consult with a Shariah lawyer"
+          description="A licensed solicitor will review your bequests and witness/registration steps. No obligation."
+          ctaLabel="Book my free consult"
+          showPhone
+          successTitle="Request received."
+          successMessage="A Shariah-trained partner will reach out within 1 business day."
+          disclaimer="By submitting you agree to be contacted by a partnered solicitor about your Wasiat."
+          getContext={() => ({
+            currency: form.currency,
+            estateValue: estateNum,
+            bequestCount: form.bequests.length,
+            totalBequests: Math.round(totalBequests),
+            bequestExceeds,
+          })}
+        />
 
         <AdSlot id="wasiat-bottom" variant="rectangle" className="print:hidden" />
 

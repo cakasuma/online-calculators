@@ -29,6 +29,7 @@ import { HistoryPanel } from "@/components/HistoryPanel";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { AdSlot } from "@/components/AdSlot";
 import { tools, toolBrand } from "@/config/tools";
+import { initAnalytics, track } from "@/lib/analytics";
 
 import HomePage from "@/pages/Home";
 import NormalCalculator from "@/pages/NormalCalculator";
@@ -139,6 +140,10 @@ function Layout() {
   const [location] = useLocation();
 
   useEffect(() => {
+    initAnalytics();
+  }, []);
+
+  useEffect(() => {
     const seo = routeSeo[location] ?? routeSeo["/"];
     document.title = seo.title;
 
@@ -146,6 +151,8 @@ function Layout() {
     if (description) {
       description.setAttribute("content", seo.description);
     }
+
+    track("pageview", { path: location });
   }, [location]);
 
   useEffect(() => {

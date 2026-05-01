@@ -1,10 +1,11 @@
-import { AlertTriangle, Download, Info, TrendingUp, Wallet } from "lucide-react";
+import { AlertTriangle, Download, Info, Sparkles, TrendingUp, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
+import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -397,6 +398,30 @@ export default function SalaryCalculator() {
               </Card>
             ))}
           </div>
+
+          {isValid && parsedInput.monthlySalary > 0 && (
+            <LeadCaptureCard
+              calculator="salary"
+              intent="newsletter"
+              source="salary-tax-tips"
+              icon={<Sparkles className="w-4 h-4 text-primary" />}
+              title="Get personalised tax-saving tips"
+              description="Free monthly email with EPF, PCB and tax-relief moves tailored to your salary band. Unsubscribe anytime."
+              ctaLabel="Send me tax-saving tips"
+              successTitle="You're in."
+              successMessage="We'll send the first tips within 24 hours."
+              disclaimer="We never share your email. See our Privacy Policy."
+              getContext={() => ({
+                monthlySalary: parsedInput.monthlySalary,
+                annualBonus: parsedInput.annualBonus,
+                workerType: parsedInput.workerType,
+                residentStatus: parsedInput.residentStatus,
+                monthlyNet: Math.round(result.monthlyNet),
+                annualTax: Math.round(result.annualIncomeTax),
+              })}
+              className="rounded-3xl"
+            />
+          )}
 
           <Card className="rounded-3xl shadow-sm">
             <CardContent className="p-6">

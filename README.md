@@ -19,7 +19,7 @@ npm run dev
 
 ## Environment Variables
 
-Monetization is controlled with Vite env vars:
+### Ads (build-time, Vite)
 
 - `VITE_ADSENSE_CLIENT` – your AdSense publisher ID (e.g. `ca-pub-...`)
 - `VITE_ADSENSE_SLOT_TOP` – ad slot ID for the global top ad placement
@@ -27,6 +27,19 @@ Monetization is controlled with Vite env vars:
 
 If these are empty, the UI shows a non-breaking placeholder ad container.
 AdSense network scripts/requests are only enabled in production builds (`import.meta.env.PROD`).
+
+### Analytics (build-time, Vite)
+
+- `VITE_PLAUSIBLE_DOMAIN` – your verified Plausible domain. Leave blank to disable.
+- `VITE_PLAUSIBLE_SCRIPT` – optional override for self-hosted Plausible. Defaults to `https://plausible.io/js/script.js`.
+
+The Plausible script is only injected in production builds. Custom events emitted: `pageview`, `cta_view`, `cta_click`, `lead_submit_success`, `lead_submit_error` — all tagged with `calculator`, `intent`, and `source`.
+
+### Lead capture & events (runtime, server)
+
+- `DATABASE_URL` – Postgres connection string used by `server/db.ts` (drizzle + `postgres-js`).
+
+When set, leads from the `LeadCaptureCard` (Faraid, Wasiat, Zakat, Salary) and event pings are persisted to the `leads` and `calculation_events` tables. Run `npx drizzle-kit push` to apply the schema. If unset, the server falls back to in-memory storage so the app still runs locally — leads and events are lost on restart. The endpoints `POST /api/leads` and `POST /api/events` are rate-limited per IP (20 req/min).
 
 ## Production Build
 

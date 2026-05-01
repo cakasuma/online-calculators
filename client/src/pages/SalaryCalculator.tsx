@@ -1,4 +1,4 @@
-import { AlertTriangle, Download, Info, Sparkles, TrendingUp, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowRight, Calculator as CalculatorIcon, Download, Info, Sparkles, TrendingUp, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
+import { recordServerEvent, track } from "@/lib/analytics";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -221,11 +222,27 @@ export default function SalaryCalculator() {
 
   const errors = useMemo(() => validateInputs(parsedInput), [parsedInput]);
   const isValid = Object.keys(errors).length === 0;
+  const [hasCalculated, setHasCalculated] = useState(false);
 
   const result = useMemo(
     () => calculateSalary({ ...parsedInput, epfRate: Math.min(15, parsedInput.epfRate) }),
     [parsedInput],
   );
+
+  function handleCalculate() {
+    if (!isValid) return;
+    setHasCalculated(true);
+    const props = {
+      monthlySalary: parsedInput.monthlySalary,
+      annualBonus: parsedInput.annualBonus,
+      workerType: parsedInput.workerType,
+      residentStatus: parsedInput.residentStatus,
+      monthlyNet: Math.round(result.monthlyNet),
+      annualTax: Math.round(result.annualIncomeTax),
+    };
+    track("calculator_complete", { calculator: "salary", ...props });
+    recordServerEvent({ calculator: "salary", event: "calculator_complete", payload: props });
+  }
 
   const takeHomeRatio =
     parsedInput.monthlySalary > 0
@@ -247,7 +264,10 @@ export default function SalaryCalculator() {
     setEpfRateInput(toInputString(DEFAULT_INPUTS.epfRate));
     setWorkerType(DEFAULT_INPUTS.workerType);
     setResidentStatus(DEFAULT_INPUTS.residentStatus);
+    setHasCalculated(false);
   }
+
+  const showResults = hasCalculated && isValid;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -266,14 +286,16 @@ export default function SalaryCalculator() {
           <Card className="border-white/10 bg-white/10 text-white backdrop-blur">
             <CardContent className="p-6">
               <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
-              <p className="mt-2 text-4xl font-bold">{money(isValid ? result.monthlyNet : 0)}</p>
+              <p className="mt-2 text-4xl font-bold">{money(showResults ? result.monthlyNet : 0)}</p>
               <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
-                <div className="h-full rounded-full bg-emerald-400" style={{ width: `${isValid ? takeHomeRatio : 0}%` }} />
+                <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
               </div>
               <p className="mt-2 text-sm text-slate-300">
-                {isValid
+                {!isValid
+                  ? t("salary.fixInputErrors")
+                  : showResults
                   ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                  : t("salary.fixInputErrors")}
+                  : "Tap Calculate to reveal your take-home pay"}
               </p>
             </CardContent>
           </Card>
@@ -371,35 +393,61 @@ export default function SalaryCalculator() {
                 </div>
               </div>
             ) : null}
+
+            <Button
+              type="button"
+              size="lg"
+              className="w-full gap-2 rounded-2xl text-base font-semibold"
+              disabled={!isValid}
+              onClick={handleCalculate}
+            >
+              <CalculatorIcon className="h-4 w-4" />
+              {hasCalculated ? "Recalculate take-home pay" : "Calculate my take-home pay"}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </CardContent>
         </Card>
 
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {([
-              [t("salary.epfMonth"), result.monthlyEpf, percent(monthlyEpfRate), Wallet],
-              [t("salary.taxMonth"), result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
-              [t("salary.socsoMonth"), result.monthlySocso, percent(monthlySocsoRate), Info],
-              [t("salary.eisMonth"), result.monthlyEis, percent(monthlyEisRate), Info],
-            ] as [string, number, string, typeof Wallet][]).map(([label, value, tooltipInfo, Icon]) => (
-              <Card key={label} className="rounded-3xl shadow-sm">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{label}</p>
-                      <p className="mt-1 text-2xl font-bold">{money(isValid ? value : 0)}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{t("salary.rateEstimate")} {tooltipInfo}</p>
+          {!showResults ? (
+            <Card className="rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
+              <CardContent className="flex flex-col items-center justify-center gap-3 p-10 text-center">
+                <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                  <CalculatorIcon className="h-6 w-6" />
+                </div>
+                <p className="text-base font-semibold">Your breakdown is ready</p>
+                <p className="max-w-sm text-sm text-muted-foreground">
+                  Fill in your salary details on the left, then tap <span className="font-medium text-foreground">Calculate</span> to see EPF, PCB, SOCSO, and your monthly take-home.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {([
+                [t("salary.epfMonth"), result.monthlyEpf, percent(monthlyEpfRate), Wallet],
+                [t("salary.taxMonth"), result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
+                [t("salary.socsoMonth"), result.monthlySocso, percent(monthlySocsoRate), Info],
+                [t("salary.eisMonth"), result.monthlyEis, percent(monthlyEisRate), Info],
+              ] as [string, number, string, typeof Wallet][]).map(([label, value, tooltipInfo, Icon]) => (
+                <Card key={label} className="rounded-3xl shadow-sm">
+                  <CardContent className="p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{label}</p>
+                        <p className="mt-1 text-2xl font-bold">{money(value)}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{t("salary.rateEstimate")} {tooltipInfo}</p>
+                      </div>
+                      <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                        <Icon className="h-5 w-5" />
+                      </div>
                     </div>
-                    <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
-          {isValid && parsedInput.monthlySalary > 0 && (
+          {showResults && (
             <LeadCaptureCard
               calculator="salary"
               intent="newsletter"
@@ -423,37 +471,39 @@ export default function SalaryCalculator() {
             />
           )}
 
-          <Card className="rounded-3xl shadow-sm">
-            <CardContent className="p-6">
-              <div className="mb-5 flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold">{t("salary.annual.title")}</h2>
-                  <p className="text-sm text-muted-foreground">{t("salary.annual.subtitle")}</p>
-                </div>
-                <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
-                  <Download className="h-4 w-4" /> {t("salary.save")}
-                </Button>
-              </div>
-              <div className="space-y-3">
-                {([
-                  [t("salary.monthlyTakeHome"), result.monthlyNet, `${takeHomeRatio.toFixed(2)}% ${t("salary.ofGross")}`],
-                  [t("salary.annualGross"), result.annualGross, t("salary.beforeDeductions")],
-                  [t("salary.chargeableIncome"), result.chargeableIncome, t("salary.afterReliefs")],
-                  [t("salary.annualTax"), result.annualIncomeTax, `${t("salary.effectiveTax")} ${percent(taxRateFromGross)}`],
-                  [t("salary.estimatedMonthlyTax"), result.monthlyTax, `${t("salary.approxMonthlyRate")} ${percent(monthlyTaxRate)}`],
-                  [t("salary.monthlyDeductions"), result.monthlyDeductions, t("salary.deductionItems")],
-                ] as [string, number, string][]).map(([label, value, helper]) => (
-                  <div key={label} className="rounded-2xl bg-muted/50 px-4 py-3">
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-sm text-muted-foreground">{label}</span>
-                      <span className="font-semibold">{money(isValid ? value : 0)}</span>
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
+          {showResults && (
+            <Card className="rounded-3xl shadow-sm">
+              <CardContent className="p-6">
+                <div className="mb-5 flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-semibold">{t("salary.annual.title")}</h2>
+                    <p className="text-sm text-muted-foreground">{t("salary.annual.subtitle")}</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
+                    <Download className="h-4 w-4" /> {t("salary.save")}
+                  </Button>
+                </div>
+                <div className="space-y-3">
+                  {([
+                    [t("salary.monthlyTakeHome"), result.monthlyNet, `${takeHomeRatio.toFixed(2)}% ${t("salary.ofGross")}`],
+                    [t("salary.annualGross"), result.annualGross, t("salary.beforeDeductions")],
+                    [t("salary.chargeableIncome"), result.chargeableIncome, t("salary.afterReliefs")],
+                    [t("salary.annualTax"), result.annualIncomeTax, `${t("salary.effectiveTax")} ${percent(taxRateFromGross)}`],
+                    [t("salary.estimatedMonthlyTax"), result.monthlyTax, `${t("salary.approxMonthlyRate")} ${percent(monthlyTaxRate)}`],
+                    [t("salary.monthlyDeductions"), result.monthlyDeductions, t("salary.deductionItems")],
+                  ] as [string, number, string][]).map(([label, value, helper]) => (
+                    <div key={label} className="rounded-2xl bg-muted/50 px-4 py-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-sm text-muted-foreground">{label}</span>
+                        <span className="font-semibold">{money(value)}</span>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

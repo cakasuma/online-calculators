@@ -16,8 +16,7 @@ const adsenseSlotHome = import.meta.env.VITE_ADSENSE_SLOT_HOME?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
 export default function HomePage() {
-  const { locale } = useLocale();
-  const isId = locale === "id";
+  const { t } = useLocale();
   const featured = tools.filter((tool) => tool.featured);
 
   return (
@@ -25,32 +24,30 @@ export default function HomePage() {
       <section className="rounded-3xl border bg-gradient-to-br from-primary/20 via-background to-sky-500/20 p-6 sm:p-10 shadow-lg">
         <Badge className="mb-4" variant="secondary">
           <Sparkles className="w-3.5 h-3.5 mr-1" />
-          {isId ? "Selamat datang di HelloKalku" : "Welcome to HelloKalku"}
+          {t("home.hero.badge")}
         </Badge>
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">{toolBrand.name}</h1>
         <p className="mt-3 max-w-3xl text-muted-foreground leading-relaxed">
-          {isId
-            ? "Kalkulator dan panduan yang cepat dan praktis untuk keuangan harian, matematika lanjutan, dan perencanaan Islam. Dibuat agar jelas, mendukung dua bahasa (Inggris + Indonesia), dan cepat di perangkat mobile."
-            : "Fast, practical calculators and guides for daily finance, advanced math, and Islamic planning. Built for clarity, bilingual usage (English + Indonesian), and mobile-first speed."}
+          {t("home.hero.subtitle")}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button asChild size="lg"><Link href="/salary">{isId ? "Mulai dari Kalkulator Gaji" : "Start with Salary Calculator"}</Link></Button>
-          <Button asChild size="lg" variant="outline"><Link href="/faraid">{isId ? "Buka Kalkulator Faraid" : "Open Faraid Calculator"}</Link></Button>
+          <Button asChild size="lg"><Link href="/salary">{t("home.hero.ctaSalary")}</Link></Button>
+          <Button asChild size="lg" variant="outline"><Link href="/faraid">{t("home.hero.ctaFaraid")}</Link></Button>
         </div>
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">{isId ? "Alat unggulan" : "Featured tools"}</h2>
+        <h2 className="text-2xl font-semibold">{t("home.featured.title")}</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {featured.map((tool) => (
             <Card key={tool.slug} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-semibold"><tool.icon className="w-4 h-4 text-primary" />{tool.name}</div>
-                  {tool.badge ? <Badge>{tool.badge}</Badge> : null}
+                  <div className="flex items-center gap-2 font-semibold"><tool.icon className="w-4 h-4 text-primary" />{t(`tools.${tool.slug}.name` as any)}</div>
+                  {tool.badge ? <Badge>{t(`tools.${tool.slug}.badge` as any)}</Badge> : null}
                 </div>
-                <p className="text-sm text-muted-foreground">{tool.description}</p>
-                <Button asChild variant="ghost" className="px-0"><Link href={tool.href}>Open tool <ArrowRight className="ml-2 w-4 h-4"/></Link></Button>
+                <p className="text-sm text-muted-foreground">{t(`tools.${tool.slug}.desc` as any)}</p>
+                <Button asChild variant="ghost" className="px-0"><Link href={tool.href}>{t("home.featured.openTool")} <ArrowRight className="ml-2 w-4 h-4"/></Link></Button>
               </CardContent>
             </Card>
           ))}
@@ -59,16 +56,14 @@ export default function HomePage() {
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {grouped.map((group) => (
-          <Card key={group.name}><CardContent className="p-5"><h3 className="font-semibold">{group.name}</h3><p className="text-sm text-muted-foreground mt-1">{group.description}</p></CardContent></Card>
+          <Card key={group.name}><CardContent className="p-5"><h3 className="font-semibold">{t(`home.category.${group.name}.name` as any)}</h3><p className="text-sm text-muted-foreground mt-1">{t(`home.category.${group.name}.desc` as any)}</p></CardContent></Card>
         ))}
       </section>
 
       <section className="rounded-2xl border bg-card p-6">
-        <h2 className="text-xl font-semibold">{isId ? "Kenapa HelloKalku?" : "Why HelloKalku?"}</h2>
+        <h2 className="text-xl font-semibold">{t("home.why.title")}</h2>
         <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-          {isId
-            ? "HelloKalku dirancang untuk pengguna di Asia Tenggara yang membutuhkan kalkulator tepercaya dengan penjelasan yang jelas, format angka lokal, dan referensi praktis. Baik Anda menghitung gaji bersih, zakat, pembagian faraid, maupun rumus matematika, HelloKalku menjaga antarmuka tetap rapi dan konsisten."
-            : "HelloKalku is designed for users in Southeast Asia who need trustworthy calculators with clear explanations, localized numbers, and practical references. Whether you are checking net salary, computing zakat, planning faraid distribution, or solving formulas, HelloKalku keeps the interface clean and consistent."}
+          {t("home.why.body")}
         </p>
       </section>
 

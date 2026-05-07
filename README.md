@@ -41,6 +41,35 @@ The Plausible script is only injected in production builds. Custom events emitte
 
 When set, leads from the `LeadCaptureCard` (Faraid, Wasiat, Zakat, Salary) and event pings are persisted to the `leads` and `calculation_events` tables. Run `npx drizzle-kit push` to apply the schema. If unset, the server falls back to in-memory storage so the app still runs locally — leads and events are lost on restart. The endpoints `POST /api/leads` and `POST /api/events` are rate-limited per IP (20 req/min).
 
+## Setting up Supabase as your DB
+
+Supabase is plain Postgres + a built-in table editor, so it works with the existing `DATABASE_URL` setup with no code changes.
+
+1. Create a project at [supabase.com](https://supabase.com) (free tier is enough). Pick a region close to your Vercel one.
+2. In the project dashboard go to **Project Settings → Database → Connection string**.
+3. You'll see three tabs. Use them like this:
+
+   | Use case | Tab to copy | Port | Why |
+   |---|---|---|---|
+   | Vercel runtime (`DATABASE_URL`) | **Transaction pooler** | 6543 | Serverless functions open many short-lived connections; the transaction pooler handles that safely. Our driver already runs with `prepare: false`, which is required here. |
+   | Local migrations (`drizzle-kit push`) | **Direct connection** (or **Session pooler** if your network is IPv4-only) | 5432 | Migrations need session-level features that the transaction pooler doesn't allow. |
+
+   Replace `[YOUR-PASSWORD]` in the URL with the database password you set when creating the project.
+
+4. Apply the schema once from your laptop:
+   ```bash
+   DATABASE_URL="postgres://...:5432/postgres" npx drizzle-kit push
+   ```
+   This creates the `leads` and `calculation_events` tables.
+
+5. In Vercel: **Project Settings → Environment Variables** → add `DATABASE_URL` with the **transaction pooler** URL (port 6543). Set it for *Production*, *Preview*, and *Development*.
+
+6. Redeploy. Submit a test lead from `/faraid`, `/wasiat`, `/zakat`, or `/salary`, then go to the Supabase **Table Editor** → `leads` to see it land.
+
+Notes:
+- Tables created by `drizzle-kit push` are owned by the `postgres` role, so RLS is irrelevant — only your server connects with that role; the client never talks to Supabase directly.
+- If you later add a public-readable `/admin/leads` page, gate it with basic auth or a session check; do **not** expose the Supabase anon key from the client.
+
 ## Production Build
 
 ```bash
@@ -66,6 +95,8 @@ This repo is ready for Vercel deployment:
    - `VITE_ADSENSE_CLIENT`
    - `VITE_ADSENSE_SLOT_TOP`
    - `VITE_ADSENSE_SLOT_HOME`
+   - `VITE_PLAUSIBLE_DOMAIN` (analytics)
+   - `DATABASE_URL` (Supabase transaction pooler URL — see "Setting up Supabase" above)
 
 ### Subdomain Connection Notes
 

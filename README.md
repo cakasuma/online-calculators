@@ -28,12 +28,14 @@ npm run dev
 If these are empty, the UI shows a non-breaking placeholder ad container.
 AdSense network scripts/requests are only enabled in production builds (`import.meta.env.PROD`).
 
-### Analytics (build-time, Vite)
+### Analytics (Vercel)
 
-- `VITE_PLAUSIBLE_DOMAIN` – your verified Plausible domain. Leave blank to disable.
-- `VITE_PLAUSIBLE_SCRIPT` – optional override for self-hosted Plausible. Defaults to `https://plausible.io/js/script.js`.
+Pageviews and custom events both go to Vercel Web Analytics:
 
-The Plausible script is only injected in production builds. Custom events emitted: `pageview`, `cta_view`, `cta_click`, `lead_submit_success`, `lead_submit_error` — all tagged with `calculator`, `intent`, and `source`.
+- The `<Analytics />` component in `client/src/App.tsx` collects pageviews automatically once you enable Web Analytics in your Vercel project's **Analytics** tab.
+- Custom events (`pageview`, `cta_view`, `cta_click`, `lead_submit_success`, `lead_submit_error`, `calculator_complete`) are emitted from `client/src/lib/analytics.ts` via `@vercel/analytics`'s `track()`. Each is tagged with `calculator`, `intent`, and `source` so you can filter the funnel by tool.
+
+No env vars needed — the package picks up your Vercel project automatically when deployed.
 
 ### Lead capture & events (runtime, server)
 
@@ -95,8 +97,8 @@ This repo is ready for Vercel deployment:
    - `VITE_ADSENSE_CLIENT`
    - `VITE_ADSENSE_SLOT_TOP`
    - `VITE_ADSENSE_SLOT_HOME`
-   - `VITE_PLAUSIBLE_DOMAIN` (analytics)
    - `DATABASE_URL` (Supabase transaction pooler URL — see "Setting up Supabase" above)
+7. Open the **Analytics** tab in Vercel and click **Enable** so pageviews + custom events start collecting.
 
 ### Subdomain Connection Notes
 

@@ -1,31 +1,10 @@
-const PLAUSIBLE_DOMAIN = import.meta.env.VITE_PLAUSIBLE_DOMAIN?.trim() || "";
-const PLAUSIBLE_SCRIPT = import.meta.env.VITE_PLAUSIBLE_SCRIPT?.trim() || "https://plausible.io/js/script.js";
+import { track as vercelTrack } from "@vercel/analytics";
 
-declare global {
-  interface Window {
-    plausible?: (event: string, options?: { props?: Record<string, unknown>; callback?: () => void }) => void;
-  }
-}
-
-let initialized = false;
 let sessionId: string | null = null;
 
 export function initAnalytics(): void {
-  if (initialized || typeof window === "undefined") return;
-  initialized = true;
-
-  if (PLAUSIBLE_DOMAIN && import.meta.env.PROD) {
-    const script = document.createElement("script");
-    script.defer = true;
-    script.dataset.domain = PLAUSIBLE_DOMAIN;
-    script.src = PLAUSIBLE_SCRIPT;
-    document.head.appendChild(script);
-
-    const stub = document.createElement("script");
-    stub.text =
-      "window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }";
-    document.head.appendChild(stub);
-  }
+  // Vercel Web Analytics is mounted via <Analytics /> in App.tsx.
+  // Custom events flow through `track()` below. Nothing else to init here.
 }
 
 function getSessionId(): string {
@@ -46,12 +25,25 @@ function getSessionId(): string {
   }
 }
 
+type TrackProps = Record<string, string | number | boolean | null>;
+
+function sanitize(props?: Record<string, unknown>): TrackProps | undefined {
+  if (!props) return undefined;
+  const out: TrackProps = {};
+  for (const [k, v] of Object.entries(props)) {
+    if (v === null) out[k] = null;
+    else if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") out[k] = v;
+    // skip nested objects/arrays — Vercel only accepts flat scalars
+  }
+  return out;
+}
+
 export function track(event: string, props?: Record<string, unknown>): void {
   if (typeof window === "undefined") return;
   try {
-    window.plausible?.(event, props ? { props } : undefined);
+    vercelTrack(event, sanitize(props));
   } catch {
-    /* ignore */
+    /* analytics must never break UX */
   }
 }
 
@@ -88,7 +80,7 @@ export function recordServerEvent({ calculator, event, payload }: ServerEvent): 
     body,
     keepalive: true,
   }).catch(() => {
-    /* swallow — analytics must never break UX */
+    /* swallow */
   });
 }
 

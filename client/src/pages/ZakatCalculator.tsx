@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "wouter";
-import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil, Loader2 } from "lucide-react";
+import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil, Loader2, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { AdSlot } from "@/components/AdSlot";
+import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency, parseLocaleNumber } from "@/lib/i18n";
 
@@ -981,6 +982,27 @@ export default function ZakatCalculator() {
           </Button>
         </CardContent>
       </Card>
+
+      {result.total > 0 && result.nisab > 0 && isAbove && (
+        <LeadCaptureCard
+          calculator="zakat"
+          intent="reminder"
+          source="zakat-yearly-reminder"
+          icon={<BellRing className="w-4 h-4 text-primary" />}
+          title="Get a yearly Zakat reminder"
+          description="We'll email you next year on your hawl date with an updated nisab and a quick re-calculation link."
+          ctaLabel="Set my reminder"
+          successTitle="Reminder set."
+          successMessage="We'll email you a year from today."
+          disclaimer="One email per year. No spam."
+          getContext={() => ({
+            currency: state.currency,
+            zakatableTotal: Math.round(result.total),
+            zakatDue: Math.round(zakatDue),
+            nisab: Math.round(result.nisab),
+          })}
+        />
+      )}
 
       <AdSlot id="zakat-bottom" variant="banner" />
 

@@ -1,13 +1,71 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { insertLeadSchema, insertEventSchema } from "../shared/schema";
+
+function getClientIp(req: Request): string | undefined {
+  const fwd = req.headers["x-forwarded-for"];
+  if (typeof fwd === "string") return fwd.split(",")[0]?.trim();
+  if (Array.isArray(fwd)) return fwd[0];
+  return req.socket.remoteAddress ?? undefined;
+}
+
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 20;
+const rateBucket = new Map<string, { count: number; reset: number }>();
+
+function rateLimited(key: string): boolean {
+  const now = Date.now();
+  const bucket = rateBucket.get(key);
+  if (!bucket || bucket.reset < now) {
+    rateBucket.set(key, { count: 1, reset: now + RATE_WINDOW_MS });
+    return false;
+  }
+  bucket.count += 1;
+  return bucket.count > RATE_MAX;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  app.post("/api/leads", async (req, res) => {
+    const ip = getClientIp(req) ?? "unknown";
+    if (rateLimited(`lead:${ip}`)) {
+      return res.status(429).json({ error: "Too many requests" });
+    }
 
-  // use storage to perform CRUD operations on the database
-  // (currently using in-memory storage, which will reset on server restart)
+    const parsed = insertLeadSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
+    }
+
+    try {
+      const userAgent = req.headers["user-agent"]?.toString().slice(0, 500);
+      const lead = await storage.createLead({ ...parsed.data, userAgent });
+      return res.status(201).json({ id: lead.id, ok: true });
+    } catch (err) {
+      console.error("[lead] failed to persist", err);
+      return res.status(500).json({ error: "Failed to save lead" });
+    }
+  });
+
+  app.post("/api/events", async (req, res) => {
+    const ip = getClientIp(req) ?? "unknown";
+    if (rateLimited(`evt:${ip}`)) {
+      return res.status(429).json({ error: "Too many requests" });
+    }
+
+    const parsed = insertEventSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid input" });
+    }
+
+    try {
+      await storage.recordEvent(parsed.data);
+      return res.status(204).end();
+    } catch (err) {
+      console.error("[event] failed to record", err);
+      return res.status(500).json({ error: "Failed to record event" });
+    }
+  });
 
   app.get("/api/metal-prices", async (req, res) => {
     const currency = (req.query.currency as string) || "MYR";

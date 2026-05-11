@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
+import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency } from "@/lib/i18n";
 import {
@@ -1587,28 +1588,30 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             </CardContent>
           </Card>
 
-          {/* Professional Consultation CTA */}
-          <Card className="border-primary/20 bg-primary/5 print:hidden">
-            <CardContent className="pt-4 pb-4">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-4 h-4 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold">{t("faraid.consultCTA.title")}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                    {t("faraid.consultCTA.text")}
-                  </p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm" className="mt-3 w-full gap-1.5" asChild>
-                <a href="https://www.google.com/search?q=certified+faraid+consultant" target="_blank" rel="noopener noreferrer">
-                  <Users className="w-3.5 h-3.5" />
-                  {t("faraid.consultCTA.button")}
-                </a>
-              </Button>
-            </CardContent>
-          </Card>
+          {/* Professional Consultation CTA — lead capture */}
+          <LeadCaptureCard
+            calculator="faraid"
+            intent="consult"
+            source="faraid-certified-consultant"
+            icon={<Users className="w-4 h-4 text-primary" />}
+            title={t("faraid.consultCTA.title")}
+            description={t("faraid.consultCTA.text")}
+            ctaLabel={t("faraid.consultCTA.button")}
+            showPhone
+            successTitle="Consultation requested."
+            successMessage="A certified faraid consultant will be in touch within 1 business day."
+            disclaimer="By submitting you agree to be contacted by a partnered consultant about your inheritance plan."
+            getContext={() => ({
+              currency: form.currency,
+              estateValue: estate,
+              debts,
+              wasiyyah,
+              netEstate: result?.netEstate,
+              heirCount: result?.heirs.length ?? 0,
+              hasAwl: result?.hasAwl,
+              undistributed: result?.undistributed,
+            })}
+          />
 
           {/* Ad slot — after results */}
           <AdSlot id="ad-after-results" variant="rectangle" className="print:hidden" />

@@ -1,17 +1,23 @@
 // ─── i18n System ────────────────────────────────────────────────────────────
-// Simple, zero-dependency i18n for English + Bahasa Indonesia.
-// Locale is persisted in localStorage and exposed via React context.
+// Zero-dependency i18n for English + Bahasa Indonesia.
+// Locale is the first path segment (e.g. /en/salary, /id/faraid) and is
+// persisted to localStorage for return-visit detection.
 
 export type Locale = "en" | "id";
 
+export const SUPPORTED_LOCALES: Locale[] = ["en", "id"];
+export const DEFAULT_LOCALE: Locale = "en";
 export const LOCALE_STORAGE_KEY = "calc_locale";
+
+export function isLocale(value: string | undefined | null): value is Locale {
+  return value === "en" || value === "id";
+}
 
 export function getLocaleFromUrl(): Locale | null {
   try {
-    const hash = window.location.hash; // e.g. "#/id/faraid" or "#/en/"
-    const path = hash.startsWith("#/") ? hash.slice(2) : hash.slice(1);
-    const firstSegment = path.split("/")[0];
-    if (firstSegment === "en" || firstSegment === "id") return firstSegment;
+    const pathname = window.location.pathname;
+    const firstSegment = pathname.split("/").filter(Boolean)[0];
+    if (isLocale(firstSegment)) return firstSegment;
   } catch { /* noop */ }
   return null;
 }
@@ -23,12 +29,26 @@ export function getSavedLocale(): Locale {
   // Priority 2: localStorage
   try {
     const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (saved === "en" || saved === "id") return saved;
+    if (isLocale(saved)) return saved;
   } catch { /* noop */ }
   // Priority 3: Auto-detect from browser
   const nav = navigator.language?.toLowerCase() || "";
   if (nav.startsWith("id") || nav.startsWith("ms")) return "id";
-  return "en";
+  return DEFAULT_LOCALE;
+}
+
+export function pathWithLocale(locale: Locale, path: string): string {
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  return `/${locale}${clean === "/" ? "" : clean}`;
+}
+
+export function stripLocaleFromPath(pathname: string): { locale: Locale | null; path: string } {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length > 0 && isLocale(segments[0])) {
+    const rest = segments.slice(1).join("/");
+    return { locale: segments[0], path: rest ? `/${rest}` : "/" };
+  }
+  return { locale: null, path: pathname || "/" };
 }
 
 export function saveLocale(locale: Locale): void {

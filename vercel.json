@@ -3,7 +3,20 @@
   "outputDirectory": "dist/public",
   "installCommand": "npm install",
   "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/", "destination": "/en", "permanent": false },
+    { "source": "/salary", "destination": "/en/salary", "permanent": false },
+    { "source": "/normal", "destination": "/en/normal", "permanent": false },
+    { "source": "/scientific", "destination": "/en/scientific", "permanent": false },
+    { "source": "/faraid", "destination": "/en/faraid", "permanent": false },
+    { "source": "/zakat", "destination": "/en/zakat", "permanent": false },
+    { "source": "/wasiat", "destination": "/en/wasiat", "permanent": false },
+    { "source": "/privacy", "destination": "/en/privacy", "permanent": false },
+    { "source": "/terms", "destination": "/en/terms", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!.*\\.).*)", "destination": "/index.html" }
   ]
 }

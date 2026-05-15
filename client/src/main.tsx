@@ -2,9 +2,13 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-// Ensure the URL hash always contains a locale prefix (e.g. /#/en or /#/id/faraid).
-// Direct path visits such as /salary are normalized to /#/en/salary while keeping query params in location.search.
-(function initLocaleHash() {
+// Normalize the URL so the first path segment is a supported locale.
+// Examples:
+//   /              -> /en  (or /id if detected)
+//   /salary        -> /en/salary
+//   /en/salary     -> unchanged
+//   /id/zakat?x=1  -> unchanged
+(function initLocalePath() {
   const SUPPORTED = ["en", "id"];
   const DEFAULT_LOCALE = "en";
 
@@ -15,42 +19,35 @@ import "./index.css";
     } catch {
       /* noop */
     }
-
     const browserLocale = navigator.language?.toLowerCase() ?? "";
     if (browserLocale.startsWith("id") || browserLocale.startsWith("ms")) {
       return "id";
     }
-
     return DEFAULT_LOCALE;
   }
 
-  const hash = window.location.hash;
-  if (!hash || hash === "#" || hash === "#/") {
-    const pathname = window.location.pathname.replace(/^\/+|\/+$/g, "");
-    if (!pathname) {
-      window.location.hash = `#/${detectLocale()}`;
-      return;
-    }
+  const pathname = window.location.pathname;
+  const segments = pathname.split("/").filter(Boolean);
+  const firstSegment = segments[0];
 
-    const segments = pathname.split("/").filter(Boolean);
-    const firstSegment = segments[0];
-    if (SUPPORTED.includes(firstSegment)) {
-      window.location.hash = `#/${segments.join("/")}`;
-      return;
-    }
+  if (SUPPORTED.includes(firstSegment)) return;
 
-    window.location.hash = `#/${detectLocale()}/${segments.join("/")}`;
+  // Legacy: migrate any old hash-routed URLs (#/en/salary) to path routing.
+  const legacyHash = window.location.hash;
+  if (legacyHash && legacyHash.startsWith("#/")) {
+    const hashPath = legacyHash.slice(1); // /en/salary or /salary
+    const hashSegments = hashPath.split("/").filter(Boolean);
+    const hashFirst = hashSegments[0];
+    const targetLocale = SUPPORTED.includes(hashFirst) ? hashFirst : detectLocale();
+    const rest = SUPPORTED.includes(hashFirst) ? hashSegments.slice(1) : hashSegments;
+    const newPath = `/${targetLocale}${rest.length ? `/${rest.join("/")}` : ""}`;
+    window.history.replaceState({}, "", newPath + window.location.search);
     return;
   }
 
-  // Check if existing hash already has a lang prefix.
-  // Keep query params in location.search (outside the hash pathname) for route matching.
-  const [hashPath] = hash.split("?");
-  const path = hashPath.startsWith("#/") ? hashPath.slice(2) : hashPath.slice(1);
-  const firstSegment = path.split("/")[0];
-  if (!SUPPORTED.includes(firstSegment)) {
-    window.location.hash = `#/${detectLocale()}${path ? `/${path}` : ""}`;
-  }
+  const locale = detectLocale();
+  const rest = segments.length ? `/${segments.join("/")}` : "";
+  window.history.replaceState({}, "", `/${locale}${rest}` + window.location.search);
 })();
 
 createRoot(document.getElementById("root")!).render(<App />);

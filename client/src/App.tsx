@@ -1,6 +1,8 @@
 import { Switch, Route, Router, Link, useLocation } from "wouter";
-import { useHashLocation } from "wouter/use-hash-location";
-import type { Locale, TranslationKey } from "@/lib/i18n";
+import type { TranslationKey } from "@/lib/i18n";
+import { SUPPORTED_LOCALES } from "@/lib/i18n";
+import { routes as seoRoutes, canonicalUrl } from "@/config/seo";
+import { CalculatorContent } from "@/components/CalculatorContent";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -42,41 +44,6 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfUse from "@/pages/TermsOfUse";
 import NotFound from "@/pages/not-found";
 
-const SUPPORTED_LOCALES: Locale[] = ["en", "id"];
-
-function getCurrentUrlLang(): Locale {
-  try {
-    const hash = window.location.hash;
-    const path = hash.startsWith("#/") ? hash.slice(2) : "";
-    const first = path.split("/")[0] as Locale;
-    if (SUPPORTED_LOCALES.includes(first)) return first;
-  } catch {
-    /* noop */
-  }
-  try {
-    const saved = localStorage.getItem("calc_locale") as Locale;
-    if (SUPPORTED_LOCALES.includes(saved)) return saved;
-  } catch {
-    /* noop */
-  }
-  const nav = navigator.language?.toLowerCase() || "";
-  return nav.startsWith("id") || nav.startsWith("ms") ? "id" : "en";
-}
-
-function useLocalizedHashLocation(): [string, (to: string) => void] {
-  const [hashPath, setHashPath] = useHashLocation();
-  const segments = hashPath.split("/").filter(Boolean);
-  const hasLangPrefix = segments.length > 0 && SUPPORTED_LOCALES.includes(segments[0] as Locale);
-  const cleanPath = hasLangPrefix ? "/" + segments.slice(1).join("/") || "/" : hashPath;
-
-  const navigate = (to: string) => {
-    const lang = getCurrentUrlLang();
-    setHashPath("/" + lang + (to === "/" ? "" : to));
-  };
-
-  return [cleanPath || "/", navigate];
-}
-
 const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
   { href: "/", labelKey: "nav.home", icon: HomeIcon },
   { href: "/salary", labelKey: "nav.salary", icon: Wallet },
@@ -91,50 +58,32 @@ const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
 const adsenseSlotTop = import.meta.env.VITE_ADSENSE_SLOT_TOP?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
-const routeSeo: Record<string, { title: string; description: string }> = {
-  "/": {
-    title: "Online Calculators for Malaysia | HelloKalku",
-    description:
-      "Free calculators for salary, scientific math, faraid inheritance, zakat, and wasiat planning for Malaysia.",
-  },
-  "/salary": {
-    title: "Malaysia Salary Calculator | HelloKalku",
-    description: "Estimate take-home pay with EPF, SOCSO, EIS, and PCB deductions for Malaysia.",
-  },
-  "/normal": {
-    title: "Basic Calculator Online | HelloKalku",
-    description: "Use a fast basic calculator for daily arithmetic with local history storage.",
-  },
-  "/scientific": {
-    title: "Scientific Calculator Online | HelloKalku",
-    description: "Solve advanced math equations with trigonometry, logarithms, powers, and constants.",
-  },
-  "/faraid": {
-    title: "Faraid Calculator (Islamic Inheritance) | HelloKalku",
-    description: "Calculate inheritance shares using simplified faraid logic and heir distribution guidance.",
-  },
-  "/zakat": {
-    title: "Zakat Calculator Malaysia | HelloKalku",
-    description: "Estimate yearly zakat obligations based on your assets and liabilities.",
-  },
-  "/wasiat": {
-    title: "Wasiat Guide & Checklist | HelloKalku",
-    description: "Plan a practical Islamic will workflow with a printable checklist and action steps.",
-  },
-  "/privacy": {
-    title: "Privacy Policy | HelloKalku",
-    description: "Read how HelloKalku handles privacy, analytics, and advertising data across calculator tools.",
-  },
-  "/terms": {
-    title: "Terms of Use | HelloKalku",
-    description: "Review HelloKalku terms, service scope, and user responsibilities.",
-  },
-};
+function setMetaTag(attr: "name" | "property", key: string, content: string) {
+  let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setLinkTag(rel: string, href: string, hreflang?: string) {
+  const selector = hreflang ? `link[rel="${rel}"][hreflang="${hreflang}"]` : `link[rel="${rel}"]`;
+  let el = document.head.querySelector<HTMLLinkElement>(selector);
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", rel);
+    if (hreflang) el.setAttribute("hreflang", hreflang);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
 
 function Layout() {
   const { theme, toggle } = useTheme();
   const history = useHistory();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [showHistory, setShowHistory] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [location] = useLocation();
@@ -144,16 +93,29 @@ function Layout() {
   }, []);
 
   useEffect(() => {
-    const seo = routeSeo[location] ?? routeSeo["/"];
-    document.title = seo.title;
+    const route = seoRoutes.find((r) => r.path === location) ?? seoRoutes[0];
+    const copy = route.copy[locale] ?? route.copy.en;
+    document.title = copy.title;
+    setMetaTag("name", "description", copy.description);
+    if (copy.keywords) setMetaTag("name", "keywords", copy.keywords);
 
-    const description = document.querySelector('meta[name="description"]');
-    if (description) {
-      description.setAttribute("content", seo.description);
+    const canonical = canonicalUrl(locale, route.path);
+    setLinkTag("canonical", canonical);
+    for (const alt of SUPPORTED_LOCALES) {
+      setLinkTag("alternate", canonicalUrl(alt, route.path), alt);
     }
+    setLinkTag("alternate", canonicalUrl("en", route.path), "x-default");
+
+    setMetaTag("property", "og:title", copy.title);
+    setMetaTag("property", "og:description", copy.description);
+    setMetaTag("property", "og:url", canonical);
+    setMetaTag("property", "og:type", route.slug === "home" ? "website" : "article");
+    setMetaTag("property", "og:locale", locale === "id" ? "id_ID" : "en_US");
+    setMetaTag("name", "twitter:title", copy.title);
+    setMetaTag("name", "twitter:description", copy.description);
 
     track("pageview", { path: location });
-  }, [location]);
+  }, [location, locale]);
 
   useEffect(() => {
     if (!adsenseEnabled) return;
@@ -286,18 +248,30 @@ function Layout() {
           <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
           <Switch>
             <Route path="/" component={HomePage} />
-            <Route path="/salary" component={SalaryCalculator} />
+            <Route path="/salary">
+              <SalaryCalculator />
+              <CalculatorContent slug="salary" />
+            </Route>
             <Route path="/normal">
               <NormalCalculator onCalculate={handleCalculate("normal")} />
+              <CalculatorContent slug="normal" />
             </Route>
             <Route path="/scientific">
               <ScientificCalculator onCalculate={handleCalculate("scientific")} />
+              <CalculatorContent slug="scientific" />
             </Route>
             <Route path="/faraid">
               <FaraidCalculator onCalculate={handleCalculate("faraid")} />
+              <CalculatorContent slug="faraid" />
             </Route>
-            <Route path="/wasiat" component={WasiatGuide} />
-            <Route path="/zakat" component={ZakatCalculator} />
+            <Route path="/wasiat">
+              <WasiatGuide />
+              <CalculatorContent slug="wasiat" />
+            </Route>
+            <Route path="/zakat">
+              <ZakatCalculator />
+              <CalculatorContent slug="zakat" />
+            </Route>
             <Route path="/privacy" component={PrivacyPolicy} />
             <Route path="/terms" component={TermsOfUse} />
             <Route component={NotFound} />
@@ -370,6 +344,11 @@ function Layout() {
   );
 }
 
+function LocaleAwareRouter({ children }: { children: React.ReactNode }) {
+  const { locale } = useLocale();
+  return <Router base={`/${locale}`}>{children}</Router>;
+}
+
 function App() {
   const localeState = useLocaleState();
 
@@ -378,9 +357,9 @@ function App() {
       <LocaleContext.Provider value={localeState}>
         <TooltipProvider>
           <Toaster />
-          <Router hook={useLocalizedHashLocation}>
+          <LocaleAwareRouter>
             <Layout />
-          </Router>
+          </LocaleAwareRouter>
         </TooltipProvider>
       </LocaleContext.Provider>
     </QueryClientProvider>

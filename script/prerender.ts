@@ -166,6 +166,21 @@ function renderContentBody(content: CalculatorContent | undefined, copy: { headi
         <h2>${escapeHtml(content.formula.heading)}</h2>
         ${content.formula.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n        ")}`
     : "";
+  const rateTable = content.rateTable
+    ? `
+        <h2>${escapeHtml(content.rateTable.heading)}</h2>
+        ${content.rateTable.caption ? `<p>${escapeHtml(content.rateTable.caption)}</p>` : ""}
+        <table>
+          <thead><tr>${content.rateTable.columns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead>
+          <tbody>${content.rateTable.rows
+            .map(
+              (row) =>
+                `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`,
+            )
+            .join("")}</tbody>
+        </table>
+        ${content.rateTable.note ? `<p><small>${escapeHtml(content.rateTable.note)}</small></p>` : ""}`
+    : "";
   const examples =
     content.examples && content.examples.length > 0
       ? `
@@ -197,6 +212,7 @@ function renderContentBody(content: CalculatorContent | undefined, copy: { headi
         ${intro}
         ${howItWorks}
         ${formula}
+        ${rateTable}
         ${examples}
         ${faq}
       </article>`;

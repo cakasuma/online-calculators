@@ -45,6 +45,42 @@ export function CalculatorContent({ slug }: Props) {
         </div>
       )}
 
+      {content.rateTable && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold tracking-tight">{content.rateTable.heading}</h2>
+          {content.rateTable.caption && (
+            <p className="mt-2 text-sm text-muted-foreground">{content.rateTable.caption}</p>
+          )}
+          <div className="mt-3 overflow-x-auto rounded-lg border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40">
+                <tr>
+                  {content.rateTable.columns.map((col, i) => (
+                    <th key={i} className="px-3 py-2 text-left font-semibold">
+                      {col}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {content.rateTable.rows.map((row, ri) => (
+                  <tr key={ri} className="border-t">
+                    {row.map((cell, ci) => (
+                      <td key={ci} className="px-3 py-2 align-top">
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {content.rateTable.note && (
+            <p className="mt-2 text-xs text-muted-foreground">{content.rateTable.note}</p>
+          )}
+        </div>
+      )}
+
       {content.examples && content.examples.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold tracking-tight">

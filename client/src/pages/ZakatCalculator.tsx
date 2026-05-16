@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil, Loader2, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { formatInputValue, formatCurrency, parseLocaleNumber } from "@/lib/i18n";
 import {
   boolField,
+  buildShareUrl,
   mergeFromUrl,
   stringField,
   useUrlSync,
@@ -159,7 +160,11 @@ const ZAKAT_URL_SCHEMA: UrlSchema<ZakatState> = {
   rentalExpenses: stringField<ZakatState, "rentalExpenses">("rentEx"),
 };
 
-export default function ZakatCalculator() {
+interface Props {
+  onCalculate?: (expression: string, result: string, url?: string) => void;
+}
+
+export default function ZakatCalculator({ onCalculate }: Props = {}) {
   const { t, locale } = useLocale();
   const [state, setState] = useState<ZakatState>(() => {
     const saved = (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })();
@@ -309,6 +314,31 @@ export default function ZakatCalculator() {
   }, [state, locale]);
 
   const currSym = CURRENCIES.find((c) => c.code === state.currency)?.symbol ?? "";
+
+  // ─── History recorder ─────────────────────────────────────────────────────────
+  // Zakat has no explicit "Calculate" button — the result recomputes on every
+  // keystroke. Recording every intermediate state would flood the history, so
+  // we wait 1.5s after the last input change for the calculation to stabilise,
+  // then emit one entry. A signature ref dedupes so revisiting the page (or
+  // arriving via a shared URL) with the same state does not add a duplicate.
+  const lastRecordedSignatureRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!onCalculate) return;
+    if (result.total <= 0) return;
+    const signature = `${state.currency}|${Math.round(result.total)}|${Math.round(result.zakatDue)}|${Math.round(result.nisab)}`;
+    if (lastRecordedSignatureRef.current === signature) return;
+    const timer = setTimeout(() => {
+      const expression = `${currSym} ${formatCurrency(result.total, locale)} zakatable • Nisab ${currSym} ${formatCurrency(result.nisab, locale)}`;
+      const resultStr =
+        result.zakatDue > 0
+          ? `${t("zakat.summary.zakatDue")} ${currSym} ${formatCurrency(result.zakatDue, locale)}`
+          : t("zakat.summary.belowNisab");
+      const url = buildShareUrl(state, ZAKAT_URL_SCHEMA);
+      onCalculate(expression, resultStr, url);
+      lastRecordedSignatureRef.current = signature;
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [result.total, result.zakatDue, result.nisab, state.currency, onCalculate, currSym, locale, t]);
 
   // ─── Status colour ────────────────────────────────────────────────────────────
   const { percentOfNisab, zakatDue, nisab, total } = result;

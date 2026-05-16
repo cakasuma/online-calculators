@@ -16,6 +16,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { formatInputValue, formatCurrency } from "@/lib/i18n";
 import {
   boolField,
+  buildShareUrl,
   mergeFromUrl,
   numberField,
   stringField,
@@ -33,7 +34,7 @@ import {
 } from "recharts";
 
 interface Props {
-  onCalculate: (expression: string, result: string) => void;
+  onCalculate: (expression: string, result: string, url?: string) => void;
 }
 
 // ─── Currencies ───────────────────────────────────────────────────────────────
@@ -892,7 +893,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
     const expr = `Faraid (${form.currency}): ${form.totalEstate}`;
     const res = `Net: ${formatAmount(net)} | ${dist.heirs.length} heirs`;
-    onCalculate(expr, res);
+    const url = buildShareUrl(form, FARAID_URL_SCHEMA);
+    onCalculate(expr, res, url);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, locale, onCalculate]);
 

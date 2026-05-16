@@ -141,8 +141,8 @@ function Layout() {
 
   const handleCalculate = useCallback(
     (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat") =>
-      (expression: string, result: string) => {
-        history.add(calculator, expression, result);
+      (expression: string, result: string, url?: string) => {
+        history.add(calculator, expression, result, url);
       },
     [history],
   );
@@ -270,7 +270,7 @@ function Layout() {
               <CalculatorContent slug="wasiat" />
             </Route>
             <Route path="/zakat">
-              <ZakatCalculator />
+              <ZakatCalculator onCalculate={handleCalculate("zakat")} />
               <CalculatorContent slug="zakat" />
             </Route>
             <Route path="/privacy" component={PrivacyPolicy} />

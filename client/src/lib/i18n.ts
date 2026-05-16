@@ -128,6 +128,7 @@ const translations = {
   "nav.faraid": { en: "Faraid", ms: "Faraid", id: "Faraid" },
   "nav.wasiat": { en: "Wasiat", ms: "Wasiat", id: "Wasiat" },
   "common.history": { en: "History", ms: "Sejarah", id: "Riwayat" },
+  "history.open": { en: "Open", ms: "Buka", id: "Buka" },
   "common.noHistory": { en: "No history yet", ms: "Tiada sejarah", id: "Belum ada riwayat" },
   "common.historyHint": { en: "Your calculations will appear here", ms: "Pengiraan Anda akan muncul di sini", id: "Perhitungan Anda akan muncul di sini" },
   "common.clear": { en: "Clear", ms: "Padam", id: "Hapus" },

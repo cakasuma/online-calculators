@@ -9,6 +9,7 @@ import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
+  buildShareUrl,
   enumField,
   mergeFromUrl,
   numberField,
@@ -237,7 +238,7 @@ const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
 };
 
 interface Props {
-  onCalculate?: (expression: string, result: string) => void;
+  onCalculate?: (expression: string, result: string, url?: string) => void;
 }
 
 export default function SalaryCalculator({ onCalculate }: Props = {}) {
@@ -314,7 +315,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
       const bonus = Math.round(parsedInput.annualBonus);
       const expression = `RM ${gross}/mo${bonus ? ` + RM ${bonus} bonus` : ""} • ${parsedInput.residentStatus} • ${parsedInput.workerType}`;
       const resultStr = `Net RM ${Math.round(result.monthlyNet)}/mo • Tax RM ${Math.round(result.annualIncomeTax)}/yr`;
-      onCalculate(expression, resultStr);
+      const url = buildShareUrl(parsedInput, SALARY_URL_SCHEMA);
+      onCalculate(expression, resultStr, url);
     }
   }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Share2, Check, Mail, X } from "lucide-react";
+import { Share2, Check, Mail, X, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLocale } from "@/hooks/use-locale";
@@ -107,41 +107,41 @@ export function ShareButton<T>({ calculator, state, schema, className }: ShareBu
     <>
       <Button
         type="button"
-        variant="outline"
-        size="sm"
+        variant="default"
+        size="default"
         onClick={handleShare}
-        className={`gap-1.5 ${className ?? ""}`}
+        className={`gap-2 font-semibold shadow-sm ${className ?? ""}`}
         data-testid="button-share"
-        aria-label={t("share.button")}
+        aria-label={t("share.action")}
       >
         {copied ? (
           <>
-            <Check className="w-3.5 h-3.5" />
+            <Check className="w-4 h-4" />
             <span>{t("share.copiedShort")}</span>
           </>
         ) : (
           <>
-            <Share2 className="w-3.5 h-3.5" />
-            <span>{t("share.button")}</span>
+            <LinkIcon className="w-4 h-4" />
+            <span>{t("share.action")}</span>
           </>
         )}
       </Button>
 
       {showNewsletter && (
         <div
-          className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-4"
+          className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 sm:max-w-sm animate-in slide-in-from-bottom-4"
           role="dialog"
           aria-labelledby="share-newsletter-title"
         >
-          <div className="relative">
+          <div className="relative rounded-xl border bg-popover text-popover-foreground shadow-2xl ring-1 ring-black/5">
             <button
               type="button"
               onClick={() => setShowNewsletter(false)}
-              className="absolute top-2 right-2 z-10 p-1 rounded-md hover:bg-muted text-muted-foreground"
+              className="absolute top-2.5 right-2.5 z-10 p-1.5 rounded-md hover:bg-muted text-muted-foreground"
               aria-label={t("share.newsletter.dismiss")}
               data-testid="button-newsletter-dismiss"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
             <LeadCaptureCard
               calculator={calculator}
@@ -154,6 +154,7 @@ export function ShareButton<T>({ calculator, state, schema, className }: ShareBu
               successMessage={t("share.newsletter.successDesc")}
               icon={<Mail className="w-4 h-4 text-primary" />}
               disclaimer={t("share.newsletter.disclaimer")}
+              className="!border-transparent !bg-transparent !shadow-none"
             />
           </div>
         </div>

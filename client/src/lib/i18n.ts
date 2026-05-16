@@ -140,7 +140,12 @@ const translations = {
 
   // ── Share ──
   "share.button": { en: "Share", ms: "Kongsi", id: "Bagikan" },
-  "share.copiedShort": { en: "Copied", ms: "Disalin", id: "Disalin" },
+  "share.action": {
+    en: "Copy share link",
+    ms: "Salin pautan kongsi",
+    id: "Salin tautan bagikan",
+  },
+  "share.copiedShort": { en: "Link copied!", ms: "Pautan disalin!", id: "Tautan disalin!" },
   "share.copied": { en: "Link copied", ms: "Pautan disalin", id: "Tautan disalin" },
   "share.copiedDesc": {
     en: "Anyone you send it to will see the same calculation.",

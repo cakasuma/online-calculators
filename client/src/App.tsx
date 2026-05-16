@@ -140,7 +140,7 @@ function Layout() {
   }, [adsenseEnabled]);
 
   const handleCalculate = useCallback(
-    (calculator: "normal" | "scientific" | "faraid") =>
+    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat") =>
       (expression: string, result: string) => {
         history.add(calculator, expression, result);
       },
@@ -250,7 +250,7 @@ function Layout() {
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/salary">
-              <SalaryCalculator />
+              <SalaryCalculator onCalculate={handleCalculate("salary")} />
               <CalculatorContent slug="salary" />
             </Route>
             <Route path="/normal">

@@ -236,7 +236,11 @@ const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
   residentStatus: enumField<SalaryUrlState, "residentStatus">("res", ["resident", "non-resident"]),
 };
 
-export default function SalaryCalculator() {
+interface Props {
+  onCalculate?: (expression: string, result: string) => void;
+}
+
+export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
   // Read URL params once on mount to pre-fill the form when a user opens a
   // shared link. Falls back to DEFAULT_INPUTS for any missing/invalid params.
@@ -301,6 +305,17 @@ export default function SalaryCalculator() {
     };
     track("calculator_complete", { calculator: "salary", ...props });
     recordServerEvent({ calculator: "salary", event: "calculator_complete", payload: props });
+
+    // Record an entry in the local calculation history so the user can recall
+    // this scenario later. Expression carries the headline inputs; result
+    // carries the take-home and annual tax.
+    if (onCalculate) {
+      const gross = Math.round(parsedInput.monthlySalary);
+      const bonus = Math.round(parsedInput.annualBonus);
+      const expression = `RM ${gross}/mo${bonus ? ` + RM ${bonus} bonus` : ""} • ${parsedInput.residentStatus} • ${parsedInput.workerType}`;
+      const resultStr = `Net RM ${Math.round(result.monthlyNet)}/mo • Tax RM ${Math.round(result.annualIncomeTax)}/yr`;
+      onCalculate(expression, resultStr);
+    }
   }
 
   const takeHomeRatio =
@@ -464,15 +479,6 @@ export default function SalaryCalculator() {
               {hasCalculated ? "Recalculate take-home pay" : "Calculate my take-home pay"}
               <ArrowRight className="h-4 w-4" />
             </Button>
-            {showResults && (
-              <div className="flex items-center justify-end pt-1">
-                <ShareButton
-                  calculator="salary"
-                  state={parsedInput}
-                  schema={SALARY_URL_SCHEMA}
-                />
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -542,14 +548,21 @@ export default function SalaryCalculator() {
           {showResults && (
             <Card className="rounded-3xl shadow-sm">
               <CardContent className="p-6">
-                <div className="mb-5 flex items-center justify-between gap-4">
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-semibold">{t("salary.annual.title")}</h2>
                     <p className="text-sm text-muted-foreground">{t("salary.annual.subtitle")}</p>
                   </div>
-                  <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
-                    <Download className="h-4 w-4" /> {t("salary.save")}
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <ShareButton
+                      calculator="salary"
+                      state={parsedInput}
+                      schema={SALARY_URL_SCHEMA}
+                    />
+                    <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
+                      <Download className="h-4 w-4" /> {t("salary.save")}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-3">
                   {([

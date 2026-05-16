@@ -1,4 +1,4 @@
-import { Clock, Trash2, Calculator, FlaskConical, Scale } from "lucide-react";
+import { Clock, Trash2, Calculator, FlaskConical, Scale, Wallet, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { HistoryEntry } from "@/lib/history";
@@ -9,12 +9,16 @@ const calcIcon: Record<HistoryEntry["calculator"], typeof Calculator> = {
   normal: Calculator,
   scientific: FlaskConical,
   faraid: Scale,
+  salary: Wallet,
+  zakat: Star,
 };
 
 const calcLabelKey: Record<HistoryEntry["calculator"], TranslationKey> = {
   normal: "nav.basic",
   scientific: "nav.scientific",
   faraid: "nav.faraid",
+  salary: "nav.salary",
+  zakat: "nav.zakat",
 };
 
 function formatTime(ts: number, locale: string): string {

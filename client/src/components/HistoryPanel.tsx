@@ -4,7 +4,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { HistoryEntry } from "@/lib/history";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
-import { useLocation } from "wouter";
 
 const calcIcon: Record<HistoryEntry["calculator"], typeof Calculator> = {
   normal: Calculator,
@@ -43,20 +42,22 @@ interface Props {
 
 export function HistoryPanel({ entries, onClear, onRemove, onUseEntry }: Props) {
   const { t, locale } = useLocale();
-  const [, navigate] = useLocation();
 
-  // Navigate to the share URL stored on the entry. Same-origin URLs use the
-  // wouter router (preserving SPA state); external links fall back to a full
-  // navigation. Returns false if the entry has no url.
+  // Open the entry's share URL. We deliberately use a full navigation rather
+  // than SPA navigation for two reasons:
+  //  1. The app's wouter Router has base="/${locale}", which would cause
+  //     navigate("/en/salary?...") to be re-prefixed into /en/en/salary.
+  //     Stripping the locale ahead of time is brittle (and breaks if we ever
+  //     change the base shape).
+  //  2. Calculator pages read URL params once on mount via mergeFromUrl. SPA
+  //     navigation keeps the component mounted, so the form state would not
+  //     pick up the new params even if routing worked.
+  // A full assign is fast on the same origin (assets cached) and guarantees
+  // the recipient calculator boots from a clean state with the shared params.
   const openEntry = (entry: HistoryEntry): boolean => {
     if (!entry.url) return false;
     try {
-      const u = new URL(entry.url, window.location.origin);
-      if (u.origin === window.location.origin) {
-        navigate(u.pathname + u.search + u.hash);
-      } else {
-        window.location.href = entry.url;
-      }
+      window.location.assign(entry.url);
       return true;
     } catch {
       return false;

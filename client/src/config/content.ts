@@ -1,0 +1,845 @@
+// Long-form content shown beneath each calculator. Rendered by
+// CalculatorContent in the client AND serialized by the prerender script so
+// crawlers see the prose even before JavaScript hydrates.
+//
+// Keep this file plain data — no imports beyond types — so it can be consumed
+// by the Node build step as well as the React app.
+
+import type { Locale } from "@/lib/i18n";
+import type { RouteSlug } from "@/config/seo";
+
+export interface ContentSection {
+  heading: string;
+  /** Plain text or simple HTML strings. Each entry renders as a <p>. */
+  paragraphs: string[];
+}
+
+export interface ContentExample {
+  title: string;
+  given: string[];
+  result: string;
+}
+
+export interface ContentFaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface ContentRateTable {
+  heading: string;
+  columns: string[];
+  rows: string[][];
+  /** Optional caption shown above the table. */
+  caption?: string;
+  /** Optional footnote shown below the table. */
+  note?: string;
+}
+
+export interface CalculatorContent {
+  intro: string;
+  howItWorks: ContentSection;
+  formula?: ContentSection;
+  rateTable?: ContentRateTable;
+  examples?: ContentExample[];
+  faq: ContentFaqItem[];
+  /** Slugs of related calculators (linked at the bottom of each page). */
+  related: RouteSlug[];
+  /** Last reviewed date (ISO) — surfaced as "Updated …" for trust. */
+  lastReviewed?: string;
+}
+
+type ContentMap = Partial<Record<RouteSlug, Record<Locale, CalculatorContent>>>;
+
+export const calculatorContent: ContentMap = {
+  salary: {
+    en: {
+      intro:
+        "Estimate your Malaysia monthly take-home pay after EPF, SOCSO, EIS, and PCB. This calculator uses 2026 statutory rates for residents, non-residents, Malaysian citizens, and foreign workers, and accounts for annual bonuses when computing the monthly PCB withholding.",
+      howItWorks: {
+        heading: "How the Malaysia salary calculator works",
+        paragraphs: [
+          "Your gross monthly salary is the starting point. From that figure, four statutory deductions are taken before you receive your net pay: EPF (Employees Provident Fund / KWSP), SOCSO (Social Security Organisation / PERKESO), EIS (Employment Insurance System), and PCB (Potongan Cukai Bulanan, the monthly income tax withholding).",
+          "EPF is split between you and your employer. For employees aged below 60, the standard employee rate is 11% of monthly wages while employers contribute 12% (or 13% for wages of RM5,000 and below). The employee rate dropped temporarily during COVID-era policies but has now returned to 11% as the default; you can choose to contribute more on a voluntary basis.",
+          "SOCSO and EIS are tiered contributions capped at a wage ceiling. SOCSO covers occupational injury and invalidity (Schemes I and II), while EIS provides income replacement for retrenched workers for up to six months. The combined employee share is typically below 1% of monthly wages, but the employer share is meaningful and shown separately in your payslip.",
+          "PCB is the trickiest line. Each month, your employer estimates how much income tax you will owe for the full calendar year — based on your year-to-date gross income, EPF, and any reliefs you have declared on Form TP1 — then divides that estimate so it is spread evenly across the remaining months. When you file your return in April–May, the actual tax is reconciled against the PCB already paid; over-withholding is refunded.",
+          "Residents (in Malaysia for at least 182 days in a calendar year) are taxed on a progressive scale from 0% to 30%. Non-residents and short-term visitors are taxed at a flat 30% on Malaysian-sourced employment income, with no access to most reliefs and rebates.",
+        ],
+      },
+      formula: {
+        heading: "Salary deduction formulas",
+        paragraphs: [
+          "Net monthly take-home = Gross salary − EPF − SOCSO − EIS − PCB.",
+          "EPF (employee, default) = 11% × gross monthly wage, rounded up to the nearest ringgit. The combined employer + employee contribution feeds two accounts (Akaun Persaraan 75% and Akaun Sejahtera 25% under the 2024 restructure).",
+          "SOCSO (employee) is calculated from a tiered table where the maximum employee contribution is RM 24.75 per month for wages of RM 4,000 and above. The employer share for the same band is RM 86.65.",
+          "EIS (employee) = 0.2% of monthly wages, capped at RM 9.90 per month (wage ceiling RM 5,000). Employer contributes a matching 0.2%.",
+          "PCB (resident) = MAX(0, lookup(annualised taxable income − reliefs, progressive brackets) − previously-paid PCB − zakat paid through payroll) ÷ months remaining in the year. Non-resident PCB = 30% × monthly chargeable income.",
+        ],
+      },
+      rateTable: {
+        heading: "Malaysia resident income tax brackets (2026)",
+        columns: ["Chargeable income (RM)", "Marginal rate", "Tax on band (RM)"],
+        rows: [
+          ["0 – 5,000", "0%", "0"],
+          ["5,001 – 20,000", "1%", "150"],
+          ["20,001 – 35,000", "3%", "450"],
+          ["35,001 – 50,000", "6%", "900"],
+          ["50,001 – 70,000", "11%", "2,200"],
+          ["70,001 – 100,000", "19%", "5,700"],
+          ["100,001 – 400,000", "25%", "75,000"],
+          ["400,001 – 600,000", "26%", "52,000"],
+          ["600,001 – 2,000,000", "28%", "392,000"],
+          ["Above 2,000,000", "30%", "—"],
+        ],
+        note: "Tax is computed cumulatively across all bands. Reliefs (EPF, life insurance, lifestyle, SSPN, medical, etc.) reduce chargeable income before this table is applied.",
+      },
+      examples: [
+        {
+          title: "Example 1 — RM 6,000 salary, Malaysian resident, no dependants",
+          given: [
+            "Monthly gross: RM 6,000",
+            "EPF rate: 11%",
+            "Annual bonus: RM 0",
+            "Other declared relief beyond EPF: RM 0",
+          ],
+          result:
+            "EPF RM 660/month, SOCSO RM 24.75, EIS RM 9.90, PCB roughly RM 95–110 depending on reliefs claimed. Estimated monthly take-home: ~RM 5,200.",
+        },
+        {
+          title: "Example 2 — RM 12,000 salary + RM 12,000 annual bonus",
+          given: [
+            "Monthly gross: RM 12,000",
+            "EPF rate: 11%",
+            "Annual bonus paid in December: RM 12,000",
+          ],
+          result:
+            "Annualised income RM 156,000 lands in the 25% marginal bracket. Monthly take-home settles around RM 9,300–9,500; the December bonus month has a higher PCB because the entire bonus is taxed at the marginal rate in that period.",
+        },
+        {
+          title: "Example 3 — RM 8,000 salary, non-resident",
+          given: ["Monthly gross: RM 8,000", "Resident status: Non-resident", "EPF: not contributing"],
+          result:
+            "PCB = 30% × RM 8,000 = RM 2,400. SOCSO/EIS may still apply depending on the work permit. Estimated take-home ~RM 5,600 before any employer-side deductions.",
+        },
+      ],
+      faq: [
+        {
+          question: "Is the take-home pay shown my final salary?",
+          answer:
+            "No — it is an estimate. PCB is reconciled annually when you file taxes (Form BE for employees with employment income only, Form B for those with business income). Reliefs, rebates, and zakat payments can lower your final tax bill, often resulting in a small refund.",
+        },
+        {
+          question: "What is the difference between PCB and income tax?",
+          answer:
+            "PCB is the monthly amount your employer withholds and remits to LHDN on your behalf. Your final income tax is what the law actually requires you to pay, calculated when you file your annual tax return. PCB is a pre-payment toward that final amount.",
+        },
+        {
+          question: "Do foreign workers contribute to EPF?",
+          answer:
+            "EPF contribution is voluntary for foreign workers (those holding a work pass other than permanent residence). If they opt in, the employee rate is 11% and the employer rate is a fixed RM 5 per month per worker. SOCSO is mandatory for foreign workers under the Employees' Social Security Act since 1 January 2019.",
+        },
+        {
+          question: "How are bonuses taxed in Malaysia?",
+          answer:
+            "Bonuses are added to your annual taxable income and taxed at your marginal rate. In the month a bonus is paid, your employer applies a specific PCB formula that may make that month's deduction look unusually large, but the annual total is unchanged. A larger bonus simply pushes part of your annual income into the next higher bracket.",
+        },
+        {
+          question: "What if I am a non-resident for tax purposes?",
+          answer:
+            "Non-residents (in Malaysia for fewer than 182 days in a calendar year) are taxed at a flat 30% on Malaysian-sourced employment income, with no access to most reliefs and rebates. Tax treaties may offer relief if you are taxed in your home country on the same income.",
+        },
+        {
+          question: "Can I lower my PCB by submitting reliefs to my employer?",
+          answer:
+            "Yes — fill out Form TP1 to declare reliefs (life insurance, medical, lifestyle, SSPN, EPF beyond the default, etc.) and Form TP3 to declare zakat paid. Your employer will reduce subsequent PCB withholdings accordingly, improving your monthly cash flow.",
+        },
+        {
+          question: "Does this calculator include the EPF i-Saraan / voluntary contribution?",
+          answer:
+            "No. The calculator uses the statutory employee rate (default 11%). Voluntary contributions through i-Saraan or self-top-ups are separate and may qualify for additional tax relief up to the applicable cap.",
+        },
+        {
+          question: "What about SOCSO and EIS for company directors?",
+          answer:
+            "Owners and directors who draw a salary through PAYE are typically subject to SOCSO and EIS like other employees. Sole-proprietors and partners are not — but they can opt in via the Self-Employment Social Security Scheme (SKSPS).",
+        },
+      ],
+      related: ["zakat", "faraid", "wasiat"],
+      lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Anggaran gaji bersih bulanan Malaysia selepas potongan wajib. Kalkulator ini menerapkan EPF, SOCSO, EIS, dan PCB (pemotongan cukai bulanan) berdasarkan kadar 2026.",
+      howItWorks: {
+        heading: "Cara kerja kalkulator gaji Malaysia",
+        paragraphs: [
+          "Gaji kotor bulanan adalah titik awal. Daripada sana, kontribusi wajib dipotong: EPF, SOCSO, EIS, dan PCB.",
+          "Karyawan di bawah 60 tahun secara default berkontribusi 11% ke EPF; Anda boleh menyesuaikan ke 7% atau tahap sukarela lebih tinggi.",
+          "PCB dikira dengan menyetahunkan pendapatan kotor, menerapkan keringanan cukai yang berlaku, mencari kurung cukai progresif untuk pemastautin, lalu membaginya 12.",
+        ],
+      },
+      formula: {
+        heading: "Rumus potongan gaji",
+        paragraphs: [
+          "Gaji bersih = Gaji kotor − EPF − SOCSO − EIS − PCB.",
+          "EPF (karyawan, default) = 11% × gaji kotor bulanan.",
+          "PCB (pemastautin) = lookup(pendapatan tahunan kena cukai, kurung progresif) ÷ 12.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah hasilnya adalah gaji final saya?",
+          answer:
+            "Ini perkiraan. PCB direkonsiliasi saat Anda mengisi SPT tahunan; keringanan, rabat, dan pembayaran zakat boleh menurunkan cukai akhir Anda.",
+        },
+        {
+          question: "Apa beda PCB dan cukai pendapatan?",
+          answer:
+            "PCB adalah jumlah bulanan yang dipotong majikan dan disetor ke LHDN; cukai final dikira saat pelaporan tahunan, dan PCB adalah pembayaran di muka untuk itu.",
+        },
+      ],
+      related: ["zakat", "scientific", "faraid"],
+      lastReviewed: "2026-01-01",
+    },
+    id: {
+      intro:
+        "Estimasi gaji bersih bulanan Malaysia setelah potongan wajib. Kalkulator ini menerapkan EPF, SOCSO, EIS, dan PCB (pemotongan pajak bulanan) berdasarkan tarif 2026.",
+      howItWorks: {
+        heading: "Cara kerja kalkulator gaji Malaysia",
+        paragraphs: [
+          "Gaji kotor bulanan adalah titik awal. Dari sana, kontribusi wajib dipotong: EPF, SOCSO, EIS, dan PCB.",
+          "Karyawan di bawah 60 tahun secara default berkontribusi 11% ke EPF; Anda dapat menyesuaikan ke 7% atau tingkat sukarela lebih tinggi.",
+          "PCB dihitung dengan menyetahunkan pendapatan kotor, menerapkan keringanan pajak yang berlaku, mencari kurung pajak progresif untuk penduduk, lalu membaginya 12.",
+        ],
+      },
+      formula: {
+        heading: "Rumus potongan gaji",
+        paragraphs: [
+          "Gaji bersih = Gaji kotor − EPF − SOCSO − EIS − PCB.",
+          "EPF (karyawan, default) = 11% × gaji kotor bulanan.",
+          "PCB (penduduk) = lookup(pendapatan tahunan kena pajak, kurung progresif) ÷ 12.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah hasilnya adalah gaji final saya?",
+          answer:
+            "Ini perkiraan. PCB direkonsiliasi saat Anda mengisi SPT tahunan; keringanan, rabat, dan pembayaran zakat dapat menurunkan pajak akhir Anda.",
+        },
+        {
+          question: "Apa beda PCB dan pajak penghasilan?",
+          answer:
+            "PCB adalah jumlah bulanan yang dipotong majikan dan disetor ke LHDN; pajak final dihitung saat pelaporan tahunan, dan PCB adalah pembayaran di muka untuk itu.",
+        },
+      ],
+      related: ["zakat", "scientific", "faraid"],
+      lastReviewed: "2026-01-01",
+    },
+  },
+
+  zakat: {
+    en: {
+      intro:
+        "Calculate your annual zakat harta (wealth zakat) across cash, savings, gold, silver, investment portfolios, and business assets. The calculator applies the standard 2.5% rate against your net zakatable wealth and compares the total against the prevailing nisab so you instantly see whether zakat is due.",
+      howItWorks: {
+        heading: "How zakat is calculated",
+        paragraphs: [
+          "Zakat al-mal (wealth zakat) is obligatory on wealth that has been held for at least one full Islamic (lunar) year — called the hawl — and that exceeds the nisab threshold. The rate that applies to most asset classes is 2.5%.",
+          "The nisab is typically pegged to the market value of 85 grams of pure gold (and, alternatively, 595 grams of silver — whichever is lower is sometimes used to protect lower-income Muslims). Malaysian state zakat authorities such as PPZ, LZS-MAIWP, MAIWP, and others publish the current nisab in ringgit each year, updated as gold prices move.",
+          "From the total of your zakatable assets, you may deduct allowable liabilities. These are typically short-term debts due within the hawl: an outstanding credit-card balance, a personal loan instalment, family maintenance arrears, and similar. Long-term liabilities such as a 20-year housing loan are usually deducted only by the instalment due within the year, not the full principal.",
+          "Once the net zakatable wealth is computed, compare it against the nisab. If it is below the nisab, no zakat is due for that hawl. If it equals or exceeds the nisab, the entire net amount (not just the portion above the threshold) is multiplied by 2.5%.",
+          "Some specific asset classes have their own rules. Zakat on agricultural produce uses 5% or 10% depending on irrigation. Zakat on business inventory follows the standard 2.5% but is computed on net working capital. EPF balances become zakatable upon withdrawal, with state authorities differing slightly on the exact mechanism (paying once upfront vs. annually after withdrawal).",
+        ],
+      },
+      formula: {
+        heading: "Zakat formula",
+        paragraphs: [
+          "Zakat due = 2.5% × (Zakatable assets − Allowable liabilities), if (Zakatable assets − Allowable liabilities) ≥ Nisab.",
+          "Zakatable assets include: cash on hand, current and savings account balances, fixed deposits, gold and silver above personal-use thresholds, business inventory and receivables, investment-grade unit trusts, shares held for trading, ASB / ASM units, and similar.",
+          "Excluded (not zakatable): primary residence, the vehicle you use daily, personal jewellery within customary limits (4-9 mayam in many Malaysian states), tools of your trade, and household furnishings.",
+          "Net wealth that falls below nisab is exempt — even by a single ringgit. Wealth slightly above nisab is fully zakatable.",
+        ],
+      },
+      rateTable: {
+        heading: "Zakat rates by asset class",
+        columns: ["Asset class", "Rate", "Notes"],
+        rows: [
+          ["Cash, savings, fixed deposit", "2.5%", "On the lowest balance held for one full hawl, or the balance at year-end (state-dependent)."],
+          ["Gold (investment)", "2.5%", "On value once total weight exceeds the personal-use threshold."],
+          ["Silver", "2.5%", "Same principle as gold; nisab is 595g of silver."],
+          ["Business inventory & receivables", "2.5%", "Net of trade payables. Computed at year-end stocktake."],
+          ["ASB / ASM / unit trusts", "2.5%", "On market value; some state councils accept a simplified method."],
+          ["Agricultural produce", "5% – 10%", "10% rain-fed; 5% irrigated. Only certain staples (e.g. rice)."],
+          ["Livestock", "Tiered", "Camel, cattle, sheep — fixed-quantity rules from classical fiqh."],
+          ["EPF / pension lump sums", "2.5%", "Typically zakatable upon withdrawal; rules vary by state."],
+        ],
+        note: "Always confirm with your state zakat authority for the exact computation and nisab in any given year.",
+      },
+      examples: [
+        {
+          title: "Example 1 — Mid-career professional",
+          given: [
+            "Cash & savings: RM 80,000",
+            "ASB / unit trusts: RM 30,000",
+            "Gold (investment): RM 10,000",
+            "Short-term debts: RM 5,000",
+            "Nisab (assumed): RM 24,000",
+          ],
+          result:
+            "Net zakatable wealth = RM 115,000, which is above the nisab. Zakat due = 2.5% × RM 115,000 = RM 2,875.",
+        },
+        {
+          title: "Example 2 — Young saver below nisab",
+          given: [
+            "Cash & savings: RM 18,000",
+            "Gold: RM 2,000",
+            "Nisab (assumed): RM 24,000",
+          ],
+          result:
+            "Net wealth = RM 20,000, below the RM 24,000 nisab. No zakat is due this hawl; the wealth is tracked again next year.",
+        },
+        {
+          title: "Example 3 — Business owner",
+          given: [
+            "Inventory at year-end: RM 250,000",
+            "Trade receivables: RM 40,000",
+            "Trade payables: RM 60,000",
+            "Cash (business): RM 30,000",
+          ],
+          result:
+            "Net zakatable working capital = 250,000 + 40,000 + 30,000 − 60,000 = RM 260,000. Zakat = 2.5% × RM 260,000 = RM 6,500.",
+        },
+      ],
+      faq: [
+        {
+          question: "What is nisab?",
+          answer:
+            "Nisab is the minimum threshold of wealth above which zakat becomes obligatory. It is most commonly tied to the market value of 85 grams of pure gold. Malaysian state zakat authorities publish the prevailing nisab each year.",
+        },
+        {
+          question: "Is my house or car included in zakatable assets?",
+          answer:
+            "No. Personal-use assets such as your primary residence, daily-use vehicle, household furnishings, and personal jewellery within customary limits are excluded. A second house held for rental income is treated differently — the rental cash flow is zakatable, but the property itself usually is not.",
+        },
+        {
+          question: "When do I pay zakat?",
+          answer:
+            "Once your zakatable wealth has remained above the nisab for one full Islamic (hijri) year (the hawl). Most muzakki choose a fixed anniversary date — for example, the start of Ramadan or a calendar date — and reconcile annually.",
+        },
+        {
+          question: "Can I pay zakat to multiple recipients?",
+          answer:
+            "Yes — the Qur'an specifies eight asnaf (recipient) categories. In Malaysia, most zakat is paid through state authorities (PPZ, LZS-MAIWP, MAIWP, MUIS-equivalents) which distribute on your behalf to all eight asnaf in the prescribed proportions.",
+        },
+        {
+          question: "Is zakat deductible from income tax?",
+          answer:
+            "Yes — zakat paid to a recognised institution is a rebate against income tax payable in Malaysia, not just a relief. The rebate equals the zakat paid, capped at your tax liability for the year, so it can entirely offset your tax bill.",
+        },
+        {
+          question: "How is EPF zakat handled?",
+          answer:
+            "Most state authorities require zakat on EPF only at the point of withdrawal — either as a one-off 2.5% on the lump sum (preferred by many councils) or annually thereafter on the remaining balance. Some muzakki pay annually on EPF balances even before withdrawal; check with your state authority.",
+        },
+        {
+          question: "What if I have shared assets with a spouse?",
+          answer:
+            "Each spouse computes zakat on their own share of jointly-held assets. Joint bank accounts are typically split 50/50 unless documented otherwise; pre-marital assets remain individually owned for zakat purposes.",
+        },
+      ],
+      related: ["salary", "faraid", "wasiat"],
+      lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Kira zakat harta tahunan untuk simpanan, emas, perak, pelaburan, dan aset perniagaan berdasarkan panduan nisab Malaysia terkini.",
+      howItWorks: {
+        heading: "Cara zakat dikira",
+        paragraphs: [
+          "Zakat wajib atas harta yang telah dimiliki selama satu tahun hijriah (haul) dan melebihi nisab. Kadar standar adalah 2,5%.",
+          "Nisab biasanya dikaitkan dengan nilai 85 gram emas murni.",
+          "Daripada total aset wajib zakat, kurangi kewajiban jangka pendek untuk memperoleh kekayaan bersih wajib zakat.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apa itu nisab?",
+          answer:
+            "Nisab adalah batas minimum kekayaan yang membuat zakat wajib. Umumnya dipatok pada nilai 85 gram emas murni.",
+        },
+      ],
+      related: ["salary", "faraid", "wasiat"],
+      lastReviewed: "2026-01-01",
+    },
+    id: {
+      intro:
+        "Hitung zakat harta tahunan untuk tabungan, emas, perak, investasi, dan aset usaha berdasarkan panduan nisab Malaysia terkini.",
+      howItWorks: {
+        heading: "Cara zakat dihitung",
+        paragraphs: [
+          "Zakat wajib atas harta yang telah dimiliki selama satu tahun hijriah (haul) dan melebihi nisab. Tarif standar adalah 2,5%.",
+          "Nisab biasanya dikaitkan dengan nilai 85 gram emas murni.",
+          "Dari total aset wajib zakat, kurangi kewajiban jangka pendek untuk memperoleh kekayaan bersih wajib zakat.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apa itu nisab?",
+          answer:
+            "Nisab adalah batas minimum kekayaan yang membuat zakat wajib. Umumnya dipatok pada nilai 85 gram emas murni.",
+        },
+      ],
+      related: ["salary", "faraid", "wasiat"],
+      lastReviewed: "2026-01-01",
+    },
+  },
+
+  faraid: {
+    en: {
+      intro:
+        "Faraid is the Islamic system for distributing a deceased Muslim's estate among heirs. This calculator applies standard Sunni jurisprudence — as practised in Malaysia by Syariah courts — to the most common family configurations. Enter the surviving heirs and the estate value to see each heir's fixed share, any residual (asabah), and the final ringgit amount per person.",
+      howItWorks: {
+        heading: "How faraid distribution works",
+        paragraphs: [
+          "Before faraid is applied, four pre-distribution items must be settled from the estate, in this order: (1) funeral and burial expenses; (2) outstanding debts owed by the deceased — including unpaid zakat, kifarah, mahar, and conventional debts; (3) valid wasiat to non-heirs, capped at one-third of the residue; and (4) any harta sepencarian (jointly-acquired marital property) due to the surviving spouse.",
+          "Whatever remains after these deductions is the net distributable estate. Faraid then divides this net estate among two classes of heirs: Quranic heirs (ashab al-furud), whose shares are explicitly fixed by the Qur'an, and residuary heirs (asabah), who receive whatever surplus is left after the Quranic shares are paid out.",
+          "If the Quranic shares sum to less than the whole net estate, the residual passes to the male agnatic line — typically sons (and through them, grandsons), then the father, then brothers, then paternal uncles. If there are no asabah, the surplus reverts (radd) back to the Quranic heirs in proportion to their shares, with the spouse usually excluded from this reversion.",
+          "Two special doctrines occasionally apply. Awl (proportional reduction) is used when the sum of fixed shares exceeds one — every share is scaled down so the total adds up to one. Hajb (exclusion) blocks distant heirs in favour of closer ones — for example, a grandson is excluded if the deceased's son is alive.",
+          "The calculator handles these standard cases, but it is a planning aid only. Complex situations — non-Muslim heirs, adopted children, conflicting paternity, missing or unborn heirs, harta sepencarian disputes — should be referred to a Malaysian Syariah Court or qualified Syariah lawyer.",
+        ],
+      },
+      formula: {
+        heading: "Common fixed shares",
+        paragraphs: [
+          "Husband: 1/4 (when the deceased wife has surviving descendants) or 1/2 (no surviving descendants).",
+          "Wife / wives: 1/8 (with surviving descendants) or 1/4 (without), divided equally if multiple wives.",
+          "Daughter: 1/2 if she is the only daughter and there is no son; 2/3 split among two or more daughters with no son; ta'sib (residuary) at the rate of half a son's share when sons exist.",
+          "Son: residuary heir — receives twice the share of any daughter and inherits the entire residual if alone.",
+          "Mother: 1/6 if the deceased has children or two or more siblings; 1/3 otherwise (subject to the Umariyyatan adjustment when spouse + both parents are the only heirs).",
+          "Father: 1/6 as a fixed share if the deceased has a son or son-of-son; residuary heir otherwise, with the right to a fixed 1/6 in addition to any residual when daughters but no sons survive.",
+          "Full sister: 1/2 (one only, no son/daughter/father), 2/3 (two+, same conditions), or residuary alongside brothers (kalalah cases).",
+          "Half-siblings (uterine): 1/6 (one) or 1/3 split (two+), only when the deceased has no descendants or father.",
+        ],
+      },
+      rateTable: {
+        heading: "Quick reference — Quranic shares",
+        columns: ["Heir", "Share with descendants", "Share without descendants"],
+        rows: [
+          ["Husband", "1/4", "1/2"],
+          ["Wife (one or several, combined)", "1/8", "1/4"],
+          ["Daughter (one, no son)", "1/2", "1/2"],
+          ["Daughters (two+, no son)", "2/3 combined", "2/3 combined"],
+          ["Mother", "1/6", "1/3 (or special cases)"],
+          ["Father", "1/6 + residual if no son", "Residual"],
+          ["Full sister (one, no son/daughter/father)", "Not applicable (excluded)", "1/2"],
+          ["Full sisters (two+)", "Excluded", "2/3 combined"],
+        ],
+        note: "Shares can be adjusted by awl (proportional reduction) or radd (return) depending on the heir combination.",
+      },
+      examples: [
+        {
+          title: "Example 1 — Husband, mother, two daughters",
+          given: [
+            "Estate (net): RM 600,000",
+            "Surviving heirs: husband, mother, two daughters",
+          ],
+          result:
+            "Husband 1/4 = RM 150,000; Mother 1/6 = RM 100,000; Two daughters 2/3 split equally = RM 200,000 each. Total: RM 650,000. Awl reduces shares proportionally so the total = RM 600,000.",
+        },
+        {
+          title: "Example 2 — Wife, one son, one daughter",
+          given: [
+            "Estate (net): RM 900,000",
+            "Surviving heirs: wife, one son, one daughter",
+          ],
+          result:
+            "Wife 1/8 = RM 112,500. Remaining RM 787,500 split between son and daughter in 2:1 ratio: son RM 525,000, daughter RM 262,500.",
+        },
+      ],
+      faq: [
+        {
+          question: "Does faraid override a will (wasiat)?",
+          answer:
+            "For the bulk of the estate, yes. A Muslim may bequeath at most one-third of the estate by wasiat, and that one-third generally cannot go to existing Quranic heirs unless all other adult heirs consent after death. The remaining two-thirds (and the entire estate if no wasiat is made) is distributed by faraid.",
+        },
+        {
+          question: "What about jointly-owned property and harta sepencarian?",
+          answer:
+            "Harta sepencarian (jointly-acquired marital property) is settled separately by the Syariah Court before faraid is applied. The surviving spouse's share of harta sepencarian is removed from the estate first, and only the deceased's portion enters the faraid distribution.",
+        },
+        {
+          question: "Is this calculator a legal opinion?",
+          answer:
+            "No. It is a planning aid based on standard Sunni rules as commonly applied in Malaysia. Complex family situations — non-Muslim heirs, adopted children, missing persons, contested paternity, foreign assets — should be confirmed with a qualified Syariah lawyer or the Mahkamah Tinggi Syariah.",
+        },
+        {
+          question: "How are EPF, insurance, and Tabung Haji handled?",
+          answer:
+            "EPF, insurance payouts to a nominee, and Tabung Haji balances are not automatically excluded from faraid. In Malaysia, the nominee is treated as a trustee (wasi) who must distribute the proceeds according to faraid, not as an absolute beneficiary. Tabung Haji and similar agencies may release funds directly to the nominee for administrative simplicity, but the funds remain part of the faraid estate.",
+        },
+        {
+          question: "Do adopted children inherit by faraid?",
+          answer:
+            "Adopted children (anak angkat) do not inherit through faraid because Islamic law does not recognise legal adoption as creating an inheritance relationship. They may, however, receive up to one-third of the estate through wasiat or via hibah (gifts made during the deceased's lifetime).",
+        },
+        {
+          question: "What happens to debts the deceased owed?",
+          answer:
+            "All debts must be settled from the estate before any distribution. This includes unpaid zakat, mahar, kifarah, and conventional debts. If the estate cannot cover the debts, heirs are not personally liable, but they receive nothing until creditors are repaid.",
+        },
+        {
+          question: "Can non-Muslims inherit from a Muslim?",
+          answer:
+            "Direct inheritance by faraid requires the heir to also be Muslim. A non-Muslim spouse or child does not inherit by faraid, but the deceased may leave them up to one-third by wasiat. Some Malaysian practitioners also use hibah ruqba and other mechanisms to provide for non-Muslim family members.",
+        },
+      ],
+      related: ["wasiat", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Faraid adalah sistem Islam untuk membagi harta peninggalan seorang Muslim kepada waris. Kalkulator ini menerapkan kaedah Sunni yang umum.",
+      howItWorks: {
+        heading: "Cara pembahagian faraid",
+        paragraphs: [
+          "Selepas kos pengebumian, hutang, dan wasiat sah (maksimum sepertiga untuk non-waris) diselesaikan, sisanya dibahagikan kepada waris.",
+          "Bahagian setiap waris ditetapkan oleh Al-Qur'an atau menjadi sisa (asabah) bagi kerabat lelaki tertentu.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah faraid mengabaikan wasiat?",
+          answer:
+            "Wasiat hanya berlaku untuk maksimum sepertiga harta dan tidak boleh kepada waris kecuali waris lain setuju. Sisa harta dibahagikan menurut faraid.",
+        },
+      ],
+      related: ["wasiat", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
+    id: {
+      intro:
+        "Faraid adalah sistem Islam untuk membagi harta peninggalan seorang Muslim kepada ahli waris. Kalkulator ini menerapkan kaidah Sunni yang umum.",
+      howItWorks: {
+        heading: "Cara pembagian faraid",
+        paragraphs: [
+          "Setelah biaya pemakaman, utang, dan wasiat sah (maksimum sepertiga untuk non-ahli waris) diselesaikan, sisanya dibagi kepada ahli waris.",
+          "Bagian setiap ahli waris ditetapkan oleh Al-Qur'an atau menjadi sisa (asabah) bagi kerabat laki-laki tertentu.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah faraid mengabaikan wasiat?",
+          answer:
+            "Wasiat hanya berlaku untuk maksimum sepertiga harta dan tidak boleh kepada ahli waris kecuali ahli waris lain setuju. Sisa harta dibagi menurut faraid.",
+        },
+      ],
+      related: ["wasiat", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
+  },
+
+  wasiat: {
+    en: {
+      intro:
+        "Wasiat is an Islamic will. In Malaysia, a Muslim may bequeath up to one-third of the net estate to non-heirs through wasiat; the remaining two-thirds (and the wasiat itself, if invalid) is distributed under faraid. This guide walks you through a practical, end-to-end workflow — from listing assets to lodging the document with a trust corporation.",
+      howItWorks: {
+        heading: "Building your wasiat",
+        paragraphs: [
+          "Step 1 — Take stock of your estate. List every asset in your name: residential property, second properties, EPF and Tabung Haji balances, current and savings accounts, ASB / ASM / unit trust holdings, shares, life insurance and takaful policies, vehicles, business interests, and any sizeable personal effects. Then list any debts: housing loan, car loan, personal loans, credit cards, and unpaid zakat or mahar.",
+          "Step 2 — Identify your wasi (executors). The wasi is the person you appoint to administer your estate: pay debts, lodge probate, distribute assets to faraid heirs, and execute your one-third bequests. Choose at least two wasis for redundancy; ensure they understand Shariah, are trustworthy, and ideally live in Malaysia for ease of court attendance.",
+          "Step 3 — Decide on your one-third bequests. A Muslim may bequeath up to one-third of the net estate (after debts) to anyone who is not a Quranic heir — non-Muslim family members, adopted children, friends, charities, waqf endowments, or specific causes. Document the recipients and amounts clearly. Bequests to existing Quranic heirs are usually invalid unless all other adult heirs consent after your death.",
+          "Step 4 — Address harta sepencarian (jointly-acquired marital property). If you and your spouse jointly built up assets during the marriage, the surviving spouse can claim their share separately before faraid applies. Documenting your understanding in the wasiat helps avoid disputes.",
+          "Step 5 — Lodge and store. Sign the wasiat in front of two adult Muslim male witnesses (or one male and two female witnesses under standard Shariah practice). Store the original with a registered trust corporation such as Amanah Raya or As-Salihin, a Syariah-qualified lawyer, or your state Mufti's office. Tell your wasi where it is kept.",
+          "Step 6 — Review every 3–5 years or after major life events: marriage, divorce, the birth of a child, a major asset purchase or sale, the death of a wasi or beneficiary, and significant changes in your financial position.",
+        ],
+      },
+      formula: {
+        heading: "The one-third rule",
+        paragraphs: [
+          "Maximum wasiat to non-heirs = 1/3 × (estate value − debts − funeral expenses).",
+          "If the bequest exceeds one-third, the excess is void unless the heirs unanimously consent after the death.",
+          "Quranic heirs can only inherit through wasiat in addition to their faraid share if every other adult heir consents.",
+        ],
+      },
+      faq: [
+        {
+          question: "Can I bequeath more than one-third to non-heirs?",
+          answer:
+            "Only if all adult Quranic heirs consent after your death — and that consent is rarely guaranteed. Otherwise the cap is strictly one-third; any excess is void and reverts to the faraid pool.",
+        },
+        {
+          question: "Is EPF distributed via faraid or my nominee?",
+          answer:
+            "An EPF nominee in Malaysia is treated as a trustee (wasi), not the absolute owner. The EPF balance is released to the nominee for administrative simplicity, but they are obliged to distribute it according to faraid rules. Naming a child as nominee does not give that child sole ownership of the EPF.",
+        },
+        {
+          question: "Do I need a Syariah lawyer to write a wasiat?",
+          answer:
+            "Not strictly — but it is strongly recommended for any estate above RM 500,000 or with complex assets (businesses, foreign property, multiple wives). Registered trust corporations such as Amanah Raya or As-Salihin offer wasiat drafting services from a few hundred ringgit upward, with the option of also acting as your wasi.",
+        },
+        {
+          question: "What is the difference between wasiat, hibah, and waqf?",
+          answer:
+            "Wasiat takes effect after death and is capped at one-third for non-heirs. Hibah is a gift made during your lifetime — it leaves the estate immediately, but the recipient takes ownership before you die. Waqf is a perpetual endowment for charitable or religious purposes; the underlying asset is locked, and only its returns are distributed.",
+        },
+        {
+          question: "What happens if I die without a wasiat?",
+          answer:
+            "Your entire net estate is distributed by faraid, with no allocation to non-Muslim family members, adopted children, friends, or charities. The probate process is also slower and more expensive because the court must determine all heirs and there is no executor named.",
+        },
+        {
+          question: "Are foreign assets covered by my Malaysian wasiat?",
+          answer:
+            "Movable assets (bank accounts, investments) are generally administered under Malaysian law. Immovable assets (land, real estate) are governed by the law of the country where they sit. A separate will may be required for property in other jurisdictions.",
+        },
+        {
+          question: "Can I name a non-Muslim as wasi?",
+          answer:
+            "Most Malaysian Syariah courts prefer a Muslim wasi to ensure the distribution follows faraid correctly. A non-Muslim co-executor (for example, a corporate trustee) is sometimes accepted, particularly for complex estates.",
+        },
+      ],
+      related: ["faraid", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Wasiat adalah wasiat Islam. Di Malaysia, seorang Muslim boleh mewasiatkan maksimum sepertiga hartanya kepada non-waris; sisanya dibahagikan dengan faraid.",
+      howItWorks: {
+        heading: "Menyusun wasiat",
+        paragraphs: [
+          "Daftarkan aset Anda dan hutang yang perlu diselesaikan.",
+          "Tetapkan wasi (pelaksana wasiat) — disarankan dua orang atau lebih.",
+          "Tentukan wasiat hingga sepertiga untuk non-waris, sedekah, atau wakaf.",
+          "Simpan wasiat di perusahaan amanah atau pengacara syariah.",
+        ],
+      },
+      faq: [
+        {
+          question: "Bisakah saya mewasiatkan lebih daripada sepertiga?",
+          answer: "Hanya jika seluruh waris dewasa setuju selepas Anda wafat.",
+        },
+      ],
+      related: ["faraid", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
+    id: {
+      intro:
+        "Wasiat adalah wasiat Islam. Di Malaysia, seorang Muslim dapat mewasiatkan maksimum sepertiga hartanya kepada non-ahli waris; sisanya dibagi dengan faraid.",
+      howItWorks: {
+        heading: "Menyusun wasiat",
+        paragraphs: [
+          "Daftarkan aset Anda dan utang yang harus diselesaikan.",
+          "Tetapkan wasi (pelaksana wasiat) — disarankan dua orang atau lebih.",
+          "Tentukan wasiat hingga sepertiga untuk non-ahli waris, sedekah, atau wakaf.",
+          "Simpan wasiat di perusahaan amanah atau pengacara syariah.",
+        ],
+      },
+      faq: [
+        {
+          question: "Bisakah saya mewasiatkan lebih dari sepertiga?",
+          answer: "Hanya jika seluruh ahli waris dewasa setuju setelah Anda wafat.",
+        },
+      ],
+      related: ["faraid", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
+  },
+
+  normal: {
+    en: {
+      intro:
+        "A fast, free basic arithmetic calculator for everyday use — addition, subtraction, multiplication, and division — with full keyboard support, a running history stored locally on your device, and dark mode for late-night work. Designed for quick mental-math sanity checks and simple budgeting without the overkill of a spreadsheet.",
+      howItWorks: {
+        heading: "Tips for using the basic calculator",
+        paragraphs: [
+          "Type directly with your keyboard. Number keys 0–9, the operators +, −, *, /, the decimal point, Enter (or =) to compute, and Backspace to delete the last digit are all wired up. Escape clears the current expression; pressing C twice clears the entire memory.",
+          "Each completed calculation is appended to the history panel on the right. Click any previous entry to recall it as the current expression — useful when you want to chain a follow-up operation on a recent result.",
+          "History is stored only in your browser's local storage on this device. It never leaves your machine, never syncs to a server, and is cleared if you wipe your browser data. There is also a one-click 'Clear history' button at the top of the panel.",
+          "On mobile, the on-screen keypad responds to taps with the same key behaviour. The order-of-operations on this calculator is strictly left-to-right — for parentheses, exponents, or precedence-sensitive math, use the scientific calculator instead.",
+        ],
+      },
+      formula: {
+        heading: "How the basic operators behave",
+        paragraphs: [
+          "Addition (+) and subtraction (−) work as expected for both integers and decimals.",
+          "Multiplication (× or *) and division (÷ or /) follow left-to-right evaluation. Pressing '2 + 3 × 4 =' on this calculator yields 20, not 14 — because each operator is applied immediately to the running total.",
+          "Division by zero displays 'Error' and clears the operand. The next key resets the calculator.",
+          "Decimal precision uses JavaScript's IEEE-754 doubles, accurate to about 15 significant digits. Use the scientific calculator for higher-precision work.",
+        ],
+      },
+      faq: [
+        {
+          question: "Does my history sync across devices?",
+          answer:
+            "No. History is stored only in your browser's local storage on this device. There is no account system and the data never leaves your machine.",
+        },
+        {
+          question: "How accurate is the arithmetic?",
+          answer:
+            "Calculations use JavaScript's IEEE-754 double-precision floats, which are exact for integers up to 2^53 and roughly 15–17 significant digits for decimals. For typical everyday use this is more than enough; for cryptographic-grade or financial-regulation work, use a fixed-point or decimal library instead.",
+        },
+        {
+          question: "Why does '2 + 3 × 4' give 20 instead of 14?",
+          answer:
+            "This calculator applies each operator immediately to the running total — the same behaviour as classic physical pocket calculators. There is no operator-precedence resolution. For PEMDAS-style math with parentheses and exponents, switch to the scientific calculator.",
+        },
+        {
+          question: "Can I copy a result?",
+          answer:
+            "Yes. Tap or click on the result display to select it, then copy with Cmd/Ctrl-C. The history panel also exposes individual entries for copy.",
+        },
+        {
+          question: "Does the calculator work offline?",
+          answer:
+            "Once the page is loaded, the calculator runs entirely in your browser — no internet connection is needed to compute, save history, or change themes. Bookmark the page for quick offline access.",
+        },
+      ],
+      related: ["scientific", "salary", "zakat"],
+      lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Kalkulator aritmetik asas — tambah, kurang, kali, bagi — dengan sokongan keyboard penuh dan sejarah lokal.",
+      howItWorks: {
+        heading: "Tips menggunakan kalkulator asas",
+        paragraphs: [
+          "Gunakan keyboard: angka, +, −, *, /, Enter (=), dan Backspace.",
+          "Klik entri di panel sejarah untuk memanggilnya kembali.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah sejarah tersinkron lintas peranti?",
+          answer: "Tidak. Sejarah hanya disimpan di penyimpanan lokal browser ini.",
+        },
+      ],
+      related: ["scientific", "salary", "zakat"],
+    },
+    id: {
+      intro:
+        "Kalkulator aritmatika dasar — tambah, kurang, kali, bagi — dengan dukungan keyboard penuh dan riwayat lokal.",
+      howItWorks: {
+        heading: "Tips menggunakan kalkulator dasar",
+        paragraphs: [
+          "Gunakan keyboard: angka, +, −, *, /, Enter (=), dan Backspace.",
+          "Klik entri di panel riwayat untuk memanggilnya kembali.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah riwayat tersinkron lintas perangkat?",
+          answer: "Tidak. Riwayat hanya disimpan di penyimpanan lokal browser ini.",
+        },
+      ],
+      related: ["scientific", "salary", "zakat"],
+    },
+  },
+
+  scientific: {
+    en: {
+      intro:
+        "A free online scientific calculator covering trigonometry (sin, cos, tan and their inverses), logarithms (log, ln), exponents, factorials, roots, percentages, and the core mathematical constants π and e. Supports degree and radian modes, full operator precedence, and a calculation history for replay and copy.",
+      howItWorks: {
+        heading: "Function reference",
+        paragraphs: [
+          "Trigonometric functions (sin, cos, tan, sin⁻¹, cos⁻¹, tan⁻¹) accept either degrees or radians. Toggle the angle-mode switch before entering values — leaving it on the wrong mode is the most common source of unexpected results.",
+          "log denotes the base-10 logarithm; ln denotes the natural logarithm (base e). For other bases, use the change-of-base formula: log_b(x) = ln(x) / ln(b) = log(x) / log(b).",
+          "Operator precedence follows standard mathematics: parentheses bind tightest, then unary minus, then exponentiation (^), then multiplication and division, then addition and subtraction. When two operators share precedence, evaluation proceeds left to right.",
+          "Powers can be entered with the ^ operator (e.g. 2^10 = 1024) or via the dedicated x² and xʸ buttons. Square root, cube root, and arbitrary nth root are available as functions; nth root is computed as x^(1/n).",
+          "Constants π (≈ 3.14159265) and e (≈ 2.71828183) are available as buttons and can be used inside any expression. The factorial operator (!) accepts non-negative integers up to about 170 before overflowing to Infinity.",
+        ],
+      },
+      formula: {
+        heading: "Identities worth remembering",
+        paragraphs: [
+          "Pythagorean identity: sin²(θ) + cos²(θ) = 1.",
+          "Logarithm rules: log(ab) = log(a) + log(b);  log(aⁿ) = n × log(a);  log_b(x) = ln(x) / ln(b).",
+          "Exponent rules: aᵐ × aⁿ = aᵐ⁺ⁿ;  (aᵐ)ⁿ = aᵐⁿ;  a⁰ = 1 for any non-zero a.",
+          "Euler's identity: eⁱπ + 1 = 0 (the calculator does not handle complex numbers, but the identity is useful context for radian-mode work).",
+        ],
+      },
+      faq: [
+        {
+          question: "Why do I get a different result for sin(30)?",
+          answer:
+            "Check the angle mode. sin(30°) = 0.5 in degree mode, but sin(30 radians) ≈ −0.988 — and 30 radians is approximately 1719°, far past one full rotation.",
+        },
+        {
+          question: "Does the calculator handle complex numbers?",
+          answer:
+            "No. Only real-valued arithmetic is supported. Square roots and even-power roots of negative numbers return 'Error'. For complex math, use a CAS such as Wolfram Alpha, SymPy, or your scientific software of choice.",
+        },
+        {
+          question: "How do I compute log base 2?",
+          answer:
+            "Use the change-of-base formula: log₂(x) = ln(x) / ln(2) = log(x) / log(2). For example, log₂(8) = ln(8) / ln(2) = 2.0794 / 0.6931 = 3.",
+        },
+        {
+          question: "What is the largest factorial I can compute?",
+          answer:
+            "JavaScript's number type can represent factorials up to 170! ≈ 7.26 × 10³⁰⁶. 171! overflows to Infinity. For arbitrary-precision factorials, use a BigInt library outside this calculator.",
+        },
+        {
+          question: "Can I store intermediate results?",
+          answer:
+            "Yes — the M+, M−, MR, MC memory buttons store and recall a single value. The history panel additionally keeps a record of every completed expression; click any entry to load it back into the editor.",
+        },
+        {
+          question: "How precise are trigonometric values?",
+          answer:
+            "About 15 significant decimal digits, the IEEE-754 double-precision limit. Values such as sin(180°) round to a tiny non-zero number rather than exactly zero — this is normal floating-point behaviour and visible only in very small magnitudes.",
+        },
+      ],
+      related: ["normal", "salary", "zakat"],
+      lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Kalkulator saintifik dengan trigonometri, logaritma, eksponen, faktorial, dan konstanta matematik.",
+      howItWorks: {
+        heading: "Referensi fungsi",
+        paragraphs: [
+          "Fungsi trigonometri menerima derajat atau radian — pilih mode terlebih dahulu.",
+          "log adalah basis 10; ln adalah logaritma natural.",
+        ],
+      },
+      faq: [
+        {
+          question: "Mengapa sin(30) berbeda?",
+          answer: "Periksa mode sudut. sin(30°) = 0,5; sin(30 rad) ≈ −0,988.",
+        },
+      ],
+      related: ["normal", "salary", "zakat"],
+    },
+    id: {
+      intro:
+        "Kalkulator saintifik dengan trigonometri, logaritma, eksponen, faktorial, dan konstanta matematika.",
+      howItWorks: {
+        heading: "Referensi fungsi",
+        paragraphs: [
+          "Fungsi trigonometri menerima derajat atau radian — pilih mode terlebih dahulu.",
+          "log adalah basis 10; ln adalah logaritma natural.",
+        ],
+      },
+      faq: [
+        {
+          question: "Mengapa sin(30) berbeda?",
+          answer: "Periksa mode sudut. sin(30°) = 0,5; sin(30 rad) ≈ −0,988.",
+        },
+      ],
+      related: ["normal", "salary", "zakat"],
+    },
+  },
+};
+
+export function getCalculatorContent(
+  slug: RouteSlug,
+  locale: Locale,
+): CalculatorContent | undefined {
+  return calculatorContent[slug]?.[locale];
+}

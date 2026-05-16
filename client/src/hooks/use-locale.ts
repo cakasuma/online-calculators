@@ -1,5 +1,13 @@
 import { useState, useContext, createContext, useEffect } from "react";
-import { t as translate, type Locale, type TranslationKey, getSavedLocale, saveLocale } from "@/lib/i18n";
+import {
+  t as translate,
+  getSavedLocale,
+  saveLocale,
+  isLocale,
+  SUPPORTED_LOCALES,
+  type Locale,
+  type TranslationKey,
+} from "@/lib/i18n";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -13,17 +21,20 @@ export const LocaleContext = createContext<LocaleContextValue>({
   t: (key) => translate(key, "en"),
 });
 
-const SUPPORTED_LOCALES: Locale[] = ["en", "id"];
-
-function updateUrlLocale(locale: Locale): void {
+function swapPathLocale(nextLocale: Locale) {
   try {
-    const hash = window.location.hash; // e.g. "#/en/faraid" or "#/faraid"
-    const path = hash.startsWith("#/") ? hash.slice(2) : hash.slice(1) || "";
-    const segments = path.split("/").filter(Boolean);
-    const hasLangPrefix = segments.length > 0 && SUPPORTED_LOCALES.includes(segments[0] as Locale);
-    const restSegments = hasLangPrefix ? segments.slice(1) : segments;
-    const newPath = restSegments.length > 0 ? restSegments.join("/") : "";
-    window.location.hash = "#/" + locale + (newPath ? "/" + newPath : "");
+    const segments = window.location.pathname.split("/").filter(Boolean);
+    if (segments.length > 0 && isLocale(segments[0])) {
+      segments[0] = nextLocale;
+    } else {
+      segments.unshift(nextLocale);
+    }
+    const newPath = "/" + segments.join("/");
+    const search = window.location.search;
+    const hash = window.location.hash;
+    window.history.pushState({}, "", newPath + search + hash);
+    // Wouter listens to popstate; emit a synthetic one so the router re-reads location.
+    window.dispatchEvent(new PopStateEvent("popstate"));
   } catch { /* noop */ }
 }
 
@@ -32,18 +43,18 @@ export function useLocaleState(): LocaleContextValue {
 
   useEffect(() => {
     const syncLocaleFromUrl = () => {
-      const nextLocale = getSavedLocale();
-      setLocaleRaw((current) => (current === nextLocale ? current : nextLocale));
+      const next = getSavedLocale();
+      setLocaleRaw((current) => (current === next ? current : next));
     };
-
-    window.addEventListener("hashchange", syncLocaleFromUrl);
-    return () => window.removeEventListener("hashchange", syncLocaleFromUrl);
+    window.addEventListener("popstate", syncLocaleFromUrl);
+    return () => window.removeEventListener("popstate", syncLocaleFromUrl);
   }, []);
 
   const setLocale = (l: Locale) => {
+    if (!SUPPORTED_LOCALES.includes(l)) return;
     saveLocale(l);
     setLocaleRaw(l);
-    updateUrlLocale(l);
+    swapPathLocale(l);
   };
 
   const t = (key: TranslationKey) => translate(key, locale);

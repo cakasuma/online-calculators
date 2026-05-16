@@ -166,6 +166,41 @@ export const calculatorContent: ContentMap = {
       related: ["zakat", "faraid", "wasiat"],
       lastReviewed: "2026-01-01",
     },
+    
+    ms: {
+      intro:
+        "Anggaran gaji bersih bulanan Malaysia selepas potongan wajib. Kalkulator ini menerapkan EPF, SOCSO, EIS, dan PCB (pemotongan cukai bulanan) berdasarkan kadar 2026.",
+      howItWorks: {
+        heading: "Cara kerja kalkulator gaji Malaysia",
+        paragraphs: [
+          "Gaji kotor bulanan adalah titik awal. Daripada sana, kontribusi wajib dipotong: EPF, SOCSO, EIS, dan PCB.",
+          "Karyawan di bawah 60 tahun secara default berkontribusi 11% ke EPF; Anda boleh menyesuaikan ke 7% atau tahap sukarela lebih tinggi.",
+          "PCB dikira dengan menyetahunkan pendapatan kotor, menerapkan keringanan cukai yang berlaku, mencari kurung cukai progresif untuk pemastautin, lalu membaginya 12.",
+        ],
+      },
+      formula: {
+        heading: "Rumus potongan gaji",
+        paragraphs: [
+          "Gaji bersih = Gaji kotor − EPF − SOCSO − EIS − PCB.",
+          "EPF (karyawan, default) = 11% × gaji kotor bulanan.",
+          "PCB (pemastautin) = lookup(pendapatan tahunan kena cukai, kurung progresif) ÷ 12.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah hasilnya adalah gaji final saya?",
+          answer:
+            "Ini perkiraan. PCB direkonsiliasi saat Anda mengisi SPT tahunan; keringanan, rabat, dan pembayaran zakat boleh menurunkan cukai akhir Anda.",
+        },
+        {
+          question: "Apa beda PCB dan cukai pendapatan?",
+          answer:
+            "PCB adalah jumlah bulanan yang dipotong majikan dan disetor ke LHDN; cukai final dikira saat pelaporan tahunan, dan PCB adalah pembayaran di muka untuk itu.",
+        },
+      ],
+      related: ["zakat", "scientific", "faraid"],
+      lastReviewed: "2026-01-01",
+    },
     id: {
       intro:
         "Estimasi gaji bersih bulanan Malaysia setelah potongan wajib. Kalkulator ini menerapkan EPF, SOCSO, EIS, dan PCB (pemotongan pajak bulanan) berdasarkan tarif 2026.",
@@ -315,6 +350,28 @@ export const calculatorContent: ContentMap = {
       related: ["salary", "faraid", "wasiat"],
       lastReviewed: "2026-01-01",
     },
+    
+    ms: {
+      intro:
+        "Kira zakat harta tahunan untuk simpanan, emas, perak, pelaburan, dan aset perniagaan berdasarkan panduan nisab Malaysia terkini.",
+      howItWorks: {
+        heading: "Cara zakat dikira",
+        paragraphs: [
+          "Zakat wajib atas harta yang telah dimiliki selama satu tahun hijriah (haul) dan melebihi nisab. Kadar standar adalah 2,5%.",
+          "Nisab biasanya dikaitkan dengan nilai 85 gram emas murni.",
+          "Daripada total aset wajib zakat, kurangi kewajiban jangka pendek untuk memperoleh kekayaan bersih wajib zakat.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apa itu nisab?",
+          answer:
+            "Nisab adalah batas minimum kekayaan yang membuat zakat wajib. Umumnya dipatok pada nilai 85 gram emas murni.",
+        },
+      ],
+      related: ["salary", "faraid", "wasiat"],
+      lastReviewed: "2026-01-01",
+    },
     id: {
       intro:
         "Hitung zakat harta tahunan untuk tabungan, emas, perak, investasi, dan aset usaha berdasarkan panduan nisab Malaysia terkini.",
@@ -440,6 +497,27 @@ export const calculatorContent: ContentMap = {
       related: ["wasiat", "zakat", "salary"],
       lastReviewed: "2026-01-01",
     },
+    
+    ms: {
+      intro:
+        "Faraid adalah sistem Islam untuk membagi harta peninggalan seorang Muslim kepada waris. Kalkulator ini menerapkan kaedah Sunni yang umum.",
+      howItWorks: {
+        heading: "Cara pembahagian faraid",
+        paragraphs: [
+          "Selepas kos pengebumian, hutang, dan wasiat sah (maksimum sepertiga untuk non-waris) diselesaikan, sisanya dibahagikan kepada waris.",
+          "Bahagian setiap waris ditetapkan oleh Al-Qur'an atau menjadi sisa (asabah) bagi kerabat lelaki tertentu.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah faraid mengabaikan wasiat?",
+          answer:
+            "Wasiat hanya berlaku untuk maksimum sepertiga harta dan tidak boleh kepada waris kecuali waris lain setuju. Sisa harta dibahagikan menurut faraid.",
+        },
+      ],
+      related: ["wasiat", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
     id: {
       intro:
         "Faraid adalah sistem Islam untuk membagi harta peninggalan seorang Muslim kepada ahli waris. Kalkulator ini menerapkan kaidah Sunni yang umum.",
@@ -525,6 +603,28 @@ export const calculatorContent: ContentMap = {
       related: ["faraid", "zakat", "salary"],
       lastReviewed: "2026-01-01",
     },
+    
+    ms: {
+      intro:
+        "Wasiat adalah wasiat Islam. Di Malaysia, seorang Muslim boleh mewasiatkan maksimum sepertiga hartanya kepada non-waris; sisanya dibahagikan dengan faraid.",
+      howItWorks: {
+        heading: "Menyusun wasiat",
+        paragraphs: [
+          "Daftarkan aset Anda dan hutang yang perlu diselesaikan.",
+          "Tetapkan wasi (pelaksana wasiat) — disarankan dua orang atau lebih.",
+          "Tentukan wasiat hingga sepertiga untuk non-waris, sedekah, atau wakaf.",
+          "Simpan wasiat di perusahaan amanah atau pengacara syariah.",
+        ],
+      },
+      faq: [
+        {
+          question: "Bisakah saya mewasiatkan lebih daripada sepertiga?",
+          answer: "Hanya jika seluruh waris dewasa setuju selepas Anda wafat.",
+        },
+      ],
+      related: ["faraid", "zakat", "salary"],
+      lastReviewed: "2026-01-01",
+    },
     id: {
       intro:
         "Wasiat adalah wasiat Islam. Di Malaysia, seorang Muslim dapat mewasiatkan maksimum sepertiga hartanya kepada non-ahli waris; sisanya dibagi dengan faraid.",
@@ -599,6 +699,25 @@ export const calculatorContent: ContentMap = {
       ],
       related: ["scientific", "salary", "zakat"],
       lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Kalkulator aritmetik asas — tambah, kurang, kali, bagi — dengan sokongan keyboard penuh dan sejarah lokal.",
+      howItWorks: {
+        heading: "Tips menggunakan kalkulator asas",
+        paragraphs: [
+          "Gunakan keyboard: angka, +, −, *, /, Enter (=), dan Backspace.",
+          "Klik entri di panel sejarah untuk memanggilnya kembali.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah sejarah tersinkron lintas peranti?",
+          answer: "Tidak. Sejarah hanya disimpan di penyimpanan lokal browser ini.",
+        },
+      ],
+      related: ["scientific", "salary", "zakat"],
     },
     id: {
       intro:
@@ -677,6 +796,25 @@ export const calculatorContent: ContentMap = {
       ],
       related: ["normal", "salary", "zakat"],
       lastReviewed: "2026-01-01",
+    },
+    
+    ms: {
+      intro:
+        "Kalkulator saintifik dengan trigonometri, logaritma, eksponen, faktorial, dan konstanta matematik.",
+      howItWorks: {
+        heading: "Referensi fungsi",
+        paragraphs: [
+          "Fungsi trigonometri menerima derajat atau radian — pilih mode terlebih dahulu.",
+          "log adalah basis 10; ln adalah logaritma natural.",
+        ],
+      },
+      faq: [
+        {
+          question: "Mengapa sin(30) berbeda?",
+          answer: "Periksa mode sudut. sin(30°) = 0,5; sin(30 rad) ≈ −0,988.",
+        },
+      ],
+      related: ["normal", "salary", "zakat"],
     },
     id: {
       intro:

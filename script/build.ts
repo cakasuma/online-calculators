@@ -3,6 +3,7 @@ import { existsSync } from "fs";
 
 execSync("vite build", { stdio: "inherit" });
 execSync("tsx script/prerender.ts", { stdio: "inherit" });
+execSync("tsx script/generate-og.ts", { stdio: "inherit" });
 execSync(
   "esbuild server/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:drizzle-orm --external:pg --external:@neondatabase/serverless --external:ws --packages=external",
   { stdio: "inherit" },

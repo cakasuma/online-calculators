@@ -8,7 +8,7 @@ import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
 
-const SUPPORTED_LOCALES = ["en", "id"] as const;
+const SUPPORTED_LOCALES = ["en", "ms", "id"] as const;
 const DEFAULT_LOCALE = "en";
 
 function registerAdsTxtRoute(app: Express) {
@@ -45,7 +45,8 @@ function hasLocalePrefix(reqPath: string): boolean {
 function detectLocaleFromHeader(acceptLanguage?: string): string {
   if (!acceptLanguage) return DEFAULT_LOCALE;
   const lower = acceptLanguage.toLowerCase();
-  if (lower.includes("id") || lower.includes("ms")) return "id";
+  if (lower.includes("ms")) return "ms";
+  if (lower.includes("id")) return "id";
   return DEFAULT_LOCALE;
 }
 

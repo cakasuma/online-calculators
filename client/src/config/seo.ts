@@ -56,6 +56,16 @@ export const routes: RouteSeoEntry[] = [
         heading: "Online calculators built for Malaysia",
         tagline: "Salary, tax, zakat, faraid, and planning tools — free and bilingual.",
       },
+      
+      ms: {
+        title: "Kalkulator Online untuk Malaysia | HelloKalku",
+        description:
+          "Kalkulator percuma fokus Malaysia: gaji (EPF, SOCSO, EIS, PCB), zakat, faraid, dan perancangan wasiat. Pantas, tepat, dan mesra mudah alih.",
+        keywords:
+          "kalkulator online malaysia, kalkulator gaji, kalkulator zakat, kalkulator faraid",
+        heading: "Kalkulator online untuk Malaysia",
+        tagline: "Gaji, cukai, zakat, faraid, dan perancangan — percuma dan dwibahasa.",
+      },
       id: {
         title: "Kalkulator Online untuk Malaysia | HelloKalku",
         description:
@@ -82,6 +92,14 @@ export const routes: RouteSeoEntry[] = [
         heading: "Malaysia salary calculator",
         tagline: "EPF, SOCSO, EIS, and PCB take-home pay estimator.",
       },
+      
+      ms: {
+        title: "Kalkulator Gaji Malaysia 2026 (EPF, SOCSO, EIS, PCB) | HelloKalku",
+        description:
+          "Kira gaji bersih Malaysia dengan potongan EPF, SOCSO, EIS, dan PCB. Menyokong pemastautin, non-pemastautin, dan pekerja asing.",
+        heading: "Kalkulator gaji Malaysia",
+        tagline: "Anggaran gaji bersih dengan EPF, SOCSO, EIS, dan PCB.",
+      },
       id: {
         title: "Kalkulator Gaji Malaysia 2026 (EPF, SOCSO, EIS, PCB) | HelloKalku",
         description:
@@ -103,6 +121,14 @@ export const routes: RouteSeoEntry[] = [
           "A fast, free online basic calculator for daily arithmetic. Includes keyboard support, calculation history, and dark mode.",
         heading: "Basic calculator",
         tagline: "Fast arithmetic with history and keyboard support.",
+      },
+      
+      ms: {
+        title: "Kalkulator Asas Online (Percuma, dengan Sejarah) | HelloKalku",
+        description:
+          "Kalkulator asas online untuk aritmetik harian. Menyokong keyboard, sejarah kira, dan mode gelap.",
+        heading: "Kalkulator asas",
+        tagline: "Aritmetik pantas dengan sejarah dan sokongan keyboard.",
       },
       id: {
         title: "Kalkulator Dasar Online (Gratis, dengan Riwayat) | HelloKalku",
@@ -128,6 +154,14 @@ export const routes: RouteSeoEntry[] = [
         heading: "Scientific calculator",
         tagline: "Trigonometry, logarithms, powers, and constants in one place.",
       },
+      
+      ms: {
+        title: "Kalkulator Saintifik Online | HelloKalku",
+        description:
+          "Kalkulator saintifik online dengan trigonometri, logaritma, eksponen, faktorial, dan konstanta matematik.",
+        heading: "Kalkulator saintifik",
+        tagline: "Trigonometri, logaritma, eksponen, dan konstanta.",
+      },
       id: {
         title: "Kalkulator Saintifik Online | HelloKalku",
         description:
@@ -151,6 +185,14 @@ export const routes: RouteSeoEntry[] = [
           "faraid calculator, islamic inheritance calculator, faraid malaysia, pengiraan faraid",
         heading: "Faraid calculator",
         tagline: "Islamic inheritance distribution made clear.",
+      },
+      
+      ms: {
+        title: "Kalkulator Faraid (Pembahagian Waris Islam) | HelloKalku",
+        description:
+          "Kira pembahagian waris faraid untuk suami/isteri, anak, ibu bapa, dan saudara berdasarkan kaedah Islam.",
+        heading: "Kalkulator faraid",
+        tagline: "Pembahagian waris Islam yang jelas dan sistematis.",
       },
       id: {
         title: "Kalkulator Faraid (Pembagian Waris Islam) | HelloKalku",
@@ -176,6 +218,14 @@ export const routes: RouteSeoEntry[] = [
         heading: "Zakat calculator",
         tagline: "Estimate your annual zakat across all asset classes.",
       },
+      
+      ms: {
+        title: "Kalkulator Zakat Malaysia (Nisab 2026) | HelloKalku",
+        description:
+          "Kira zakat tahunan untuk simpanan, emas, perak, pelaburan, dan aset perniagaan berdasarkan nisab terkini.",
+        heading: "Kalkulator zakat",
+        tagline: "Anggaran zakat tahunan untuk semua jenis aset.",
+      },
       id: {
         title: "Kalkulator Zakat Malaysia (Nisab 2026) | HelloKalku",
         description:
@@ -198,6 +248,14 @@ export const routes: RouteSeoEntry[] = [
         heading: "Wasiat planning guide",
         tagline: "A practical Islamic will workflow with checklist and action steps.",
       },
+      
+      ms: {
+        title: "Panduan Wasiat Islam & senarai semak | HelloKalku",
+        description:
+          "Susun wasiat Islam langkah demi langkah dengan senarai semak merangkumi aset, wasi, waris, dan syarat syariah.",
+        heading: "Panduan wasiat",
+        tagline: "Aliran kerja wasiat Islam dengan senarai semak dan langkah praktikal.",
+      },
       id: {
         title: "Panduan Wasiat Islam & Checklist | HelloKalku",
         description:
@@ -219,6 +277,13 @@ export const routes: RouteSeoEntry[] = [
           "How HelloKalku handles privacy, analytics, lead capture, and advertising data across calculator tools.",
         heading: "Privacy policy",
       },
+      
+      ms: {
+        title: "Dasar Privasi | HelloKalku",
+        description:
+          "Cara HelloKalku menangani privasi, analitik, pengumpulan prospek, dan data iklan.",
+        heading: "Dasar privasi",
+      },
       id: {
         title: "Kebijakan Privasi | HelloKalku",
         description:
@@ -238,6 +303,13 @@ export const routes: RouteSeoEntry[] = [
         description:
           "HelloKalku terms of use, service scope, disclaimers, and user responsibilities.",
         heading: "Terms of use",
+      },
+      
+      ms: {
+        title: "Syarat Penggunaan | HelloKalku",
+        description:
+          "Syarat penggunaan HelloKalku, skop perkhidmatan, penafian, dan tanggungjawab pengguna.",
+        heading: "Syarat penggunaan",
       },
       id: {
         title: "Syarat Penggunaan | HelloKalku",

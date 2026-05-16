@@ -20,7 +20,37 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const OUT_DIR = path.resolve(REPO_ROOT, "dist/public");
 const SHELL_PATH = path.join(OUT_DIR, "index.html");
-const LOCALES: Locale[] = ["en", "id"];
+const LOCALES: Locale[] = ["en", "ms", "id"];
+
+const LOCALIZED_STRINGS: Record<Locale, {
+  home: string;
+  workedExamples: string;
+  resultLabel: string;
+  faqHeading: string;
+  ogLocale: string;
+}> = {
+  en: {
+    home: "Home",
+    workedExamples: "Worked examples",
+    resultLabel: "Result:",
+    faqHeading: "Frequently asked questions",
+    ogLocale: "en_US",
+  },
+  ms: {
+    home: "Laman Utama",
+    workedExamples: "Contoh pengiraan",
+    resultLabel: "Hasil:",
+    faqHeading: "Soalan lazim",
+    ogLocale: "ms_MY",
+  },
+  id: {
+    home: "Beranda",
+    workedExamples: "Contoh perhitungan",
+    resultLabel: "Hasil:",
+    faqHeading: "Pertanyaan yang sering diajukan",
+    ogLocale: "id_ID",
+  },
+};
 
 function escapeHtml(input: string): string {
   return input
@@ -34,12 +64,12 @@ function escapeHtml(input: string): string {
 function buildMetaBlock(route: RouteSeoEntry, locale: Locale): string {
   const copy = route.copy[locale] ?? route.copy.en;
   const canonical = canonicalUrl(locale, route.path);
-  const ogLocale = locale === "id" ? "id_ID" : "en_US";
+  const ogLocale = LOCALIZED_STRINGS[locale].ogLocale;
 
-  const altLinks = LOCALES.map(
-    (alt) =>
-      `    <link rel="alternate" hreflang="${alt}" href="${canonicalUrl(alt, route.path)}" />`,
-  ).join("\n");
+  const altLinks = LOCALES.map((alt) => {
+    const hreflang = alt === "ms" ? "ms-MY" : alt === "id" ? "id-ID" : "en";
+    return `    <link rel="alternate" hreflang="${hreflang}" href="${canonicalUrl(alt, route.path)}" />`;
+  }).join("\n");
 
   return [
     `    <title>${escapeHtml(copy.title)}</title>`,
@@ -54,9 +84,13 @@ function buildMetaBlock(route: RouteSeoEntry, locale: Locale): string {
     `    <meta property="og:url" content="${canonical}" />`,
     `    <meta property="og:site_name" content="HelloKalku" />`,
     `    <meta property="og:locale" content="${ogLocale}" />`,
-    `    <meta name="twitter:card" content="summary" />`,
+    `    <meta property="og:image" content="${SITE_ORIGIN}/og/${locale}/${route.slug}.png" />`,
+    `    <meta property="og:image:width" content="1200" />`,
+    `    <meta property="og:image:height" content="630" />`,
+    `    <meta name="twitter:card" content="summary_large_image" />`,
     `    <meta name="twitter:title" content="${escapeHtml(copy.title)}" />`,
     `    <meta name="twitter:description" content="${escapeHtml(copy.description)}" />`,
+    `    <meta name="twitter:image" content="${SITE_ORIGIN}/og/${locale}/${route.slug}.png" />`,
     `    <meta name="robots" content="index,follow,max-image-preview:large" />`,
   ]
     .filter(Boolean)
@@ -74,7 +108,7 @@ function buildJsonLd(route: RouteSeoEntry, locale: Locale, content: CalculatorCo
       {
         "@type": "ListItem",
         position: 1,
-        name: locale === "id" ? "Beranda" : "Home",
+        name: LOCALIZED_STRINGS[locale].home,
         item: `${SITE_ORIGIN}/${locale}`,
       },
       ...(route.slug !== "home"
@@ -184,20 +218,20 @@ function renderContentBody(content: CalculatorContent | undefined, copy: { headi
   const examples =
     content.examples && content.examples.length > 0
       ? `
-        <h2>${locale === "id" ? "Contoh perhitungan" : "Worked examples"}</h2>
+        <h2>${LOCALIZED_STRINGS[locale].workedExamples}</h2>
         ${content.examples
           .map(
             (ex) => `
         <article>
           <h3>${escapeHtml(ex.title)}</h3>
           <ul>${ex.given.map((g) => `<li>${escapeHtml(g)}</li>`).join("")}</ul>
-          <p><strong>${locale === "id" ? "Hasil:" : "Result:"}</strong> ${escapeHtml(ex.result)}</p>
+          <p><strong>${LOCALIZED_STRINGS[locale].resultLabel}</strong> ${escapeHtml(ex.result)}</p>
         </article>`,
           )
           .join("")}`
       : "";
   const faq = `
-        <h2>${locale === "id" ? "Pertanyaan yang sering diajukan" : "Frequently asked questions"}</h2>
+        <h2>${LOCALIZED_STRINGS[locale].faqHeading}</h2>
         <dl>${content.faq
           .map(
             (item) =>
@@ -283,10 +317,10 @@ function writeSitemap() {
 
     for (const locale of LOCALES) {
       const url = canonicalUrl(locale, route.path);
-      const alts = LOCALES.map(
-        (alt) =>
-          `      <xhtml:link rel="alternate" hreflang="${alt}" href="${canonicalUrl(alt, route.path)}" />`,
-      ).join("\n");
+      const alts = LOCALES.map((alt) => {
+        const hreflang = alt === "ms" ? "ms-MY" : alt === "id" ? "id-ID" : "en";
+        return `      <xhtml:link rel="alternate" hreflang="${hreflang}" href="${canonicalUrl(alt, route.path)}" />`;
+      }).join("\n");
       urls.push(
         `  <url>
     <loc>${url}</loc>

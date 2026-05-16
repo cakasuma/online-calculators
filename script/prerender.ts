@@ -276,17 +276,26 @@ function applyShell(shell: string, route: RouteSeoEntry, locale: Locale): string
 
   html = html.replace(
     "</head>",
-    `\n${metaBlock}\n${jsonLd}\n  </head>`,
+    `\n${metaBlock}\n${jsonLd}
+    <style id="prerender-fallback-style">
+      /* No-FOUC: when JS is enabled, hide the prerendered SEO fallback so
+         users never see unstyled raw HTML between initial paint and React
+         hydration. The fallback stays in the DOM for non-JS crawlers (AI
+         bots, older indexers) which don't apply CSS. The .js class is set
+         synchronously below before the body paints. */
+      .js #prerender-fallback { display: none !important; }
+    </style>
+    <script>document.documentElement.classList.add('js');</script>
+  </head>`,
   );
 
-  // Inject prerendered content as a sibling of #root so crawlers see prose even
-  // before JS hydrates. We mark it data-prerender-fallback so a small inline
-  // script can hide it once the SPA mounts.
+  // Inject prerendered content as a sibling of #root so crawlers see prose
+  // even before JS hydrates. JS-enabled clients hide it via the no-FOUC CSS
+  // rule injected in <head> above — no MutationObserver needed.
   if (body) {
     const fallback = `
     <div id="prerender-fallback" data-prerender-fallback="${route.slug}">${body}
-    </div>
-    <script>(function(){var r=document.getElementById('root');var f=document.getElementById('prerender-fallback');if(!r||!f)return;var hide=function(){if(r.childElementCount>0){f.setAttribute('hidden','');}};var mo=new MutationObserver(hide);mo.observe(r,{childList:true});hide();})();</script>`;
+    </div>`;
     html = html.replace(
       '<div id="root"></div>',
       `<div id="root"></div>${fallback}`,

@@ -110,7 +110,8 @@ function Layout() {
     setMetaTag("property", "og:description", copy.description);
     setMetaTag("property", "og:url", canonical);
     setMetaTag("property", "og:type", route.slug === "home" ? "website" : "article");
-    setMetaTag("property", "og:locale", locale === "id" ? "id_ID" : "en_US");
+    const ogLocale = locale === "ms" ? "ms_MY" : locale === "id" ? "id_ID" : "en_US";
+    setMetaTag("property", "og:locale", ogLocale);
     setMetaTag("name", "twitter:title", copy.title);
     setMetaTag("name", "twitter:description", copy.description);
 

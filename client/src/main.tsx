@@ -1,16 +1,18 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from "./lib/i18n";
 import "./index.css";
 
 // Normalize the URL so the first path segment is a supported locale.
 // Examples:
-//   /              -> /en  (or /id if detected)
+//   /              -> /en  (or /ms / /id if detected)
 //   /salary        -> /en/salary
 //   /en/salary     -> unchanged
+//   /ms/zakat?x=1  -> unchanged
 //   /id/zakat?x=1  -> unchanged
 (function initLocalePath() {
-  const SUPPORTED = ["en", "id"];
-  const DEFAULT_LOCALE = "en";
+  // Source from the shared i18n module so this stays in sync as locales are added.
+  const SUPPORTED: readonly string[] = SUPPORTED_LOCALES;
 
   function detectLocale(): string {
     try {
@@ -20,9 +22,8 @@ import "./index.css";
       /* noop */
     }
     const browserLocale = navigator.language?.toLowerCase() ?? "";
-    if (browserLocale.startsWith("id") || browserLocale.startsWith("ms")) {
-      return "id";
-    }
+    if (browserLocale.startsWith("ms")) return "ms";
+    if (browserLocale.startsWith("id")) return "id";
     return DEFAULT_LOCALE;
   }
 

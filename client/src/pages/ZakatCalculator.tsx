@@ -10,8 +10,16 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
+import { ShareButton } from "@/components/ShareButton";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency, parseLocaleNumber } from "@/lib/i18n";
+import {
+  boolField,
+  mergeFromUrl,
+  stringField,
+  useUrlSync,
+  type UrlSchema,
+} from "@/lib/urlState";
 
 // ─── Currencies ────────────────────────────────────────────────────────────────
 const CURRENCIES = [
@@ -123,12 +131,41 @@ interface MetalPriceResponse {
   sourceUrl?: string;
 }
 
+const ZAKAT_URL_SCHEMA: UrlSchema<ZakatState> = {
+  currency: stringField<ZakatState, "currency">("cur"),
+  cashHawl: boolField<ZakatState, "cashHawl">("ch"),
+  cashOnHand: stringField<ZakatState, "cashOnHand">("cash"),
+  bankSavings: stringField<ZakatState, "bankSavings">("save"),
+  fixedDeposits: stringField<ZakatState, "fixedDeposits">("fd"),
+  includeEPF: boolField<ZakatState, "includeEPF">("iEpf"),
+  epfBalance: stringField<ZakatState, "epfBalance">("epf"),
+  goldHawl: boolField<ZakatState, "goldHawl">("gh"),
+  goldGrams: stringField<ZakatState, "goldGrams">("gold"),
+  goldPricePerGram: stringField<ZakatState, "goldPricePerGram">("goldP"),
+  silverGrams: stringField<ZakatState, "silverGrams">("silv"),
+  silverPricePerGram: stringField<ZakatState, "silverPricePerGram">("silvP"),
+  includeJewelry: boolField<ZakatState, "includeJewelry">("iJ"),
+  investHawl: boolField<ZakatState, "investHawl">("ih"),
+  stocks: stringField<ZakatState, "stocks">("stk"),
+  unitTrusts: stringField<ZakatState, "unitTrusts">("ut"),
+  includeCrypto: boolField<ZakatState, "includeCrypto">("iCr"),
+  cryptoAmount: stringField<ZakatState, "cryptoAmount">("crypto"),
+  businessHawl: boolField<ZakatState, "businessHawl">("bh"),
+  inventory: stringField<ZakatState, "inventory">("inv"),
+  receivables: stringField<ZakatState, "receivables">("recv"),
+  liabilities: stringField<ZakatState, "liabilities">("liab"),
+  rentalHawl: boolField<ZakatState, "rentalHawl">("rh"),
+  rentalIncome: stringField<ZakatState, "rentalIncome">("rent"),
+  rentalExpenses: stringField<ZakatState, "rentalExpenses">("rentEx"),
+};
+
 export default function ZakatCalculator() {
   const { t, locale } = useLocale();
   const [state, setState] = useState<ZakatState>(() => {
     const saved = (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })();
-    return makeInitialState(saved);
+    return mergeFromUrl(makeInitialState(saved), ZAKAT_URL_SCHEMA);
   });
+  useUrlSync(state, ZAKAT_URL_SCHEMA);
   const [livePricesLoading, setLivePricesLoading] = useState(false);
   const [livePricesLoaded, setLivePricesLoaded] = useState(false);
   const [priceSource, setPriceSource] = useState<{ name: string; url: string } | null>(null);
@@ -968,6 +1005,9 @@ export default function ZakatCalculator() {
                 ? t("zakat.summary.closeToNisab")
                 : t("zakat.summary.belowNisab")}
             </p>
+            <div className="flex items-center justify-center pt-2">
+              <ShareButton calculator="zakat" state={state} schema={ZAKAT_URL_SCHEMA} />
+            </div>
           </div>
 
           {/* Reset */}

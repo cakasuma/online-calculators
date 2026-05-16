@@ -138,6 +138,49 @@ const translations = {
   "common.reset": { en: "Reset", ms: "Tetapkan Semula", id: "Atur Ulang" },
   "common.error": { en: "Error", ms: "Ralat", id: "Kesalahan" },
 
+  // ── Share ──
+  "share.button": { en: "Share", ms: "Kongsi", id: "Bagikan" },
+  "share.copiedShort": { en: "Copied", ms: "Disalin", id: "Disalin" },
+  "share.copied": { en: "Link copied", ms: "Pautan disalin", id: "Tautan disalin" },
+  "share.copiedDesc": {
+    en: "Anyone you send it to will see the same calculation.",
+    ms: "Sesiapa yang menerima pautan akan melihat pengiraan yang sama.",
+    id: "Siapa pun yang menerimanya akan melihat perhitungan yang sama.",
+  },
+  "share.error": { en: "Could not copy", ms: "Tidak boleh disalin", id: "Tidak dapat menyalin" },
+  "share.errorDesc": {
+    en: "Copy the URL from the address bar instead.",
+    ms: "Salin URL dari bar alamat sebagai gantinya.",
+    id: "Salin URL dari bilah alamat sebagai gantinya.",
+  },
+  "share.newsletter.title": {
+    en: "Get monthly Malaysia finance tips",
+    ms: "Dapatkan petua kewangan Malaysia bulanan",
+    id: "Dapatkan tips keuangan Malaysia bulanan",
+  },
+  "share.newsletter.desc": {
+    en: "Short, practical notes on salary, tax, zakat, and planning — one email per month, unsubscribe anytime.",
+    ms: "Nota ringkas dan praktikal tentang gaji, cukai, zakat, dan perancangan — satu e-mel sebulan, henti langganan bila-bila masa.",
+    id: "Catatan ringkas dan praktis tentang gaji, pajak, zakat, dan perencanaan — satu email sebulan, berhenti berlangganan kapan saja.",
+  },
+  "share.newsletter.cta": { en: "Subscribe", ms: "Langgan", id: "Berlangganan" },
+  "share.newsletter.successTitle": {
+    en: "Thanks for joining.",
+    ms: "Terima kasih kerana melanggan.",
+    id: "Terima kasih telah berlangganan.",
+  },
+  "share.newsletter.successDesc": {
+    en: "Look out for your first issue in the coming weeks.",
+    ms: "Nantikan keluaran pertama dalam beberapa minggu akan datang.",
+    id: "Nantikan edisi pertama dalam beberapa minggu mendatang.",
+  },
+  "share.newsletter.disclaimer": {
+    en: "We won't share your email. Unsubscribe in one click.",
+    ms: "Kami tidak akan berkongsi e-mel anda. Henti langganan dengan satu klik.",
+    id: "Kami tidak akan membagikan email Anda. Berhenti berlangganan dengan satu klik.",
+  },
+  "share.newsletter.dismiss": { en: "Dismiss", ms: "Tutup", id: "Tutup" },
+
   // ── Home Page ──
   "home.title": { en: "Islamic Inheritance Calculator", ms: "Kalkulator Waris Islam", id: "Kalkulator Waris Islam" },
   "home.subtitle": { en: "Accurately calculate Faraid (Islamic inheritance) distribution based on Quran and Sunnah.", ms: "Kira pembahagian Faraid (waris Islam) secara tepat berdasarkan Al-Qur'an dan Sunnah.", id: "Hitung pembagian Faraid (waris Islam) secara akurat berdasarkan Al-Qur'an dan Sunnah." },

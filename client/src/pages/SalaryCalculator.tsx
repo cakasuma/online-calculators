@@ -6,7 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
+import { ShareButton } from "@/components/ShareButton";
 import { recordServerEvent, track } from "@/lib/analytics";
+import {
+  enumField,
+  mergeFromUrl,
+  numberField,
+  stringField,
+  urlHasSchemaParams,
+  useUrlSync,
+  type UrlSchema,
+} from "@/lib/urlState";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -199,14 +209,57 @@ function NumberField({
   );
 }
 
+interface SalaryUrlState {
+  monthlySalary: number;
+  annualBonus: number;
+  otherRelief: number;
+  epfRate: number;
+  workerType: WorkerType;
+  residentStatus: ResidentStatus;
+}
+
+const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
+  monthlySalary: numberField("gross"),
+  annualBonus: numberField("bonus"),
+  otherRelief: numberField("relief"),
+  epfRate: {
+    key: "epf",
+    parse: (raw) => {
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : undefined;
+    },
+    // Always emit epfRate so the recipient sees the same configuration even
+    // when the value matches the default 11%.
+    serialize: (v) => (v == null ? null : String(v)),
+  },
+  workerType: enumField<SalaryUrlState, "workerType">("worker", ["malaysian", "foreigner"]),
+  residentStatus: enumField<SalaryUrlState, "residentStatus">("res", ["resident", "non-resident"]),
+};
+
 export default function SalaryCalculator() {
   const { t } = useLocale();
-  const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(DEFAULT_INPUTS.monthlySalary));
-  const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(DEFAULT_INPUTS.annualBonus));
-  const [otherReliefInput, setOtherReliefInput] = useState(toInputString(DEFAULT_INPUTS.otherRelief));
-  const [epfRateInput, setEpfRateInput] = useState(toInputString(DEFAULT_INPUTS.epfRate));
-  const [workerType, setWorkerType] = useState<WorkerType>(DEFAULT_INPUTS.workerType);
-  const [residentStatus, setResidentStatus] = useState<ResidentStatus>(DEFAULT_INPUTS.residentStatus);
+  // Read URL params once on mount to pre-fill the form when a user opens a
+  // shared link. Falls back to DEFAULT_INPUTS for any missing/invalid params.
+  const [initial] = useState<SalaryUrlState>(() =>
+    mergeFromUrl<SalaryUrlState>(
+      {
+        monthlySalary: DEFAULT_INPUTS.monthlySalary,
+        annualBonus: DEFAULT_INPUTS.annualBonus,
+        otherRelief: DEFAULT_INPUTS.otherRelief,
+        epfRate: DEFAULT_INPUTS.epfRate,
+        workerType: DEFAULT_INPUTS.workerType,
+        residentStatus: DEFAULT_INPUTS.residentStatus,
+      },
+      SALARY_URL_SCHEMA,
+    ),
+  );
+  const arrivedViaShare = useMemo(() => urlHasSchemaParams(SALARY_URL_SCHEMA), []);
+  const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(initial.monthlySalary));
+  const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(initial.annualBonus));
+  const [otherReliefInput, setOtherReliefInput] = useState(toInputString(initial.otherRelief));
+  const [epfRateInput, setEpfRateInput] = useState(toInputString(initial.epfRate));
+  const [workerType, setWorkerType] = useState<WorkerType>(initial.workerType);
+  const [residentStatus, setResidentStatus] = useState<ResidentStatus>(initial.residentStatus);
 
   const parsedInput = useMemo<SalaryInputs>(
     () => ({
@@ -222,7 +275,13 @@ export default function SalaryCalculator() {
 
   const errors = useMemo(() => validateInputs(parsedInput), [parsedInput]);
   const isValid = Object.keys(errors).length === 0;
-  const [hasCalculated, setHasCalculated] = useState(false);
+  // If the user arrived via a shared link, show results immediately so they
+  // don't have to click Calculate just to see what was shared.
+  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+
+  // Keep the URL in sync with the form state so the address bar is always a
+  // copyable share link. Debounced inside useUrlSync.
+  useUrlSync(parsedInput, SALARY_URL_SCHEMA);
 
   const result = useMemo(
     () => calculateSalary({ ...parsedInput, epfRate: Math.min(15, parsedInput.epfRate) }),
@@ -405,6 +464,15 @@ export default function SalaryCalculator() {
               {hasCalculated ? "Recalculate take-home pay" : "Calculate my take-home pay"}
               <ArrowRight className="h-4 w-4" />
             </Button>
+            {showResults && (
+              <div className="flex items-center justify-end pt-1">
+                <ShareButton
+                  calculator="salary"
+                  state={parsedInput}
+                  schema={SALARY_URL_SCHEMA}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
 

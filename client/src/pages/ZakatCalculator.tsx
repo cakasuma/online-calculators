@@ -11,6 +11,7 @@ import { useLocale } from "@/hooks/use-locale";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
+import { SaveButton } from "@/components/SaveButton";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency, parseLocaleNumber } from "@/lib/i18n";
 import {
@@ -21,6 +22,8 @@ import {
   useUrlSync,
   type UrlSchema,
 } from "@/lib/urlState";
+import { downloadZakatPdf } from "@/lib/pdf/zakatPdf";
+import { Download } from "lucide-react";
 
 // ─── Currencies ────────────────────────────────────────────────────────────────
 const CURRENCIES = [
@@ -1038,8 +1041,41 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                 ? t("zakat.summary.closeToNisab")
                 : t("zakat.summary.belowNisab")}
             </p>
-            <div className="flex items-center justify-center pt-2">
+            <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
               <ShareButton calculator="zakat" state={state} schema={ZAKAT_URL_SCHEMA} />
+              <SaveButton
+                calculator="zakat"
+                state={state}
+                schema={ZAKAT_URL_SCHEMA}
+                defaultName={`Zakat ${state.currency} ${Math.round(result.total)}`}
+              />
+              <Button
+                variant="outline"
+                size="default"
+                className="gap-2 font-semibold"
+                onClick={() =>
+                  downloadZakatPdf({
+                    currency: state.currency,
+                    currencySymbol: currSym,
+                    nisab: result.nisab,
+                    total: result.total,
+                    zakatDue,
+                    breakdown: [
+                      { label: "Cash & savings", amount: result.cashZakatable },
+                      { label: "Gold & silver", amount: result.goldSilverZakatable },
+                      { label: "Investments", amount: result.investZakatable },
+                      { label: "Business", amount: result.businessZakatable },
+                      { label: "Rental (net)", amount: result.rentalZakatable },
+                    ],
+                    locale,
+                    shareUrl: buildShareUrl(state, ZAKAT_URL_SCHEMA),
+                  })
+                }
+                data-testid="button-download-pdf"
+              >
+                <Download className="w-4 h-4" />
+                {t("common.downloadPdf")}
+              </Button>
             </div>
           </div>
 

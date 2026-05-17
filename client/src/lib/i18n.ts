@@ -136,6 +136,9 @@ const translations = {
   "common.mAgo": { en: "m ago", ms: "m lalu", id: "m lalu" },
   "common.hAgo": { en: "h ago", ms: "j lalu", id: "j lalu" },
   "common.calculate": { en: "Calculate", ms: "Kira", id: "Hitung" },
+  "common.downloadPdf": { en: "Download PDF", ms: "Muat turun PDF", id: "Unduh PDF" },
+  "common.save": { en: "Save", ms: "Simpan", id: "Simpan" },
+  "common.saved": { en: "Saved", ms: "Disimpan", id: "Tersimpan" },
   "common.reset": { en: "Reset", ms: "Tetapkan Semula", id: "Atur Ulang" },
   "common.error": { en: "Error", ms: "Ralat", id: "Kesalahan" },
 
@@ -186,6 +189,39 @@ const translations = {
     id: "Kami tidak akan membagikan email Anda. Berhenti berlangganan dengan satu klik.",
   },
   "share.newsletter.dismiss": { en: "Dismiss", ms: "Tutup", id: "Tutup" },
+
+  // ── Save scenarios ──
+  "save.action": { en: "Save scenario", ms: "Simpan senario", id: "Simpan skenario" },
+  "save.savedShort": { en: "Saved", ms: "Disimpan", id: "Tersimpan" },
+  "save.saved": { en: "Scenario saved", ms: "Senario disimpan", id: "Skenario tersimpan" },
+  "save.savedDesc": {
+    en: "Find it under Saved in the history drawer.",
+    ms: "Cari di bawah Disimpan dalam laci sejarah.",
+    id: "Temukan di bawah Tersimpan pada laci riwayat.",
+  },
+  "save.dialogTitle": {
+    en: "Name this scenario",
+    ms: "Namakan senario ini",
+    id: "Beri nama skenario ini",
+  },
+  "save.dialogDesc": {
+    en: "Give it a label you'll recognise later — e.g. \"My 2026 salary\" or \"Mum's faraid\".",
+    ms: "Beri label yang anda akan kenal nanti — cth. \"Gaji saya 2026\" atau \"Faraid mak\".",
+    id: "Beri label yang Anda akan kenali nanti — cth. \"Gaji saya 2026\" atau \"Faraid ibu\".",
+  },
+  "save.namePlaceholder": {
+    en: "Scenario name",
+    ms: "Nama senario",
+    id: "Nama skenario",
+  },
+  "save.cancel": { en: "Cancel", ms: "Batal", id: "Batal" },
+  "save.confirm": { en: "Save", ms: "Simpan", id: "Simpan" },
+  "save.sectionTitle": { en: "Saved", ms: "Disimpan", id: "Tersimpan" },
+  "save.empty": {
+    en: "No saved scenarios yet",
+    ms: "Tiada senario disimpan",
+    id: "Belum ada skenario tersimpan",
+  },
 
   // ── Home Page ──
   "home.title": { en: "Islamic Inheritance Calculator", ms: "Kalkulator Waris Islam", id: "Kalkulator Waris Islam" },

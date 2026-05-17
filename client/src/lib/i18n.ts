@@ -731,6 +731,68 @@ const translations = {
     ms: "Kami tidak akan berkongsi e-mel anda. Lihat Dasar Privasi kami.",
     id: "Kami tidak pernah membagikan email Anda. Lihat Kebijakan Privasi kami.",
   },
+
+  // ── Salary percentile ──
+  "salary.percentile.title": {
+    en: "Where do you stand?",
+    ms: "Di mana kedudukan anda?",
+    id: "Di mana posisi Anda?",
+  },
+  "salary.percentile.subtitle": {
+    en: "Compare your gross salary against Malaysian income brackets and other users on this site.",
+    ms: "Bandingkan gaji kotor anda dengan jurang pendapatan Malaysia dan pengguna lain di laman ini.",
+    id: "Bandingkan gaji kotor Anda dengan kisaran pendapatan Malaysia dan pengguna lain di situs ini.",
+  },
+  "salary.percentile.malaysiaBracket": {
+    en: "Malaysia income bracket (DOSM 2022)",
+    ms: "Jurang pendapatan Malaysia (DOSM 2022)",
+    id: "Kisaran pendapatan Malaysia (DOSM 2022)",
+  },
+  "salary.percentile.bracket.B40": {
+    en: "Bottom 40% of households",
+    ms: "40% isi rumah terbawah",
+    id: "40% rumah tangga terbawah",
+  },
+  "salary.percentile.bracket.M40": {
+    en: "Middle 40% of households",
+    ms: "40% isi rumah pertengahan",
+    id: "40% rumah tangga menengah",
+  },
+  "salary.percentile.bracket.T20": {
+    en: "Top 20% of households",
+    ms: "20% isi rumah teratas",
+    id: "20% rumah tangga teratas",
+  },
+  "salary.percentile.bracket.T10": {
+    en: "Top 10% of households",
+    ms: "10% isi rumah teratas",
+    id: "10% rumah tangga teratas",
+  },
+  "salary.percentile.bracket.T1": {
+    en: "Top 1% of households",
+    ms: "1% isi rumah teratas",
+    id: "1% rumah tangga teratas",
+  },
+  "salary.percentile.amongUsers": {
+    en: "You are in the top {percentile}% of {sampleSize} salary submissions on this site.",
+    ms: "Anda berada dalam {percentile}% teratas daripada {sampleSize} penghantaran gaji di laman ini.",
+    id: "Anda berada di {percentile}% teratas dari {sampleSize} pengiriman gaji di situs ini.",
+  },
+  "salary.percentile.windowNote": {
+    en: "Based on submissions in the last 6 months. Anonymous and aggregate only.",
+    ms: "Berdasarkan penghantaran dalam 6 bulan lepas. Anonim dan agregat sahaja.",
+    id: "Berdasarkan pengiriman dalam 6 bulan terakhir. Anonim dan agregat saja.",
+  },
+  "salary.percentile.notEnoughData": {
+    en: "Not enough submissions yet to show your rank among other users. Come back soon.",
+    ms: "Belum cukup data untuk menunjukkan kedudukan anda berbanding pengguna lain. Kembali tidak lama lagi.",
+    id: "Belum cukup data untuk menunjukkan posisi Anda dibanding pengguna lain. Kembali lagi nanti.",
+  },
+  "salary.percentile.householdNote": {
+    en: "DOSM B40/M40/T20 brackets are measured at household income level. If this is your individual salary in a multi-earner household, your household bracket is likely higher.",
+    ms: "Jurang B40/M40/T20 DOSM diukur pada tahap pendapatan isi rumah. Jika ini gaji individu anda dalam isi rumah dengan beberapa pencari nafkah, jurang isi rumah anda mungkin lebih tinggi.",
+    id: "Kisaran B40/M40/T20 DOSM diukur pada tingkat pendapatan rumah tangga. Jika ini gaji individu Anda di rumah tangga dengan beberapa pencari nafkah, kisaran rumah tangga Anda kemungkinan lebih tinggi.",
+  },
   "zakat.lead.reminder.title": {
     en: "Get a yearly Zakat reminder",
     ms: "Dapatkan peringatan Zakat tahunan",

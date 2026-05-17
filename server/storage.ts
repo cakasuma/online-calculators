@@ -11,12 +11,39 @@ import {
 } from "../shared/schema";
 import { getDb } from "./db";
 
+export interface SalaryDistribution {
+  sampleSize: number;
+  /** ms since epoch — earliest event timestamp considered for the window. */
+  windowStart: number;
+  /** Percentile breakpoints in ringgit per month, sorted ascending. */
+  breakpoints: { p: number; value: number }[];
+}
+
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   createLead(lead: InsertLead): Promise<Lead>;
   recordEvent(event: InsertCalculationEvent): Promise<CalculationEvent>;
+  /** Aggregate salary submissions over the recent window. Returns null when
+   *  not enough data exists to draw meaningful percentiles. */
+  getSalaryDistribution(): Promise<SalaryDistribution | null>;
+}
+
+const SALARY_PERCENTILES = [10, 25, 50, 75, 90, 99];
+const SALARY_WINDOW_DAYS = 180;
+const SALARY_MIN_SAMPLE = 20;
+
+function computePercentiles(sortedAsc: number[]): { p: number; value: number }[] {
+  const n = sortedAsc.length;
+  return SALARY_PERCENTILES.map((p) => {
+    if (n === 0) return { p, value: 0 };
+    const rank = (p / 100) * (n - 1);
+    const lo = Math.floor(rank);
+    const hi = Math.ceil(rank);
+    const value = lo === hi ? sortedAsc[lo] : sortedAsc[lo] + (sortedAsc[hi] - sortedAsc[lo]) * (rank - lo);
+    return { p, value: Math.round(value) };
+  });
 }
 
 export class MemStorage implements IStorage {
@@ -76,6 +103,24 @@ export class MemStorage implements IStorage {
     this.events.push(event);
     return event;
   }
+
+  async getSalaryDistribution(): Promise<SalaryDistribution | null> {
+    const windowStart = Date.now() - SALARY_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    const values: number[] = [];
+    for (const e of this.events) {
+      if (e.calculator !== "salary" || e.event !== "calculator_complete") continue;
+      if (e.createdAt.getTime() < windowStart) continue;
+      const v = (e.payload as Record<string, unknown> | null)?.monthlySalary;
+      if (typeof v === "number" && v > 0 && v < 10_000_000) values.push(v);
+    }
+    if (values.length < SALARY_MIN_SAMPLE) return null;
+    values.sort((a, b) => a - b);
+    return {
+      sampleSize: values.length,
+      windowStart,
+      breakpoints: computePercentiles(values),
+    };
+  }
 }
 
 export class DbStorage implements IStorage {
@@ -114,6 +159,46 @@ export class DbStorage implements IStorage {
     if (!db) throw new Error("Database not configured");
     const [row] = await db.insert(calculationEvents).values(input).returning();
     return row;
+  }
+
+  async getSalaryDistribution(): Promise<SalaryDistribution | null> {
+    const db = getDb();
+    if (!db) return null;
+    const windowStart = new Date(Date.now() - SALARY_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+    const { sql } = await import("drizzle-orm");
+    // Use a CTE to extract monthlySalary once, then compute count + percentiles
+    // in a single round trip. payload is jsonb; the value lives at $.monthlySalary.
+    const percentileFractions = SALARY_PERCENTILES.map((p) => p / 100);
+    const rows = await db.execute(sql`
+      WITH sample AS (
+        SELECT (payload->>'monthlySalary')::numeric AS v
+        FROM ${calculationEvents}
+        WHERE calculator = 'salary'
+          AND event = 'calculator_complete'
+          AND created_at >= ${windowStart}
+          AND payload ? 'monthlySalary'
+      )
+      SELECT
+        count(*) FILTER (WHERE v > 0 AND v < 10000000) AS sample_size,
+        percentile_cont(ARRAY[${sql.raw(percentileFractions.join(","))}]::float[])
+          WITHIN GROUP (ORDER BY v) AS breakpoints
+      FROM sample
+      WHERE v > 0 AND v < 10000000
+    `);
+
+    const row = (rows as unknown as { rows?: Array<Record<string, unknown>> }).rows?.[0]
+      ?? (rows as unknown as Array<Record<string, unknown>>)[0];
+    if (!row) return null;
+
+    const sampleSize = Number(row.sample_size ?? row.sampleSize ?? 0);
+    if (sampleSize < SALARY_MIN_SAMPLE) return null;
+    const raw = row.breakpoints as number[] | null;
+    if (!raw) return null;
+    return {
+      sampleSize,
+      windowStart: windowStart.getTime(),
+      breakpoints: SALARY_PERCENTILES.map((p, i) => ({ p, value: Math.round(raw[i]) })),
+    };
   }
 }
 

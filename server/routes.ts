@@ -67,6 +67,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/salary-percentile", async (_req, res) => {
+    try {
+      const dist = await storage.getSalaryDistribution();
+      // Cache for 1 hour to absorb load — percentiles change slowly and the
+      // window is 180 days, so this stays accurate enough for the UI.
+      res.set("Cache-Control", "public, max-age=3600, s-maxage=3600");
+      if (!dist) {
+        return res.json({ available: false });
+      }
+      return res.json({
+        available: true,
+        sampleSize: dist.sampleSize,
+        windowStart: dist.windowStart,
+        breakpoints: dist.breakpoints,
+      });
+    } catch (err) {
+      console.error("[salary-percentile] failed", err);
+      return res.status(500).json({ available: false });
+    }
+  });
+
   app.get("/api/metal-prices", async (req, res) => {
     const currency = (req.query.currency as string) || "MYR";
 

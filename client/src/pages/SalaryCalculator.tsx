@@ -8,6 +8,7 @@ import type { TranslationKey } from "@/lib/i18n";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
+import { SalaryPercentile } from "@/components/SalaryPercentile";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
   buildShareUrl,
@@ -527,6 +528,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               ))}
             </div>
           )}
+
+          {showResults && <SalaryPercentile monthlyGross={parsedInput.monthlySalary} />}
 
           {showResults && (
             <LeadCaptureCard

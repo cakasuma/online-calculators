@@ -41,6 +41,7 @@ import WasiatGuide from "@/pages/WasiatGuide";
 import ZakatCalculator from "@/pages/ZakatCalculator";
 import SalaryCalculator from "@/pages/SalaryCalculator";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import Partners from "@/pages/Partners";
 import TermsOfUse from "@/pages/TermsOfUse";
 import NotFound from "@/pages/not-found";
 
@@ -273,6 +274,7 @@ function Layout() {
               <ZakatCalculator onCalculate={handleCalculate("zakat")} />
               <CalculatorContent slug="zakat" />
             </Route>
+            <Route path="/partners" component={Partners} />
             <Route path="/privacy" component={PrivacyPolicy} />
             <Route path="/terms" component={TermsOfUse} />
             <Route component={NotFound} />
@@ -330,6 +332,9 @@ function Layout() {
                 <span className="hover:text-foreground transition-colors cursor-pointer">{t(`tools.${item.slug}.name` as any)}</span>
               </Link>
             ))}
+            <Link href="/partners">
+              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.partners")}</span>
+            </Link>
             <Link href="/privacy">
               <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.privacy")}</span>
             </Link>

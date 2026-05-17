@@ -67,6 +67,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/embed-hosts", async (_req, res) => {
+    try {
+      const hosts = await storage.getEmbedHosts();
+      // Cache aggressively — the partner directory does not need to be
+      // sub-minute accurate, and this endpoint is hit by every Partners
+      // page view.
+      res.set("Cache-Control", "public, max-age=900, s-maxage=3600");
+      return res.json({
+        totalHosts: hosts.length,
+        totalEmbedViews: hosts.reduce((sum, h) => sum + h.count, 0),
+        hosts: hosts.slice(0, 100),
+      });
+    } catch (err) {
+      console.error("[embed-hosts] failed", err);
+      return res.status(500).json({ totalHosts: 0, totalEmbedViews: 0, hosts: [] });
+    }
+  });
+
   app.get("/api/salary-percentile", async (_req, res) => {
     try {
       const dist = await storage.getSalaryDistribution();

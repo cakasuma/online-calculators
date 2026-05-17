@@ -485,7 +485,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                 type="button"
                 onClick={() => setSilverPriceOverride((v) => !v)}
                 className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
+                title={silverPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                 disabled={livePricesLoading}
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -518,7 +518,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
           {/* Price source attribution */}
           {livePricesLoaded && priceSource && (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span>Price via</span>
+              <span>{t("zakat.price.via")}</span>
               <a
                 href={priceSource.url}
                 target="_blank"
@@ -692,7 +692,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                     type="button"
                     onClick={() => setGoldPriceOverride((v) => !v)}
                     className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${goldPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                    title={goldPriceOverride ? "Lock to live price" : "Edit price manually"}
+                    title={goldPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                     disabled={livePricesLoading}
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -760,7 +760,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                     type="button"
                     onClick={() => setSilverPriceOverride((v) => !v)}
                     className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                    title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
+                    title={silverPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                     disabled={livePricesLoading}
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -1031,7 +1031,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
             </p>
             <p className={`text-sm font-medium ${zakatTextColor}`}>
               {result.nisab === 0
-                ? "Enter silver price above"
+                ? t("zakat.price.enterSilverFirst")
                 : isAbove
                 ? t("zakat.summary.aboveNisab")
                 : isClose
@@ -1062,12 +1062,12 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
           intent="reminder"
           source="zakat-yearly-reminder"
           icon={<BellRing className="w-4 h-4 text-primary" />}
-          title="Get a yearly Zakat reminder"
-          description="We'll email you next year on your hawl date with an updated nisab and a quick re-calculation link."
-          ctaLabel="Set my reminder"
-          successTitle="Reminder set."
-          successMessage="We'll email you a year from today."
-          disclaimer="One email per year. No spam."
+          title={t("zakat.lead.reminder.title")}
+          description={t("zakat.lead.reminder.desc")}
+          ctaLabel={t("zakat.lead.reminder.cta")}
+          successTitle={t("zakat.lead.reminder.successTitle")}
+          successMessage={t("zakat.lead.reminder.successDesc")}
+          disclaimer={t("zakat.lead.reminder.disclaimer")}
           getContext={() => ({
             currency: state.currency,
             zakatableTotal: Math.round(result.total),

@@ -1658,9 +1658,9 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             description={t("faraid.consultCTA.text")}
             ctaLabel={t("faraid.consultCTA.button")}
             showPhone
-            successTitle="Consultation requested."
-            successMessage="A certified faraid consultant will be in touch within 1 business day."
-            disclaimer="By submitting you agree to be contacted by a partnered consultant about your inheritance plan."
+            successTitle={t("faraid.lead.consult.successTitle")}
+            successMessage={t("faraid.lead.consult.successDesc")}
+            disclaimer={t("faraid.lead.consult.disclaimer")}
             getContext={() => ({
               currency: form.currency,
               estateValue: estate,

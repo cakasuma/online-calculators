@@ -593,6 +593,152 @@ const translations = {
   "salary.takeHomePay": { en: "Estimated monthly take-home pay", ms: "Anggaran gaji bersih bulanan", id: "Estimasi gaji bersih bulanan" },
   "salary.ofMonthlyGross": { en: "of monthly gross salary", ms: "daripada gaji kotor bulanan", id: "dari gaji kotor bulanan" },
   "salary.fixInputErrors": { en: "Fix input errors to view estimate", ms: "Perbaiki input yang error untuk melihat anggaran", id: "Perbaiki input yang error untuk melihat estimasi" },
+  "salary.cta.calculate": {
+    en: "Calculate my take-home pay",
+    ms: "Kira gaji bersih saya",
+    id: "Hitung gaji bersih saya",
+  },
+  "salary.cta.recalculate": {
+    en: "Recalculate take-home pay",
+    ms: "Kira semula gaji bersih",
+    id: "Hitung ulang gaji bersih",
+  },
+  "salary.cta.tapToReveal": {
+    en: "Tap Calculate to reveal your take-home pay",
+    ms: "Tekan Kira untuk lihat gaji bersih anda",
+    id: "Tekan Hitung untuk lihat gaji bersih Anda",
+  },
+  "salary.breakdown.ready": {
+    en: "Your breakdown is ready",
+    ms: "Pecahan anda sudah sedia",
+    id: "Rincian Anda siap",
+  },
+  "salary.breakdown.hint": {
+    en: "Fill in your salary details on the left, then tap Calculate to see EPF, PCB, SOCSO, and your monthly take-home.",
+    ms: "Isikan butiran gaji anda di sebelah kiri, kemudian tekan Kira untuk melihat EPF, PCB, SOCSO dan gaji bersih bulanan anda.",
+    id: "Isi detail gaji Anda di sebelah kiri, lalu tekan Hitung untuk melihat EPF, PCB, SOCSO, dan gaji bersih bulanan Anda.",
+  },
+  "salary.lead.title": {
+    en: "Get personalised tax-saving tips",
+    ms: "Dapatkan tip jimat cukai yang diperibadikan",
+    id: "Dapatkan tips hemat pajak yang dipersonalisasi",
+  },
+  "salary.lead.desc": {
+    en: "Free monthly email with EPF, PCB and tax-relief moves tailored to your salary band. Unsubscribe anytime.",
+    ms: "E-mel bulanan percuma dengan langkah EPF, PCB dan pelepasan cukai yang sesuai dengan jurang gaji anda. Henti langganan bila-bila masa.",
+    id: "Email bulanan gratis dengan langkah EPF, PCB, dan keringanan pajak yang sesuai dengan kisaran gaji Anda. Berhenti berlangganan kapan saja.",
+  },
+  "salary.lead.cta": {
+    en: "Send me tax-saving tips",
+    ms: "Hantar tip jimat cukai kepada saya",
+    id: "Kirim tips hemat pajak ke saya",
+  },
+  "salary.lead.successTitle": {
+    en: "You're in.",
+    ms: "Anda sudah dalam senarai.",
+    id: "Anda sudah terdaftar.",
+  },
+  "salary.lead.successDesc": {
+    en: "We'll send the first tips within 24 hours.",
+    ms: "Kami akan menghantar tip pertama dalam masa 24 jam.",
+    id: "Kami akan mengirim tips pertama dalam 24 jam.",
+  },
+  "salary.lead.disclaimer": {
+    en: "We never share your email. See our Privacy Policy.",
+    ms: "Kami tidak akan berkongsi e-mel anda. Lihat Dasar Privasi kami.",
+    id: "Kami tidak pernah membagikan email Anda. Lihat Kebijakan Privasi kami.",
+  },
+  "zakat.lead.reminder.title": {
+    en: "Get a yearly Zakat reminder",
+    ms: "Dapatkan peringatan Zakat tahunan",
+    id: "Dapatkan pengingat Zakat tahunan",
+  },
+  "zakat.lead.reminder.desc": {
+    en: "We'll email you next year on your hawl date with an updated nisab and a quick re-calculation link.",
+    ms: "Kami akan menghantar e-mel kepada anda tahun depan pada tarikh haul anda dengan nisab terkini dan pautan kira semula yang pantas.",
+    id: "Kami akan mengirim email Anda tahun depan pada tanggal haul Anda dengan nisab terbaru dan tautan hitung ulang yang cepat.",
+  },
+  "zakat.lead.reminder.cta": {
+    en: "Set my reminder",
+    ms: "Tetapkan peringatan saya",
+    id: "Atur pengingat saya",
+  },
+  "zakat.lead.reminder.successTitle": {
+    en: "Reminder set.",
+    ms: "Peringatan ditetapkan.",
+    id: "Pengingat diatur.",
+  },
+  "zakat.lead.reminder.successDesc": {
+    en: "We'll email you a year from today.",
+    ms: "Kami akan menghantar e-mel kepada anda setahun dari sekarang.",
+    id: "Kami akan mengirim email kepada Anda satu tahun dari sekarang.",
+  },
+  "zakat.lead.reminder.disclaimer": {
+    en: "One email per year. No spam.",
+    ms: "Satu e-mel setahun. Tiada spam.",
+    id: "Satu email per tahun. Tanpa spam.",
+  },
+  "zakat.price.lockToLive": {
+    en: "Lock to live price",
+    ms: "Kunci ke harga semasa",
+    id: "Kunci ke harga terkini",
+  },
+  "zakat.price.editManually": {
+    en: "Edit price manually",
+    ms: "Edit harga secara manual",
+    id: "Ubah harga secara manual",
+  },
+  "zakat.price.via": { en: "Price via", ms: "Harga daripada", id: "Harga dari" },
+  "zakat.price.enterSilverFirst": {
+    en: "Enter silver price above",
+    ms: "Masukkan harga perak di atas",
+    id: "Masukkan harga perak di atas",
+  },
+  "wasiat.lead.consult.title": {
+    en: "Get a free 15-min consult with a Shariah lawyer",
+    ms: "Dapatkan perundingan percuma 15 minit dengan peguam Syariah",
+    id: "Dapatkan konsultasi gratis 15 menit dengan pengacara Syariah",
+  },
+  "wasiat.lead.consult.desc": {
+    en: "A licensed solicitor will review your bequests and witness/registration steps. No obligation.",
+    ms: "Peguam berlesen akan menyemak wasiat anda serta langkah saksi/pendaftaran. Tiada obligasi.",
+    id: "Pengacara berlisensi akan meninjau wasiat Anda dan langkah saksi/pendaftaran. Tanpa kewajiban.",
+  },
+  "wasiat.lead.consult.cta": {
+    en: "Book my free consult",
+    ms: "Tempah perundingan percuma saya",
+    id: "Pesan konsultasi gratis saya",
+  },
+  "wasiat.lead.consult.successTitle": {
+    en: "Request received.",
+    ms: "Permintaan diterima.",
+    id: "Permintaan diterima.",
+  },
+  "wasiat.lead.consult.successDesc": {
+    en: "A Shariah-trained partner will reach out within 1 business day.",
+    ms: "Rakan terlatih Syariah akan menghubungi anda dalam 1 hari bekerja.",
+    id: "Mitra terlatih Syariah akan menghubungi dalam 1 hari kerja.",
+  },
+  "wasiat.lead.consult.disclaimer": {
+    en: "By submitting you agree to be contacted by a partnered solicitor about your Wasiat.",
+    ms: "Dengan menghantar, anda bersetuju untuk dihubungi oleh peguam rakan kongsi tentang Wasiat anda.",
+    id: "Dengan mengirim, Anda setuju dihubungi oleh pengacara mitra tentang Wasiat Anda.",
+  },
+  "faraid.lead.consult.successTitle": {
+    en: "Consultation requested.",
+    ms: "Perundingan diminta.",
+    id: "Konsultasi diminta.",
+  },
+  "faraid.lead.consult.successDesc": {
+    en: "A certified faraid consultant will be in touch within 1 business day.",
+    ms: "Perunding faraid bertauliah akan menghubungi anda dalam 1 hari bekerja.",
+    id: "Konsultan faraid bersertifikat akan menghubungi Anda dalam 1 hari kerja.",
+  },
+  "faraid.lead.consult.disclaimer": {
+    en: "By submitting you agree to be contacted by a partnered consultant about your inheritance plan.",
+    ms: "Dengan menghantar, anda bersetuju untuk dihubungi oleh perunding rakan kongsi tentang rancangan waris anda.",
+    id: "Dengan mengirim, Anda setuju dihubungi oleh konsultan mitra tentang rencana waris Anda.",
+  },
   "salary.inputs.title": { en: "Inputs", ms: "Input", id: "Input" },
   "salary.inputs.subtitle": { en: "Set your employment and tax profile for a closer monthly estimate.", ms: "Atur profil pekerjaan dan cukai Anda untuk anggaran bulanan yang lebih tepat.", id: "Atur profil pekerjaan dan pajak Anda untuk estimasi bulanan yang lebih akurat." },
   "salary.inputs.monthlySalary": { en: "Monthly gross salary", ms: "Gaji kotor bulanan", id: "Gaji kotor bulanan" },

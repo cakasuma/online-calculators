@@ -371,7 +371,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                   ? t("salary.fixInputErrors")
                   : showResults
                   ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                  : "Tap Calculate to reveal your take-home pay"}
+                  : t("salary.cta.tapToReveal")}
               </p>
             </CardContent>
           </Card>
@@ -478,7 +478,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               onClick={handleCalculate}
             >
               <CalculatorIcon className="h-4 w-4" />
-              {hasCalculated ? "Recalculate take-home pay" : "Calculate my take-home pay"}
+              {hasCalculated ? t("salary.cta.recalculate") : t("salary.cta.calculate")}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </CardContent>
@@ -491,9 +491,9 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                   <CalculatorIcon className="h-6 w-6" />
                 </div>
-                <p className="text-base font-semibold">Your breakdown is ready</p>
+                <p className="text-base font-semibold">{t("salary.breakdown.ready")}</p>
                 <p className="max-w-sm text-sm text-muted-foreground">
-                  Fill in your salary details on the left, then tap <span className="font-medium text-foreground">Calculate</span> to see EPF, PCB, SOCSO, and your monthly take-home.
+                  {t("salary.breakdown.hint")}
                 </p>
               </CardContent>
             </Card>
@@ -529,12 +529,12 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               intent="newsletter"
               source="salary-tax-tips"
               icon={<Sparkles className="w-4 h-4 text-primary" />}
-              title="Get personalised tax-saving tips"
-              description="Free monthly email with EPF, PCB and tax-relief moves tailored to your salary band. Unsubscribe anytime."
-              ctaLabel="Send me tax-saving tips"
-              successTitle="You're in."
-              successMessage="We'll send the first tips within 24 hours."
-              disclaimer="We never share your email. See our Privacy Policy."
+              title={t("salary.lead.title")}
+              description={t("salary.lead.desc")}
+              ctaLabel={t("salary.lead.cta")}
+              successTitle={t("salary.lead.successTitle")}
+              successMessage={t("salary.lead.successDesc")}
+              disclaimer={t("salary.lead.disclaimer")}
               getContext={() => ({
                 monthlySalary: parsedInput.monthlySalary,
                 annualBonus: parsedInput.annualBonus,

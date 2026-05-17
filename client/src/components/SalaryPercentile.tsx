@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useLocale } from "@/hooks/use-locale";
 import { formatCurrency } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
-import { INCOME_BRACKETS, bracketForIncome } from "@/lib/salaryBrackets";
+import { BRACKET_SEGMENTS, bracketForIncome, positionInDistribution } from "@/lib/salaryBrackets";
 
 interface Breakpoint {
   p: number;
@@ -67,14 +67,19 @@ export function SalaryPercentile({ monthlyGross }: Props) {
   if (monthlyGross <= 0) return null;
 
   const bracket = bracketForIncome(monthlyGross);
+  // Marker position across the FULL bracket distribution (not within the
+  // current bracket alone). RM 6,000 (just above B40) now lands at ~40.8%
+  // instead of ~2%, matching the labels below the bar.
+  const positionPct = positionInDistribution(monthlyGross);
 
-  // Where does the user sit in the bracket range? Used for the inline marker.
-  const bracketMin = bracket.min;
-  const bracketMax = bracket.max === Infinity ? bracketMin * 2 : bracket.max;
-  const positionPct = Math.min(
-    100,
-    Math.max(0, ((monthlyGross - bracketMin) / Math.max(1, bracketMax - bracketMin)) * 100),
-  );
+  // Bracket segment background colours, ordered B40 → T1 from cool to warm.
+  const segmentTint: Record<string, string> = {
+    B40: "bg-sky-500/15",
+    M40: "bg-emerald-500/15",
+    T20: "bg-amber-500/20",
+    T10: "bg-orange-500/25",
+    T1: "bg-rose-500/30",
+  };
 
   const submissionPctile = dist?.available && dist.breakpoints
     ? percentileOfValue(monthlyGross, dist.breakpoints)
@@ -110,7 +115,7 @@ export function SalaryPercentile({ monthlyGross }: Props) {
               </p>
             </div>
             <p className="text-sm text-muted-foreground">
-              {bracketMin === 0
+              {bracket.min === 0
                 ? `≤ RM ${formatCurrency(bracket.max, locale)}`
                 : bracket.max === Infinity
                   ? `≥ RM ${formatCurrency(bracket.min, locale)}`
@@ -118,29 +123,45 @@ export function SalaryPercentile({ monthlyGross }: Props) {
             </p>
           </div>
 
-          {/* Visual bracket strip */}
-          <div className="relative h-2 rounded-full bg-muted overflow-hidden">
+          {/* Visual bracket strip — segments are proportional to population
+              share (B40=40%, M40=40%, T20=10%, T10=9%, T1=1%) so the marker
+              sits at the user's true position across the full distribution. */}
+          <div className="relative h-3 rounded-full overflow-hidden bg-muted flex">
+            {BRACKET_SEGMENTS.map((seg) => (
+              <div
+                key={seg.key}
+                className={`h-full ${segmentTint[seg.key]} ${seg.key === bracket.key ? "ring-1 ring-inset ring-primary/50" : ""}`}
+                style={{ width: `${seg.endPct - seg.startPct}%` }}
+              />
+            ))}
+            {/* User marker */}
             <div
-              className="absolute top-0 h-full bg-primary/70"
-              style={{ width: `${positionPct}%` }}
-            />
-            <div
-              className="absolute top-[-4px] h-4 w-0.5 bg-foreground"
+              className="absolute top-[-6px] bottom-[-6px] w-0.5 bg-foreground rounded-sm"
               style={{ left: `${positionPct}%` }}
               aria-hidden="true"
             />
+            <div
+              className="absolute top-[-10px] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-foreground border-2 border-background shadow"
+              style={{ left: `${positionPct}%` }}
+              aria-label={`You at percentile ${positionPct.toFixed(1)}`}
+            />
           </div>
 
-          {/* Bracket key row */}
-          <div className="flex justify-between text-[10px] uppercase tracking-wide text-muted-foreground pt-1">
-            {INCOME_BRACKETS.map((b) => (
-              <span
-                key={b.key}
-                className={b.key === bracket.key ? "text-primary font-semibold" : ""}
-              >
-                {b.key}
-              </span>
-            ))}
+          {/* Bracket key row — labels positioned over each segment's midpoint
+              so they line up with the bar above instead of evenly spaced. */}
+          <div className="relative h-4 pt-1">
+            {BRACKET_SEGMENTS.map((seg) => {
+              const mid = (seg.startPct + seg.endPct) / 2;
+              return (
+                <span
+                  key={seg.key}
+                  className={`absolute -translate-x-1/2 text-[10px] uppercase tracking-wide ${seg.key === bracket.key ? "text-primary font-semibold" : "text-muted-foreground"}`}
+                  style={{ left: `${mid}%` }}
+                >
+                  {seg.key}
+                </span>
+              );
+            })}
           </div>
         </div>
 

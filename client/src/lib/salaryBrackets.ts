@@ -49,3 +49,54 @@ export function bracketForIncome(monthlyIncome: number): BracketInfo {
   }
   return INCOME_BRACKETS[0];
 }
+
+/**
+ * Each bracket's share of the bar (cumulative percentage of households).
+ * B40 = 40% of households, M40 = next 40%, T20-but-not-T10 = next 10%,
+ * T10-but-not-T1 = next 9%, T1 = top 1%.
+ *
+ * Used by the SalaryPercentile visual so the bar's segments are
+ * proportional to the population, and the user's marker can sit at its
+ * true location across the full distribution instead of relative to a
+ * single bracket.
+ */
+export const BRACKET_SEGMENTS: { key: IncomeBracket; startPct: number; endPct: number }[] = [
+  { key: "B40", startPct: 0, endPct: 40 },
+  { key: "M40", startPct: 40, endPct: 80 },
+  { key: "T20", startPct: 80, endPct: 90 },
+  { key: "T10", startPct: 90, endPct: 99 },
+  { key: "T1", startPct: 99, endPct: 100 },
+];
+
+/** Visual ceiling for the T1 marker — beyond this, marker pins at 100%. */
+const T1_VISUAL_CEILING = 100_000;
+
+/**
+ * Map a monthly income to the user's position (0-100) across the full
+ * bracket distribution, interpolating linearly inside each bracket's
+ * RM range. So RM 6,000 (just above the B40 ceiling) lands at ~40.8%
+ * rather than ~2% (which would be its position within M40 alone).
+ */
+export function positionInDistribution(monthlyIncome: number): number {
+  if (monthlyIncome <= 0) return 0;
+  for (let i = 0; i < INCOME_BRACKETS.length; i++) {
+    const b = INCOME_BRACKETS[i];
+    const seg = BRACKET_SEGMENTS[i];
+    const segWidth = seg.endPct - seg.startPct;
+    // Find the RM-range for this bracket so we can interpolate inside it.
+    const rmLo = b.min === 0 ? 0 : b.min;
+    let rmHi: number;
+    if (b.max === Infinity) {
+      // T1 is open-ended; cap at a sensible visual ceiling so the marker
+      // can still move within the segment for high but realistic incomes.
+      rmHi = T1_VISUAL_CEILING;
+    } else {
+      rmHi = b.max;
+    }
+    if (monthlyIncome <= rmHi) {
+      const frac = Math.min(1, Math.max(0, (monthlyIncome - rmLo) / Math.max(1, rmHi - rmLo)));
+      return seg.startPct + frac * segWidth;
+    }
+  }
+  return 100;
+}

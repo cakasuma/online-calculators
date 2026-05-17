@@ -12,8 +12,10 @@ import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
+import { SaveButton } from "@/components/SaveButton";
+import { EmbedDialog } from "@/components/EmbedDialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { formatInputValue, formatCurrency } from "@/lib/i18n";
+import { formatInputValue, formatCurrency, type TranslationKey } from "@/lib/i18n";
 import {
   boolField,
   buildShareUrl,
@@ -24,6 +26,8 @@ import {
   useUrlSync,
   type UrlSchema,
 } from "@/lib/urlState";
+import { downloadFaraidPdf } from "@/lib/pdf/faraidPdf";
+import { Download } from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -1507,6 +1511,53 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                 <CardTitle className="text-base">{t("faraid.results")}</CardTitle>
                 <div className="flex gap-2 print:hidden flex-wrap">
                   <ShareButton calculator="faraid" state={form} schema={FARAID_URL_SCHEMA} />
+                  <SaveButton
+                    calculator="faraid"
+                    state={form}
+                    schema={FARAID_URL_SCHEMA}
+                    defaultName={`Faraid ${form.currency} ${form.totalEstate || "scenario"}`}
+                  />
+                  <EmbedDialog calculator="faraid" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!result) return;
+                      const estate = parseInput(form.totalEstate);
+                      const debts = parseInput(form.debtsAndExpenses);
+                      const wasiyyah = parseInput(form.wasiyyah);
+                      downloadFaraidPdf({
+                        currency: form.currency,
+                        currencySymbol,
+                        estateValue: estate,
+                        debtsAndExpenses: debts,
+                        wasiyyah,
+                        netEstate: result.netEstate,
+                        heirs: result.heirs.map((h) => ({
+                          name: t(h.nameKey as TranslationKey) +
+                            (h.nameNum && h.nameNum > 1 ? ` (${h.nameNum})` : ""),
+                          share: h.share,
+                          amount: h.amount,
+                          percentage: h.percentage,
+                          type: h.type,
+                        })),
+                        blockedHeirs: result.blockedHeirs.map((b) => ({
+                          name: t(b.nameKey as TranslationKey),
+                          blockedBy: t(b.blockedByKey as TranslationKey),
+                        })),
+                        hasAwl: result.hasAwl,
+                        awlFactor: result.awlFactor,
+                        undistributed: result.undistributed,
+                        locale,
+                        shareUrl: buildShareUrl(form, FARAID_URL_SCHEMA),
+                      });
+                    }}
+                    className="gap-1.5 text-xs"
+                    data-testid="button-download-pdf"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    {t("common.downloadPdf")}
+                  </Button>
                   <Button variant="outline" size="sm" onClick={handleShareWhatsApp} className="gap-1.5 text-xs">
                     <Share2 className="w-3.5 h-3.5" />
                     {t("faraid.shareResults")}

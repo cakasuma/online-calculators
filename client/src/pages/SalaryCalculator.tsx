@@ -7,6 +7,9 @@ import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
+import { SaveButton } from "@/components/SaveButton";
+import { SalaryPercentile } from "@/components/SalaryPercentile";
+import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
   buildShareUrl,
@@ -18,6 +21,7 @@ import {
   useUrlSync,
   type UrlSchema,
 } from "@/lib/urlState";
+import { downloadSalaryPdf } from "@/lib/pdf/salaryPdf";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -142,6 +146,9 @@ function calculateSalary(input: SalaryInputs) {
     monthlyDeductions,
     monthlyNet,
     annualIncomeTax,
+    annualEpf,
+    annualSocso,
+    annualEis,
   };
 }
 
@@ -242,7 +249,7 @@ interface Props {
 }
 
 export default function SalaryCalculator({ onCalculate }: Props = {}) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   // Read URL params once on mount to pre-fill the form when a user opens a
   // shared link. Falls back to DEFAULT_INPUTS for any missing/invalid params.
   const [initial] = useState<SalaryUrlState>(() =>
@@ -523,6 +530,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             </div>
           )}
 
+          {showResults && <SalaryPercentile monthlyGross={parsedInput.monthlySalary} />}
+
           {showResults && (
             <LeadCaptureCard
               calculator="salary"
@@ -561,8 +570,27 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                       state={parsedInput}
                       schema={SALARY_URL_SCHEMA}
                     />
-                    <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
-                      <Download className="h-4 w-4" /> {t("salary.save")}
+                    <SaveButton
+                      calculator="salary"
+                      state={parsedInput}
+                      schema={SALARY_URL_SCHEMA}
+                      defaultName={`RM ${Math.round(parsedInput.monthlySalary)}/mo${parsedInput.annualBonus ? ` + bonus` : ""}`}
+                    />
+                    <EmbedDialog calculator="salary" />
+                    <Button
+                      variant="outline"
+                      className="gap-2 rounded-2xl"
+                      onClick={() =>
+                        downloadSalaryPdf({
+                          inputs: parsedInput,
+                          result,
+                          locale,
+                          shareUrl: buildShareUrl(parsedInput, SALARY_URL_SCHEMA),
+                        })
+                      }
+                      data-testid="button-download-pdf"
+                    >
+                      <Download className="h-4 w-4" /> {t("common.downloadPdf")}
                     </Button>
                   </div>
                 </div>

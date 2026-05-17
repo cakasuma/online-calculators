@@ -42,6 +42,14 @@ function hasLocalePrefix(reqPath: string): boolean {
   return (SUPPORTED_LOCALES as readonly string[]).includes(first);
 }
 
+// /embed/<calculator> is the partner-embeddable subtree. It never carries a
+// locale prefix and must not be redirected, otherwise EmbedApp never mounts
+// (locale-aware redirect would push it to /en/embed/... which the client
+// then renders as the regular App rather than the embed shell).
+function isEmbedPath(reqPath: string): boolean {
+  return reqPath === "/embed" || reqPath.startsWith("/embed/");
+}
+
 function detectLocaleFromHeader(acceptLanguage?: string): string {
   if (!acceptLanguage) return DEFAULT_LOCALE;
   const lower = acceptLanguage.toLowerCase();
@@ -90,7 +98,7 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
     const reqPath = url.split("?")[0] || "/";
 
-    if (reqPath !== "/" && !hasLocalePrefix(reqPath)) {
+    if (reqPath !== "/" && !hasLocalePrefix(reqPath) && !isEmbedPath(reqPath)) {
       const locale = detectLocaleFromHeader(req.headers["accept-language"] as string | undefined);
       const search = url.includes("?") ? url.slice(url.indexOf("?")) : "";
       return res.redirect(302, `/${locale}${reqPath}${search}`);
@@ -135,7 +143,8 @@ export function serveStatic(app: Express) {
     const reqPath = req.path || "/";
 
     // Redirect bare paths to the default locale so prerendered HTML can be served.
-    if (reqPath !== "/" && !hasLocalePrefix(reqPath)) {
+    // /embed/* is exempt — it's a partner-embeddable subtree that doesn't carry a locale prefix.
+    if (reqPath !== "/" && !hasLocalePrefix(reqPath) && !isEmbedPath(reqPath)) {
       const locale = detectLocaleFromHeader(req.headers["accept-language"] as string | undefined);
       return res.redirect(302, `/${locale}${reqPath}`);
     }

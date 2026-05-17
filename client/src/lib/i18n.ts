@@ -136,6 +136,9 @@ const translations = {
   "common.mAgo": { en: "m ago", ms: "m lalu", id: "m lalu" },
   "common.hAgo": { en: "h ago", ms: "j lalu", id: "j lalu" },
   "common.calculate": { en: "Calculate", ms: "Kira", id: "Hitung" },
+  "common.downloadPdf": { en: "Download PDF", ms: "Muat turun PDF", id: "Unduh PDF" },
+  "common.save": { en: "Save", ms: "Simpan", id: "Simpan" },
+  "common.saved": { en: "Saved", ms: "Disimpan", id: "Tersimpan" },
   "common.reset": { en: "Reset", ms: "Tetapkan Semula", id: "Atur Ulang" },
   "common.error": { en: "Error", ms: "Ralat", id: "Kesalahan" },
 
@@ -186,6 +189,67 @@ const translations = {
     id: "Kami tidak akan membagikan email Anda. Berhenti berlangganan dengan satu klik.",
   },
   "share.newsletter.dismiss": { en: "Dismiss", ms: "Tutup", id: "Tutup" },
+
+  // ── Save scenarios ──
+  "save.action": { en: "Save scenario", ms: "Simpan senario", id: "Simpan skenario" },
+  "save.savedShort": { en: "Saved", ms: "Disimpan", id: "Tersimpan" },
+  "save.saved": { en: "Scenario saved", ms: "Senario disimpan", id: "Skenario tersimpan" },
+  "save.savedDesc": {
+    en: "Find it under Saved in the history drawer.",
+    ms: "Cari di bawah Disimpan dalam laci sejarah.",
+    id: "Temukan di bawah Tersimpan pada laci riwayat.",
+  },
+  "save.dialogTitle": {
+    en: "Name this scenario",
+    ms: "Namakan senario ini",
+    id: "Beri nama skenario ini",
+  },
+  "save.dialogDesc": {
+    en: "Give it a label you'll recognise later — e.g. \"My 2026 salary\" or \"Mum's faraid\".",
+    ms: "Beri label yang anda akan kenal nanti — cth. \"Gaji saya 2026\" atau \"Faraid mak\".",
+    id: "Beri label yang Anda akan kenali nanti — cth. \"Gaji saya 2026\" atau \"Faraid ibu\".",
+  },
+  "save.namePlaceholder": {
+    en: "Scenario name",
+    ms: "Nama senario",
+    id: "Nama skenario",
+  },
+  "save.cancel": { en: "Cancel", ms: "Batal", id: "Batal" },
+  "save.confirm": { en: "Save", ms: "Simpan", id: "Simpan" },
+  "save.sectionTitle": { en: "Saved", ms: "Disimpan", id: "Tersimpan" },
+  "save.empty": {
+    en: "No saved scenarios yet",
+    ms: "Tiada senario disimpan",
+    id: "Belum ada skenario tersimpan",
+  },
+
+  // ── Embed widget ──
+  "embed.button": { en: "Embed", ms: "Benamkan", id: "Sematkan" },
+  "embed.dialogTitle": {
+    en: "Embed this calculator on your site",
+    ms: "Benamkan kalkulator ini di laman anda",
+    id: "Sematkan kalkulator ini di situs Anda",
+  },
+  "embed.dialogDesc": {
+    en: "Paste this snippet anywhere on your page. The iframe auto-resizes as users interact.",
+    ms: "Tampalkan keratan ini di mana-mana pada halaman anda. Iframe akan ubah saiz secara automatik semasa pengguna berinteraksi.",
+    id: "Tempelkan cuplikan ini di mana saja pada halaman Anda. Iframe akan menyesuaikan ukuran secara otomatis saat pengguna berinteraksi.",
+  },
+  "embed.htmlSnippet": { en: "HTML snippet", ms: "Keratan HTML", id: "Cuplikan HTML" },
+  "embed.urlOnly": { en: "Direct URL only", ms: "URL sahaja", id: "URL saja" },
+  "embed.copy": { en: "Copy", ms: "Salin", id: "Salin" },
+  "embed.copied": { en: "Copied!", ms: "Disalin!", id: "Tersalin!" },
+  "embed.copyError": { en: "Could not copy", ms: "Tidak boleh disalin", id: "Tidak dapat menyalin" },
+  "embed.snippetHint": {
+    en: "Includes the auto-resize helper script. Drop the snippet into any HTML or CMS rich-text block.",
+    ms: "Termasuk skrip pembantu ubah saiz automatik. Letakkan keratan dalam mana-mana HTML atau blok teks kaya CMS.",
+    id: "Termasuk skrip bantu ubah ukuran otomatis. Tempel cuplikan ke dalam HTML atau blok teks kaya CMS apa pun.",
+  },
+  "embed.urlHint": {
+    en: "Useful if you only want the URL — your own iframe wrapper, or a sandboxed preview.",
+    ms: "Berguna jika anda mahu URL sahaja — pembalut iframe sendiri, atau pratonton sandboxed.",
+    id: "Berguna jika Anda hanya ingin URL — pembungkus iframe sendiri, atau pratinjau ber-sandbox.",
+  },
 
   // ── Home Page ──
   "home.title": { en: "Islamic Inheritance Calculator", ms: "Kalkulator Waris Islam", id: "Kalkulator Waris Islam" },
@@ -694,6 +758,68 @@ const translations = {
     en: "We never share your email. See our Privacy Policy.",
     ms: "Kami tidak akan berkongsi e-mel anda. Lihat Dasar Privasi kami.",
     id: "Kami tidak pernah membagikan email Anda. Lihat Kebijakan Privasi kami.",
+  },
+
+  // ── Salary percentile ──
+  "salary.percentile.title": {
+    en: "Where do you stand?",
+    ms: "Di mana kedudukan anda?",
+    id: "Di mana posisi Anda?",
+  },
+  "salary.percentile.subtitle": {
+    en: "Compare your gross salary against Malaysian income brackets and other users on this site.",
+    ms: "Bandingkan gaji kotor anda dengan jurang pendapatan Malaysia dan pengguna lain di laman ini.",
+    id: "Bandingkan gaji kotor Anda dengan kisaran pendapatan Malaysia dan pengguna lain di situs ini.",
+  },
+  "salary.percentile.malaysiaBracket": {
+    en: "Malaysia income bracket (DOSM HIES 2024)",
+    ms: "Jurang pendapatan Malaysia (DOSM HIES 2024)",
+    id: "Kisaran pendapatan Malaysia (DOSM HIES 2024)",
+  },
+  "salary.percentile.bracket.B40": {
+    en: "Bottom 40% of households",
+    ms: "40% isi rumah terbawah",
+    id: "40% rumah tangga terbawah",
+  },
+  "salary.percentile.bracket.M40": {
+    en: "Middle 40% of households",
+    ms: "40% isi rumah pertengahan",
+    id: "40% rumah tangga menengah",
+  },
+  "salary.percentile.bracket.T20": {
+    en: "Top 20% of households",
+    ms: "20% isi rumah teratas",
+    id: "20% rumah tangga teratas",
+  },
+  "salary.percentile.bracket.T10": {
+    en: "Top 10% of households",
+    ms: "10% isi rumah teratas",
+    id: "10% rumah tangga teratas",
+  },
+  "salary.percentile.bracket.T1": {
+    en: "Top 1% of households",
+    ms: "1% isi rumah teratas",
+    id: "1% rumah tangga teratas",
+  },
+  "salary.percentile.amongUsers": {
+    en: "You are in the top {percentile}% of {sampleSize} salary submissions on this site.",
+    ms: "Anda berada dalam {percentile}% teratas daripada {sampleSize} penghantaran gaji di laman ini.",
+    id: "Anda berada di {percentile}% teratas dari {sampleSize} pengiriman gaji di situs ini.",
+  },
+  "salary.percentile.windowNote": {
+    en: "Based on submissions in the last 6 months. Anonymous and aggregate only.",
+    ms: "Berdasarkan penghantaran dalam 6 bulan lepas. Anonim dan agregat sahaja.",
+    id: "Berdasarkan pengiriman dalam 6 bulan terakhir. Anonim dan agregat saja.",
+  },
+  "salary.percentile.notEnoughData": {
+    en: "Not enough submissions yet to show your rank among other users. Come back soon.",
+    ms: "Belum cukup data untuk menunjukkan kedudukan anda berbanding pengguna lain. Kembali tidak lama lagi.",
+    id: "Belum cukup data untuk menunjukkan posisi Anda dibanding pengguna lain. Kembali lagi nanti.",
+  },
+  "salary.percentile.householdNote": {
+    en: "DOSM B40/M40/T20 brackets are measured at household income level. If this is your individual salary in a multi-earner household, your household bracket is likely higher.",
+    ms: "Jurang B40/M40/T20 DOSM diukur pada tahap pendapatan isi rumah. Jika ini gaji individu anda dalam isi rumah dengan beberapa pencari nafkah, jurang isi rumah anda mungkin lebih tinggi.",
+    id: "Kisaran B40/M40/T20 DOSM diukur pada tingkat pendapatan rumah tangga. Jika ini gaji individu Anda di rumah tangga dengan beberapa pencari nafkah, kisaran rumah tangga Anda kemungkinan lebih tinggi.",
   },
   "zakat.lead.reminder.title": {
     en: "Get a yearly Zakat reminder",

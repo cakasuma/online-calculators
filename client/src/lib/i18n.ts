@@ -560,9 +560,56 @@ const translations = {
 
   // ── Tool names (for footer / other non-Home uses) ──
   "tools.normal-calculator.name": { en: "Basic Calculator", ms: "Kalkulator Asas", id: "Kalkulator Dasar" },
+  "tools.normal-calculator.desc": {
+    en: "Quick arithmetic for everyday calculations.",
+    ms: "Aritmetik pantas untuk pengiraan harian.",
+    id: "Aritmatika cepat untuk perhitungan sehari-hari.",
+  },
   "tools.scientific-calculator.name": { en: "Scientific Calculator", ms: "Kalkulator Saintifik", id: "Kalkulator Ilmiah" },
+  "tools.scientific-calculator.desc": {
+    en: "Advanced functions including trigonometry, logs, and powers.",
+    ms: "Fungsi lanjutan termasuk trigonometri, logaritma, dan pangkat.",
+    id: "Fungsi lanjutan termasuk trigonometri, logaritma, dan pangkat.",
+  },
   "tools.zakat-calculator.name": { en: "Zakat Calculator", ms: "Kalkulator Zakat", id: "Kalkulator Zakat" },
+  "tools.zakat-calculator.desc": {
+    en: "Estimate annual zakat obligation across major zakatable asset classes.",
+    ms: "Anggarkan kewajipan zakat tahunan merentas kelas aset utama yang wajib dizakatkan.",
+    id: "Estimasi kewajiban zakat tahunan untuk kelas aset utama yang wajib dizakati.",
+  },
   "tools.wasiat-guide.name": { en: "Wasiat Guide", ms: "Panduan Wasiat", id: "Panduan Wasiat" },
+  "tools.wasiat-guide.desc": {
+    en: "Step-by-step Islamic will guidance with printable planning checklist.",
+    ms: "Panduan wasiat Islam langkah demi langkah dengan senarai semak perancangan boleh cetak.",
+    id: "Panduan wasiat Islam langkah demi langkah dengan checklist perencanaan yang bisa dicetak.",
+  },
+
+  // ── Calculator content section headings ──
+  "content.workedExamples": {
+    en: "Worked examples",
+    ms: "Contoh pengiraan",
+    id: "Contoh perhitungan",
+  },
+  "content.resultLabel": {
+    en: "Result: ",
+    ms: "Hasil: ",
+    id: "Hasil: ",
+  },
+  "content.faqTitle": {
+    en: "Frequently asked questions",
+    ms: "Soalan lazim",
+    id: "Pertanyaan yang sering diajukan",
+  },
+  "content.relatedTitle": {
+    en: "Related calculators",
+    ms: "Kalkulator berkaitan",
+    id: "Kalkulator terkait",
+  },
+  "content.lastReviewed": {
+    en: "Last reviewed: ",
+    ms: "Disemak terakhir: ",
+    id: "Terakhir ditinjau: ",
+  },
 
   // ── Not Found ──
   "notFound.title": { en: "Page not found", ms: "Halaman tidak ditemukan", id: "Halaman tidak ditemukan" },

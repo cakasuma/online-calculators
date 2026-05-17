@@ -3,21 +3,28 @@ import { useLocale } from "@/hooks/use-locale";
 import { getCalculatorContent } from "@/config/content";
 import { findRouteBySlug, type RouteSlug } from "@/config/seo";
 import { tools } from "@/config/tools";
+import type { TranslationKey } from "@/lib/i18n";
 
 interface Props {
   slug: RouteSlug;
 }
 
 export function CalculatorContent({ slug }: Props) {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const content = getCalculatorContent(slug, locale);
   if (!content) return null;
 
   const related = content.related
     .map((s) => {
       const route = findRouteBySlug(s);
-      const tool = tools.find((t) => t.href === route?.path);
-      return route && tool ? { slug: s, name: tool.name, href: route.path, description: tool.description } : null;
+      const tool = tools.find((tt) => tt.href === route?.path);
+      if (!route || !tool) return null;
+      // Use the localised tool name / description from i18n when available;
+      // fall back to the hardcoded English in tools.ts so adding a new tool
+      // without translations still renders something.
+      const name = t(`tools.${tool.slug}.name` as TranslationKey) || tool.name;
+      const description = t(`tools.${tool.slug}.desc` as TranslationKey) || tool.description;
+      return { slug: s, name, href: route.path, description };
     })
     .filter((x): x is { slug: RouteSlug; name: string; href: string; description: string } => x !== null);
 
@@ -83,9 +90,7 @@ export function CalculatorContent({ slug }: Props) {
 
       {content.examples && content.examples.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold tracking-tight">
-            {locale === "id" ? "Contoh perhitungan" : "Worked examples"}
-          </h2>
+          <h2 className="text-xl font-semibold tracking-tight">{t("content.workedExamples")}</h2>
           <div className="mt-3 grid gap-3">
             {content.examples.map((ex, i) => (
               <div key={i} className="rounded-lg border p-4">
@@ -96,7 +101,7 @@ export function CalculatorContent({ slug }: Props) {
                   ))}
                 </ul>
                 <p className="mt-2 text-sm">
-                  <span className="font-medium">{locale === "id" ? "Hasil: " : "Result: "}</span>
+                  <span className="font-medium">{t("content.resultLabel")}</span>
                   {ex.result}
                 </p>
               </div>
@@ -106,9 +111,7 @@ export function CalculatorContent({ slug }: Props) {
       )}
 
       <div className="mt-8">
-        <h2 className="text-xl font-semibold tracking-tight">
-          {locale === "id" ? "Pertanyaan yang sering diajukan" : "Frequently asked questions"}
-        </h2>
+        <h2 className="text-xl font-semibold tracking-tight">{t("content.faqTitle")}</h2>
         <dl className="mt-3 space-y-4">
           {content.faq.map((item, i) => (
             <div key={i}>
@@ -121,9 +124,7 @@ export function CalculatorContent({ slug }: Props) {
 
       {related.length > 0 && (
         <div className="mt-10 border-t pt-6">
-          <h2 className="text-base font-semibold tracking-tight">
-            {locale === "id" ? "Kalkulator terkait" : "Related calculators"}
-          </h2>
+          <h2 className="text-base font-semibold tracking-tight">{t("content.relatedTitle")}</h2>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {related.map((r) => (
               <Link key={r.slug} href={r.href}>
@@ -139,7 +140,7 @@ export function CalculatorContent({ slug }: Props) {
 
       {content.lastReviewed && (
         <p className="mt-8 text-xs text-muted-foreground">
-          {locale === "id" ? "Terakhir ditinjau: " : "Last reviewed: "}
+          {t("content.lastReviewed")}
           {content.lastReviewed}
         </p>
       )}

@@ -168,6 +168,12 @@ export class DbStorage implements IStorage {
     const { sql } = await import("drizzle-orm");
     // Use a CTE to extract monthlySalary once, then compute count + percentiles
     // in a single round trip. payload is jsonb; the value lives at $.monthlySalary.
+    //
+    // Guard the ::numeric cast with jsonb_typeof = 'number' — /api/events
+    // accepts arbitrary JSON, so a single bad row (e.g. monthlySalary as a
+    // string) would otherwise throw `invalid input syntax for type numeric`
+    // and poison every percentile request until the row ages out of the
+    // 180-day window.
     const percentileFractions = SALARY_PERCENTILES.map((p) => p / 100);
     const rows = await db.execute(sql`
       WITH sample AS (
@@ -176,7 +182,7 @@ export class DbStorage implements IStorage {
         WHERE calculator = 'salary'
           AND event = 'calculator_complete'
           AND created_at >= ${windowStart}
-          AND payload ? 'monthlySalary'
+          AND jsonb_typeof(payload->'monthlySalary') = 'number'
       )
       SELECT
         count(*) FILTER (WHERE v > 0 AND v < 10000000) AS sample_size,

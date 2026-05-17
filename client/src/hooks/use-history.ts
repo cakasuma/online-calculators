@@ -18,13 +18,19 @@ export function useHistory() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
 
-  const add = (calculator: HistoryEntry["calculator"], expression: string, result: string) => {
+  const add = (
+    calculator: HistoryEntry["calculator"],
+    expression: string,
+    result: string,
+    url?: string,
+  ) => {
     const entry: HistoryEntry = {
       id: crypto.randomUUID(),
       calculator,
       expression,
       result,
       timestamp: Date.now(),
+      url,
     };
     setEntries((prev) => [entry, ...prev].slice(0, MAX_ENTRIES));
   };

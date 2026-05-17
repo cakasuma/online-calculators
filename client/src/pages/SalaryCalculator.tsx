@@ -6,7 +6,18 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
+import { ShareButton } from "@/components/ShareButton";
 import { recordServerEvent, track } from "@/lib/analytics";
+import {
+  buildShareUrl,
+  enumField,
+  mergeFromUrl,
+  numberField,
+  stringField,
+  urlHasSchemaParams,
+  useUrlSync,
+  type UrlSchema,
+} from "@/lib/urlState";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -199,14 +210,61 @@ function NumberField({
   );
 }
 
-export default function SalaryCalculator() {
+interface SalaryUrlState {
+  monthlySalary: number;
+  annualBonus: number;
+  otherRelief: number;
+  epfRate: number;
+  workerType: WorkerType;
+  residentStatus: ResidentStatus;
+}
+
+const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
+  monthlySalary: numberField("gross"),
+  annualBonus: numberField("bonus"),
+  otherRelief: numberField("relief"),
+  epfRate: {
+    key: "epf",
+    parse: (raw) => {
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : undefined;
+    },
+    // Always emit epfRate so the recipient sees the same configuration even
+    // when the value matches the default 11%.
+    serialize: (v) => (v == null ? null : String(v)),
+  },
+  workerType: enumField<SalaryUrlState, "workerType">("worker", ["malaysian", "foreigner"]),
+  residentStatus: enumField<SalaryUrlState, "residentStatus">("res", ["resident", "non-resident"]),
+};
+
+interface Props {
+  onCalculate?: (expression: string, result: string, url?: string) => void;
+}
+
+export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
-  const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(DEFAULT_INPUTS.monthlySalary));
-  const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(DEFAULT_INPUTS.annualBonus));
-  const [otherReliefInput, setOtherReliefInput] = useState(toInputString(DEFAULT_INPUTS.otherRelief));
-  const [epfRateInput, setEpfRateInput] = useState(toInputString(DEFAULT_INPUTS.epfRate));
-  const [workerType, setWorkerType] = useState<WorkerType>(DEFAULT_INPUTS.workerType);
-  const [residentStatus, setResidentStatus] = useState<ResidentStatus>(DEFAULT_INPUTS.residentStatus);
+  // Read URL params once on mount to pre-fill the form when a user opens a
+  // shared link. Falls back to DEFAULT_INPUTS for any missing/invalid params.
+  const [initial] = useState<SalaryUrlState>(() =>
+    mergeFromUrl<SalaryUrlState>(
+      {
+        monthlySalary: DEFAULT_INPUTS.monthlySalary,
+        annualBonus: DEFAULT_INPUTS.annualBonus,
+        otherRelief: DEFAULT_INPUTS.otherRelief,
+        epfRate: DEFAULT_INPUTS.epfRate,
+        workerType: DEFAULT_INPUTS.workerType,
+        residentStatus: DEFAULT_INPUTS.residentStatus,
+      },
+      SALARY_URL_SCHEMA,
+    ),
+  );
+  const arrivedViaShare = useMemo(() => urlHasSchemaParams(SALARY_URL_SCHEMA), []);
+  const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(initial.monthlySalary));
+  const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(initial.annualBonus));
+  const [otherReliefInput, setOtherReliefInput] = useState(toInputString(initial.otherRelief));
+  const [epfRateInput, setEpfRateInput] = useState(toInputString(initial.epfRate));
+  const [workerType, setWorkerType] = useState<WorkerType>(initial.workerType);
+  const [residentStatus, setResidentStatus] = useState<ResidentStatus>(initial.residentStatus);
 
   const parsedInput = useMemo<SalaryInputs>(
     () => ({
@@ -222,7 +280,13 @@ export default function SalaryCalculator() {
 
   const errors = useMemo(() => validateInputs(parsedInput), [parsedInput]);
   const isValid = Object.keys(errors).length === 0;
-  const [hasCalculated, setHasCalculated] = useState(false);
+  // If the user arrived via a shared link, show results immediately so they
+  // don't have to click Calculate just to see what was shared.
+  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+
+  // Keep the URL in sync with the form state so the address bar is always a
+  // copyable share link. Debounced inside useUrlSync.
+  useUrlSync(parsedInput, SALARY_URL_SCHEMA);
 
   const result = useMemo(
     () => calculateSalary({ ...parsedInput, epfRate: Math.min(15, parsedInput.epfRate) }),
@@ -242,6 +306,18 @@ export default function SalaryCalculator() {
     };
     track("calculator_complete", { calculator: "salary", ...props });
     recordServerEvent({ calculator: "salary", event: "calculator_complete", payload: props });
+
+    // Record an entry in the local calculation history so the user can recall
+    // this scenario later. Expression carries the headline inputs; result
+    // carries the take-home and annual tax.
+    if (onCalculate) {
+      const gross = Math.round(parsedInput.monthlySalary);
+      const bonus = Math.round(parsedInput.annualBonus);
+      const expression = `RM ${gross}/mo${bonus ? ` + RM ${bonus} bonus` : ""} • ${parsedInput.residentStatus} • ${parsedInput.workerType}`;
+      const resultStr = `Net RM ${Math.round(result.monthlyNet)}/mo • Tax RM ${Math.round(result.annualIncomeTax)}/yr`;
+      const url = buildShareUrl(parsedInput, SALARY_URL_SCHEMA);
+      onCalculate(expression, resultStr, url);
+    }
   }
 
   const takeHomeRatio =
@@ -295,7 +371,7 @@ export default function SalaryCalculator() {
                   ? t("salary.fixInputErrors")
                   : showResults
                   ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                  : "Tap Calculate to reveal your take-home pay"}
+                  : t("salary.cta.tapToReveal")}
               </p>
             </CardContent>
           </Card>
@@ -402,7 +478,7 @@ export default function SalaryCalculator() {
               onClick={handleCalculate}
             >
               <CalculatorIcon className="h-4 w-4" />
-              {hasCalculated ? "Recalculate take-home pay" : "Calculate my take-home pay"}
+              {hasCalculated ? t("salary.cta.recalculate") : t("salary.cta.calculate")}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </CardContent>
@@ -415,9 +491,9 @@ export default function SalaryCalculator() {
                 <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                   <CalculatorIcon className="h-6 w-6" />
                 </div>
-                <p className="text-base font-semibold">Your breakdown is ready</p>
+                <p className="text-base font-semibold">{t("salary.breakdown.ready")}</p>
                 <p className="max-w-sm text-sm text-muted-foreground">
-                  Fill in your salary details on the left, then tap <span className="font-medium text-foreground">Calculate</span> to see EPF, PCB, SOCSO, and your monthly take-home.
+                  {t("salary.breakdown.hint")}
                 </p>
               </CardContent>
             </Card>
@@ -453,12 +529,12 @@ export default function SalaryCalculator() {
               intent="newsletter"
               source="salary-tax-tips"
               icon={<Sparkles className="w-4 h-4 text-primary" />}
-              title="Get personalised tax-saving tips"
-              description="Free monthly email with EPF, PCB and tax-relief moves tailored to your salary band. Unsubscribe anytime."
-              ctaLabel="Send me tax-saving tips"
-              successTitle="You're in."
-              successMessage="We'll send the first tips within 24 hours."
-              disclaimer="We never share your email. See our Privacy Policy."
+              title={t("salary.lead.title")}
+              description={t("salary.lead.desc")}
+              ctaLabel={t("salary.lead.cta")}
+              successTitle={t("salary.lead.successTitle")}
+              successMessage={t("salary.lead.successDesc")}
+              disclaimer={t("salary.lead.disclaimer")}
               getContext={() => ({
                 monthlySalary: parsedInput.monthlySalary,
                 annualBonus: parsedInput.annualBonus,
@@ -474,14 +550,21 @@ export default function SalaryCalculator() {
           {showResults && (
             <Card className="rounded-3xl shadow-sm">
               <CardContent className="p-6">
-                <div className="mb-5 flex items-center justify-between gap-4">
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-semibold">{t("salary.annual.title")}</h2>
                     <p className="text-sm text-muted-foreground">{t("salary.annual.subtitle")}</p>
                   </div>
-                  <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
-                    <Download className="h-4 w-4" /> {t("salary.save")}
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <ShareButton
+                      calculator="salary"
+                      state={parsedInput}
+                      schema={SALARY_URL_SCHEMA}
+                    />
+                    <Button variant="outline" className="gap-2 rounded-2xl" onClick={() => window.print()}>
+                      <Download className="h-4 w-4" /> {t("salary.save")}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-3">
                   {([

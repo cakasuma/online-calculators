@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil, Loader2, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,17 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
+import { ShareButton } from "@/components/ShareButton";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency, parseLocaleNumber } from "@/lib/i18n";
+import {
+  boolField,
+  buildShareUrl,
+  mergeFromUrl,
+  stringField,
+  useUrlSync,
+  type UrlSchema,
+} from "@/lib/urlState";
 
 // ─── Currencies ────────────────────────────────────────────────────────────────
 const CURRENCIES = [
@@ -123,12 +132,48 @@ interface MetalPriceResponse {
   sourceUrl?: string;
 }
 
-export default function ZakatCalculator() {
+// Hawl flags default to `true` in makeInitialState, so the schema must
+// declare that default — otherwise turning a Hawl off would strip the param
+// from the share URL and the recipient would load it back as `true`.
+const ZAKAT_URL_SCHEMA: UrlSchema<ZakatState> = {
+  currency: stringField<ZakatState, "currency">("cur"),
+  cashHawl: boolField<ZakatState, "cashHawl">("ch", true),
+  cashOnHand: stringField<ZakatState, "cashOnHand">("cash"),
+  bankSavings: stringField<ZakatState, "bankSavings">("save"),
+  fixedDeposits: stringField<ZakatState, "fixedDeposits">("fd"),
+  includeEPF: boolField<ZakatState, "includeEPF">("iEpf"),
+  epfBalance: stringField<ZakatState, "epfBalance">("epf"),
+  goldHawl: boolField<ZakatState, "goldHawl">("gh", true),
+  goldGrams: stringField<ZakatState, "goldGrams">("gold"),
+  goldPricePerGram: stringField<ZakatState, "goldPricePerGram">("goldP"),
+  silverGrams: stringField<ZakatState, "silverGrams">("silv"),
+  silverPricePerGram: stringField<ZakatState, "silverPricePerGram">("silvP"),
+  includeJewelry: boolField<ZakatState, "includeJewelry">("iJ"),
+  investHawl: boolField<ZakatState, "investHawl">("ih", true),
+  stocks: stringField<ZakatState, "stocks">("stk"),
+  unitTrusts: stringField<ZakatState, "unitTrusts">("ut"),
+  includeCrypto: boolField<ZakatState, "includeCrypto">("iCr"),
+  cryptoAmount: stringField<ZakatState, "cryptoAmount">("crypto"),
+  businessHawl: boolField<ZakatState, "businessHawl">("bh", true),
+  inventory: stringField<ZakatState, "inventory">("inv"),
+  receivables: stringField<ZakatState, "receivables">("recv"),
+  liabilities: stringField<ZakatState, "liabilities">("liab"),
+  rentalHawl: boolField<ZakatState, "rentalHawl">("rh", true),
+  rentalIncome: stringField<ZakatState, "rentalIncome">("rent"),
+  rentalExpenses: stringField<ZakatState, "rentalExpenses">("rentEx"),
+};
+
+interface Props {
+  onCalculate?: (expression: string, result: string, url?: string) => void;
+}
+
+export default function ZakatCalculator({ onCalculate }: Props = {}) {
   const { t, locale } = useLocale();
   const [state, setState] = useState<ZakatState>(() => {
     const saved = (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })();
-    return makeInitialState(saved);
+    return mergeFromUrl(makeInitialState(saved), ZAKAT_URL_SCHEMA);
   });
+  useUrlSync(state, ZAKAT_URL_SCHEMA);
   const [livePricesLoading, setLivePricesLoading] = useState(false);
   const [livePricesLoaded, setLivePricesLoaded] = useState(false);
   const [priceSource, setPriceSource] = useState<{ name: string; url: string } | null>(null);
@@ -273,6 +318,31 @@ export default function ZakatCalculator() {
 
   const currSym = CURRENCIES.find((c) => c.code === state.currency)?.symbol ?? "";
 
+  // ─── History recorder ─────────────────────────────────────────────────────────
+  // Zakat has no explicit "Calculate" button — the result recomputes on every
+  // keystroke. Recording every intermediate state would flood the history, so
+  // we wait 1.5s after the last input change for the calculation to stabilise,
+  // then emit one entry. A signature ref dedupes so revisiting the page (or
+  // arriving via a shared URL) with the same state does not add a duplicate.
+  const lastRecordedSignatureRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!onCalculate) return;
+    if (result.total <= 0) return;
+    const signature = `${state.currency}|${Math.round(result.total)}|${Math.round(result.zakatDue)}|${Math.round(result.nisab)}`;
+    if (lastRecordedSignatureRef.current === signature) return;
+    const timer = setTimeout(() => {
+      const expression = `${currSym} ${formatCurrency(result.total, locale)} zakatable • Nisab ${currSym} ${formatCurrency(result.nisab, locale)}`;
+      const resultStr =
+        result.zakatDue > 0
+          ? `${t("zakat.summary.zakatDue")} ${currSym} ${formatCurrency(result.zakatDue, locale)}`
+          : t("zakat.summary.belowNisab");
+      const url = buildShareUrl(state, ZAKAT_URL_SCHEMA);
+      onCalculate(expression, resultStr, url);
+      lastRecordedSignatureRef.current = signature;
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [result.total, result.zakatDue, result.nisab, state.currency, onCalculate, currSym, locale, t]);
+
   // ─── Status colour ────────────────────────────────────────────────────────────
   const { percentOfNisab, zakatDue, nisab, total } = result;
   const isAbove = zakatDue > 0;
@@ -415,7 +485,7 @@ export default function ZakatCalculator() {
                 type="button"
                 onClick={() => setSilverPriceOverride((v) => !v)}
                 className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
+                title={silverPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                 disabled={livePricesLoading}
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -448,7 +518,7 @@ export default function ZakatCalculator() {
           {/* Price source attribution */}
           {livePricesLoaded && priceSource && (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span>Price via</span>
+              <span>{t("zakat.price.via")}</span>
               <a
                 href={priceSource.url}
                 target="_blank"
@@ -622,7 +692,7 @@ export default function ZakatCalculator() {
                     type="button"
                     onClick={() => setGoldPriceOverride((v) => !v)}
                     className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${goldPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                    title={goldPriceOverride ? "Lock to live price" : "Edit price manually"}
+                    title={goldPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                     disabled={livePricesLoading}
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -690,7 +760,7 @@ export default function ZakatCalculator() {
                     type="button"
                     onClick={() => setSilverPriceOverride((v) => !v)}
                     className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
-                    title={silverPriceOverride ? "Lock to live price" : "Edit price manually"}
+                    title={silverPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                     disabled={livePricesLoading}
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -961,13 +1031,16 @@ export default function ZakatCalculator() {
             </p>
             <p className={`text-sm font-medium ${zakatTextColor}`}>
               {result.nisab === 0
-                ? "Enter silver price above"
+                ? t("zakat.price.enterSilverFirst")
                 : isAbove
                 ? t("zakat.summary.aboveNisab")
                 : isClose
                 ? t("zakat.summary.closeToNisab")
                 : t("zakat.summary.belowNisab")}
             </p>
+            <div className="flex items-center justify-center pt-2">
+              <ShareButton calculator="zakat" state={state} schema={ZAKAT_URL_SCHEMA} />
+            </div>
           </div>
 
           {/* Reset */}
@@ -989,12 +1062,12 @@ export default function ZakatCalculator() {
           intent="reminder"
           source="zakat-yearly-reminder"
           icon={<BellRing className="w-4 h-4 text-primary" />}
-          title="Get a yearly Zakat reminder"
-          description="We'll email you next year on your hawl date with an updated nisab and a quick re-calculation link."
-          ctaLabel="Set my reminder"
-          successTitle="Reminder set."
-          successMessage="We'll email you a year from today."
-          disclaimer="One email per year. No spam."
+          title={t("zakat.lead.reminder.title")}
+          description={t("zakat.lead.reminder.desc")}
+          ctaLabel={t("zakat.lead.reminder.cta")}
+          successTitle={t("zakat.lead.reminder.successTitle")}
+          successMessage={t("zakat.lead.reminder.successDesc")}
+          disclaimer={t("zakat.lead.reminder.disclaimer")}
           getContext={() => ({
             currency: state.currency,
             zakatableTotal: Math.round(result.total),

@@ -1,9 +1,14 @@
 export interface HistoryEntry {
   id: string;
-  calculator: "normal" | "scientific" | "faraid";
+  calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat";
   expression: string;
   result: string;
   timestamp: number;
+  /**
+   * Optional shareable URL that recreates the calculation. When present, the
+   * history row in HistoryPanel becomes clickable and navigates here.
+   */
+  url?: string;
 }
 
 const STORAGE_KEY = "calc_history";

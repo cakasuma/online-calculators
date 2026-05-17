@@ -1040,13 +1040,13 @@ export default function WasiatGuide() {
           intent="consult"
           source="wasiat-shariah-lawyer"
           icon={<FileText className="w-4 h-4 text-primary" />}
-          title="Get a free 15-min consult with a Shariah lawyer"
-          description="A licensed solicitor will review your bequests and witness/registration steps. No obligation."
-          ctaLabel="Book my free consult"
+          title={t("wasiat.lead.consult.title")}
+          description={t("wasiat.lead.consult.desc")}
+          ctaLabel={t("wasiat.lead.consult.cta")}
           showPhone
-          successTitle="Request received."
-          successMessage="A Shariah-trained partner will reach out within 1 business day."
-          disclaimer="By submitting you agree to be contacted by a partnered solicitor about your Wasiat."
+          successTitle={t("wasiat.lead.consult.successTitle")}
+          successMessage={t("wasiat.lead.consult.successDesc")}
+          disclaimer={t("wasiat.lead.consult.disclaimer")}
           getContext={() => ({
             currency: form.currency,
             estateValue: estateNum,

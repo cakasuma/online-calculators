@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { AlertTriangle, Info, Printer, Users, BookOpen, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,19 @@ import { useLocale } from "@/hooks/use-locale";
 import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
+import { ShareButton } from "@/components/ShareButton";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency } from "@/lib/i18n";
+import {
+  boolField,
+  buildShareUrl,
+  mergeFromUrl,
+  numberField,
+  stringField,
+  urlHasSchemaParams,
+  useUrlSync,
+  type UrlSchema,
+} from "@/lib/urlState";
 import {
   PieChart,
   Pie,
@@ -23,7 +34,7 @@ import {
 } from "recharts";
 
 interface Props {
-  onCalculate: (expression: string, result: string) => void;
+  onCalculate: (expression: string, result: string, url?: string) => void;
 }
 
 // ─── Currencies ───────────────────────────────────────────────────────────────
@@ -101,6 +112,32 @@ interface ValidationErrors {
   wasiyyah?: string;
   heirs?: string;
 }
+
+// ─── URL state schema ─────────────────────────────────────────────────────────
+const FARAID_URL_SCHEMA: UrlSchema<FormState> = {
+  totalEstate: stringField<FormState, "totalEstate">("est"),
+  debtsAndExpenses: stringField<FormState, "debtsAndExpenses">("debt"),
+  wasiyyah: stringField<FormState, "wasiyyah">("wsy"),
+  currency: stringField<FormState, "currency">("cur"),
+  hasHusband: boolField<FormState, "hasHusband">("h"),
+  numberOfWives: numberField<FormState, "numberOfWives">("nw"),
+  hasFather: boolField<FormState, "hasFather">("f"),
+  hasPaternalGrandfather: boolField<FormState, "hasPaternalGrandfather">("pgf"),
+  hasPaternalGrandmother: boolField<FormState, "hasPaternalGrandmother">("pgm"),
+  hasMother: boolField<FormState, "hasMother">("m"),
+  hasMaternalGrandmother: boolField<FormState, "hasMaternalGrandmother">("mgm"),
+  sons: numberField<FormState, "sons">("s"),
+  daughters: numberField<FormState, "daughters">("d"),
+  grandsons: numberField<FormState, "grandsons">("gs"),
+  granddaughters: numberField<FormState, "granddaughters">("gd"),
+  fullBrothers: numberField<FormState, "fullBrothers">("fb"),
+  fullSisters: numberField<FormState, "fullSisters">("fs"),
+  paternalBrothers: numberField<FormState, "paternalBrothers">("pb"),
+  paternalSisters: numberField<FormState, "paternalSisters">("ps"),
+  maternalBrothers: numberField<FormState, "maternalBrothers">("mb"),
+  maternalSisters: numberField<FormState, "maternalSisters">("ms"),
+  hasConsanguineMale: boolField<FormState, "hasConsanguineMale">("cm"),
+};
 
 // ─── Initial form ─────────────────────────────────────────────────────────────
 const initialForm: FormState = {
@@ -721,17 +758,28 @@ function Counter({
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function FaraidCalculator({ onCalculate }: Props) {
   const { t, locale } = useLocale();
-  const [form, setForm] = useState<FormState>(() => ({
-    ...initialForm,
-    currency: (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })(),
-  }));
+  const [form, setForm] = useState<FormState>(() => {
+    const base: FormState = {
+      ...initialForm,
+      currency: (() => { try { return localStorage.getItem("calc_currency") || "MYR"; } catch { return "MYR"; } })(),
+    };
+    return mergeFromUrl(base, FARAID_URL_SCHEMA);
+  });
+  useUrlSync(form, FARAID_URL_SCHEMA);
   const [result, setResult] = useState<DistributionResult | null>(null);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showRefs, setShowRefs] = useState(false);
   const [wasiatLoaded, setWasiatLoaded] = useState(false);
 
-  // Auto-set currency when locale changes (only on first locale load, not on re-renders)
+  // Auto-set currency when locale changes — but skip the very first run when
+  // the user arrived via a shared link that carries a currency, otherwise we
+  // would clobber the sender's choice (e.g. ?cur=USD reverting to MYR).
+  const skipNextCurrencyAutoSet = useRef(urlHasSchemaParams(FARAID_URL_SCHEMA));
   useEffect(() => {
+    if (skipNextCurrencyAutoSet.current) {
+      skipNextCurrencyAutoSet.current = false;
+      return;
+    }
     const currency = locale === "id" ? "IDR" : "MYR";
     setForm((f) => ({ ...f, currency }));
     try { localStorage.setItem("calc_currency", currency); } catch { /* noop */ }
@@ -852,7 +900,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
 
     const expr = `Faraid (${form.currency}): ${form.totalEstate}`;
     const res = `Net: ${formatAmount(net)} | ${dist.heirs.length} heirs`;
-    onCalculate(expr, res);
+    const url = buildShareUrl(form, FARAID_URL_SCHEMA);
+    onCalculate(expr, res, url);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, locale, onCalculate]);
 
@@ -861,6 +910,16 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   function handlePrint() {
     window.print();
   }
+
+  // If the form was preloaded from a shared link, kick off the distribution
+  // automatically so the recipient sees the results without having to click
+  // Calculate. Runs once on mount.
+  useEffect(() => {
+    if (urlHasSchemaParams(FARAID_URL_SCHEMA) && form.totalEstate) {
+      calculate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleShareWhatsApp() {
     if (!result) return;
@@ -1447,6 +1506,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <CardTitle className="text-base">{t("faraid.results")}</CardTitle>
                 <div className="flex gap-2 print:hidden flex-wrap">
+                  <ShareButton calculator="faraid" state={form} schema={FARAID_URL_SCHEMA} />
                   <Button variant="outline" size="sm" onClick={handleShareWhatsApp} className="gap-1.5 text-xs">
                     <Share2 className="w-3.5 h-3.5" />
                     {t("faraid.shareResults")}
@@ -1598,9 +1658,9 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             description={t("faraid.consultCTA.text")}
             ctaLabel={t("faraid.consultCTA.button")}
             showPhone
-            successTitle="Consultation requested."
-            successMessage="A certified faraid consultant will be in touch within 1 business day."
-            disclaimer="By submitting you agree to be contacted by a partnered consultant about your inheritance plan."
+            successTitle={t("faraid.lead.consult.successTitle")}
+            successMessage={t("faraid.lead.consult.successDesc")}
+            disclaimer={t("faraid.lead.consult.disclaimer")}
             getContext={() => ({
               currency: form.currency,
               estateValue: estate,

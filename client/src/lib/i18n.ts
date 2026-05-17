@@ -223,6 +223,34 @@ const translations = {
     id: "Belum ada skenario tersimpan",
   },
 
+  // ── Embed widget ──
+  "embed.button": { en: "Embed", ms: "Benamkan", id: "Sematkan" },
+  "embed.dialogTitle": {
+    en: "Embed this calculator on your site",
+    ms: "Benamkan kalkulator ini di laman anda",
+    id: "Sematkan kalkulator ini di situs Anda",
+  },
+  "embed.dialogDesc": {
+    en: "Paste this snippet anywhere on your page. The iframe auto-resizes as users interact.",
+    ms: "Tampalkan keratan ini di mana-mana pada halaman anda. Iframe akan ubah saiz secara automatik semasa pengguna berinteraksi.",
+    id: "Tempelkan cuplikan ini di mana saja pada halaman Anda. Iframe akan menyesuaikan ukuran secara otomatis saat pengguna berinteraksi.",
+  },
+  "embed.htmlSnippet": { en: "HTML snippet", ms: "Keratan HTML", id: "Cuplikan HTML" },
+  "embed.urlOnly": { en: "Direct URL only", ms: "URL sahaja", id: "URL saja" },
+  "embed.copy": { en: "Copy", ms: "Salin", id: "Salin" },
+  "embed.copied": { en: "Copied!", ms: "Disalin!", id: "Tersalin!" },
+  "embed.copyError": { en: "Could not copy", ms: "Tidak boleh disalin", id: "Tidak dapat menyalin" },
+  "embed.snippetHint": {
+    en: "Includes the auto-resize helper script. Drop the snippet into any HTML or CMS rich-text block.",
+    ms: "Termasuk skrip pembantu ubah saiz automatik. Letakkan keratan dalam mana-mana HTML atau blok teks kaya CMS.",
+    id: "Termasuk skrip bantu ubah ukuran otomatis. Tempel cuplikan ke dalam HTML atau blok teks kaya CMS apa pun.",
+  },
+  "embed.urlHint": {
+    en: "Useful if you only want the URL — your own iframe wrapper, or a sandboxed preview.",
+    ms: "Berguna jika anda mahu URL sahaja — pembalut iframe sendiri, atau pratonton sandboxed.",
+    id: "Berguna jika Anda hanya ingin URL — pembungkus iframe sendiri, atau pratinjau ber-sandbox.",
+  },
+
   // ── Home Page ──
   "home.title": { en: "Islamic Inheritance Calculator", ms: "Kalkulator Waris Islam", id: "Kalkulator Waris Islam" },
   "home.subtitle": { en: "Accurately calculate Faraid (Islamic inheritance) distribution based on Quran and Sunnah.", ms: "Kira pembahagian Faraid (waris Islam) secara tepat berdasarkan Al-Qur'an dan Sunnah.", id: "Hitung pembagian Faraid (waris Islam) secara akurat berdasarkan Al-Qur'an dan Sunnah." },

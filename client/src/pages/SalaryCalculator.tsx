@@ -9,6 +9,7 @@ import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { SalaryPercentile } from "@/components/SalaryPercentile";
+import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
   buildShareUrl,
@@ -575,6 +576,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                       schema={SALARY_URL_SCHEMA}
                       defaultName={`RM ${Math.round(parsedInput.monthlySalary)}/mo${parsedInput.annualBonus ? ` + bonus` : ""}`}
                     />
+                    <EmbedDialog calculator="salary" />
                     <Button
                       variant="outline"
                       className="gap-2 rounded-2xl"

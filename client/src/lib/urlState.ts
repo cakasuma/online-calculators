@@ -54,11 +54,25 @@ export function numberField<T, K extends keyof T>(key: string): UrlField<T, K> {
   };
 }
 
-export function boolField<T, K extends keyof T>(key: string): UrlField<T, K> {
+export function boolField<T, K extends keyof T>(
+  key: string,
+  defaultValue = false,
+): UrlField<T, K> {
   return {
     key,
-    parse: (raw) => (raw === "1" || raw === "true") as unknown as T[K],
-    serialize: (v) => (v ? "1" : null),
+    parse: (raw) => {
+      if (raw === "1" || raw === "true") return true as unknown as T[K];
+      if (raw === "0" || raw === "false") return false as unknown as T[K];
+      return undefined;
+    },
+    // Omit when the value matches the supplied default so URLs stay short;
+    // encode true/false explicitly otherwise. Without an explicit "0" for
+    // non-default false values, recipients of a shared link would fall back
+    // to the schema default and load the *wrong* value.
+    serialize: (v) => {
+      if (v === defaultValue) return null;
+      return v ? "1" : "0";
+    },
   };
 }
 

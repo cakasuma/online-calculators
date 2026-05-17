@@ -132,30 +132,33 @@ interface MetalPriceResponse {
   sourceUrl?: string;
 }
 
+// Hawl flags default to `true` in makeInitialState, so the schema must
+// declare that default — otherwise turning a Hawl off would strip the param
+// from the share URL and the recipient would load it back as `true`.
 const ZAKAT_URL_SCHEMA: UrlSchema<ZakatState> = {
   currency: stringField<ZakatState, "currency">("cur"),
-  cashHawl: boolField<ZakatState, "cashHawl">("ch"),
+  cashHawl: boolField<ZakatState, "cashHawl">("ch", true),
   cashOnHand: stringField<ZakatState, "cashOnHand">("cash"),
   bankSavings: stringField<ZakatState, "bankSavings">("save"),
   fixedDeposits: stringField<ZakatState, "fixedDeposits">("fd"),
   includeEPF: boolField<ZakatState, "includeEPF">("iEpf"),
   epfBalance: stringField<ZakatState, "epfBalance">("epf"),
-  goldHawl: boolField<ZakatState, "goldHawl">("gh"),
+  goldHawl: boolField<ZakatState, "goldHawl">("gh", true),
   goldGrams: stringField<ZakatState, "goldGrams">("gold"),
   goldPricePerGram: stringField<ZakatState, "goldPricePerGram">("goldP"),
   silverGrams: stringField<ZakatState, "silverGrams">("silv"),
   silverPricePerGram: stringField<ZakatState, "silverPricePerGram">("silvP"),
   includeJewelry: boolField<ZakatState, "includeJewelry">("iJ"),
-  investHawl: boolField<ZakatState, "investHawl">("ih"),
+  investHawl: boolField<ZakatState, "investHawl">("ih", true),
   stocks: stringField<ZakatState, "stocks">("stk"),
   unitTrusts: stringField<ZakatState, "unitTrusts">("ut"),
   includeCrypto: boolField<ZakatState, "includeCrypto">("iCr"),
   cryptoAmount: stringField<ZakatState, "cryptoAmount">("crypto"),
-  businessHawl: boolField<ZakatState, "businessHawl">("bh"),
+  businessHawl: boolField<ZakatState, "businessHawl">("bh", true),
   inventory: stringField<ZakatState, "inventory">("inv"),
   receivables: stringField<ZakatState, "receivables">("recv"),
   liabilities: stringField<ZakatState, "liabilities">("liab"),
-  rentalHawl: boolField<ZakatState, "rentalHawl">("rh"),
+  rentalHawl: boolField<ZakatState, "rentalHawl">("rh", true),
   rentalIncome: stringField<ZakatState, "rentalIncome">("rent"),
   rentalExpenses: stringField<ZakatState, "rentalExpenses">("rentEx"),
 };

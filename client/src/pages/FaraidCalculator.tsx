@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { AlertTriangle, Info, Printer, Users, BookOpen, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -771,8 +771,15 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   const [showRefs, setShowRefs] = useState(false);
   const [wasiatLoaded, setWasiatLoaded] = useState(false);
 
-  // Auto-set currency when locale changes (only on first locale load, not on re-renders)
+  // Auto-set currency when locale changes — but skip the very first run when
+  // the user arrived via a shared link that carries a currency, otherwise we
+  // would clobber the sender's choice (e.g. ?cur=USD reverting to MYR).
+  const skipNextCurrencyAutoSet = useRef(urlHasSchemaParams(FARAID_URL_SCHEMA));
   useEffect(() => {
+    if (skipNextCurrencyAutoSet.current) {
+      skipNextCurrencyAutoSet.current = false;
+      return;
+    }
     const currency = locale === "id" ? "IDR" : "MYR";
     setForm((f) => ({ ...f, currency }));
     try { localStorage.setItem("calc_currency", currency); } catch { /* noop */ }

@@ -772,9 +772,9 @@ const translations = {
     id: "Bandingkan gaji kotor Anda dengan kisaran pendapatan Malaysia dan pengguna lain di situs ini.",
   },
   "salary.percentile.malaysiaBracket": {
-    en: "Malaysia income bracket (DOSM 2022)",
-    ms: "Jurang pendapatan Malaysia (DOSM 2022)",
-    id: "Kisaran pendapatan Malaysia (DOSM 2022)",
+    en: "Malaysia income bracket (DOSM HIES 2024)",
+    ms: "Jurang pendapatan Malaysia (DOSM HIES 2024)",
+    id: "Kisaran pendapatan Malaysia (DOSM HIES 2024)",
   },
   "salary.percentile.bracket.B40": {
     en: "Bottom 40% of households",

@@ -261,10 +261,10 @@ export default function ScientificCalculator({ onCalculate }: Props) {
   };
 
   return (
-    <div className="max-w-sm mx-auto w-full">
+    <div className="max-w-sm mx-auto w-full min-w-0">
       {/* Display */}
-      <div className="mb-3 p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
-        <div className="flex items-center gap-2 mb-1.5">
+      <div className="mb-3 p-3 sm:p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
+        <div className="flex items-center gap-2 mb-1.5 w-full min-w-0 flex-wrap">
           <div className="flex text-xs rounded-full border overflow-hidden shrink-0" aria-label="angle mode">
             <button
               onClick={() => setMode("deg")}
@@ -288,8 +288,8 @@ export default function ScientificCalculator({ onCalculate }: Props) {
           )}
         </div>
         <p
-          className="font-mono font-semibold text-right break-all"
-          style={{ fontSize: display.length > 12 ? "1.35rem" : display.length > 8 ? "1.75rem" : "2.5rem" }}
+          className="font-mono font-semibold text-right break-all max-w-full"
+          style={{ fontSize: `clamp(1.1rem, ${display.length > 12 ? "4.5vw" : display.length > 8 ? "6vw" : "9vw"}, ${display.length > 12 ? "1.35rem" : display.length > 8 ? "1.75rem" : "2.5rem"})` }}
           data-testid="sci-display-main"
         >
           {display}
@@ -297,7 +297,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
       </div>
 
       {/* Scientific function grid */}
-      <div className="grid grid-cols-6 gap-1.5 mb-2">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 mb-2">
         {scientificFunctions.map((fn) => (
           <button
             key={fn}
@@ -312,7 +312,7 @@ export default function ScientificCalculator({ onCalculate }: Props) {
       </div>
 
       {/* Numpad */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
         {numpadButtons.map((key) => (
           <button
             key={key}

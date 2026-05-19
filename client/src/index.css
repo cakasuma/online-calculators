@@ -214,6 +214,22 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     font-size: 16px;
+    /* Avoid horizontal scroll on small screens when a child overflows */
+    overflow-x: hidden;
+  }
+}
+
+/* iOS safe-area support for notched devices */
+@supports (padding: env(safe-area-inset-top)) {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 }
 

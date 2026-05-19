@@ -153,8 +153,8 @@ function Layout() {
 
   return (
     <div className={`min-h-screen flex flex-col${location === "/faraid" ? " theme-faraid" : ""}`}>
-      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-lg border-b">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-lg border-b safe-area-top">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
@@ -248,8 +248,8 @@ function Layout() {
         )}
       </header>
 
-      <div className="flex-1 flex">
-        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+      <div className="flex-1 flex w-full min-w-0">
+        <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
           <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
           <Switch>
             <Route path="/" component={HomePage} />
@@ -316,7 +316,7 @@ function Layout() {
         </div>
       )}
 
-      <footer className="border-t py-6 px-4">
+      <footer className="border-t py-6 px-4 safe-area-bottom">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm text-muted-foreground">
           <div>
             <span className="font-medium text-foreground">{toolBrand.name}</span>

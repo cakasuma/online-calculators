@@ -417,11 +417,11 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
 
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
+    <div className="max-w-2xl mx-auto space-y-5 min-w-0">
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("zakat.title")}</h1>
+      <div className="min-w-0">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight break-words">{t("zakat.title")}</h1>
           <Badge variant="secondary" className="text-xs">
             {t("home.zakat.badge")}
           </Badge>
@@ -564,12 +564,12 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         {/* ── Cash & Savings ── */}
         <AccordionItem value="cash" className="border rounded-xl overflow-hidden">
           <AccordionTrigger className="px-4 sm:px-5 py-4 hover:no-underline hover:bg-muted/30 [&>svg]:hidden">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center">
+            <div className="flex items-center justify-between w-full gap-2 min-w-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
                   <span className="text-lg">💰</span>
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0">
                   <p className="text-sm font-semibold">{t("zakat.category.cashSavings")}</p>
                   {result.cashZakatable > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -578,7 +578,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                   )}
                 </div>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180 flex-shrink-0" />
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
@@ -630,12 +630,12 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         {/* ── Gold & Silver ── */}
         <AccordionItem value="gold" className="border rounded-xl overflow-hidden">
           <AccordionTrigger className="px-4 sm:px-5 py-4 hover:no-underline hover:bg-muted/30 [&>svg]:hidden">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-yellow-500/15 flex items-center justify-center">
+            <div className="flex items-center justify-between w-full gap-2 min-w-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-lg bg-yellow-500/15 flex items-center justify-center flex-shrink-0">
                   <span className="text-lg">🥇</span>
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0">
                   <p className="text-sm font-semibold">{t("zakat.category.goldSilver")}</p>
                   {result.goldSilverZakatable > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -644,7 +644,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                   )}
                 </div>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180 flex-shrink-0" />
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
@@ -667,7 +667,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
               </div>
             </div>
             {/* Gold */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">{t("zakat.gold.goldGrams")}</Label>
                 <Input
@@ -735,7 +735,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
               </p>
             )}
             {/* Silver */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">{t("zakat.gold.silverGrams")}</Label>
                 <Input
@@ -809,12 +809,12 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         {/* ── Investments ── */}
         <AccordionItem value="investments" className="border rounded-xl overflow-hidden">
           <AccordionTrigger className="px-4 sm:px-5 py-4 hover:no-underline hover:bg-muted/30 [&>svg]:hidden">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-purple-500/15 flex items-center justify-center">
+            <div className="flex items-center justify-between w-full gap-2 min-w-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0">
                   <span className="text-lg">📈</span>
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0">
                   <p className="text-sm font-semibold">{t("zakat.category.investments")}</p>
                   {result.investZakatable > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -823,7 +823,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                   )}
                 </div>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180 flex-shrink-0" />
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
@@ -870,12 +870,12 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         {/* ── Business Assets ── */}
         <AccordionItem value="business" className="border rounded-xl overflow-hidden">
           <AccordionTrigger className="px-4 sm:px-5 py-4 hover:no-underline hover:bg-muted/30 [&>svg]:hidden">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-orange-500/15 flex items-center justify-center">
+            <div className="flex items-center justify-between w-full gap-2 min-w-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-lg bg-orange-500/15 flex items-center justify-center flex-shrink-0">
                   <span className="text-lg">🏪</span>
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0">
                   <p className="text-sm font-semibold">{t("zakat.category.business")}</p>
                   {result.businessZakatable > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -884,7 +884,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                   )}
                 </div>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180 flex-shrink-0" />
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
@@ -913,12 +913,12 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         {/* ── Rental Income ── */}
         <AccordionItem value="rental" className="border rounded-xl overflow-hidden">
           <AccordionTrigger className="px-4 sm:px-5 py-4 hover:no-underline hover:bg-muted/30 [&>svg]:hidden">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-teal-500/15 flex items-center justify-center">
+            <div className="flex items-center justify-between w-full gap-2 min-w-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-lg bg-teal-500/15 flex items-center justify-center flex-shrink-0">
                   <span className="text-lg">🏠</span>
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0">
                   <p className="text-sm font-semibold">{t("zakat.category.rental")}</p>
                   {result.rentalZakatable > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -927,7 +927,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                   )}
                 </div>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180 flex-shrink-0" />
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 sm:px-5 pb-5 space-y-4">
@@ -1024,11 +1024,11 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
           )}
 
           {/* Zakat due */}
-          <div className="rounded-xl border p-4 text-center space-y-1">
+          <div className="rounded-xl border p-4 text-center space-y-1 min-w-0">
             <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
               {t("zakat.summary.zakatDue")}
             </p>
-            <p className={`text-3xl font-bold tabular-nums ${zakatTextColor}`}>
+            <p className={`text-2xl sm:text-3xl font-bold tabular-nums break-words ${zakatTextColor}`}>
               {result.nisab === 0
                 ? "—"
                 : `${currSym} ${formatCurrency(zakatDue, locale)}`}

@@ -739,19 +739,19 @@ function Counter({
   max?: number;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       <button
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold flex-shrink-0"
       >
         −
       </button>
-      <span className="text-base font-mono w-7 text-center font-semibold">{value}</span>
+      <span className="text-base font-mono w-7 text-center font-semibold flex-1 sm:flex-none">{value}</span>
       <button
         type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
-        className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold flex-shrink-0"
       >
         +
       </button>
@@ -953,7 +953,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   const liveNet = Math.max(0, estate - debts - wasiyyah);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4 print:space-y-3">
+    <div className="max-w-2xl mx-auto space-y-4 print:space-y-3 min-w-0">
       {/* Disclaimer */}
       <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-sm print:hidden">
         <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />

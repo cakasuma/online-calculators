@@ -70,11 +70,15 @@ function EmbedAnalytics() {
     if (!calculator) return;
     const referrer = typeof document !== "undefined" ? document.referrer : "";
     const host = parentHost(referrer);
+    // Only send the eTLD+1 host (or null). The full referrer URL can contain
+    // path / query string data under permissive referrer policies, which the
+    // partners aggregate does not need; sending only the host minimises
+    // captured data and storage retention risk.
     track("embed_view", { calculator, parentHost: host ?? "(unknown)" });
     recordServerEvent({
       calculator: calculator as "salary" | "zakat" | "faraid" | "normal" | "scientific" | "epf",
       event: "embed_view",
-      payload: { parentHost: host, referrer: referrer || null },
+      payload: { parentHost: host },
     });
   }, [calculator]);
   return null;

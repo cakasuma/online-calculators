@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ExternalLink, Globe, Loader2, Sparkles } from "lucide-react";
+import { Globe, Loader2, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocale } from "@/hooks/use-locale";
 import { findRouteBySlug, canonicalUrl, SITE_ORIGIN } from "@/config/seo";
@@ -105,14 +105,15 @@ export default function Partners() {
             </CardContent>
           </Card>
         ) : (
+          // Render each host as plain text (not a link). The list is fed by
+          // unauthenticated embed_view events, so even with server-side host
+          // validation we do not turn it into a clickable target — a verified
+          // partner programme can re-add anchors later.
           <div className="grid sm:grid-cols-2 gap-2">
             {data.hosts.map((h) => (
-              <a
+              <div
                 key={h.host}
-                href={`https://${h.host}`}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="group flex items-center justify-between gap-3 rounded-lg border bg-card p-3 transition-colors hover:border-primary/50 hover:bg-muted/40"
+                className="flex items-center justify-between gap-3 rounded-lg border bg-card p-3"
                 data-testid={`partner-${h.host}`}
               >
                 <div className="flex items-center gap-3 min-w-0">
@@ -120,14 +121,13 @@ export default function Partners() {
                     <Globe className="w-4 h-4 text-primary" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate group-hover:text-primary">{h.host}</p>
+                    <p className="text-sm font-medium truncate">{h.host}</p>
                     <p className="text-xs text-muted-foreground">
                       {h.count.toLocaleString()} {t("partners.embedViews")}
                     </p>
                   </div>
                 </div>
-                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-              </a>
+              </div>
             ))}
           </div>
         )}

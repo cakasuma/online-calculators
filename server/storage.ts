@@ -47,6 +47,18 @@ export interface IStorage {
 const EMBED_WINDOW_DAYS = 180;
 const EMBED_DEFAULT_MIN_COUNT = 5;
 
+// Defence-in-depth: even though /api/events sanitises parentHost on write,
+// re-validate on read so legacy data (or any future code path that bypasses
+// /api/events) cannot surface a malformed host to the partners page.
+const SAFE_DOMAIN_RE = /^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
+function isSafeDomain(s: string): boolean {
+  const lower = s.toLowerCase().trim();
+  if (!SAFE_DOMAIN_RE.test(lower)) return false;
+  if (lower === "localhost" || lower === "hellokalku.com" || lower.endsWith(".hellokalku.com")) return false;
+  if (/^[0-9]+(\.[0-9]+){0,3}$/.test(lower)) return false;
+  return true;
+}
+
 const SALARY_PERCENTILES = [10, 25, 50, 75, 90, 99];
 const SALARY_WINDOW_DAYS = 180;
 const SALARY_MIN_SAMPLE = 20;
@@ -147,6 +159,7 @@ export class MemStorage implements IStorage {
       if (e.createdAt.getTime() < windowStart) continue;
       const host = (e.payload as Record<string, unknown> | null)?.parentHost;
       if (typeof host !== "string" || !host) continue;
+      if (!isSafeDomain(host)) continue;
       const ts = e.createdAt.getTime();
       const cur = agg.get(host);
       if (cur) {
@@ -281,7 +294,7 @@ export class DbStorage implements IStorage {
         firstSeen: Math.round(Number(r.first_seen ?? r.firstSeen ?? 0)),
         lastSeen: Math.round(Number(r.last_seen ?? r.lastSeen ?? 0)),
       }))
-      .filter((r) => r.host.length > 0);
+      .filter((r) => r.host.length > 0 && isSafeDomain(r.host));
   }
 }
 

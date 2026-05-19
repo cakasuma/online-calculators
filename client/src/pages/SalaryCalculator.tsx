@@ -118,8 +118,12 @@ function calculateSalary(input: SalaryInputs) {
   const bonusEpf = input.annualBonus * epfRate;
   const annualEpf = monthlyEpf * 12 + bonusEpf;
 
-  const monthlySocso = input.workerType === "foreigner" ? 0 : Math.min(input.monthlySalary, 6000) * 0.005;
-  const monthlyEis = input.workerType === "foreigner" ? 0 : Math.min(input.monthlySalary, 6000) * 0.002;
+  // SOCSO Cat 1 employee contribution: 0.5% of wages, capped at RM 29.75/month
+  // (PERKESO contribution schedule for wages above RM 5,990).
+  const monthlySocso = input.workerType === "foreigner" ? 0 : Math.min(input.monthlySalary * 0.005, 29.75);
+  // EIS employee contribution: 0.2% of wages, capped at RM 9.90/month
+  // (wage ceiling RM 5,000 under the EIS Act).
+  const monthlyEis = input.workerType === "foreigner" ? 0 : Math.min(input.monthlySalary * 0.002, 9.90);
   const annualSocso = monthlySocso * 12;
   const annualEis = monthlyEis * 12;
 

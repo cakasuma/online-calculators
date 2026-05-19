@@ -72,7 +72,7 @@ function EmbedAnalytics() {
     const host = parentHost(referrer);
     track("embed_view", { calculator, parentHost: host ?? "(unknown)" });
     recordServerEvent({
-      calculator: calculator as "salary" | "zakat" | "faraid" | "normal" | "scientific",
+      calculator: calculator as "salary" | "zakat" | "faraid" | "normal" | "scientific" | "epf",
       event: "embed_view",
       payload: { parentHost: host, referrer: referrer || null },
     });

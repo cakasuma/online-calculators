@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { getUtmParams, recordServerEvent, track } from "@/lib/analytics";
 
-type Calculator = "faraid" | "wasiat" | "zakat" | "salary" | "normal" | "scientific";
+type Calculator = "faraid" | "wasiat" | "zakat" | "salary" | "normal" | "scientific" | "epf";
 type Intent = "consult" | "reminder" | "partner" | "newsletter" | "report";
 
 export interface LeadCaptureCardProps {

@@ -19,6 +19,7 @@ import {
   X,
   Menu,
   FileText,
+  PiggyBank,
   Star,
   Wallet,
 } from "lucide-react";
@@ -40,6 +41,7 @@ import FaraidCalculator from "@/pages/FaraidCalculator";
 import WasiatGuide from "@/pages/WasiatGuide";
 import ZakatCalculator from "@/pages/ZakatCalculator";
 import SalaryCalculator from "@/pages/SalaryCalculator";
+import EpfCalculator from "@/pages/EpfCalculator";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Partners from "@/pages/Partners";
 import TermsOfUse from "@/pages/TermsOfUse";
@@ -48,6 +50,7 @@ import NotFound from "@/pages/not-found";
 const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
   { href: "/", labelKey: "nav.home", icon: HomeIcon },
   { href: "/salary", labelKey: "nav.salary", icon: Wallet },
+  { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
   { href: "/normal", labelKey: "nav.basic", icon: Calculator },
   { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
   { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
@@ -141,7 +144,7 @@ function Layout() {
   }, [adsenseEnabled]);
 
   const handleCalculate = useCallback(
-    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat") =>
+    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf") =>
       (expression: string, result: string, url?: string) => {
         history.add(calculator, expression, result, url);
       },
@@ -253,6 +256,10 @@ function Layout() {
             <Route path="/salary">
               <SalaryCalculator onCalculate={handleCalculate("salary")} />
               <CalculatorContent slug="salary" />
+            </Route>
+            <Route path="/epf-retirement">
+              <EpfCalculator onCalculate={handleCalculate("epf")} />
+              <CalculatorContent slug="epf" />
             </Route>
             <Route path="/normal">
               <NormalCalculator onCalculate={handleCalculate("normal")} />

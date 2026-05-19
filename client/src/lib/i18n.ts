@@ -127,6 +127,165 @@ const translations = {
   "nav.scientific": { en: "Scientific", ms: "Saintifik", id: "Ilmiah" },
   "nav.faraid": { en: "Faraid", ms: "Faraid", id: "Faraid" },
   "nav.wasiat": { en: "Wasiat", ms: "Wasiat", id: "Wasiat" },
+  "nav.epf": { en: "EPF", ms: "EPF", id: "EPF" },
+
+  // ── EPF retirement calculator ──
+  "epf.title": {
+    en: "EPF retirement projection",
+    ms: "Unjuran persaraan EPF",
+    id: "Proyeksi pensiun EPF",
+  },
+  "epf.subtitle": {
+    en: "Project your KWSP balance at retirement age, compare against the EPF Basic Savings target, and estimate your monthly retirement income.",
+    ms: "Unjurkan baki KWSP anda pada umur persaraan, bandingkan dengan sasaran Simpanan Asas EPF, dan anggarkan pendapatan persaraan bulanan anda.",
+    id: "Proyeksikan saldo KWSP Anda pada usia pensiun, bandingkan dengan target Basic Savings EPF, dan perkirakan pendapatan pensiun bulanan Anda.",
+  },
+  "epf.inputs.heading": { en: "Your details", ms: "Maklumat anda", id: "Detail Anda" },
+  "epf.inputs.currentAge": { en: "Current age", ms: "Umur sekarang", id: "Usia sekarang" },
+  "epf.inputs.retirementAge": {
+    en: "Retirement age",
+    ms: "Umur persaraan",
+    id: "Usia pensiun",
+  },
+  "epf.inputs.retirementAgeHint": {
+    en: "55 (early) or 60 (full withdrawal)",
+    ms: "55 (awal) atau 60 (pengeluaran penuh)",
+    id: "55 (awal) atau 60 (penarikan penuh)",
+  },
+  "epf.inputs.currentBalance": {
+    en: "Current EPF balance",
+    ms: "Baki EPF sekarang",
+    id: "Saldo EPF sekarang",
+  },
+  "epf.inputs.currentBalanceHint": {
+    en: "Akaun Persaraan + Akaun Sejahtera combined",
+    ms: "Akaun Persaraan + Akaun Sejahtera digabungkan",
+    id: "Akun Persaraan + Akun Sejahtera digabungkan",
+  },
+  "epf.inputs.monthlySalary": {
+    en: "Monthly gross salary",
+    ms: "Gaji kotor bulanan",
+    id: "Gaji kotor bulanan",
+  },
+  "epf.inputs.salaryGrowth": {
+    en: "Annual salary growth",
+    ms: "Pertumbuhan gaji tahunan",
+    id: "Pertumbuhan gaji tahunan",
+  },
+  "epf.inputs.dividendRate": {
+    en: "Expected EPF dividend",
+    ms: "Dividen EPF dijangka",
+    id: "Dividen EPF diharapkan",
+  },
+  "epf.inputs.dividendRateHint": {
+    en: "KWSP has paid 5.5%–6.4% in recent years",
+    ms: "KWSP telah membayar 5.5%–6.4% dalam beberapa tahun kebelakangan",
+    id: "KWSP telah membayar 5.5%–6.4% dalam beberapa tahun terakhir",
+  },
+  "epf.inputs.employeeRate": {
+    en: "Employee rate",
+    ms: "Kadar pekerja",
+    id: "Tarif karyawan",
+  },
+  "epf.inputs.employerRate": {
+    en: "Employer rate (override)",
+    ms: "Kadar majikan (ganti)",
+    id: "Tarif majikan (override)",
+  },
+  "epf.inputs.employerRateHint": {
+    en: "Default for this salary:",
+    ms: "Lalai untuk gaji ini:",
+    id: "Default untuk gaji ini:",
+  },
+  "epf.inputs.bonusMonths": {
+    en: "Bonus months / year",
+    ms: "Bulan bonus / tahun",
+    id: "Bulan bonus / tahun",
+  },
+  "epf.inputs.bonusMonthsHint": {
+    en: "0 if no bonus, 2 if two-month bonus, etc.",
+    ms: "0 jika tiada bonus, 2 untuk bonus dua bulan, dll.",
+    id: "0 jika tanpa bonus, 2 untuk bonus dua bulan, dll.",
+  },
+  "epf.inputs.voluntary": {
+    en: "Yearly voluntary contribution",
+    ms: "Sumbangan sukarela tahunan",
+    id: "Kontribusi sukarela tahunan",
+  },
+  "epf.inputs.voluntaryHint": {
+    en: "e.g. i-Saraan top-ups",
+    ms: "cth. tambahan i-Saraan",
+    id: "cth. tambahan i-Saraan",
+  },
+  "epf.units.years": { en: "yrs", ms: "thn", id: "thn" },
+  "epf.units.months": { en: "mo", ms: "bln", id: "bln" },
+  "epf.units.year": { en: "yr", ms: "thn", id: "thn" },
+  "epf.results.projectedAt": {
+    en: "Projected EPF balance at age",
+    ms: "Unjuran baki EPF pada umur",
+    id: "Proyeksi saldo EPF di usia",
+  },
+  "epf.results.contributed": {
+    en: "contributed",
+    ms: "disumbangkan",
+    id: "dikontribusikan",
+  },
+  "epf.results.dividends": {
+    en: "dividends",
+    ms: "dividen",
+    id: "dividen",
+  },
+  "epf.results.targetTitle": {
+    en: "KWSP Basic Savings target",
+    ms: "Sasaran Simpanan Asas KWSP",
+    id: "Target Basic Savings KWSP",
+  },
+  "epf.results.aboveTargetBy": {
+    en: "On track — above target by",
+    ms: "Mengikut sasaran — melebihi sasaran sebanyak",
+    id: "Sesuai jalur — di atas target sebesar",
+  },
+  "epf.results.belowTargetBy": {
+    en: "Below the target by",
+    ms: "Di bawah sasaran sebanyak",
+    id: "Di bawah target sebesar",
+  },
+  "epf.results.targetSource": {
+    en: "Source: KWSP Retirement Income Adequacy framework (RM 390k at age 60 by 2028).",
+    ms: "Sumber: Rangka kerja Kecukupan Pendapatan Persaraan KWSP (RM 390k pada umur 60 menjelang 2028).",
+    id: "Sumber: Kerangka Kecukupan Pendapatan Pensiun KWSP (RM 390k di usia 60 pada 2028).",
+  },
+  "epf.results.monthlyIncome": {
+    en: "Estimated monthly retirement income",
+    ms: "Anggaran pendapatan persaraan bulanan",
+    id: "Estimasi pendapatan pensiun bulanan",
+  },
+  "epf.results.monthlyIncomeHint": {
+    en: "Using a 4% safe-withdrawal rate. For a longer retirement, plan with a lower rate.",
+    ms: "Menggunakan kadar pengeluaran selamat 4%. Untuk persaraan lebih panjang, rancang dengan kadar lebih rendah.",
+    id: "Menggunakan tarif penarikan aman 4%. Untuk pensiun lebih panjang, rencanakan dengan tarif lebih rendah.",
+  },
+  "epf.results.yearly.title": {
+    en: "Year-by-year breakdown",
+    ms: "Pecahan tahun demi tahun",
+    id: "Rincian tahun per tahun",
+  },
+  "epf.results.yearly.age": { en: "Age", ms: "Umur", id: "Usia" },
+  "epf.results.yearly.salary": { en: "Salary", ms: "Gaji", id: "Gaji" },
+  "epf.results.yearly.contrib": { en: "Contribution", ms: "Sumbangan", id: "Kontribusi" },
+  "epf.results.yearly.div": { en: "Dividend", ms: "Dividen", id: "Dividen" },
+  "epf.results.yearly.endBal": { en: "End balance", ms: "Baki akhir", id: "Saldo akhir" },
+
+  "tools.epf-calculator.name": {
+    en: "EPF Retirement Projection",
+    ms: "Unjuran Persaraan EPF",
+    id: "Proyeksi Pensiun EPF",
+  },
+  "tools.epf-calculator.desc": {
+    en: "Project your KWSP balance at retirement and compare against the Basic Savings target.",
+    ms: "Unjurkan baki KWSP anda pada persaraan dan bandingkan dengan sasaran Simpanan Asas.",
+    id: "Proyeksikan saldo KWSP Anda pada pensiun dan bandingkan dengan target Basic Savings.",
+  },
   "common.history": { en: "History", ms: "Sejarah", id: "Riwayat" },
   "history.open": { en: "Open", ms: "Buka", id: "Buka" },
   "common.noHistory": { en: "No history yet", ms: "Tiada sejarah", id: "Belum ada riwayat" },

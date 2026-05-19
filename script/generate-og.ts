@@ -63,6 +63,15 @@ const SLUG_STYLE: Record<string, { accent: string; tagShort: string; tagLong: Re
       id: "Disematkan di mana-mana",
     },
   },
+  epf: {
+    accent: "#7C3AED",
+    tagShort: "EPF",
+    tagLong: {
+      en: "Retirement projection",
+      ms: "Unjuran persaraan",
+      id: "Proyeksi pensiun",
+    },
+  },
   privacy: {
     accent: "#64748B",
     tagShort: "POLICY",

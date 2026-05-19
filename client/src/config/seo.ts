@@ -11,6 +11,7 @@ export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-default.png`;
 export type RouteSlug =
   | "home"
   | "salary"
+  | "epf"
   | "normal"
   | "scientific"
   | "faraid"
@@ -107,6 +108,37 @@ export const routes: RouteSeoEntry[] = [
           "Hitung gaji bersih Malaysia dengan potongan EPF, SOCSO, EIS, dan PCB. Mendukung penduduk, non-penduduk, dan pekerja asing.",
         heading: "Kalkulator gaji Malaysia",
         tagline: "Estimasi gaji bersih dengan EPF, SOCSO, EIS, dan PCB.",
+      },
+    },
+  },
+  {
+    slug: "epf",
+    path: "/epf-retirement",
+    prerender: true,
+    sitemap: { priority: 0.85, changefreq: "monthly" },
+    copy: {
+      en: {
+        title: "EPF Retirement Calculator Malaysia 2026 (KWSP Basic Savings) | HelloKalku",
+        description:
+          "Project your KWSP balance at retirement age. Compares against the 2026 EPF Basic Savings target (RM 270k @ 55, RM 390k @ 60) and estimates your monthly retirement income.",
+        keywords:
+          "epf calculator malaysia, kwsp retirement calculator, basic savings target, ria retirement calculator, epf projection",
+        heading: "EPF retirement projection",
+        tagline: "Project your KWSP balance and compare against the Basic Savings target.",
+      },
+      ms: {
+        title: "Kalkulator Persaraan EPF Malaysia 2026 (Simpanan Asas KWSP) | HelloKalku",
+        description:
+          "Unjurkan baki KWSP anda pada umur persaraan. Bandingkan dengan sasaran Simpanan Asas EPF 2026 (RM 270k @ 55, RM 390k @ 60) dan anggarkan pendapatan persaraan bulanan anda.",
+        heading: "Unjuran persaraan EPF",
+        tagline: "Unjurkan baki KWSP dan bandingkan dengan sasaran Simpanan Asas.",
+      },
+      id: {
+        title: "Kalkulator Pensiun EPF Malaysia 2026 (Simpanan Asas KWSP) | HelloKalku",
+        description:
+          "Proyeksikan saldo KWSP Anda pada usia pensiun. Bandingkan dengan target Basic Savings EPF 2026 (RM 270k @ 55, RM 390k @ 60) dan perkirakan pendapatan pensiun bulanan Anda.",
+        heading: "Proyeksi pensiun EPF",
+        tagline: "Proyeksikan saldo KWSP dan bandingkan dengan target Basic Savings.",
       },
     },
   },

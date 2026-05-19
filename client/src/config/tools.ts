@@ -4,6 +4,7 @@ import {
   FileText,
   FlaskConical,
   Landmark,
+  PiggyBank,
   Scale,
   Sigma,
   Star,
@@ -40,6 +41,16 @@ export const tools: ToolMeta[] = [
     icon: CircleDollarSign,
     featured: true,
     badge: "Popular",
+  },
+  {
+    slug: "epf-calculator",
+    href: "/epf-retirement",
+    name: "EPF Retirement Projection",
+    description: "Project your KWSP balance at retirement and compare against the Basic Savings target.",
+    category: "Finance",
+    icon: PiggyBank,
+    featured: true,
+    badge: "New",
   },
   {
     slug: "normal-calculator",
@@ -84,7 +95,7 @@ export const tools: ToolMeta[] = [
   },
 ];
 
-export const navTools = ["/salary", "/normal", "/scientific", "/faraid", "/zakat", "/wasiat"];
+export const navTools = ["/salary", "/epf-retirement", "/normal", "/scientific", "/faraid", "/zakat", "/wasiat"];
 
 export const toolBrand = {
   name: "HelloKalku",

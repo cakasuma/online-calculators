@@ -353,23 +353,23 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const showResults = hasCalculated && isValid;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      <section className="relative overflow-hidden rounded-[2rem] border bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-6 text-white shadow-2xl sm:p-10">
-        <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-          <div className="space-y-4">
+    <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8 min-w-0">
+      <section className="relative overflow-hidden rounded-3xl sm:rounded-[2rem] border bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-4 sm:p-6 md:p-10 text-white shadow-2xl">
+        <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl pointer-events-none" />
+        <div className="relative grid gap-6 sm:gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end min-w-0">
+          <div className="space-y-3 sm:space-y-4 min-w-0">
             <Badge className="w-fit border-white/15 bg-white/10 text-emerald-100 hover:bg-white/10">
               {t("salary.badge")}
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{t("salary.title")}</h1>
-            <p className="max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight break-words">{t("salary.title")}</h1>
+            <p className="max-w-2xl text-sm sm:text-base md:text-lg leading-6 sm:leading-7 text-slate-300">
               {t("salary.subtitle")}
             </p>
           </div>
-          <Card className="border-white/10 bg-white/10 text-white backdrop-blur">
-            <CardContent className="p-6">
+          <Card className="border-white/10 bg-white/10 text-white backdrop-blur min-w-0">
+            <CardContent className="p-4 sm:p-6 min-w-0">
               <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
-              <p className="mt-2 text-4xl font-bold">{money(showResults ? result.monthlyNet : 0)}</p>
+              <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
               <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
                 <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
               </div>
@@ -385,9 +385,9 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <Card className="rounded-3xl border-slate-200/80 shadow-sm dark:border-slate-800">
-          <CardContent className="space-y-5 p-6">
+      <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] min-w-0">
+        <Card className="rounded-2xl sm:rounded-3xl border-slate-200/80 shadow-sm dark:border-slate-800 min-w-0">
+          <CardContent className="space-y-5 p-4 sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold">{t("salary.inputs.title")}</h2>
@@ -491,10 +491,10 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
           {!showResults ? (
-            <Card className="rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
-              <CardContent className="flex flex-col items-center justify-center gap-3 p-10 text-center">
+            <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
+              <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
                 <div className="rounded-2xl bg-primary/10 p-3 text-primary">
                   <CalculatorIcon className="h-6 w-6" />
                 </div>
@@ -505,22 +505,22 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 min-w-0">
               {([
                 [t("salary.epfMonth"), result.monthlyEpf, percent(monthlyEpfRate), Wallet],
                 [t("salary.taxMonth"), result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
                 [t("salary.socsoMonth"), result.monthlySocso, percent(monthlySocsoRate), Info],
                 [t("salary.eisMonth"), result.monthlyEis, percent(monthlyEisRate), Info],
               ] as [string, number, string, typeof Wallet][]).map(([label, value, tooltipInfo, Icon]) => (
-                <Card key={label} className="rounded-3xl shadow-sm">
-                  <CardContent className="p-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{label}</p>
-                        <p className="mt-1 text-2xl font-bold">{money(value)}</p>
+                <Card key={label} className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-3 min-w-0">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm text-muted-foreground">{label}</p>
+                        <p className="mt-1 text-xl sm:text-2xl font-bold break-words tabular-nums">{money(value)}</p>
                         <p className="mt-1 text-xs text-muted-foreground">{t("salary.rateEstimate")} {tooltipInfo}</p>
                       </div>
-                      <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                      <div className="rounded-2xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
                         <Icon className="h-5 w-5" />
                       </div>
                     </div>
@@ -557,8 +557,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
           )}
 
           {showResults && (
-            <Card className="rounded-3xl shadow-sm">
-              <CardContent className="p-6">
+            <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+              <CardContent className="p-4 sm:p-6 min-w-0">
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-semibold">{t("salary.annual.title")}</h2>
@@ -603,10 +603,10 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                     [t("salary.estimatedMonthlyTax"), result.monthlyTax, `${t("salary.approxMonthlyRate")} ${percent(monthlyTaxRate)}`],
                     [t("salary.monthlyDeductions"), result.monthlyDeductions, t("salary.deductionItems")],
                   ] as [string, number, string][]).map(([label, value, helper]) => (
-                    <div key={label} className="rounded-2xl bg-muted/50 px-4 py-3">
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="text-sm text-muted-foreground">{label}</span>
-                        <span className="font-semibold">{money(value)}</span>
+                    <div key={label} className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                      <div className="flex items-center justify-between gap-3 min-w-0">
+                        <span className="text-sm text-muted-foreground min-w-0 break-words">{label}</span>
+                        <span className="font-semibold tabular-nums text-right break-words">{money(value)}</span>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
                     </div>

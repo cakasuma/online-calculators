@@ -167,15 +167,15 @@ export default function NormalCalculator({ onCalculate }: Props) {
   return (
     <div className="max-w-sm mx-auto w-full">
       {/* Display */}
-      <div className="mb-3 p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
+      <div className="mb-3 p-3 sm:p-5 rounded-2xl bg-card border min-h-[96px] flex flex-col justify-end items-end overflow-hidden shadow-sm">
         {expression && (
-          <div className="text-sm text-muted-foreground font-mono mb-1 w-full overflow-x-auto text-right whitespace-nowrap scrollbar-none">
+          <div className="text-xs sm:text-sm text-muted-foreground font-mono mb-1 w-full overflow-x-auto text-right whitespace-nowrap scrollbar-none">
             {expression}
           </div>
         )}
         <p
-          className="font-mono font-semibold text-right break-all"
-          style={{ fontSize: display.length > 12 ? "1.5rem" : display.length > 8 ? "2rem" : "2.75rem" }}
+          className="font-mono font-semibold text-right break-all max-w-full"
+          style={{ fontSize: `clamp(1.25rem, ${display.length > 12 ? "5vw" : display.length > 8 ? "7vw" : "10vw"}, ${display.length > 12 ? "1.5rem" : display.length > 8 ? "2rem" : "2.75rem"})` }}
           data-testid="display-main"
         >
           {justEvaluated ? formatDisplayResult(display) : display}
@@ -183,7 +183,7 @@ export default function NormalCalculator({ onCalculate }: Props) {
       </div>
 
       {/* Buttons */}
-      <div className="grid grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
         {BUTTONS.flat().map((key) => (
           <button
             key={key}

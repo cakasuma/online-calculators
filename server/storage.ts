@@ -19,6 +19,17 @@ export interface SalaryDistribution {
   breakpoints: { p: number; value: number }[];
 }
 
+export interface EmbedHost {
+  /** eTLD+1 of the parent page hosting the embed. */
+  host: string;
+  /** Number of distinct embed_view events recorded from this host. */
+  count: number;
+  /** Earliest embed_view from this host, ms since epoch. */
+  firstSeen: number;
+  /** Latest embed_view from this host, ms since epoch. */
+  lastSeen: number;
+}
+
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -28,6 +39,24 @@ export interface IStorage {
   /** Aggregate salary submissions over the recent window. Returns null when
    *  not enough data exists to draw meaningful percentiles. */
   getSalaryDistribution(): Promise<SalaryDistribution | null>;
+  /** Aggregate embed_view events by parent host. Filters out hosts with
+   *  fewer than the threshold to avoid one-off visits showing up. */
+  getEmbedHosts(minCount?: number): Promise<EmbedHost[]>;
+}
+
+const EMBED_WINDOW_DAYS = 180;
+const EMBED_DEFAULT_MIN_COUNT = 5;
+
+// Defence-in-depth: even though /api/events sanitises parentHost on write,
+// re-validate on read so legacy data (or any future code path that bypasses
+// /api/events) cannot surface a malformed host to the partners page.
+const SAFE_DOMAIN_RE = /^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
+function isSafeDomain(s: string): boolean {
+  const lower = s.toLowerCase().trim();
+  if (!SAFE_DOMAIN_RE.test(lower)) return false;
+  if (lower === "localhost" || lower === "hellokalku.com" || lower.endsWith(".hellokalku.com")) return false;
+  if (/^[0-9]+(\.[0-9]+){0,3}$/.test(lower)) return false;
+  return true;
 }
 
 const SALARY_PERCENTILES = [10, 25, 50, 75, 90, 99];
@@ -121,6 +150,34 @@ export class MemStorage implements IStorage {
       breakpoints: computePercentiles(values),
     };
   }
+
+  async getEmbedHosts(minCount = EMBED_DEFAULT_MIN_COUNT): Promise<EmbedHost[]> {
+    const windowStart = Date.now() - EMBED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    const agg = new Map<string, { count: number; first: number; last: number }>();
+    for (const e of this.events) {
+      if (e.event !== "embed_view") continue;
+      if (e.createdAt.getTime() < windowStart) continue;
+      const host = (e.payload as Record<string, unknown> | null)?.parentHost;
+      if (typeof host !== "string" || !host) continue;
+      if (!isSafeDomain(host)) continue;
+      const ts = e.createdAt.getTime();
+      const cur = agg.get(host);
+      if (cur) {
+        cur.count += 1;
+        cur.first = Math.min(cur.first, ts);
+        cur.last = Math.max(cur.last, ts);
+      } else {
+        agg.set(host, { count: 1, first: ts, last: ts });
+      }
+    }
+    const list: EmbedHost[] = [];
+    for (const [host, v] of agg) {
+      if (v.count < minCount) continue;
+      list.push({ host, count: v.count, firstSeen: v.first, lastSeen: v.last });
+    }
+    list.sort((a, b) => b.count - a.count);
+    return list;
+  }
 }
 
 export class DbStorage implements IStorage {
@@ -205,6 +262,39 @@ export class DbStorage implements IStorage {
       windowStart: windowStart.getTime(),
       breakpoints: SALARY_PERCENTILES.map((p, i) => ({ p, value: Math.round(raw[i]) })),
     };
+  }
+
+  async getEmbedHosts(minCount = EMBED_DEFAULT_MIN_COUNT): Promise<EmbedHost[]> {
+    const db = getDb();
+    if (!db) return [];
+    const windowStart = new Date(Date.now() - EMBED_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+    const { sql } = await import("drizzle-orm");
+    const rows = await db.execute(sql`
+      SELECT
+        payload->>'parentHost' AS host,
+        count(*)::int AS cnt,
+        EXTRACT(EPOCH FROM min(created_at)) * 1000 AS first_seen,
+        EXTRACT(EPOCH FROM max(created_at)) * 1000 AS last_seen
+      FROM ${calculationEvents}
+      WHERE event = 'embed_view'
+        AND created_at >= ${windowStart}
+        AND jsonb_typeof(payload->'parentHost') = 'string'
+        AND payload->>'parentHost' <> ''
+      GROUP BY payload->>'parentHost'
+      HAVING count(*) >= ${minCount}
+      ORDER BY cnt DESC
+    `);
+
+    const data = (rows as unknown as { rows?: Array<Record<string, unknown>> }).rows
+      ?? (rows as unknown as Array<Record<string, unknown>>);
+    return data
+      .map((r) => ({
+        host: String(r.host ?? ""),
+        count: Number(r.cnt ?? 0),
+        firstSeen: Math.round(Number(r.first_seen ?? r.firstSeen ?? 0)),
+        lastSeen: Math.round(Number(r.last_seen ?? r.lastSeen ?? 0)),
+      }))
+      .filter((r) => r.host.length > 0 && isSafeDomain(r.host));
   }
 }
 

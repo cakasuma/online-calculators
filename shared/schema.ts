@@ -22,6 +22,7 @@ export const CALCULATOR_KEYS = [
   "salary",
   "normal",
   "scientific",
+  "epf",
 ] as const;
 
 export const LEAD_INTENTS = [

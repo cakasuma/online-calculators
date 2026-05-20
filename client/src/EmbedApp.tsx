@@ -7,19 +7,82 @@
 // can auto-resize their iframe without a hardcoded height. A matching helper
 // script (public/embed.js) is provided for partners to drop in.
 
-import { Switch, Route, Router } from "wouter";
-import { useEffect, useRef } from "react";
+import { Switch, Route, Router, useRoute } from "wouter";
+import { useEffect, useMemo, useRef } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { useLocaleState, LocaleContext } from "@/hooks/use-locale";
 import { useLocale } from "@/hooks/use-locale";
 import { isLocale, type Locale } from "@/lib/i18n";
+import { recordServerEvent, track } from "@/lib/analytics";
 
 import SalaryCalculator from "@/pages/SalaryCalculator";
 import NormalCalculator from "@/pages/NormalCalculator";
 import ScientificCalculator from "@/pages/ScientificCalculator";
 import FaraidCalculator from "@/pages/FaraidCalculator";
 import ZakatCalculator from "@/pages/ZakatCalculator";
+
+// Strip a referrer URL down to its eTLD+1 ("blog.example.com" → "example.com").
+// Pure heuristic — good enough for grouping; we do not need to be exact about
+// public suffixes for an analytics aggregate.
+function parentHost(referrer: string): string | null {
+  if (!referrer) return null;
+  try {
+    const u = new URL(referrer);
+    const h = u.hostname.toLowerCase();
+    if (!h || h === "localhost" || h === "127.0.0.1") return null;
+    if (h === "hellokalku.com" || h.endsWith(".hellokalku.com")) return null;
+    const parts = h.split(".");
+    if (parts.length <= 2) return h;
+    // Two-part TLDs like .co.uk → keep three labels; otherwise just keep two.
+    const TWO_PART_TLDS = new Set(["co.uk", "com.my", "com.sg", "com.au", "co.id", "or.id"]);
+    const lastTwo = parts.slice(-2).join(".");
+    return TWO_PART_TLDS.has(lastTwo)
+      ? parts.slice(-3).join(".")
+      : parts.slice(-2).join(".");
+  } catch {
+    return null;
+  }
+}
+
+// Wraps the calculator detection + analytics so we fire exactly one
+// `embed_view` per page load and capture the parent host for the partners
+// directory. Lives inside the Router so useRoute() can name the calculator.
+function EmbedAnalytics() {
+  const [salary] = useRoute("/salary");
+  const [zakat] = useRoute("/zakat");
+  const [faraid] = useRoute("/faraid");
+  const [normal] = useRoute("/normal");
+  const [scientific] = useRoute("/scientific");
+  const calculator = salary
+    ? "salary"
+    : zakat
+      ? "zakat"
+      : faraid
+        ? "faraid"
+        : normal
+          ? "normal"
+          : scientific
+            ? "scientific"
+            : null;
+
+  useEffect(() => {
+    if (!calculator) return;
+    const referrer = typeof document !== "undefined" ? document.referrer : "";
+    const host = parentHost(referrer);
+    // Only send the eTLD+1 host (or null). The full referrer URL can contain
+    // path / query string data under permissive referrer policies, which the
+    // partners aggregate does not need; sending only the host minimises
+    // captured data and storage retention risk.
+    track("embed_view", { calculator, parentHost: host ?? "(unknown)" });
+    recordServerEvent({
+      calculator: calculator as "salary" | "zakat" | "faraid" | "normal" | "scientific" | "epf",
+      event: "embed_view",
+      payload: { parentHost: host },
+    });
+  }, [calculator]);
+  return null;
+}
 
 interface EmbedFrameProps {
   children: React.ReactNode;
@@ -76,15 +139,27 @@ function EmbedFrame({ children }: EmbedFrameProps) {
 
 function EmbedFooter() {
   const { locale } = useLocale();
+  // Tag the back-link with UTMs so a click coming from an embed shows up as
+  // utm_source=embed on the canonical site analytics. utm_campaign carries
+  // the parent host so we can attribute traffic per partner.
+  const ctaHref = useMemo(() => {
+    const params = new URLSearchParams({ utm_source: "embed", utm_medium: "iframe" });
+    const referrer = typeof document !== "undefined" ? document.referrer : "";
+    const host = parentHost(referrer);
+    if (host) params.set("utm_campaign", host);
+    return `https://hellokalku.com/${locale}?${params.toString()}`;
+  }, [locale]);
+
   return (
     <div className="border-t mt-6 px-4 py-3 flex items-center justify-between text-xs text-muted-foreground">
       <span>
         Powered by{" "}
         <a
-          href={`https://hellokalku.com/${locale}`}
+          href={ctaHref}
           target="_blank"
           rel="noopener noreferrer"
           className="font-medium text-foreground hover:text-primary underline-offset-2 hover:underline"
+          data-testid="link-powered-by"
         >
           HelloKalku
         </a>
@@ -109,6 +184,7 @@ function localeFromQuery(): Locale | null {
 function EmbedRoutes() {
   return (
     <Router base="/embed">
+      <EmbedAnalytics />
       <Switch>
         <Route path="/salary">
           <EmbedFrame>

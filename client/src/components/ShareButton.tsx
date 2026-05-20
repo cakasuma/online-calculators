@@ -7,7 +7,7 @@ import { track, recordServerEvent } from "@/lib/analytics";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { syncStateToUrl, buildShareUrl, type UrlSchema } from "@/lib/urlState";
 
-type Calculator = "salary" | "zakat" | "faraid" | "wasiat" | "normal" | "scientific";
+type Calculator = "salary" | "zakat" | "faraid" | "wasiat" | "normal" | "scientific" | "epf";
 
 interface ShareButtonProps<T> {
   /** Calculator slug, used for analytics tagging. */

@@ -127,6 +127,172 @@ const translations = {
   "nav.scientific": { en: "Scientific", ms: "Saintifik", id: "Ilmiah" },
   "nav.faraid": { en: "Faraid", ms: "Faraid", id: "Faraid" },
   "nav.wasiat": { en: "Wasiat", ms: "Wasiat", id: "Wasiat" },
+  "nav.epf": { en: "EPF", ms: "EPF", id: "EPF" },
+
+  // ── EPF retirement calculator ──
+  "epf.title": {
+    en: "EPF retirement projection",
+    ms: "Unjuran persaraan EPF",
+    id: "Proyeksi pensiun EPF",
+  },
+  "epf.subtitle": {
+    en: "Project your KWSP balance at retirement age, compare against the EPF Basic Savings target, and estimate your monthly retirement income.",
+    ms: "Unjurkan baki KWSP anda pada umur persaraan, bandingkan dengan sasaran Simpanan Asas EPF, dan anggarkan pendapatan persaraan bulanan anda.",
+    id: "Proyeksikan saldo KWSP Anda pada usia pensiun, bandingkan dengan target Basic Savings EPF, dan perkirakan pendapatan pensiun bulanan Anda.",
+  },
+  "epf.inputs.heading": { en: "Your details", ms: "Maklumat anda", id: "Detail Anda" },
+  "epf.inputs.currentAge": { en: "Current age", ms: "Umur sekarang", id: "Usia sekarang" },
+  "epf.inputs.retirementAge": {
+    en: "Retirement age",
+    ms: "Umur persaraan",
+    id: "Usia pensiun",
+  },
+  "epf.inputs.retirementAgeHint": {
+    en: "55 (early) or 60 (full withdrawal)",
+    ms: "55 (awal) atau 60 (pengeluaran penuh)",
+    id: "55 (awal) atau 60 (penarikan penuh)",
+  },
+  "epf.inputs.currentBalance": {
+    en: "Current EPF balance",
+    ms: "Baki EPF sekarang",
+    id: "Saldo EPF sekarang",
+  },
+  "epf.inputs.currentBalanceHint": {
+    en: "Akaun Persaraan + Akaun Sejahtera combined",
+    ms: "Akaun Persaraan + Akaun Sejahtera digabungkan",
+    id: "Akun Persaraan + Akun Sejahtera digabungkan",
+  },
+  "epf.inputs.monthlySalary": {
+    en: "Monthly gross salary",
+    ms: "Gaji kotor bulanan",
+    id: "Gaji kotor bulanan",
+  },
+  "epf.inputs.salaryGrowth": {
+    en: "Annual salary growth",
+    ms: "Pertumbuhan gaji tahunan",
+    id: "Pertumbuhan gaji tahunan",
+  },
+  "epf.inputs.dividendRate": {
+    en: "Expected EPF dividend",
+    ms: "Dividen EPF dijangka",
+    id: "Dividen EPF diharapkan",
+  },
+  "epf.inputs.dividendRateHint": {
+    en: "KWSP has paid 5.5%–6.4% in recent years",
+    ms: "KWSP telah membayar 5.5%–6.4% dalam beberapa tahun kebelakangan",
+    id: "KWSP telah membayar 5.5%–6.4% dalam beberapa tahun terakhir",
+  },
+  "epf.inputs.employeeRate": {
+    en: "Employee rate",
+    ms: "Kadar pekerja",
+    id: "Tarif karyawan",
+  },
+  "epf.inputs.employerRate": {
+    en: "Employer rate (override)",
+    ms: "Kadar majikan (ganti)",
+    id: "Tarif majikan (override)",
+  },
+  "epf.inputs.employerRateHint": {
+    en: "Default for this salary:",
+    ms: "Lalai untuk gaji ini:",
+    id: "Default untuk gaji ini:",
+  },
+  "epf.inputs.bonusMonths": {
+    en: "Bonus months / year",
+    ms: "Bulan bonus / tahun",
+    id: "Bulan bonus / tahun",
+  },
+  "epf.inputs.bonusMonthsHint": {
+    en: "0 if no bonus, 2 if two-month bonus, etc.",
+    ms: "0 jika tiada bonus, 2 untuk bonus dua bulan, dll.",
+    id: "0 jika tanpa bonus, 2 untuk bonus dua bulan, dll.",
+  },
+  "epf.inputs.voluntary": {
+    en: "Yearly voluntary contribution",
+    ms: "Sumbangan sukarela tahunan",
+    id: "Kontribusi sukarela tahunan",
+  },
+  "epf.inputs.voluntaryHint": {
+    en: "e.g. i-Saraan top-ups",
+    ms: "cth. tambahan i-Saraan",
+    id: "cth. tambahan i-Saraan",
+  },
+  "epf.units.years": { en: "yrs", ms: "thn", id: "thn" },
+  "epf.units.months": { en: "mo", ms: "bln", id: "bln" },
+  "epf.units.year": { en: "yr", ms: "thn", id: "thn" },
+  "epf.results.projectedAt": {
+    en: "Projected EPF balance at age",
+    ms: "Unjuran baki EPF pada umur",
+    id: "Proyeksi saldo EPF di usia",
+  },
+  "epf.results.contributed": {
+    en: "contributed",
+    ms: "disumbangkan",
+    id: "dikontribusikan",
+  },
+  "epf.results.dividends": {
+    en: "dividends",
+    ms: "dividen",
+    id: "dividen",
+  },
+  "epf.results.targetTitle": {
+    en: "KWSP Basic Savings target",
+    ms: "Sasaran Simpanan Asas KWSP",
+    id: "Target Basic Savings KWSP",
+  },
+  "epf.results.aboveTargetBy": {
+    en: "On track — above target by",
+    ms: "Mengikut sasaran — melebihi sasaran sebanyak",
+    id: "Sesuai jalur — di atas target sebesar",
+  },
+  "epf.results.belowTargetBy": {
+    en: "Below the target by",
+    ms: "Di bawah sasaran sebanyak",
+    id: "Di bawah target sebesar",
+  },
+  "epf.results.targetSource": {
+    en: "Source: KWSP Retirement Income Adequacy framework (RM 390k at age 60 by 2028).",
+    ms: "Sumber: Rangka kerja Kecukupan Pendapatan Persaraan KWSP (RM 390k pada umur 60 menjelang 2028).",
+    id: "Sumber: Kerangka Kecukupan Pendapatan Pensiun KWSP (RM 390k di usia 60 pada 2028).",
+  },
+  "epf.results.monthlyIncome": {
+    en: "Estimated monthly retirement income",
+    ms: "Anggaran pendapatan persaraan bulanan",
+    id: "Estimasi pendapatan pensiun bulanan",
+  },
+  "epf.results.monthlyIncomeHint": {
+    en: "Using a 4% safe-withdrawal rate. For a longer retirement, plan with a lower rate.",
+    ms: "Menggunakan kadar pengeluaran selamat 4%. Untuk persaraan lebih panjang, rancang dengan kadar lebih rendah.",
+    id: "Menggunakan tarif penarikan aman 4%. Untuk pensiun lebih panjang, rencanakan dengan tarif lebih rendah.",
+  },
+  "epf.results.yearly.title": {
+    en: "Year-by-year breakdown",
+    ms: "Pecahan tahun demi tahun",
+    id: "Rincian tahun per tahun",
+  },
+  "epf.results.yearly.age": { en: "Age", ms: "Umur", id: "Usia" },
+  "epf.results.yearly.salary": { en: "Salary", ms: "Gaji", id: "Gaji" },
+  "epf.results.yearly.contrib": { en: "Contributions", ms: "Sumbangan", id: "Kontribusi" },
+  "epf.results.yearly.div": { en: "Dividends", ms: "Dividen", id: "Dividen" },
+  "epf.results.yearly.endBal": { en: "End balance", ms: "Baki akhir", id: "Saldo akhir" },
+  "epf.results.yearly.chartView": { en: "Chart", ms: "Carta", id: "Grafik" },
+  "epf.results.yearly.tableView": { en: "Table", ms: "Jadual", id: "Tabel" },
+  "epf.results.yearly.targetLine": {
+    en: "Basic Savings",
+    ms: "Simpanan Asas",
+    id: "Basic Savings",
+  },
+
+  "tools.epf-calculator.name": {
+    en: "EPF Retirement Projection",
+    ms: "Unjuran Persaraan EPF",
+    id: "Proyeksi Pensiun EPF",
+  },
+  "tools.epf-calculator.desc": {
+    en: "Project your KWSP balance at retirement and compare against the Basic Savings target.",
+    ms: "Unjurkan baki KWSP anda pada persaraan dan bandingkan dengan sasaran Simpanan Asas.",
+    id: "Proyeksikan saldo KWSP Anda pada pensiun dan bandingkan dengan target Basic Savings.",
+  },
   "common.history": { en: "History", ms: "Sejarah", id: "Riwayat" },
   "history.open": { en: "Open", ms: "Buka", id: "Buka" },
   "common.noHistory": { en: "No history yet", ms: "Tiada sejarah", id: "Belum ada riwayat" },
@@ -279,6 +445,7 @@ const translations = {
   "tools.salary-calculator.name": { en: "Salary Calculator (Malaysia)", ms: "Kalkulator Gaji (Malaysia)", id: "Kalkulator Gaji (Malaysia)" },
   "tools.salary-calculator.desc": { en: "Estimate monthly take-home pay with EPF, SOCSO, EIS, and income tax deductions.", ms: "Perkirakan gaji bersih bulanan dengan potongan EPF, SOCSO, EIS, dan cukai pendapatan.", id: "Perkirakan gaji bersih bulanan dengan potongan EPF, SOCSO, EIS, dan pajak penghasilan." },
   "tools.salary-calculator.badge": { en: "Popular", ms: "Populer", id: "Populer" },
+  "tools.epf-calculator.badge": { en: "New", ms: "Baharu", id: "Baru" },
   "tools.faraid-calculator.name": { en: "Faraid Calculator", ms: "Kalkulator Faraid", id: "Kalkulator Faraid" },
   "tools.faraid-calculator.desc": { en: "Islamic inheritance share calculator with detailed heir distribution.", ms: "Kalkulator pembahagian waris Islam dengan perincian ahli waris yang terperinci.", id: "Kalkulator pembagian waris Islam dengan rincian ahli waris yang detail." },
   "home.tools.title": { en: "Other Tools", ms: "Alat Lain", id: "Alat Lainnya" },
@@ -614,6 +781,85 @@ const translations = {
   "footer.builtBy": { en: "Built by", ms: "Dibuat oleh", id: "Dibuat oleh" },
   "footer.privacy": { en: "Privacy", ms: "Privasi", id: "Privasi" },
   "footer.terms": { en: "Terms", ms: "Syarat", id: "Syarat" },
+  "footer.partners": { en: "Partners", ms: "Rakan kongsi", id: "Mitra" },
+  "home.hero.partnersLink": {
+    en: "Trusted by writers, blogs, and platforms — see who embeds HelloKalku →",
+    ms: "Dipercayai penulis, blog, dan platform — lihat siapa membenamkan HelloKalku →",
+    id: "Dipercaya penulis, blog, dan platform — lihat siapa yang menyematkan HelloKalku →",
+  },
+
+  // ── Partners page ──
+  "partners.stat.sites": {
+    en: "Embedding sites",
+    ms: "Laman membenamkan",
+    id: "Situs menyematkan",
+  },
+  "partners.stat.views": {
+    en: "Embed views",
+    ms: "Tontonan benaman",
+    id: "Tayangan sematan",
+  },
+  "partners.stat.windowNote": {
+    en: "Last 6 months",
+    ms: "6 bulan lepas",
+    id: "6 bulan terakhir",
+  },
+  "partners.stat.calculators": {
+    en: "Embeddable calculators",
+    ms: "Kalkulator boleh dibenamkan",
+    id: "Kalkulator dapat disematkan",
+  },
+  "partners.stat.calcList": {
+    en: "Salary · Zakat · Faraid · Basic · Scientific",
+    ms: "Gaji · Zakat · Faraid · Asas · Saintifik",
+    id: "Gaji · Zakat · Faraid · Dasar · Ilmiah",
+  },
+  "partners.embedViews": { en: "embed views", ms: "tontonan", id: "tayangan" },
+  "partners.pitch.title": {
+    en: "Embed any HelloKalku calculator on your site",
+    ms: "Benamkan mana-mana kalkulator HelloKalku di laman anda",
+    id: "Sematkan kalkulator HelloKalku mana pun di situs Anda",
+  },
+  "partners.pitch.body": {
+    en: "Drop a single iframe + script tag into your page and your readers get an interactive calculator that auto-resizes and stays up-to-date with the latest Malaysia tax, zakat, and inheritance rules. No maintenance, no fees, no signup.",
+    ms: "Letakkan satu iframe + tag skrip ke halaman anda dan pembaca anda dapat kalkulator interaktif yang ubah saiz secara automatik serta sentiasa terkini dengan peraturan cukai, zakat, dan waris Malaysia terbaharu. Tiada penyelenggaraan, tiada bayaran, tiada pendaftaran.",
+    id: "Tempelkan satu iframe + tag skrip ke halaman Anda dan pembaca Anda mendapat kalkulator interaktif yang menyesuaikan ukuran otomatis serta selalu terbaru dengan aturan pajak, zakat, dan waris Malaysia terkini. Tanpa pemeliharaan, tanpa biaya, tanpa pendaftaran.",
+  },
+  "partners.pitch.cta": {
+    en: "Open any calculator and click the Embed button to copy the snippet.",
+    ms: "Buka mana-mana kalkulator dan klik butang Benamkan untuk menyalin keratan.",
+    id: "Buka kalkulator mana pun dan klik tombol Sematkan untuk menyalin cuplikan.",
+  },
+  "partners.list.title": {
+    en: "Where HelloKalku is embedded",
+    ms: "Di mana HelloKalku dibenamkan",
+    id: "Di mana HelloKalku disematkan",
+  },
+  "partners.list.loading": {
+    en: "Loading partner list…",
+    ms: "Memuatkan senarai rakan kongsi…",
+    id: "Memuat daftar mitra…",
+  },
+  "partners.list.error": {
+    en: "Could not load the partner list right now. Please try again later.",
+    ms: "Tidak dapat memuatkan senarai rakan kongsi sekarang. Cuba lagi nanti.",
+    id: "Tidak dapat memuat daftar mitra sekarang. Silakan coba lagi nanti.",
+  },
+  "partners.list.empty": {
+    en: "No partner sites have reached the listing threshold yet.",
+    ms: "Belum ada laman rakan kongsi mencapai ambang penyenaraian.",
+    id: "Belum ada situs mitra yang mencapai ambang pencatatan.",
+  },
+  "partners.list.emptyHint": {
+    en: "Sites with at least 5 embed views in the last 6 months show up here.",
+    ms: "Laman dengan sekurang-kurangnya 5 tontonan benaman dalam 6 bulan lepas akan muncul di sini.",
+    id: "Situs dengan minimal 5 tayangan sematan dalam 6 bulan terakhir akan muncul di sini.",
+  },
+  "partners.list.disclosure": {
+    en: "Domains are detected automatically from embed traffic. Hosts can opt out by emailing us — see Privacy.",
+    ms: "Domain dikesan secara automatik daripada trafik benaman. Hos boleh menarik diri dengan menghantar e-mel kepada kami — lihat Privasi.",
+    id: "Domain dideteksi secara otomatis dari lalu lintas sematan. Host dapat memilih keluar dengan mengirim email kepada kami — lihat Privasi.",
+  },
 
   // ── Brand ──
   "brand.tagline": { en: "Smart calculators for everyday decisions", ms: "Kalkulator cerdas untuk keputusan harian", id: "Kalkulator cerdas untuk keputusan sehari-hari" },

@@ -34,6 +34,11 @@ export default function HomePage() {
           <Button asChild size="lg"><Link href="/salary">{t("home.hero.ctaSalary")}</Link></Button>
           <Button asChild size="lg" variant="outline"><Link href="/faraid">{t("home.hero.ctaFaraid")}</Link></Button>
         </div>
+        <p className="mt-5 text-sm text-muted-foreground">
+          <Link href="/partners" className="hover:text-foreground underline-offset-2 hover:underline">
+            {t("home.hero.partnersLink")}
+          </Link>
+        </p>
       </section>
 
       <section className="space-y-4">

@@ -272,9 +272,16 @@ const translations = {
   },
   "epf.results.yearly.age": { en: "Age", ms: "Umur", id: "Usia" },
   "epf.results.yearly.salary": { en: "Salary", ms: "Gaji", id: "Gaji" },
-  "epf.results.yearly.contrib": { en: "Contribution", ms: "Sumbangan", id: "Kontribusi" },
-  "epf.results.yearly.div": { en: "Dividend", ms: "Dividen", id: "Dividen" },
+  "epf.results.yearly.contrib": { en: "Contributions", ms: "Sumbangan", id: "Kontribusi" },
+  "epf.results.yearly.div": { en: "Dividends", ms: "Dividen", id: "Dividen" },
   "epf.results.yearly.endBal": { en: "End balance", ms: "Baki akhir", id: "Saldo akhir" },
+  "epf.results.yearly.chartView": { en: "Chart", ms: "Carta", id: "Grafik" },
+  "epf.results.yearly.tableView": { en: "Table", ms: "Jadual", id: "Tabel" },
+  "epf.results.yearly.targetLine": {
+    en: "Basic Savings",
+    ms: "Simpanan Asas",
+    id: "Basic Savings",
+  },
 
   "tools.epf-calculator.name": {
     en: "EPF Retirement Projection",
@@ -438,6 +445,7 @@ const translations = {
   "tools.salary-calculator.name": { en: "Salary Calculator (Malaysia)", ms: "Kalkulator Gaji (Malaysia)", id: "Kalkulator Gaji (Malaysia)" },
   "tools.salary-calculator.desc": { en: "Estimate monthly take-home pay with EPF, SOCSO, EIS, and income tax deductions.", ms: "Perkirakan gaji bersih bulanan dengan potongan EPF, SOCSO, EIS, dan cukai pendapatan.", id: "Perkirakan gaji bersih bulanan dengan potongan EPF, SOCSO, EIS, dan pajak penghasilan." },
   "tools.salary-calculator.badge": { en: "Popular", ms: "Populer", id: "Populer" },
+  "tools.epf-calculator.badge": { en: "New", ms: "Baharu", id: "Baru" },
   "tools.faraid-calculator.name": { en: "Faraid Calculator", ms: "Kalkulator Faraid", id: "Kalkulator Faraid" },
   "tools.faraid-calculator.desc": { en: "Islamic inheritance share calculator with detailed heir distribution.", ms: "Kalkulator pembahagian waris Islam dengan perincian ahli waris yang terperinci.", id: "Kalkulator pembagian waris Islam dengan rincian ahli waris yang detail." },
   "home.tools.title": { en: "Other Tools", ms: "Alat Lain", id: "Alat Lainnya" },

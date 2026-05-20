@@ -1,5 +1,15 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, PiggyBank, Target, TrendingUp, Wallet } from "lucide-react";
+import { BarChart3, Table2, PiggyBank, Target, TrendingUp, Wallet } from "lucide-react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
@@ -113,7 +123,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
   );
   const [voluntaryAnnual, setVoluntaryAnnual] = useState(formatInputValue(String(initial.voluntaryAnnual), locale));
   const [bonusMonths, setBonusMonths] = useState(String(initial.bonusMonths));
-  const [showYearly, setShowYearly] = useState(false);
+  const [yearlyView, setYearlyView] = useState<"chart" | "table">("chart");
 
   const parsedInputs: EpfInputs = useMemo(() => {
     const p = (s: string) => {
@@ -179,6 +189,43 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
       ? Math.min(100, (projection.finalBalance / projection.basicSavingsTarget) * 100)
       : 0;
   const erDefault = defaultEmployerRate(parsedInputs.monthlySalary);
+
+  // Compact RM formatter for axis ticks: 1,234 → "1.2k", 1,200,000 → "1.2m".
+  const compactRM = (n: number) => {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}m`;
+    if (n >= 1_000) return `${Math.round(n / 1_000)}k`;
+    return String(Math.round(n));
+  };
+
+  // Stacked-area data: cumulative contributions (incl. starting balance) at the
+  // bottom, cumulative dividends on top. Their sum equals the year-end balance,
+  // so the stack height traces the projected balance while showing how much of
+  // it is the user's own money vs compounding dividends.
+  const chartData = useMemo(() => {
+    let cumContrib = parsedInputs.currentBalance;
+    let cumDiv = 0;
+    const rows = projection.years.map((y) => {
+      cumContrib += y.totalContribution;
+      cumDiv += y.dividendCredited;
+      return {
+        age: y.age,
+        contributions: Math.round(cumContrib),
+        dividends: Math.round(cumDiv),
+        total: Math.round(y.endBalance),
+      };
+    });
+    // Seed the chart with the starting point so the area begins at the
+    // current balance rather than after the first year.
+    return [
+      {
+        age: parsedInputs.currentAge,
+        contributions: Math.round(parsedInputs.currentBalance),
+        dividends: 0,
+        total: Math.round(parsedInputs.currentBalance),
+      },
+      ...rows,
+    ];
+  }, [projection.years, parsedInputs.currentBalance, parsedInputs.currentAge]);
 
   return (
     <div className="space-y-6">
@@ -301,23 +348,121 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
             </CardContent>
           </Card>
 
-          {/* Year-by-year */}
+          {/* Year-by-year — chart by default, table on toggle */}
           <Card className="rounded-3xl">
-            <CardContent className="p-4">
-              <button
-                type="button"
-                onClick={() => setShowYearly((v) => !v)}
-                className="w-full flex items-center justify-between gap-2 px-2 py-2 rounded-lg hover:bg-muted/40 transition-colors"
-                data-testid="button-toggle-yearly"
-              >
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2 px-1">
                 <span className="flex items-center gap-2 text-sm font-semibold">
                   <Wallet className="w-4 h-4 text-primary" />
                   {t("epf.results.yearly.title")}
                 </span>
-                {showYearly ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
-              {showYearly && (
-                <div className="mt-3 overflow-x-auto">
+                <div className="flex items-center gap-1 rounded-lg border p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setYearlyView("chart")}
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${yearlyView === "chart" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                    data-testid="button-view-chart"
+                    aria-pressed={yearlyView === "chart"}
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" />
+                    {t("epf.results.yearly.chartView")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setYearlyView("table")}
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${yearlyView === "table" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                    data-testid="button-view-table"
+                    aria-pressed={yearlyView === "table"}
+                  >
+                    <Table2 className="w-3.5 h-3.5" />
+                    {t("epf.results.yearly.tableView")}
+                  </button>
+                </div>
+              </div>
+
+              {yearlyView === "chart" ? (
+                <div className="space-y-2">
+                  <div className="h-64 w-full" data-testid="epf-chart">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
+                        <defs>
+                          <linearGradient id="epfContrib" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.5} />
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                          </linearGradient>
+                          <linearGradient id="epfDiv" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.6} />
+                            <stop offset="95%" stopColor="#10B981" stopOpacity={0.05} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
+                        <XAxis
+                          dataKey="age"
+                          tick={{ fontSize: 11 }}
+                          tickLine={false}
+                          axisLine={false}
+                          minTickGap={20}
+                        />
+                        <YAxis
+                          tickFormatter={compactRM}
+                          tick={{ fontSize: 11 }}
+                          tickLine={false}
+                          axisLine={false}
+                          width={40}
+                        />
+                        <RechartsTooltip
+                          formatter={(value: number, name: string) => [money(value), name]}
+                          labelFormatter={(age) => `${t("epf.results.yearly.age")} ${age}`}
+                          contentStyle={{
+                            background: "hsl(var(--popover))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: 12,
+                            fontSize: 12,
+                          }}
+                        />
+                        <ReferenceLine
+                          y={projection.basicSavingsTarget}
+                          stroke="hsl(var(--muted-foreground))"
+                          strokeDasharray="4 4"
+                          label={{
+                            value: t("epf.results.yearly.targetLine"),
+                            position: "insideTopRight",
+                            fontSize: 10,
+                            fill: "hsl(var(--muted-foreground))",
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="contributions"
+                          name={t("epf.results.yearly.contrib")}
+                          stackId="1"
+                          stroke="hsl(var(--primary))"
+                          fill="url(#epfContrib)"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="dividends"
+                          name={t("epf.results.yearly.div")}
+                          stackId="1"
+                          stroke="#10B981"
+                          fill="url(#epfDiv)"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-sm bg-primary/60" />
+                      {t("epf.results.yearly.contrib")}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#10B981" }} />
+                      {t("epf.results.yearly.div")}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="text-muted-foreground">
                       <tr className="text-left">

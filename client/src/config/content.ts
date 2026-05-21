@@ -237,6 +237,167 @@ export const calculatorContent: ContentMap = {
     },
   },
 
+  epf: {
+    en: {
+      intro:
+        "Project your KWSP (Kumpulan Wang Simpanan Pekerja) balance at retirement using your current savings, monthly salary, expected annual salary growth, and EPF dividend history. Compare your projected balance against the EPF Basic Savings target and estimate a monthly retirement income using the 4% safe-withdrawal rate.",
+      howItWorks: {
+        heading: "How the EPF retirement projection works",
+        paragraphs: [
+          "The projection starts from your current EPF balance and simulates each remaining year until your chosen retirement age. Each year it adds your employee contribution (default 11% of gross salary), your employer contribution (12% for salaries above RM 5,000; 13% for RM 5,000 and below), any voluntary top-ups (e.g. i-Saraan), and any bonus-month contributions, then credits dividends on the end-of-year balance.",
+          "EPF dividends compound annually. The calculator defaults to 5.5% — a conservative figure within KWSP's recent 5.50%–6.40% range. Because dividends are declared on the total balance rather than new contributions alone, even a half-percentage-point change meaningfully shifts the 20- or 30-year projection.",
+          "Your salary is assumed to grow by the percentage you enter each year. A 3%–5% annual growth rate is typical for most Malaysian employees; adjust downward if you are near the peak of your earning years or upward if you expect rapid career progression.",
+          "The 2024 KWSP account restructure split contributions between Akaun Persaraan (75%) and Akaun Sejahtera (25%). This calculator treats the combined balance as the retirement balance since both accounts ultimately fund retirement, though Akaun Sejahtera allows limited withdrawals before retirement age.",
+          "The Basic Savings target is the KWSP benchmark designed to fund 20 years of retirement at the poverty line — RM 270,000 at age 55 (early withdrawal) and RM 390,000 at age 60 (full withdrawal) by 2028. The gap analysis shows whether your projected balance is on track to meet this target.",
+        ],
+      },
+      formula: {
+        heading: "Projection formula",
+        paragraphs: [
+          "End balance (year n) = Begin balance + Contributions + Voluntary + Bonus contributions + Dividends.",
+          "Contributions = Salary × (employee rate + employer rate) × 12.",
+          "Bonus contributions = (Salary × bonus months) × (employee rate + employer rate).",
+          "Dividends = End balance (before dividends) × dividend rate.",
+          "Monthly retirement income (4% rule) = Projected balance × 4% ÷ 12.",
+        ],
+      },
+      rateTable: {
+        heading: "KWSP employer contribution rates (2026)",
+        caption:
+          "Employer rates depend on the employee's monthly salary and whether the employee is below or above 60 years old.",
+        columns: ["Monthly salary", "Age below 60 — employer rate", "Age 60 & above — employer rate"],
+        rows: [
+          ["RM 5,000 and below", "13%", "6.5%"],
+          ["Above RM 5,000", "12%", "6%"],
+        ],
+        note: "Employee default rate: 11% (age below 60); 5.5% (age 60 and above). Members may voluntarily contribute more. Foreign employees contribute a flat RM 5 employer / variable employee amount unless they opt into the standard scheme.",
+      },
+      examples: [
+        {
+          title: "Example 1 — 30-year-old, RM 5,000/month, RM 30,000 current balance",
+          given: [
+            "Current age: 30, retirement age: 60 (30-year horizon)",
+            "Monthly salary: RM 5,000, salary growth: 3% per year",
+            "Current EPF balance: RM 30,000",
+            "Dividend rate: 5.5%, employee rate: 11%, employer rate: 13%",
+            "No bonus, no voluntary contributions",
+          ],
+          result:
+            "Projected balance at 60: approximately RM 728,000 — well above the RM 390,000 Basic Savings target. Estimated monthly retirement income at 4% SWR: ~RM 2,430.",
+        },
+        {
+          title: "Example 2 — 45-year-old, RM 8,000/month, RM 120,000 current balance",
+          given: [
+            "Current age: 45, retirement age: 60 (15-year horizon)",
+            "Monthly salary: RM 8,000, salary growth: 2% per year",
+            "Current EPF balance: RM 120,000",
+            "Dividend rate: 5.5%, employee rate: 11%, employer rate: 12%",
+            "Annual bonus: 1 month",
+          ],
+          result:
+            "Projected balance at 60: approximately RM 560,000 — above the RM 390,000 target. Estimated monthly retirement income at 4% SWR: ~RM 1,867.",
+        },
+      ],
+      faq: [
+        {
+          question: "What is the EPF Basic Savings target?",
+          answer:
+            "The Basic Savings target is KWSP's minimum recommended balance tied to retirement age: RM 270,000 at age 55 and RM 390,000 at age 60 (updated targets for 2028 under KWSP's Retirement Income Adequacy framework). It is designed to cover approximately 20 years of minimum living expenses. Falling short does not mean you cannot retire — it is a benchmark, not a hard cutoff.",
+        },
+        {
+          question: "What is the 4% safe-withdrawal rate?",
+          answer:
+            "The 4% rule is a guideline from retirement research (the Trinity Study) suggesting that withdrawing 4% of your portfolio annually has historically allowed the balance to last 30 years. Applied to an EPF balance: RM 400,000 × 4% = RM 16,000 per year, or RM 1,333 per month. This is a rough estimate — the EPF pays dividends rather than market returns, so actual sustainability depends on payout rates.",
+        },
+        {
+          question: "Should I use 55 or 60 as my retirement age?",
+          answer:
+            "Age 55 unlocks partial EPF withdrawals from Akaun Persaraan. Full flexible withdrawal is available at age 60. If you plan to work until 60, use 60 for a more accurate projection. The Basic Savings target for age 55 (RM 270,000) is lower because the remaining 5 years of contributions are counted separately.",
+        },
+        {
+          question: "How accurate is the dividend rate assumption?",
+          answer:
+            "KWSP has paid dividends between 5.50% (Akaun Persaraan, 2024) and 6.40% in recent years. The default 5.5% is conservative. Using a higher rate (e.g. 6%) will project a meaningfully larger balance over a 20–30 year horizon due to compounding. For planning purposes, model both a pessimistic (5%) and optimistic (6.5%) scenario.",
+        },
+        {
+          question: "Are voluntary contributions (i-Saraan) worth it?",
+          answer:
+            "Voluntary top-ups via i-Saraan earn the same EPF dividend rate and are tax-deductible under Malaysian income tax. For self-employed individuals or those wanting to accelerate savings, i-Saraan contributions can significantly boost the projected balance, especially when started early. The annual tax relief limit for EPF (including voluntary) is RM 4,000.",
+        },
+      ],
+      related: ["salary", "zakat", "normal"],
+      lastReviewed: "2026-01-01",
+    },
+
+    ms: {
+      intro:
+        "Unjurkan baki KWSP anda pada umur persaraan menggunakan simpanan semasa, gaji bulanan, pertumbuhan gaji tahunan, dan kadar dividen EPF. Bandingkan baki yang diunjurkan dengan sasaran Simpanan Asas EPF dan anggarkan pendapatan persaraan bulanan.",
+      howItWorks: {
+        heading: "Cara unjuran persaraan EPF berfungsi",
+        paragraphs: [
+          "Unjuran bermula dari baki EPF semasa anda dan mensimulasi setiap tahun yang tinggal sehingga umur persaraan yang anda pilih. Setiap tahun, sumbangan pekerja, majikan, sukarela, dan bonus ditambah, kemudian dividen dikreditkan pada baki akhir tahun.",
+          "Gaji anda diasumsikan tumbuh mengikut peratusan yang anda masukkan setiap tahun. Kadar pertumbuhan 3%–5% setahun adalah lazim untuk kebanyakan pekerja Malaysia.",
+          "Sasaran Simpanan Asas adalah penanda aras KWSP: RM 270,000 pada umur 55 dan RM 390,000 pada umur 60 menjelang 2028.",
+        ],
+      },
+      formula: {
+        heading: "Formula unjuran",
+        paragraphs: [
+          "Baki akhir (tahun n) = Baki mula + Sumbangan + Sukarela + Sumbangan bonus + Dividen.",
+          "Pendapatan persaraan bulanan (kadar 4%) = Baki yang diunjurkan × 4% ÷ 12.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah Sasaran Simpanan Asas EPF?",
+          answer:
+            "Sasaran Simpanan Asas ialah baki minimum yang disyorkan KWSP: RM 270,000 pada umur 55 dan RM 390,000 pada umur 60. Ia direka untuk menampung kira-kira 20 tahun sara hidup minimum.",
+        },
+        {
+          question: "Adakah sumbangan sukarela (i-Saraan) berbaloi?",
+          answer:
+            "Ya. Tambahan i-Saraan mendapat kadar dividen EPF yang sama dan layak untuk pelepasan cukai sehingga RM 4,000 setahun (termasuk caruman biasa EPF).",
+        },
+      ],
+      related: ["salary", "zakat", "normal"],
+      lastReviewed: "2026-01-01",
+    },
+
+    id: {
+      intro:
+        "Proyeksikan saldo KWSP Anda pada usia pensiun menggunakan tabungan saat ini, gaji bulanan, pertumbuhan gaji tahunan, dan riwayat dividen EPF. Bandingkan saldo yang diproyeksikan dengan target Basic Savings EPF dan estimasikan pendapatan pensiun bulanan.",
+      howItWorks: {
+        heading: "Cara proyeksi pensiun EPF bekerja",
+        paragraphs: [
+          "Proyeksi dimulai dari saldo EPF Anda saat ini dan mensimulasikan setiap tahun yang tersisa hingga usia pensiun yang Anda pilih. Setiap tahun, kontribusi karyawan, majikan, sukarela, dan bonus ditambahkan, lalu dividen dikreditkan pada saldo akhir tahun.",
+          "Gaji Anda diasumsikan tumbuh sesuai persentase yang Anda masukkan setiap tahun. Tingkat pertumbuhan 3%–5% per tahun adalah tipikal untuk kebanyakan karyawan Malaysia.",
+          "Target Basic Savings adalah tolok ukur KWSP: RM 270.000 pada usia 55 dan RM 390.000 pada usia 60 menjelang 2028.",
+        ],
+      },
+      formula: {
+        heading: "Rumus proyeksi",
+        paragraphs: [
+          "Saldo akhir (tahun n) = Saldo awal + Kontribusi + Sukarela + Kontribusi bonus + Dividen.",
+          "Pendapatan pensiun bulanan (aturan 4%) = Saldo yang diproyeksikan × 4% ÷ 12.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apa itu target Basic Savings EPF?",
+          answer:
+            "Target Basic Savings adalah saldo minimum yang direkomendasikan KWSP: RM 270.000 pada usia 55 dan RM 390.000 pada usia 60. Dirancang untuk menanggung sekitar 20 tahun biaya hidup minimum.",
+        },
+        {
+          question: "Apakah kontribusi sukarela (i-Saraan) layak dilakukan?",
+          answer:
+            "Ya. Tambahan i-Saraan mendapat tarif dividen EPF yang sama dan memenuhi syarat untuk potongan pajak hingga RM 4.000 per tahun (termasuk kontribusi EPF biasa).",
+        },
+      ],
+      related: ["salary", "zakat", "normal"],
+      lastReviewed: "2026-01-01",
+    },
+  },
+
   zakat: {
     en: {
       intro:

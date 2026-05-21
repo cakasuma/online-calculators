@@ -1,26 +1,59 @@
 import { Link } from "wouter";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, Globe, Lock, MapPin, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AdSlot } from "@/components/AdSlot";
-import { toolBrand, toolCategories, tools } from "@/config/tools";
+import { toolBrand, tools } from "@/config/tools";
 import { useLocale } from "@/hooks/use-locale";
+import type { TranslationKey } from "@/lib/i18n";
 
-const grouped = toolCategories.map((category) => ({
-  ...category,
-  items: tools.filter((tool) => tool.category === category.name),
-}));
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
 const adsenseSlotHome = import.meta.env.VITE_ADSENSE_SLOT_HOME?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
+// Three display groups — merges "Documents" into Islamic since Wasiat is an
+// Islamic estate-planning tool, keeping the homepage consistent with the nav.
+const TOOL_GROUPS = [
+  {
+    labelKey: "nav.groupFinance" as TranslationKey,
+    descKey: "home.category.Finance.desc" as TranslationKey,
+    hrefs: ["/salary", "/epf-retirement"],
+  },
+  {
+    labelKey: "nav.groupMath" as TranslationKey,
+    descKey: "home.category.Math.desc" as TranslationKey,
+    hrefs: ["/normal", "/scientific"],
+  },
+  {
+    labelKey: "nav.groupIslamic" as TranslationKey,
+    descKey: "home.category.Islamic.desc" as TranslationKey,
+    hrefs: ["/faraid", "/zakat", "/wasiat"],
+  },
+] as const;
+
+const FEATURES = [
+  { icon: BadgeCheck, titleKey: "home.features.accurate.title", bodyKey: "home.features.accurate.body" },
+  { icon: MapPin, titleKey: "home.features.malaysia.title", bodyKey: "home.features.malaysia.body" },
+  { icon: Globe, titleKey: "home.features.multilingual.title", bodyKey: "home.features.multilingual.body" },
+  { icon: Lock, titleKey: "home.features.private.title", bodyKey: "home.features.private.body" },
+] as const;
+
+const FAQ_PAIRS = [
+  ["home.faq.q1", "home.faq.a1"],
+  ["home.faq.q2", "home.faq.a2"],
+  ["home.faq.q3", "home.faq.a3"],
+  ["home.faq.q4", "home.faq.a4"],
+  ["home.faq.q5", "home.faq.a5"],
+] as const;
+
 export default function HomePage() {
   const { t } = useLocale();
-  const featured = tools.filter((tool) => tool.featured);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10">
+    <div className="max-w-6xl mx-auto space-y-14">
+
+      {/* ── Hero ── */}
       <section className="rounded-3xl border bg-gradient-to-br from-primary/20 via-background to-sky-500/20 p-6 sm:p-10 shadow-lg">
         <Badge className="mb-4" variant="secondary">
           <Sparkles className="w-3.5 h-3.5 mr-1" />
@@ -31,48 +64,115 @@ export default function HomePage() {
           {t("home.hero.subtitle")}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button asChild size="lg"><Link href="/salary">{t("home.hero.ctaSalary")}</Link></Button>
-          <Button asChild size="lg" variant="outline"><Link href="/faraid">{t("home.hero.ctaFaraid")}</Link></Button>
+          <Button asChild size="lg">
+            <Link href="/salary">{t("home.hero.ctaSalary")}</Link>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <Link href="/faraid">{t("home.hero.ctaFaraid")}</Link>
+          </Button>
         </div>
-        <p className="mt-5 text-sm text-muted-foreground">
-          <Link href="/partners" className="hover:text-foreground underline-offset-2 hover:underline">
-            {t("home.hero.partnersLink")}
-          </Link>
-        </p>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">{t("home.featured.title")}</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          {featured.map((tool) => (
-            <Card key={tool.slug} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-semibold"><tool.icon className="w-4 h-4 text-primary" />{t(`tools.${tool.slug}.name` as any)}</div>
-                  {tool.badge ? <Badge>{t(`tools.${tool.slug}.badge` as any)}</Badge> : null}
-                </div>
-                <p className="text-sm text-muted-foreground">{t(`tools.${tool.slug}.desc` as any)}</p>
-                <Button asChild variant="ghost" className="px-0"><Link href={tool.href}>{t("home.featured.openTool")} <ArrowRight className="ml-2 w-4 h-4"/></Link></Button>
-              </CardContent>
-            </Card>
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t pt-6">
+          {(
+            [
+              { value: "7", labelKey: "home.stats.tools" },
+              { value: "3", labelKey: "home.stats.locales" },
+              { value: "2026", labelKey: "home.stats.updated" },
+              { value: "100%", labelKey: "home.stats.free" },
+            ] as const
+          ).map(({ value, labelKey }) => (
+            <div key={labelKey} className="text-center">
+              <div className="text-2xl font-bold text-primary">{value}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{t(labelKey)}</div>
+            </div>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {grouped.map((group) => (
-          <Card key={group.name}><CardContent className="p-5"><h3 className="font-semibold">{t(`home.category.${group.name}.name` as any)}</h3><p className="text-sm text-muted-foreground mt-1">{t(`home.category.${group.name}.desc` as any)}</p></CardContent></Card>
-        ))}
+      {/* ── Tools by category ── */}
+      <div className="space-y-10">
+        {TOOL_GROUPS.map((group) => {
+          const groupTools = tools.filter((tool) => group.hrefs.includes(tool.href as typeof group.hrefs[number]));
+          return (
+            <section key={group.labelKey}>
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold">{t(group.labelKey)}</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">{t(group.descKey)}</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {groupTools.map((tool) => (
+                  <Link key={tool.slug} href={tool.href}>
+                    <Card className="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group">
+                      <CardContent className="p-5 flex flex-col gap-3 h-full">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
+                              <tool.icon className="w-5 h-5 text-primary" />
+                            </div>
+                            <span className="font-semibold text-sm leading-tight">
+                              {t(`tools.${tool.slug}.name` as TranslationKey)}
+                            </span>
+                          </div>
+                          {tool.badge ? (
+                            <Badge variant="secondary" className="text-xs shrink-0">
+                              {t(`tools.${tool.slug}.badge` as TranslationKey)}
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                          {t(`tools.${tool.slug}.desc` as TranslationKey)}
+                        </p>
+                        <span className="text-xs text-primary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                          {t("home.featured.openTool")}
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      {adsenseEnabled && adsenseSlotHome ? (
+        <AdSlot slot={adsenseSlotHome} className="mx-auto" />
+      ) : null}
+
+      {/* ── Why HelloKalku ── */}
+      <section>
+        <h2 className="text-2xl font-semibold">{t("home.features.title")}</h2>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {FEATURES.map(({ icon: Icon, titleKey, bodyKey }) => (
+            <div key={titleKey} className="rounded-xl border bg-card p-5 space-y-2">
+              <div className="flex items-center gap-2.5">
+                <Icon className="w-5 h-5 text-primary shrink-0" />
+                <h3 className="font-semibold text-sm">{t(titleKey)}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t(bodyKey)}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
-      <section className="rounded-2xl border bg-card p-6">
-        <h2 className="text-xl font-semibold">{t("home.why.title")}</h2>
-        <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-          {t("home.why.body")}
-        </p>
+      {/* ── FAQ ── */}
+      <section className="rounded-2xl border bg-card p-6 sm:p-8">
+        <h2 className="text-xl font-semibold">{t("home.faq.title")}</h2>
+        <dl className="mt-5 divide-y">
+          {FAQ_PAIRS.map(([qKey, aKey]) => (
+            <div key={qKey} className="py-4 first:pt-0 last:pb-0">
+              <dt className="font-medium text-sm">{t(qKey)}</dt>
+              <dd className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{t(aKey)}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
-      {adsenseEnabled && adsenseSlotHome ? <AdSlot slot={adsenseSlotHome} className="mx-auto" /> : null}
+      <p className="text-sm text-muted-foreground text-center pb-2">
+        <Link href="/partners" className="hover:text-foreground underline-offset-2 hover:underline">
+          {t("home.hero.partnersLink")}
+        </Link>
+      </p>
     </div>
   );
 }

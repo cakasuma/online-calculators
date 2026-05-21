@@ -427,7 +427,11 @@ const translations = {
   "home.islamicTools": { en: "Islamic Tools", ms: "Alat Islam", id: "Alat Islam" },
   "home.zakat.badge": { en: "Zakat", ms: "Zakat", id: "Zakat" },
   "home.hero.badge": { en: "Welcome to HelloKalku", ms: "Selamat datang di HelloKalku", id: "Selamat datang di HelloKalku" },
-  "home.hero.subtitle": { en: "Fast, practical calculators and guides for daily finance, advanced math, and Islamic planning. Built for clarity, bilingual usage (English + Indonesian), and mobile-first speed.", ms: "Kalkulator dan panduan yang pantas dan praktikal untuk keuangan harian, matematik lanjutan, dan perancangan Islam. Dibuat agar jelas, menyokong dua bahasa (Inggris + Indonesia), dan pantas di peranti mudah alih.", id: "Kalkulator dan panduan yang cepat dan praktis untuk keuangan harian, matematika lanjutan, dan perencanaan Islam. Dibuat agar jelas, mendukung dua bahasa (Inggris + Indonesia), dan cepat di perangkat mobile." },
+  "home.hero.subtitle": {
+    en: "Free, accurate calculators and guides for Malaysia salary (EPF, SOCSO, PCB), zakat, faraid inheritance, and Islamic estate planning. Available in English, Bahasa Malaysia, and Bahasa Indonesia.",
+    ms: "Kalkulator dan panduan percuma yang tepat untuk gaji Malaysia (EPF, SOCSO, PCB), zakat, faraid, dan perancangan harta Islam. Tersedia dalam Bahasa Inggeris, Bahasa Malaysia, dan Bahasa Indonesia.",
+    id: "Kalkulator dan panduan gratis yang akurat untuk gaji Malaysia (EPF, SOCSO, PCB), zakat, faraid, dan perencanaan harta Islam. Tersedia dalam Bahasa Inggris, Bahasa Malaysia, dan Bahasa Indonesia.",
+  },
   "home.hero.ctaSalary": { en: "Start with Salary Calculator", ms: "Mulakan daripada Kalkulator Gaji", id: "Mulai dari Kalkulator Gaji" },
   "home.hero.ctaFaraid": { en: "Open Faraid Calculator", ms: "Buka Kalkulator Faraid", id: "Buka Kalkulator Faraid" },
   "home.featured.title": { en: "Featured tools", ms: "Alat unggulan", id: "Alat unggulan" },
@@ -928,7 +932,7 @@ const translations = {
   // ── Privacy Policy ──
   "privacy.title": { en: "Privacy Policy", ms: "Dasar Privasi", id: "Kebijakan Privasi" },
   "privacy.lastUpdated": { en: "Last updated: April 28, 2026", ms: "Terakhir dikemas kini: 28 April 2026", id: "Terakhir diperbarui: 28 April 2026" },
-  "privacy.p1": { en: "ToolHub MY respects your privacy. Most calculator inputs are processed in your browser and are not sent to our servers.", ms: "ToolHub MY menghormati privasi Anda. Sebagian besar input kalkulator diproses di browser Anda dan tidak dikirim ke server kami.", id: "ToolHub MY menghormati privasi Anda. Sebagian besar input kalkulator diproses di browser Anda dan tidak dikirim ke server kami." },
+  "privacy.p1": { en: "HelloKalku respects your privacy. Most calculator inputs are processed in your browser and are not sent to our servers.", ms: "HelloKalku menghormati privasi anda. Kebanyakan input kalkulator diproses dalam browser anda dan tidak dihantar ke pelayan kami.", id: "HelloKalku menghormati privasi Anda. Sebagian besar input kalkulator diproses di browser Anda dan tidak dikirim ke server kami." },
   "privacy.p2": { en: "We may use analytics and advertising partners (including Google AdSense) that use cookies or similar technologies to measure usage and serve relevant ads.", ms: "Kami boleh menggunakan mitra analitik dan iklan (termasuk Google AdSense) yang menggunakan cookie atau teknologi serupa untuk mengukur penggunaan dan menyajikan iklan yang relevan.", id: "Kami dapat menggunakan mitra analitik dan iklan (termasuk Google AdSense) yang menggunakan cookie atau teknologi serupa untuk mengukur penggunaan dan menyajikan iklan yang relevan." },
   "privacy.p3": { en: "You can control cookies in your browser settings. By using this site, you consent to data practices described in this policy.", ms: "Anda boleh mengontrol cookie di tetapan browser Anda. Dengan menggunakan situs ini, Anda menyetujui praktik data yang dijelaskan dalam dasar ini.", id: "Anda dapat mengontrol cookie di pengaturan browser Anda. Dengan menggunakan situs ini, Anda menyetujui praktik data yang dijelaskan dalam kebijakan ini." },
   "privacy.contact.title": { en: "Contact", ms: "Kontak", id: "Kontak" },
@@ -937,7 +941,7 @@ const translations = {
   // ── Terms of Use ──
   "terms.title": { en: "Terms of Use", ms: "Syarat Penggunaan", id: "Syarat Penggunaan" },
   "terms.lastUpdated": { en: "Last updated: April 28, 2026", ms: "Terakhir dikemas kini: 28 April 2026", id: "Terakhir diperbarui: 28 April 2026" },
-  "terms.p1": { en: "ToolHub MY provides calculators and educational guides for informational purposes only. Results may not reflect legal, tax, or religious rulings for your specific case.", ms: "ToolHub MY menyediakan kalkulator dan panduan pendidikan hanya untuk tujuan informasi. Hasil mungkin tidak mencerminkan keputusan hukum, cukai, atau agama untuk kasus spesifik Anda.", id: "ToolHub MY menyediakan kalkulator dan panduan edukasi hanya untuk tujuan informasi. Hasil mungkin tidak mencerminkan keputusan hukum, pajak, atau agama untuk kasus spesifik Anda." },
+  "terms.p1": { en: "HelloKalku provides calculators and educational guides for informational purposes only. Results may not reflect legal, tax, or religious rulings for your specific case.", ms: "HelloKalku menyediakan kalkulator dan panduan pendidikan hanya untuk tujuan maklumat. Keputusan mungkin tidak mencerminkan peraturan undang-undang, cukai, atau agama untuk kes khusus anda.", id: "HelloKalku menyediakan kalkulator dan panduan edukasi hanya untuk tujuan informasi. Hasil mungkin tidak mencerminkan keputusan hukum, pajak, atau agama untuk kasus spesifik Anda." },
   "terms.p2": { en: "You are responsible for verifying outcomes and seeking qualified professional advice where required.", ms: "Anda bertanggung jawab untuk memverifikasi hasil dan mencari saran profesional yang berkualifikasi jika diperlukan.", id: "Anda bertanggung jawab untuk memverifikasi hasil dan mencari saran profesional yang berkualifikasi jika diperlukan." },
   "terms.p3": { en: "We may update or discontinue tools at any time without notice. Continued use of this website means you accept these terms.", ms: "Kami boleh memperbarui atau menghentikan alat kapan sahaja tanpa pemberitahuan. Penggunaan lanjutan situs ini berarti Anda menerima syarat-syarat ini.", id: "Kami dapat memperbarui atau menghentikan alat kapan saja tanpa pemberitahuan. Penggunaan lanjutan situs ini berarti Anda menerima syarat-syarat ini." },
   "terms.contact.title": { en: "Contact", ms: "Kontak", id: "Kontak" },
@@ -1227,6 +1231,80 @@ const translations = {
   "a11y.calc.arccosine": { en: "arccosine", ms: "arccosine", id: "arccosine" },
   "a11y.calc.arctangent": { en: "arctangent", ms: "arctangent", id: "arctangent" },
   "a11y.degRadToggle": { en: "angle mode", ms: "mode sudut", id: "mode sudut" },
+
+  // ── Home page — stats bar ──
+  "home.stats.tools": { en: "calculators", ms: "kalkulator", id: "kalkulator" },
+  "home.stats.locales": { en: "languages", ms: "bahasa", id: "bahasa" },
+  "home.stats.updated": { en: "rates updated", ms: "kadar dikemaskini", id: "rate diperbarui" },
+  "home.stats.free": { en: "free to use", ms: "percuma digunakan", id: "gratis digunakan" },
+
+  // ── Home page — all tools section ──
+  "home.allTools.title": { en: "All calculators", ms: "Semua kalkulator", id: "Semua kalkulator" },
+  "home.allTools.subtitle": {
+    en: "Pick a tool to get started — free, no sign-up required.",
+    ms: "Pilih alat untuk bermula — percuma, tiada pendaftaran diperlukan.",
+    id: "Pilih alat untuk memulai — gratis, tanpa perlu daftar.",
+  },
+
+  // ── Home page — features / why section ──
+  "home.features.title": { en: "Why HelloKalku?", ms: "Kenapa HelloKalku?", id: "Kenapa HelloKalku?" },
+  "home.features.accurate.title": { en: "Accurate 2026 rates", ms: "Kadar 2026 yang tepat", id: "Rate 2026 yang akurat" },
+  "home.features.accurate.body": {
+    en: "EPF, SOCSO, EIS, PCB tax brackets, and zakat nisab are reviewed annually against the latest Malaysian government and KWSP guidelines so your estimates stay reliable.",
+    ms: "Kadar EPF, SOCSO, EIS, PCB, dan nisab zakat disemak setiap tahun mengikut garis panduan terkini kerajaan Malaysia dan KWSP supaya anggaran anda sentiasa tepat.",
+    id: "Rate EPF, SOCSO, EIS, PCB, dan nisab zakat ditinjau setiap tahun sesuai panduan terkini pemerintah Malaysia dan KWSP agar estimasi Anda tetap andal.",
+  },
+  "home.features.malaysia.title": { en: "Built for Malaysia", ms: "Dibina untuk Malaysia", id: "Dibangun untuk Malaysia" },
+  "home.features.malaysia.body": {
+    en: "Every tool is built around Malaysian-specific rules: PCB progressive brackets, KWSP restructured accounts (Akaun Persaraan + Akaun Sejahtera), SOCSO and EIS caps, and Shariah-compliant inheritance under civil and Islamic law.",
+    ms: "Setiap alat dibina mengikut peraturan khusus Malaysia: jadual PCB progresif, akaun KWSP yang direstruktur (Akaun Persaraan + Akaun Sejahtera), had SOCSO dan EIS, serta warisan patuh syariah di bawah undang-undang sivil dan Islam.",
+    id: "Setiap alat dibangun sesuai aturan khusus Malaysia: jadwal PCB progresif, akun KWSP yang direstruktur (Akaun Persaraan + Akaun Sejahtera), batas SOCSO dan EIS, serta warisan sesuai syariah di bawah hukum sipil dan Islam.",
+  },
+  "home.features.multilingual.title": { en: "English, Malay & Indonesian", ms: "Inggeris, Melayu & Indonesia", id: "Inggris, Melayu & Indonesia" },
+  "home.features.multilingual.body": {
+    en: "Switch between English, Bahasa Malaysia, and Bahasa Indonesia at any time without losing your inputs. Useful for international professionals, expats, and cross-border families across Southeast Asia.",
+    ms: "Tukar antara Bahasa Inggeris, Bahasa Malaysia, dan Bahasa Indonesia pada bila-bila masa tanpa kehilangan input anda. Berguna untuk profesional antarabangsa, ekspatriat, dan keluarga merentas sempadan di seluruh Asia Tenggara.",
+    id: "Beralih antara Bahasa Inggris, Bahasa Malaysia, dan Bahasa Indonesia kapan saja tanpa kehilangan input Anda. Berguna untuk profesional internasional, ekspatriat, dan keluarga lintas batas di seluruh Asia Tenggara.",
+  },
+  "home.features.private.title": { en: "Private — no sign-up needed", ms: "Sulit — tiada pendaftaran diperlukan", id: "Pribadi — tanpa perlu daftar" },
+  "home.features.private.body": {
+    en: "All calculations run in your browser. No account, no email address, no data sent to our servers. Your salary figures and financial inputs stay on your device.",
+    ms: "Semua pengiraan dijalankan dalam browser anda. Tiada akaun, tiada e-mel, tiada data dihantar ke pelayan kami. Angka gaji dan input kewangan anda kekal di peranti anda.",
+    id: "Semua perhitungan berjalan di browser Anda. Tanpa akun, tanpa email, tanpa data yang dikirim ke server kami. Angka gaji dan input keuangan Anda tetap di perangkat Anda.",
+  },
+
+  // ── Home page — FAQ ──
+  "home.faq.title": { en: "Frequently asked questions", ms: "Soalan yang sering ditanya", id: "Pertanyaan yang sering diajukan" },
+  "home.faq.q1": { en: "Are the calculations accurate for 2026?", ms: "Adakah pengiraan tepat untuk 2026?", id: "Apakah perhitungan akurat untuk 2026?" },
+  "home.faq.a1": {
+    en: "Yes. HelloKalku uses 2026 statutory rates for EPF (11% employee / 12–13% employer), SOCSO, EIS (0.2%), and the current Malaysia resident income tax brackets (0%–30%). The zakat nisab is derived from the prevailing silver price per gram multiplied by 595g. These are estimates — for official payslip figures your employer's payroll system is the authoritative source.",
+    ms: "Ya. HelloKalku menggunakan kadar berkanun 2026 untuk EPF (11% pekerja / 12–13% majikan), SOCSO, EIS (0.2%), dan jadual cukai pendapatan pemastautin Malaysia terkini (0%–30%). Nisab zakat dikira berdasarkan harga perak semasa per gram darab 595g. Ini adalah anggaran — untuk angka gaji rasmi, sistem penggajian majikan anda adalah sumber yang muktamad.",
+    id: "Ya. HelloKalku menggunakan tarif berdasarkan undang-undang 2026 untuk EPF (11% karyawan / 12–13% majikan), SOCSO, EIS (0,2%), dan jadwal pajak penghasilan penduduk Malaysia saat ini (0%–30%). Nisab zakat diturunkan dari harga perak berlaku per gram dikalikan 595g. Ini adalah estimasi — untuk angka gaji resmi, sistem penggajian majikan Anda adalah sumber yang otoritatif.",
+  },
+  "home.faq.q2": { en: "Is HelloKalku free to use?", ms: "Adakah HelloKalku percuma digunakan?", id: "Apakah HelloKalku gratis digunakan?" },
+  "home.faq.a2": {
+    en: "Completely free. There is no subscription, no account, and no paywall. HelloKalku is supported by Google AdSense advertisements shown alongside the calculators.",
+    ms: "Sepenuhnya percuma. Tiada langganan, tiada akaun, dan tiada paywall. HelloKalku disokong oleh iklan Google AdSense yang ditunjukkan bersama kalkulator.",
+    id: "Sepenuhnya gratis. Tidak ada langganan, tidak ada akun, dan tidak ada paywall. HelloKalku didukung oleh iklan Google AdSense yang ditampilkan bersama kalkulator.",
+  },
+  "home.faq.q3": { en: "Which deductions does the salary calculator cover?", ms: "Apakah potongan yang diliputi kalkulator gaji?", id: "Potongan apa saja yang dicakup kalkulator gaji?" },
+  "home.faq.a3": {
+    en: "The salary calculator covers EPF (Kumpulan Wang Simpanan Pekerja / KWSP), SOCSO (PERKESO), EIS (Employment Insurance System / SIP), and PCB (Potongan Cukai Bulanan — the monthly income tax withholding). You can adjust the EPF employee rate, enter an annual bonus, declare additional reliefs, and switch between resident / non-resident and Malaysian / foreign worker tax profiles.",
+    ms: "Kalkulator gaji merangkumi EPF (Kumpulan Wang Simpanan Pekerja / KWSP), SOCSO (PERKESO), EIS (Sistem Insurans Pekerjaan / SIP), dan PCB (Potongan Cukai Bulanan). Anda boleh melaraskan kadar EPF pekerja, memasukkan bonus tahunan, mengisytiharkan pelepasan tambahan, dan bertukar antara profil cukai pemastautin / bukan pemastautin dan pekerja Malaysia / asing.",
+    id: "Kalkulator gaji mencakup EPF (Kumpulan Wang Simpanan Pekerja / KWSP), SOCSO (PERKESO), EIS (Sistem Asuransi Ketenagakerjaan / SIP), dan PCB (Potongan Cukai Bulanan). Anda dapat menyesuaikan tarif EPF karyawan, memasukkan bonus tahunan, mendeklarasikan potongan tambahan, dan beralih antara profil pajak penduduk / bukan penduduk dan pekerja Malaysia / asing.",
+  },
+  "home.faq.q4": { en: "How does the Faraid calculator differ from a regular inheritance tool?", ms: "Bagaimana kalkulator Faraid berbeza daripada alat waris biasa?", id: "Bagaimana kalkulator Faraid berbeda dari alat waris biasa?" },
+  "home.faq.a4": {
+    en: "Faraid is Islamic inheritance law derived from the Quran and Sunnah. Unlike general inheritance calculators, the Faraid calculator applies fixed Quranic shares (fard), residual shares (asabah), and blocking rules (hajb) — for example, a living father blocks the paternal grandfather, and sons receive twice a daughter's share. It also handles awl (proportional reduction when fixed shares exceed 100%) and radd (surplus returned to eligible heirs). Results are always accompanied by Quranic verse references.",
+    ms: "Faraid adalah hukum waris Islam yang diambil daripada Al-Quran dan Sunnah. Berbeza dengan kalkulator waris biasa, kalkulator Faraid menggunakan bahagian tetap Al-Quran (fard), bahagian sisa (asabah), dan peraturan penyekatan (hajb) — contohnya, bapa yang masih hidup menyekat datuk, dan anak lelaki mendapat dua kali bahagian anak perempuan. Ia juga mengendalikan awl (pengurangan berkadar jika bahagian melebihi 100%) dan radd (lebihan dikembalikan kepada ahli waris). Keputusan sentiasa disertai rujukan ayat Al-Quran.",
+    id: "Faraid adalah hukum waris Islam yang diambil dari Al-Quran dan Sunnah. Berbeda dengan kalkulator waris biasa, kalkulator Faraid menerapkan bagian tetap Al-Quran (fard), bagian sisa (asabah), dan aturan pemblokiran (hajb) — misalnya, ayah yang masih hidup memblokir kakek, dan anak laki-laki mendapat dua kali bagian anak perempuan. Ia juga menangani awl (pengurangan proporsional ketika bagian melebihi 100%) dan radd (surplus dikembalikan ke ahli waris yang berhak). Hasil selalu disertai referensi ayat Al-Quran.",
+  },
+  "home.faq.q5": { en: "Can I use HelloKalku on my phone?", ms: "Bolehkah saya menggunakan HelloKalku di telefon?", id: "Bisakah saya menggunakan HelloKalku di ponsel?" },
+  "home.faq.a5": {
+    en: "Yes. HelloKalku is designed mobile-first. All calculators resize automatically to any screen width and are tested on iOS and Android browsers. The layout adapts from a single column on phones to a multi-column layout on tablets and desktops. Results, charts, and PDF exports work on mobile too.",
+    ms: "Ya. HelloKalku direka mengutamakan mudah alih. Semua kalkulator ubah saiz secara automatik mengikut mana-mana lebar skrin dan diuji pada pelayar iOS dan Android. Susun atur berubah daripada satu lajur pada telefon kepada susun atur berbilang lajur pada tablet dan komputer riba. Keputusan, carta, dan eksport PDF juga berfungsi pada mudah alih.",
+    id: "Ya. HelloKalku dirancang mengutamakan mobile. Semua kalkulator menyesuaikan ukuran secara otomatis ke lebar layar apa pun dan diuji pada browser iOS dan Android. Tata letak beradaptasi dari satu kolom di ponsel ke tata letak multi-kolom di tablet dan desktop. Hasil, grafik, dan ekspor PDF juga berfungsi di mobile.",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

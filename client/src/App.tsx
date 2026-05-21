@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Analytics } from "@vercel/analytics/react";
 import {
   Calculator,
+  ChevronDown,
   FlaskConical,
   Scale,
   Sun,
@@ -31,6 +32,12 @@ import { useLocale } from "@/hooks/use-locale";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { AdSlot } from "@/components/AdSlot";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { tools, toolBrand } from "@/config/tools";
 import { initAnalytics, track } from "@/lib/analytics";
 
@@ -47,15 +54,32 @@ import Partners from "@/pages/Partners";
 import TermsOfUse from "@/pages/TermsOfUse";
 import NotFound from "@/pages/not-found";
 
-const navItems: { href: string; labelKey: TranslationKey; icon: typeof HomeIcon }[] = [
-  { href: "/", labelKey: "nav.home", icon: HomeIcon },
-  { href: "/salary", labelKey: "nav.salary", icon: Wallet },
-  { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
-  { href: "/normal", labelKey: "nav.basic", icon: Calculator },
-  { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
-  { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
-  { href: "/zakat", labelKey: "nav.zakat", icon: Star },
-  { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
+type NavItem = { href: string; labelKey: TranslationKey; icon: typeof HomeIcon };
+type NavGroup = { labelKey: TranslationKey; items: NavItem[] };
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    labelKey: "nav.groupFinance",
+    items: [
+      { href: "/salary", labelKey: "nav.salary", icon: Wallet },
+      { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
+    ],
+  },
+  {
+    labelKey: "nav.groupMath",
+    items: [
+      { href: "/normal", labelKey: "nav.basic", icon: Calculator },
+      { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
+    ],
+  },
+  {
+    labelKey: "nav.groupIslamic",
+    items: [
+      { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
+      { href: "/zakat", labelKey: "nav.zakat", icon: Star },
+      { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
+    ],
+  },
 ];
 
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
@@ -178,22 +202,43 @@ function Layout() {
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-1" data-testid="nav-desktop">
-            {navItems.map((item) => {
-              const isActive = location === item.href;
+          <nav className="hidden md:flex items-center gap-0.5" data-testid="nav-desktop">
+            {/* Home direct link */}
+            <Link href="/">
+              <span className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                location === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}>
+                <HomeIcon className="w-4 h-4" />
+                {t("nav.home")}
+              </span>
+            </Link>
+
+            {/* Category dropdowns */}
+            {NAV_GROUPS.map((group) => {
+              const isGroupActive = group.items.some((item) => item.href === location);
               return (
-                <Link key={item.href} href={item.href}>
-                  <span
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {t(item.labelKey)}
-                  </span>
-                </Link>
+                <DropdownMenu key={group.labelKey}>
+                  <DropdownMenuTrigger asChild>
+                    <button className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer outline-none ${
+                      isGroupActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }`}>
+                      {t(group.labelKey)}
+                      <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="min-w-[180px]">
+                    {group.items.map((item) => (
+                      <DropdownMenuItem key={item.href} asChild>
+                        <Link href={item.href}>
+                          <span className={`flex items-center gap-2 w-full cursor-pointer ${item.href === location ? "text-primary" : ""}`}>
+                            <item.icon className="w-4 h-4 shrink-0" />
+                            {t(item.labelKey)}
+                          </span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               );
             })}
           </nav>
@@ -225,25 +270,34 @@ function Layout() {
         {showMobileNav && <div className="md:hidden fixed inset-0 z-40 top-14" onClick={() => setShowMobileNav(false)} aria-hidden="true" />}
 
         {showMobileNav && (
-          <div className="md:hidden border-t bg-background px-4 py-3 space-y-1 relative z-50" id="mobile-nav" data-testid="nav-mobile">
-            {navItems.map((item) => {
-              const isActive = location === item.href;
-              return (
-                <Link key={item.href} href={item.href}>
-                  <span
-                    onClick={() => setShowMobileNav(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    {t(item.labelKey)}
-                  </span>
-                </Link>
-              );
-            })}
+          <div className="md:hidden border-t bg-background px-4 py-3 relative z-50" id="mobile-nav" data-testid="nav-mobile">
+            {/* Home */}
+            <Link href="/">
+              <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
+                location === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}>
+                <HomeIcon className="w-5 h-5" />
+                {t("nav.home")}
+              </span>
+            </Link>
+            {/* Category groups */}
+            {NAV_GROUPS.map((group) => (
+              <div key={group.labelKey} className="mt-3">
+                <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  {t(group.labelKey)}
+                </p>
+                {group.items.map((item) => (
+                  <Link key={item.href} href={item.href}>
+                    <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
+                      item.href === location ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }`}>
+                      <item.icon className="w-5 h-5" />
+                      {t(item.labelKey)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ))}
           </div>
         )}
       </header>

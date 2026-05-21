@@ -12,6 +12,26 @@ const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
 const adsenseSlotHome = import.meta.env.VITE_ADSENSE_SLOT_HOME?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
+// Three display groups — merges "Documents" into Islamic since Wasiat is an
+// Islamic estate-planning tool, keeping the homepage consistent with the nav.
+const TOOL_GROUPS = [
+  {
+    labelKey: "nav.groupFinance" as TranslationKey,
+    descKey: "home.category.Finance.desc" as TranslationKey,
+    hrefs: ["/salary", "/epf-retirement"],
+  },
+  {
+    labelKey: "nav.groupMath" as TranslationKey,
+    descKey: "home.category.Math.desc" as TranslationKey,
+    hrefs: ["/normal", "/scientific"],
+  },
+  {
+    labelKey: "nav.groupIslamic" as TranslationKey,
+    descKey: "home.category.Islamic.desc" as TranslationKey,
+    hrefs: ["/faraid", "/zakat", "/wasiat"],
+  },
+] as const;
+
 const FEATURES = [
   { icon: BadgeCheck, titleKey: "home.features.accurate.title", bodyKey: "home.features.accurate.body" },
   { icon: MapPin, titleKey: "home.features.malaysia.title", bodyKey: "home.features.malaysia.body" },
@@ -31,7 +51,7 @@ export default function HomePage() {
   const { t } = useLocale();
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12">
+    <div className="max-w-6xl mx-auto space-y-14">
 
       {/* ── Hero ── */}
       <section className="rounded-3xl border bg-gradient-to-br from-primary/20 via-background to-sky-500/20 p-6 sm:p-10 shadow-lg">
@@ -51,8 +71,6 @@ export default function HomePage() {
             <Link href="/faraid">{t("home.hero.ctaFaraid")}</Link>
           </Button>
         </div>
-
-        {/* Stats bar */}
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t pt-6">
           {(
             [
@@ -70,43 +88,52 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── All calculators ── */}
-      <section>
-        <h2 className="text-2xl font-semibold">{t("home.allTools.title")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t("home.allTools.subtitle")}</p>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {tools.map((tool) => (
-            <Link key={tool.slug} href={tool.href}>
-              <Card className="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group">
-                <CardContent className="p-5 flex flex-col gap-3 h-full">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
-                        <tool.icon className="w-5 h-5 text-primary" />
-                      </div>
-                      <span className="font-semibold text-sm leading-tight">
-                        {t(`tools.${tool.slug}.name` as TranslationKey)}
-                      </span>
-                    </div>
-                    {tool.badge ? (
-                      <Badge variant="secondary" className="text-xs shrink-0">
-                        {t(`tools.${tool.slug}.badge` as TranslationKey)}
-                      </Badge>
-                    ) : null}
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">
-                    {t(`tools.${tool.slug}.desc` as TranslationKey)}
-                  </p>
-                  <span className="text-xs text-primary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                    {t("home.featured.openTool")}
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* ── Tools by category ── */}
+      <div className="space-y-10">
+        {TOOL_GROUPS.map((group) => {
+          const groupTools = tools.filter((tool) => group.hrefs.includes(tool.href as typeof group.hrefs[number]));
+          return (
+            <section key={group.labelKey}>
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold">{t(group.labelKey)}</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">{t(group.descKey)}</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {groupTools.map((tool) => (
+                  <Link key={tool.slug} href={tool.href}>
+                    <Card className="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group">
+                      <CardContent className="p-5 flex flex-col gap-3 h-full">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
+                              <tool.icon className="w-5 h-5 text-primary" />
+                            </div>
+                            <span className="font-semibold text-sm leading-tight">
+                              {t(`tools.${tool.slug}.name` as TranslationKey)}
+                            </span>
+                          </div>
+                          {tool.badge ? (
+                            <Badge variant="secondary" className="text-xs shrink-0">
+                              {t(`tools.${tool.slug}.badge` as TranslationKey)}
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                          {t(`tools.${tool.slug}.desc` as TranslationKey)}
+                        </p>
+                        <span className="text-xs text-primary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                          {t("home.featured.openTool")}
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
       {adsenseEnabled && adsenseSlotHome ? (
         <AdSlot slot={adsenseSlotHome} className="mx-auto" />

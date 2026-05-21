@@ -872,6 +872,11 @@ const translations = {
   "nav.salary": { en: "Salary", ms: "Gaji", id: "Gaji" },
   "nav.zakat": { en: "Zakat", ms: "Zakat", id: "Zakat" },
 
+  // ── Nav group labels ──
+  "nav.groupFinance": { en: "Finance", ms: "Kewangan", id: "Keuangan" },
+  "nav.groupMath": { en: "Math", ms: "Matematik", id: "Matematika" },
+  "nav.groupIslamic": { en: "Islamic & Planning", ms: "Islam & Perancangan", id: "Islam & Perencanaan" },
+
   // ── Tool names (for footer / other non-Home uses) ──
   "tools.normal-calculator.name": { en: "Basic Calculator", ms: "Kalkulator Asas", id: "Kalkulator Dasar" },
   "tools.normal-calculator.desc": {

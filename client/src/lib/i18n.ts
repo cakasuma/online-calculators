@@ -1310,6 +1310,9 @@ const translations = {
     ms: "Ya. HelloKalku direka mengutamakan mudah alih. Semua kalkulator ubah saiz secara automatik mengikut mana-mana lebar skrin dan diuji pada pelayar iOS dan Android. Susun atur berubah daripada satu lajur pada telefon kepada susun atur berbilang lajur pada tablet dan komputer riba. Keputusan, carta, dan eksport PDF juga berfungsi pada mudah alih.",
     id: "Ya. HelloKalku dirancang mengutamakan mobile. Semua kalkulator menyesuaikan ukuran secara otomatis ke lebar layar apa pun dan diuji pada browser iOS dan Android. Tata letak beradaptasi dari satu kolom di ponsel ke tata letak multi-kolom di tablet dan desktop. Hasil, grafik, dan ekspor PDF juga berfungsi di mobile.",
   },
+  "home.search.placeholder": { en: "Search calculators…", ms: "Cari kalkulator…", id: "Cari kalkulator…" },
+  "home.search.noResults": { en: "No calculators match your search.", ms: "Tiada kalkulator sepadan dengan carian anda.", id: "Tidak ada kalkulator yang cocok dengan pencarian Anda." },
+  "home.search.clear": { en: "Clear search", ms: "Kosongkan carian", id: "Kosongkan pencarian" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

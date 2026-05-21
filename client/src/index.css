@@ -276,3 +276,40 @@
     padding: 0 !important;
   }
 }
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.25),
+    hsl(210 100% 56% / 0.18),
+    hsl(var(--primary) / 0.12),
+    hsl(199 89% 48% / 0.22)
+  );
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* Fade-up entrance — add .fade-up to an element, then toggle .in-view */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.fade-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered delay helpers (used on card children via inline style) */
+.fade-up[style*="--delay"] {
+  transition-delay: var(--delay, 0ms);
+}

@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
 import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n";
+import { recordServerEvent, track } from "@/lib/analytics";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { EmbedDialog } from "@/components/EmbedDialog";
@@ -196,6 +197,19 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
     setCalcResult(result);
     hasCalculatedRef.current = true;
     setDirty(false);
+
+    const analyticsPayload = {
+      currentAge: parsedInputs.currentAge,
+      retirementAge: parsedInputs.retirementAge,
+      yearsToRetirement: parsedInputs.retirementAge - parsedInputs.currentAge,
+      monthlySalary: Math.round(parsedInputs.monthlySalary),
+      currentBalance: Math.round(parsedInputs.currentBalance),
+      finalBalance: Math.round(result.finalBalance),
+      monthlyRetirementIncome: Math.round(result.monthlyRetirementIncome),
+      meetsTarget: result.meetsTarget,
+    };
+    track("calculator_complete", { calculator: "epf", ...analyticsPayload });
+    recordServerEvent({ calculator: "epf", event: "calculator_complete", payload: analyticsPayload });
 
     if (onCalculate) {
       const yearsAway = parsedInputs.retirementAge - parsedInputs.currentAge;

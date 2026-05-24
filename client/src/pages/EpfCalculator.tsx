@@ -17,6 +17,7 @@ import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n"
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { EmbedDialog } from "@/components/EmbedDialog";
+import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import {
   EPF_DEFAULTS,
   basicSavingsTargetAt,
@@ -489,6 +490,8 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               )}
             </CardContent>
           </Card>
+
+          <RelatedToolsCard currentHref="/epf-retirement" />
         </div>
       </div>
     </div>

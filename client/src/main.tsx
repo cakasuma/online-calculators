@@ -60,3 +60,9 @@ const IS_EMBED = window.location.pathname.startsWith("/embed/");
 })();
 
 createRoot(document.getElementById("root")!).render(IS_EMBED ? <EmbedApp /> : <App />);
+
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}

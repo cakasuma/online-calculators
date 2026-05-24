@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, BadgeCheck, Globe, Lock, MapPin, Search, Sparkles, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, Clock, Globe, Lock, MapPin, Search, Sparkles, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { toolBrand, tools } from "@/config/tools";
 import { useLocale } from "@/hooks/use-locale";
 import { useInView } from "@/hooks/use-in-view";
+import { useHistory } from "@/hooks/use-history";
 import type { TranslationKey } from "@/lib/i18n";
 
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
@@ -169,8 +170,20 @@ function ToolSearchBar() {
   );
 }
 
+const CALC_HREF: Record<string, string> = {
+  salary: "/salary",
+  epf: "/epf-retirement",
+  normal: "/normal",
+  scientific: "/scientific",
+  faraid: "/faraid",
+  zakat: "/zakat",
+  wasiat: "/wasiat",
+};
+
 export default function HomePage() {
   const { t } = useLocale();
+  const { entries: historyEntries } = useHistory();
+  const recentEntries = historyEntries.slice(0, 3);
 
   return (
     <div className="max-w-6xl mx-auto space-y-14">
@@ -217,6 +230,39 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ── Recently used ── */}
+      {recentEntries.length > 0 && (
+        <FadeIn>
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-base font-semibold">{t("home.recentlyUsed.title")}</h2>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {recentEntries.map((entry) => {
+                const href = entry.url || CALC_HREF[entry.calculator] || "/";
+                const tool = tools.find((tt) => tt.href === CALC_HREF[entry.calculator]);
+                return (
+                  <Link key={entry.id} href={href}>
+                    <span className="group flex items-start gap-3 rounded-xl border bg-card p-3 cursor-pointer hover:border-primary/30 hover:shadow-sm transition-all">
+                      {tool && (
+                        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0 mt-0.5">
+                          <tool.icon className="w-3.5 h-3.5 text-primary" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold truncate">{entry.expression}</p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{entry.result}</p>
+                      </div>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </FadeIn>
+      )}
 
       {/* ── Tools by category ── */}
       <div className="space-y-10">

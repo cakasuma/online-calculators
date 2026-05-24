@@ -307,6 +307,9 @@ const translations = {
   "common.saved": { en: "Saved", ms: "Disimpan", id: "Tersimpan" },
   "common.reset": { en: "Reset", ms: "Tetapkan Semula", id: "Atur Ulang" },
   "common.error": { en: "Error", ms: "Ralat", id: "Kesalahan" },
+  "lead.sending": { en: "Sending…", ms: "Menghantar…", id: "Mengirim…" },
+  "lead.errorEmail": { en: "Please enter a valid email address.", ms: "Sila masukkan e-mel yang sah.", id: "Masukkan email yang valid." },
+  "lead.errorGeneric": { en: "Something went wrong. Please try again.", ms: "Ralat berlaku. Sila cuba lagi.", id: "Terjadi kesalahan. Silakan coba lagi." },
 
   // ── Share ──
   "share.button": { en: "Share", ms: "Kongsi", id: "Bagikan" },
@@ -1313,6 +1316,7 @@ const translations = {
   "home.search.placeholder": { en: "Search calculators…", ms: "Cari kalkulator…", id: "Cari kalkulator…" },
   "home.search.noResults": { en: "No calculators match your search.", ms: "Tiada kalkulator sepadan dengan carian anda.", id: "Tidak ada kalkulator yang cocok dengan pencarian Anda." },
   "home.search.clear": { en: "Clear search", ms: "Kosongkan carian", id: "Kosongkan pencarian" },
+  "home.recentlyUsed.title": { en: "Recently used", ms: "Baru digunakan", id: "Baru digunakan" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Delete } from "lucide-react";
 import { useLocale } from "@/hooks/use-locale";
+import { recordServerEvent, track } from "@/lib/analytics";
 import type { TranslationKey } from "@/lib/i18n";
 
 interface Props {
@@ -188,6 +189,8 @@ export default function ScientificCalculator({ onCalculate }: Props) {
         const expr = expression + display;
         const result = evaluate(expr);
         onCalculate(expr, result);
+        track("calculator_complete", { calculator: "scientific", expression: expr, result, mode });
+        recordServerEvent({ calculator: "scientific", event: "calculator_complete", payload: { expression: expr, result, mode } });
         setExpression("");
         setDisplay(result);
         setJustEvaluated(true);

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
+import { recordServerEvent, track } from "@/lib/analytics";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
@@ -343,6 +344,15 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
       const url = buildShareUrl(state, ZAKAT_URL_SCHEMA);
       onCalculate(expression, resultStr, url);
       lastRecordedSignatureRef.current = signature;
+      const analyticsPayload = {
+        currency: state.currency,
+        total: Math.round(result.total),
+        zakatDue: Math.round(result.zakatDue),
+        nisab: Math.round(result.nisab),
+        meetsNisab: result.zakatDue > 0,
+      };
+      track("calculator_complete", { calculator: "zakat", ...analyticsPayload });
+      recordServerEvent({ calculator: "zakat", event: "calculator_complete", payload: analyticsPayload });
     }, 1500);
     return () => clearTimeout(timer);
   }, [result.total, result.zakatDue, result.nisab, state.currency, onCalculate, currSym, locale, t]);

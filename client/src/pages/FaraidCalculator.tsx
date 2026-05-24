@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
+import { recordServerEvent, track } from "@/lib/analytics";
 import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
@@ -906,6 +907,17 @@ export default function FaraidCalculator({ onCalculate }: Props) {
     const res = `Net: ${formatAmount(net)} | ${dist.heirs.length} heirs`;
     const url = buildShareUrl(form, FARAID_URL_SCHEMA);
     onCalculate(expr, res, url);
+
+    const analyticsPayload = {
+      currency: form.currency,
+      totalEstate: Math.round(estate),
+      netEstate: Math.round(net),
+      heirCount: dist.heirs.length,
+      blockedHeirCount: dist.blockedHeirs?.length ?? 0,
+      hasAwl: dist.hasAwl ?? false,
+    };
+    track("calculator_complete", { calculator: "faraid", ...analyticsPayload });
+    recordServerEvent({ calculator: "faraid", event: "calculator_complete", payload: analyticsPayload });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, locale, onCalculate]);
 

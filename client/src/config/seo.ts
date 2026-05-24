@@ -52,7 +52,7 @@ export const routes: RouteSeoEntry[] = [
       en: {
         title: "Online Calculators for Malaysia | HelloKalku",
         description:
-          "Free Malaysia-focused calculators for salary (EPF, SOCSO, EIS, PCB), zakat, faraid inheritance, and wasiat planning. Fast, accurate, mobile-friendly.",
+          "Free Malaysia-focused calculators for salary (EPF, SOCSO, EIS, PCB), zakat, faraid inheritance, and wasiat planning. Fast, private, mobile-friendly.",
         keywords:
           "online calculator malaysia, salary calculator, zakat calculator, faraid calculator, epf calculator",
         heading: "Online calculators built for Malaysia",
@@ -310,7 +310,7 @@ export const routes: RouteSeoEntry[] = [
           "HelloKalku calculators are embedded on personal finance blogs, fintech sites, and educational platforms across Malaysia and Southeast Asia.",
         keywords: "hellokalku partners, embed calculator malaysia, calculator widget partners",
         heading: "Sites that embed HelloKalku",
-        tagline: "Free, accurate calculators trusted by writers, planners, and platforms.",
+        tagline: "Free, private calculators trusted by writers, planners, and platforms.",
       },
       ms: {
         title: "Laman web yang membenamkan HelloKalku | Rakan kongsi",

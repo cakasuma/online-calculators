@@ -449,9 +449,9 @@ const translations = {
   "home.zakat.badge": { en: "Zakat", ms: "Zakat", id: "Zakat" },
   "home.hero.badge": { en: "Welcome to HelloKalku", ms: "Selamat datang di HelloKalku", id: "Selamat datang di HelloKalku" },
   "home.hero.subtitle": {
-    en: "Free, accurate calculators and guides for Malaysia salary (EPF, SOCSO, PCB), zakat, faraid inheritance, and Islamic estate planning. Available in English, Bahasa Malaysia, and Bahasa Indonesia.",
-    ms: "Kalkulator dan panduan percuma yang tepat untuk gaji Malaysia (EPF, SOCSO, PCB), zakat, faraid, dan perancangan harta Islam. Tersedia dalam Bahasa Inggeris, Bahasa Malaysia, dan Bahasa Indonesia.",
-    id: "Kalkulator dan panduan gratis yang akurat untuk gaji Malaysia (EPF, SOCSO, PCB), zakat, faraid, dan perencanaan harta Islam. Tersedia dalam Bahasa Inggris, Bahasa Malaysia, dan Bahasa Indonesia.",
+    en: "Free, private calculators and guides for Malaysia salary (EPF, SOCSO, PCB), zakat, faraid inheritance, and Islamic estate planning. Available in English, Bahasa Malaysia, and Bahasa Indonesia.",
+    ms: "Kalkulator dan panduan percuma yang peribadi untuk gaji Malaysia (EPF, SOCSO, PCB), zakat, faraid, dan perancangan harta Islam. Tersedia dalam Bahasa Inggeris, Bahasa Malaysia, dan Bahasa Indonesia.",
+    id: "Kalkulator dan panduan gratis yang privat untuk gaji Malaysia (EPF, SOCSO, PCB), zakat, faraid, dan perencanaan harta Islam. Tersedia dalam Bahasa Inggris, Bahasa Malaysia, dan Bahasa Indonesia.",
   },
   "home.hero.ctaSalary": { en: "Start with Salary Calculator", ms: "Mulakan daripada Kalkulator Gaji", id: "Mulai dari Kalkulator Gaji" },
   "home.hero.ctaFaraid": { en: "Open Faraid Calculator", ms: "Buka Kalkulator Faraid", id: "Buka Kalkulator Faraid" },

@@ -139,10 +139,11 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
       const n = parseLocaleNumber(s, locale);
       return Number.isFinite(n) ? n : 0;
     };
+    const parsedCurrentAge = Math.max(15, Math.min(70, p(currentAge) || EPF_DEFAULTS.currentAge));
     const empOverride = employerRateOverride.trim() ? p(employerRateOverride) : undefined;
     return {
-      currentAge: Math.max(15, Math.min(70, p(currentAge) || EPF_DEFAULTS.currentAge)),
-      retirementAge: Math.max(45, Math.min(70, p(retirementAge) || EPF_DEFAULTS.retirementAge)),
+      currentAge: parsedCurrentAge,
+      retirementAge: Math.max(parsedCurrentAge + 1, Math.min(75, p(retirementAge) || EPF_DEFAULTS.retirementAge)),
       currentBalance: Math.max(0, p(currentBalance)),
       monthlySalary: Math.max(0, p(monthlySalary)),
       salaryGrowthRate: p(salaryGrowthRate),

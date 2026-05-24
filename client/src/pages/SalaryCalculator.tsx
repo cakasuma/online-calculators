@@ -374,7 +374,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               {t("salary.subtitle")}
             </p>
           </div>
-          <Card className="border-white/10 bg-white/10 text-white backdrop-blur min-w-0">
+          <Card className="hidden lg:block border-white/10 bg-white/10 text-white backdrop-blur min-w-0">
             <CardContent className="p-4 sm:p-6 min-w-0">
               <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
               <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
@@ -500,6 +500,24 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
         </Card>
 
         <div ref={resultsRef} className="space-y-6 min-w-0">
+          {/* Mobile-only take-home summary — mirrors the hero card hidden on small screens */}
+          <Card className="lg:hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 border-emerald-900/50 text-white">
+            <CardContent className="p-4 sm:p-6">
+              <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
+              <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
+              <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
+                <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
+              </div>
+              <p className="mt-2 text-sm text-slate-300">
+                {!isValid
+                  ? t("salary.fixInputErrors")
+                  : showResults
+                  ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
+                  : t("salary.cta.tapToReveal")}
+              </p>
+            </CardContent>
+          </Card>
+
           {!showResults ? (
             <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
               <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">

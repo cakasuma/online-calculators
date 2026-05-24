@@ -133,6 +133,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
   const [calcResult, setCalcResult] = useState<EpfProjection | null>(null);
   const [dirty, setDirty] = useState(false);
   const hasCalculatedRef = useRef(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const parsedInputs: EpfInputs = useMemo(() => {
     const p = (s: string) => {
@@ -198,6 +199,11 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
     setCalcResult(result);
     hasCalculatedRef.current = true;
     setDirty(false);
+    setTimeout(() => {
+      if (window.innerWidth < 1024) {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 120);
 
     const analyticsPayload = {
       currentAge: parsedInputs.currentAge,
@@ -354,7 +360,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
         </Card>
 
         {/* Results */}
-        <div className="space-y-4">
+        <div ref={resultsRef} className="space-y-4">
           {!projection ? (
             /* Empty state */
             <Card className="rounded-3xl">

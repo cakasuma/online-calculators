@@ -124,6 +124,7 @@ function Layout() {
     const route = seoRoutes.find((r) => r.path === location) ?? seoRoutes[0];
     const copy = route.copy[locale] ?? route.copy.en;
     document.title = copy.title;
+    document.documentElement.lang = locale;
     setMetaTag("name", "description", copy.description);
     if (copy.keywords) setMetaTag("name", "keywords", copy.keywords);
 
@@ -303,7 +304,7 @@ function Layout() {
       </header>
 
       <div className="flex-1 flex w-full min-w-0">
-        <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+        <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden pb-20 md:pb-8 lg:pb-8">
           <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
           <Switch>
             <Route path="/" component={HomePage} />
@@ -370,7 +371,47 @@ function Layout() {
         </div>
       )}
 
-      <footer className="border-t py-6 px-4 safe-area-bottom">
+      {/* Mobile bottom navigation — persistent quick access to key tools */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t safe-area-bottom"
+        aria-label={t("a11y.navToggle")}
+      >
+        <div className="grid grid-cols-5 h-14">
+          {([
+            { href: "/", icon: HomeIcon, labelKey: "nav.home" as TranslationKey },
+            { href: "/salary", icon: Wallet, labelKey: "nav.salary" as TranslationKey },
+            { href: "/faraid", icon: Scale, labelKey: "nav.faraid" as TranslationKey },
+            { href: "/normal", icon: Calculator, labelKey: "nav.basic" as TranslationKey },
+          ] as { href: string; icon: typeof HomeIcon; labelKey: TranslationKey }[]).map(({ href, icon: Icon, labelKey }) => {
+            const isActive = location === href;
+            return (
+              <Link key={href} href={href}>
+                <span
+                  className={`flex flex-col items-center justify-center gap-0.5 h-14 w-full cursor-pointer transition-colors ${
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[10px] font-medium leading-none">{t(labelKey)}</span>
+                </span>
+              </Link>
+            );
+          })}
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className={`flex flex-col items-center justify-center gap-0.5 h-14 w-full cursor-pointer transition-colors ${
+              showHistory ? "text-primary" : "text-muted-foreground"
+            }`}
+            aria-label={t("a11y.historyToggle")}
+            aria-expanded={showHistory}
+          >
+            <History className="w-5 h-5" />
+            <span className="text-[10px] font-medium leading-none">{t("common.history")}</span>
+          </button>
+        </div>
+      </nav>
+
+      <footer className="border-t py-6 px-4 pb-20 md:pb-6 safe-area-bottom">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm text-muted-foreground">
           <div>
             <span className="font-medium text-foreground">{toolBrand.name}</span>

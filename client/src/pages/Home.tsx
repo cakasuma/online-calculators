@@ -114,7 +114,7 @@ function ToolSearchBar() {
           aria-haspopup="listbox"
           role="combobox"
           aria-autocomplete="list"
-          className="w-full h-12 rounded-xl border bg-background pl-11 pr-10 text-sm shadow-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-1 placeholder:text-muted-foreground transition-shadow"
+          className="w-full h-12 rounded-xl border bg-background pl-11 pr-10 text-base shadow-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-1 placeholder:text-muted-foreground transition-shadow md:text-sm"
         />
         {query && (
           <button
@@ -149,14 +149,9 @@ function ToolSearchBar() {
                   <tool.icon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold text-sm truncate">
-                      {t(`tools.${tool.slug}.name` as TranslationKey)}
-                    </span>
-                    <code className="shrink-0 text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-mono">
-                      {tool.slug}
-                    </code>
-                  </div>
+                  <span className="font-semibold text-sm truncate block">
+                    {t(`tools.${tool.slug}.name` as TranslationKey)}
+                  </span>
                   <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">
                     {t(`tools.${tool.slug}.desc` as TranslationKey)}
                   </p>

@@ -128,7 +128,7 @@ export function projectEpf(input: EpfInputs): EpfProjection {
   const bonusMonths = Math.max(0, Math.min(6, input.bonusMonths));
 
   const startAge = Math.max(15, Math.floor(input.currentAge));
-  const endAge = Math.max(startAge, Math.min(70, Math.floor(input.retirementAge)));
+  const endAge = Math.max(startAge + 1, Math.min(75, Math.floor(input.retirementAge)));
 
   let totalContrib = 0;
   let totalDiv = 0;

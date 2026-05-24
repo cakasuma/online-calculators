@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { recordServerEvent, track } from "@/lib/analytics";
 import { Link } from "wouter";
 // @ts-ignore
 import jsPDF from "jspdf";
@@ -449,6 +450,20 @@ export default function WasiatGuide() {
   function goToStep(target: number) {
     if (target === 3 && step === 2) {
       if (!validateStep2()) return;
+      const estateNum = parseLocaleNumber(form.estateValue, locale);
+      const totalBequestAmt = form.bequests.reduce((sum, b) => {
+        const amt = parseLocaleNumber(b.amount, locale);
+        return sum + (isNaN(amt) ? 0 : amt);
+      }, 0);
+      const analyticsPayload = {
+        currency: form.currency,
+        estateValue: Math.round(isNaN(estateNum) ? 0 : estateNum),
+        bequestCount: form.bequests.length,
+        totalBequestAmount: Math.round(totalBequestAmt),
+        exceeds1Third: totalBequestAmt > (isNaN(estateNum) ? 0 : estateNum) / 3,
+      };
+      track("calculator_complete", { calculator: "wasiat", ...analyticsPayload });
+      recordServerEvent({ calculator: "wasiat", event: "calculator_complete", payload: analyticsPayload });
     }
     setStep(target);
     window.scrollTo({ top: 0, behavior: "smooth" });

@@ -140,7 +140,14 @@ const translations = {
     ms: "Unjurkan baki KWSP anda pada umur persaraan, bandingkan dengan sasaran Simpanan Asas EPF, dan anggarkan pendapatan persaraan bulanan anda.",
     id: "Proyeksikan saldo KWSP Anda pada usia pensiun, bandingkan dengan target Basic Savings EPF, dan perkirakan pendapatan pensiun bulanan Anda.",
   },
+  "epf.calculate": { en: "Calculate", ms: "Kira", id: "Hitung" },
+  "epf.recalculate": { en: "Recalculate", ms: "Kira semula", id: "Hitung ulang" },
   "epf.inputs.heading": { en: "Your details", ms: "Maklumat anda", id: "Detail Anda" },
+  "epf.inputs.advancedSettings": {
+    en: "Advanced settings",
+    ms: "Tetapan lanjutan",
+    id: "Pengaturan lanjutan",
+  },
   "epf.inputs.currentAge": { en: "Current age", ms: "Umur sekarang", id: "Usia sekarang" },
   "epf.inputs.retirementAge": {
     en: "Retirement age",
@@ -216,6 +223,17 @@ const translations = {
     en: "e.g. i-Saraan top-ups",
     ms: "cth. tambahan i-Saraan",
     id: "cth. tambahan i-Saraan",
+  },
+  "epf.results.yearsAway": { en: "yrs to retirement", ms: "thn lagi", id: "thn lagi" },
+  "epf.results.staleHint": {
+    en: "Inputs changed — recalculate to update",
+    ms: "Input berubah — kira semula untuk kemaskini",
+    id: "Input berubah — hitung ulang untuk memperbarui",
+  },
+  "epf.results.emptyHint": {
+    en: "Enter your details above and click Calculate to see your EPF projection.",
+    ms: "Masukkan maklumat anda di atas dan klik Kira untuk melihat unjuran EPF anda.",
+    id: "Masukkan detail Anda di atas dan klik Hitung untuk melihat proyeksi EPF Anda.",
   },
   "epf.units.years": { en: "yrs", ms: "thn", id: "thn" },
   "epf.units.months": { en: "mo", ms: "bln", id: "bln" },

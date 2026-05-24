@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Delete } from "lucide-react";
 import { useLocale } from "@/hooks/use-locale";
+import { recordServerEvent, track } from "@/lib/analytics";
 import type { TranslationKey } from "@/lib/i18n";
 
 interface Props {
@@ -84,6 +85,8 @@ export default function NormalCalculator({ onCalculate }: Props) {
         const expr = expression + display;
         const result = safeEval(expr);
         onCalculate(expr, result);
+        track("calculator_complete", { calculator: "normal", expression: expr, result });
+        recordServerEvent({ calculator: "normal", event: "calculator_complete", payload: { expression: expr, result } });
         setExpression("");
         setDisplay(result);
         setJustEvaluated(true);

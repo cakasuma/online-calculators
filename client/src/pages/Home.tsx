@@ -194,7 +194,7 @@ export default function HomePage() {
           <Sparkles className="w-3.5 h-3.5 mr-1" />
           {t("home.hero.badge")}
         </Badge>
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">{toolBrand.name}</h1>
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">{t("brand.tagline")}</h1>
         <p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
           {t("home.hero.subtitle")}
         </p>

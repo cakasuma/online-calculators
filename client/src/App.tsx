@@ -198,7 +198,6 @@ function Layout() {
                 <span className="text-base font-bold block leading-tight" data-testid="text-site-title">
                   {toolBrand.name}
                 </span>
-                <span className="text-[11px] uppercase tracking-wide text-muted-foreground">hellokalku.com</span>
               </div>
             </Link>
           </div>

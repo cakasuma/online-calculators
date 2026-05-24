@@ -276,3 +276,36 @@
     padding: 0 !important;
   }
 }
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.18),
+    hsl(210 100% 56% / 0.12),
+    hsl(var(--primary) / 0.08),
+    hsl(199 89% 48% / 0.14)
+  );
+}
+
+/* Scroll-triggered fade-in — toggle .in-view to animate */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fade-in-section.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Respect user motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-section {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

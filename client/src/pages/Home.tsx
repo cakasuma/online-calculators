@@ -52,7 +52,7 @@ function FadeIn({ children, className = "" }: { children: React.ReactNode; class
   const { ref, inView } = useInView();
   return (
     <div
-      ref={ref as React.RefObject<HTMLDivElement>}
+      ref={ref}
       className={`fade-in-section${inView ? " in-view" : ""} ${className}`}
     >
       {children}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { getUtmParams, recordServerEvent, track } from "@/lib/analytics";
+import { useLocale } from "@/hooks/use-locale";
 
 type Calculator = "faraid" | "wasiat" | "zakat" | "salary" | "normal" | "scientific" | "epf";
 type Intent = "consult" | "reminder" | "partner" | "newsletter" | "report";
@@ -49,6 +50,7 @@ export function LeadCaptureCard({
   className,
   disclaimer,
 }: LeadCaptureCardProps) {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -74,7 +76,7 @@ export function LeadCaptureCard({
     const trimmedEmail = email.trim();
     if (!EMAIL_RE.test(trimmedEmail)) {
       setStatus("error");
-      setErrorMessage("Please enter a valid email address.");
+      setErrorMessage(t("lead.errorEmail"));
       return;
     }
 
@@ -115,7 +117,7 @@ export function LeadCaptureCard({
       });
     } catch (err) {
       setStatus("error");
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage(t("lead.errorGeneric"));
       track("lead_submit_error", { calculator, intent, source: sourceLabel });
     }
   }
@@ -181,7 +183,7 @@ export function LeadCaptureCard({
             {status === "submitting" ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Sending…
+                {t("lead.sending")}
               </>
             ) : (
               ctaLabel

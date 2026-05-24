@@ -1,0 +1,40 @@
+{
+  "name": "HelloKalku — Smart Calculators",
+  "short_name": "HelloKalku",
+  "description": "Free online calculators for salary, zakat, faraid, EPF, and more — built for Malaysia.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f8fb",
+  "theme_color": "#00a6d0",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "utilities"],
+  "lang": "en",
+  "shortcuts": [
+    {
+      "name": "Salary Calculator",
+      "short_name": "Salary",
+      "url": "/salary",
+      "description": "Calculate your Malaysian take-home pay"
+    },
+    {
+      "name": "Faraid Calculator",
+      "short_name": "Faraid",
+      "url": "/faraid",
+      "description": "Islamic inheritance distribution"
+    },
+    {
+      "name": "Zakat Calculator",
+      "short_name": "Zakat",
+      "url": "/zakat",
+      "description": "Calculate your zakat obligation"
+    }
+  ]
+}

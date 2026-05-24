@@ -17,6 +17,7 @@ import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n"
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { EmbedDialog } from "@/components/EmbedDialog";
+import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import {
   EPF_DEFAULTS,
   basicSavingsTargetAt,
@@ -90,7 +91,7 @@ function NumberInput({
         value={value}
         onChange={(e) => onChange(formatInputValue(e.target.value, locale))}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+        className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-base outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 md:text-sm"
       />
       {suffix && (
         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
@@ -489,6 +490,8 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               )}
             </CardContent>
           </Card>
+
+          <RelatedToolsCard currentHref="/epf-retirement" />
         </div>
       </div>
     </div>

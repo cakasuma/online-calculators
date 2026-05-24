@@ -1,5 +1,5 @@
 import { AlertTriangle, ArrowRight, Calculator as CalculatorIcon, Download, Info, Sparkles, TrendingUp, Wallet } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import {
   type UrlSchema,
 } from "@/lib/urlState";
 import { downloadSalaryPdf } from "@/lib/pdf/salaryPdf";
+import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -266,6 +267,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
     ),
   );
   const arrivedViaShare = useMemo(() => urlHasSchemaParams(SALARY_URL_SCHEMA), []);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(initial.monthlySalary));
   const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(initial.annualBonus));
   const [otherReliefInput, setOtherReliefInput] = useState(toInputString(initial.otherRelief));
@@ -303,6 +305,12 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
   function handleCalculate() {
     if (!isValid) return;
     setHasCalculated(true);
+    // On mobile (< lg), results appear below the form — scroll there after render
+    setTimeout(() => {
+      if (window.innerWidth < 1024) {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 120);
     const props = {
       monthlySalary: parsedInput.monthlySalary,
       annualBonus: parsedInput.annualBonus,
@@ -491,7 +499,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
           </CardContent>
         </Card>
 
-        <div className="space-y-6 min-w-0">
+        <div ref={resultsRef} className="space-y-6 min-w-0">
           {!showResults ? (
             <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
               <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
@@ -615,6 +623,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </CardContent>
             </Card>
           )}
+
+          {showResults && <RelatedToolsCard currentHref="/salary" />}
         </div>
       </div>
     </div>

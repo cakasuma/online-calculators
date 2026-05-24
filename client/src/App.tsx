@@ -191,9 +191,7 @@ function Layout() {
               <Menu className="w-5 h-5" />
             </button>
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-                <Calculator className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src="/favicon.svg" alt="" className="w-8 h-8" />
               <div className="hidden sm:block">
                 <span className="text-base font-bold block leading-tight" data-testid="text-site-title">
                   {toolBrand.name}

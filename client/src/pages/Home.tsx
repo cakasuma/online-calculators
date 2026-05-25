@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, BadgeCheck, Clock, Globe, Lock, MapPin, Search, Sparkles, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, Clock, Globe, Lock, MapPin, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,11 +33,35 @@ const TOOL_GROUPS = [
   },
 ] as const;
 
+const GROUP_COLORS: Record<string, { iconColor: string; iconBg: string; badge: string; hoverBorder: string; accentLine: string }> = {
+  "nav.groupFinance": {
+    iconColor: "text-blue-700 dark:text-blue-400",
+    iconBg: "bg-blue-50 dark:bg-blue-950/50 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50",
+    badge: "bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200/60 dark:border-blue-800/60",
+    hoverBorder: "hover:border-blue-300/60 dark:hover:border-blue-700/60",
+    accentLine: "bg-blue-500",
+  },
+  "nav.groupMath": {
+    iconColor: "text-orange-600 dark:text-orange-400",
+    iconBg: "bg-orange-50 dark:bg-orange-950/50 group-hover:bg-orange-100 dark:group-hover:bg-orange-900/50",
+    badge: "bg-orange-50 dark:bg-orange-950/50 text-orange-700 dark:text-orange-300 border-orange-200/60 dark:border-orange-800/60",
+    hoverBorder: "hover:border-orange-300/60 dark:hover:border-orange-700/60",
+    accentLine: "bg-orange-500",
+  },
+  "nav.groupIslamic": {
+    iconColor: "text-emerald-700 dark:text-emerald-400",
+    iconBg: "bg-emerald-50 dark:bg-emerald-950/50 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/50",
+    badge: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/60",
+    hoverBorder: "hover:border-emerald-300/60 dark:hover:border-emerald-700/60",
+    accentLine: "bg-emerald-500",
+  },
+};
+
 const FEATURES = [
-  { icon: BadgeCheck, titleKey: "home.features.accurate.title", bodyKey: "home.features.accurate.body" },
-  { icon: MapPin, titleKey: "home.features.malaysia.title", bodyKey: "home.features.malaysia.body" },
-  { icon: Globe, titleKey: "home.features.multilingual.title", bodyKey: "home.features.multilingual.body" },
-  { icon: Lock, titleKey: "home.features.private.title", bodyKey: "home.features.private.body" },
+  { icon: BadgeCheck, titleKey: "home.features.accurate.title", bodyKey: "home.features.accurate.body", iconColor: "text-emerald-700 dark:text-emerald-400", iconBg: "bg-emerald-50 dark:bg-emerald-950/50" },
+  { icon: MapPin, titleKey: "home.features.malaysia.title", bodyKey: "home.features.malaysia.body", iconColor: "text-blue-700 dark:text-blue-400", iconBg: "bg-blue-50 dark:bg-blue-950/50" },
+  { icon: Globe, titleKey: "home.features.multilingual.title", bodyKey: "home.features.multilingual.body", iconColor: "text-orange-600 dark:text-orange-400", iconBg: "bg-orange-50 dark:bg-orange-950/50" },
+  { icon: Lock, titleKey: "home.features.private.title", bodyKey: "home.features.private.body", iconColor: "text-amber-600 dark:text-amber-400", iconBg: "bg-amber-50 dark:bg-amber-950/50" },
 ] as const;
 
 const FAQ_PAIRS = [
@@ -189,45 +213,78 @@ export default function HomePage() {
     <div className="max-w-6xl mx-auto space-y-14">
 
       {/* ── Hero ── */}
-      <section className="hero-gradient rounded-3xl border p-6 sm:p-10 shadow-sm">
-        <Badge className="mb-4" variant="secondary">
-          <Sparkles className="w-3.5 h-3.5 mr-1" />
-          {t("home.hero.badge")}
-        </Badge>
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">{t("brand.tagline")}</h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
-          {t("home.hero.subtitle")}
-        </p>
+      <section className="hero-gradient rounded-3xl border p-6 sm:p-10 shadow-sm overflow-hidden relative">
+        {/* Dot grid overlay */}
+        <div className="absolute inset-0 hero-grid rounded-3xl pointer-events-none" aria-hidden="true" />
 
-        {/* Prominent search */}
-        <div className="mt-6 max-w-xl">
-          <ToolSearchBar />
-        </div>
-
-        {/* Secondary CTAs */}
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Button asChild size="sm" variant="outline">
-            <Link href="/salary">{t("home.hero.ctaSalary")}</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/faraid">{t("home.hero.ctaFaraid")}</Link>
-          </Button>
-        </div>
-
-        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t pt-6">
-          {(
-            [
-              { value: "7", labelKey: "home.stats.tools" },
-              { value: "3", labelKey: "home.stats.locales" },
-              { value: "2026", labelKey: "home.stats.updated" },
-              { value: "100%", labelKey: "home.stats.free" },
-            ] as const
-          ).map(({ value, labelKey }) => (
-            <div key={labelKey} className="text-center">
-              <div className="text-2xl font-bold text-primary">{value}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{t(labelKey)}</div>
-            </div>
+        {/* Floating math symbols — desktop decoration */}
+        <div className="hidden lg:block absolute top-0 right-0 bottom-0 w-80 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+          {[
+            { char: "%",  top: "10%",  right: "22%", size: "text-6xl",  opacity: "opacity-[0.055]", rotate: "rotate-12" },
+            { char: "÷",  top: "35%",  right: "8%",  size: "text-8xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-6" },
+            { char: "+",  top: "60%",  right: "28%", size: "text-5xl",  opacity: "opacity-[0.06]",  rotate: "rotate-3" },
+            { char: "=",  top: "18%",  right: "46%", size: "text-4xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-15" },
+            { char: "∑",  top: "75%",  right: "6%",  size: "text-6xl",  opacity: "opacity-[0.05]",  rotate: "rotate-8" },
+            { char: "π",  top: "48%",  right: "44%", size: "text-5xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-3" },
+            { char: "×",  top: "82%",  right: "36%", size: "text-4xl",  opacity: "opacity-[0.045]", rotate: "rotate-20" },
+            { char: "√",  top: "5%",   right: "58%", size: "text-3xl",  opacity: "opacity-[0.035]", rotate: "-rotate-8" },
+          ].map(({ char, top, right, size, opacity, rotate }) => (
+            <span
+              key={char}
+              className={`absolute font-mono font-black text-foreground ${size} ${opacity} ${rotate}`}
+              style={{ top, right }}
+            >
+              {char}
+            </span>
           ))}
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10">
+          <Badge className="mb-4 border" variant="secondary">
+            <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
+            {t("home.hero.badge")}
+          </Badge>
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight max-w-lg">
+            <span className="gradient-text">{t("brand.tagline")}</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
+            {t("home.hero.subtitle")}
+          </p>
+
+          {/* Prominent search */}
+          <div className="mt-6 max-w-xl">
+            <ToolSearchBar />
+          </div>
+
+          {/* Secondary CTAs */}
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button asChild size="sm" className="shadow-sm shadow-primary/20 hover:shadow-md hover:shadow-primary/30 transition-shadow">
+              <Link href="/salary">
+                <Wallet className="w-3.5 h-3.5 mr-1.5" />
+                {t("home.hero.ctaSalary")}
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline" className="hover:border-primary/40">
+              <Link href="/faraid">{t("home.hero.ctaFaraid")}</Link>
+            </Button>
+          </div>
+
+          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 border-t pt-6">
+            {(
+              [
+                { value: "7",    labelKey: "home.stats.tools",   icon: "🧮" },
+                { value: "3",    labelKey: "home.stats.locales",  icon: "🌐" },
+                { value: "2026", labelKey: "home.stats.updated",  icon: "✅" },
+                { value: "100%", labelKey: "home.stats.free",     icon: "🆓" },
+              ] as const
+            ).map(({ value, labelKey, icon }) => (
+              <div key={labelKey} className="text-center">
+                <div className="text-xl sm:text-2xl font-bold gradient-text">{value}</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{icon} {t(labelKey)}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -270,29 +327,33 @@ export default function HomePage() {
           const groupTools = tools.filter((tool) =>
             group.hrefs.includes(tool.href as (typeof group.hrefs)[number]),
           );
+          const colors = GROUP_COLORS[group.labelKey];
           return (
             <FadeIn key={group.labelKey}>
               <section>
-                <div className="mb-4">
-                  <h2 className="text-xl font-semibold">{t(group.labelKey)}</h2>
-                  <p className="text-sm text-muted-foreground mt-0.5">{t(group.descKey)}</p>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className={`w-1 h-8 rounded-full shrink-0 ${colors.accentLine}`} aria-hidden="true" />
+                  <div>
+                    <h2 className="text-xl font-semibold">{t(group.labelKey)}</h2>
+                    <p className="text-sm text-muted-foreground mt-0.5">{t(group.descKey)}</p>
+                  </div>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {groupTools.map((tool) => (
                     <Link key={tool.slug} href={tool.href}>
-                      <Card className="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group">
+                      <Card className={`h-full hover:shadow-sm transition-all duration-200 cursor-pointer group border ${colors.hoverBorder}`}>
                         <CardContent className="p-5 flex flex-col gap-3 h-full">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
-                                <tool.icon className="w-5 h-5 text-primary" />
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors shrink-0 ${colors.iconBg}`}>
+                                <tool.icon className={`w-5 h-5 ${colors.iconColor}`} />
                               </div>
                               <span className="font-semibold text-sm leading-tight">
                                 {t(`tools.${tool.slug}.name` as TranslationKey)}
                               </span>
                             </div>
                             {tool.badge ? (
-                              <Badge variant="secondary" className="text-xs shrink-0">
+                              <Badge variant="secondary" className={`text-xs shrink-0 border ${colors.badge}`}>
                                 {t(`tools.${tool.slug}.badge` as TranslationKey)}
                               </Badge>
                             ) : null}
@@ -300,7 +361,7 @@ export default function HomePage() {
                           <p className="text-sm text-muted-foreground leading-relaxed flex-1">
                             {t(`tools.${tool.slug}.desc` as TranslationKey)}
                           </p>
-                          <span className="text-xs text-primary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                          <span className={`text-xs font-medium flex items-center gap-1 group-hover:gap-2 transition-all ${colors.iconColor}`}>
                             {t("home.featured.openTool")}
                             <ArrowRight className="w-3.5 h-3.5" />
                           </span>
@@ -324,10 +385,12 @@ export default function HomePage() {
         <section>
           <h2 className="text-2xl font-semibold">{t("home.features.title")}</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            {FEATURES.map(({ icon: Icon, titleKey, bodyKey }) => (
-              <div key={titleKey} className="rounded-xl border bg-card p-5 space-y-2">
-                <div className="flex items-center gap-2.5">
-                  <Icon className="w-5 h-5 text-primary shrink-0" />
+            {FEATURES.map(({ icon: Icon, titleKey, bodyKey, iconColor, iconBg }) => (
+              <div key={titleKey} className="rounded-2xl border bg-card p-5 space-y-3 hover:shadow-sm transition-shadow">
+                <div className="flex items-center gap-3">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
+                    <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
+                  </div>
                   <h3 className="font-semibold text-sm">{t(titleKey)}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{t(bodyKey)}</p>

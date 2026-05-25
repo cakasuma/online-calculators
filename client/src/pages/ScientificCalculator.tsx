@@ -256,11 +256,11 @@ export default function ScientificCalculator({ onCalculate }: Props) {
     "calc-btn h-12 text-xs font-medium rounded-xl bg-slate-100 dark:bg-muted/70 hover:bg-slate-200 dark:hover:bg-muted border border-slate-200/80 dark:border-border transition-all text-slate-700 dark:text-slate-300";
   const numBtnClass = (key: string) => {
     const base = "calc-btn h-14 text-base";
-    if (key === "=") return `${base} bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 hover:shadow-lg hover:brightness-110`;
-    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 font-bold text-lg`;
-    if (key === "C") return `${base} bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50 hover:bg-rose-100 dark:hover:bg-rose-900/50`;
+    if (key === "=") return `${base} bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-md shadow-blue-600/30 hover:shadow-lg hover:brightness-110`;
+    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-300 border border-orange-200/70 dark:border-orange-900/60 hover:bg-orange-100 dark:hover:bg-orange-900/50 font-bold text-lg`;
+    if (key === "C") return `${base} bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/70 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/50`;
     if (["±", "%"].includes(key)) return `${base} bg-slate-100 dark:bg-muted/80 text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-border hover:bg-slate-200 dark:hover:bg-muted`;
-    if (key === "⌫") return `${base} bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/50`;
+    if (key === "⌫") return `${base} bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/50`;
     return `${base} bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-muted/40 border border-slate-200 dark:border-border text-foreground shadow-sm`;
   };
 
@@ -272,14 +272,14 @@ export default function ScientificCalculator({ onCalculate }: Props) {
           <div className="flex text-xs rounded-full border border-slate-600/60 overflow-hidden shrink-0" aria-label="angle mode">
             <button
               onClick={() => setMode("deg")}
-              className={`px-2.5 py-1 font-medium transition-colors ${mode === "deg" ? "bg-indigo-500 text-white" : "bg-slate-700/60 text-slate-400 hover:bg-slate-700"}`}
+              className={`px-2.5 py-1 font-medium transition-colors ${mode === "deg" ? "bg-blue-600 text-white" : "bg-slate-700/60 text-slate-400 hover:bg-slate-700"}`}
               aria-pressed={mode === "deg"}
             >
               DEG
             </button>
             <button
               onClick={() => setMode("rad")}
-              className={`px-2.5 py-1 font-medium transition-colors ${mode === "rad" ? "bg-indigo-500 text-white" : "bg-slate-700/60 text-slate-400 hover:bg-slate-700"}`}
+              className={`px-2.5 py-1 font-medium transition-colors ${mode === "rad" ? "bg-blue-600 text-white" : "bg-slate-700/60 text-slate-400 hover:bg-slate-700"}`}
               aria-pressed={mode === "rad"}
             >
               RAD

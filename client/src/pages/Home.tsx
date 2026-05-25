@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, BadgeCheck, Clock, Globe, Lock, MapPin, Search, Sparkles, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, Clock, Globe, Lock, MapPin, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,31 +33,34 @@ const TOOL_GROUPS = [
   },
 ] as const;
 
-const GROUP_COLORS: Record<string, { iconColor: string; iconBg: string; badge: string; hoverBorder: string }> = {
+const GROUP_COLORS: Record<string, { iconColor: string; iconBg: string; badge: string; hoverBorder: string; accentLine: string }> = {
   "nav.groupFinance": {
-    iconColor: "text-blue-600 dark:text-blue-400",
+    iconColor: "text-blue-700 dark:text-blue-400",
     iconBg: "bg-blue-50 dark:bg-blue-950/50 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50",
     badge: "bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200/60 dark:border-blue-800/60",
     hoverBorder: "hover:border-blue-300/60 dark:hover:border-blue-700/60",
+    accentLine: "bg-blue-500",
   },
   "nav.groupMath": {
-    iconColor: "text-violet-600 dark:text-violet-400",
-    iconBg: "bg-violet-50 dark:bg-violet-950/50 group-hover:bg-violet-100 dark:group-hover:bg-violet-900/50",
-    badge: "bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300 border-violet-200/60 dark:border-violet-800/60",
-    hoverBorder: "hover:border-violet-300/60 dark:hover:border-violet-700/60",
+    iconColor: "text-orange-600 dark:text-orange-400",
+    iconBg: "bg-orange-50 dark:bg-orange-950/50 group-hover:bg-orange-100 dark:group-hover:bg-orange-900/50",
+    badge: "bg-orange-50 dark:bg-orange-950/50 text-orange-700 dark:text-orange-300 border-orange-200/60 dark:border-orange-800/60",
+    hoverBorder: "hover:border-orange-300/60 dark:hover:border-orange-700/60",
+    accentLine: "bg-orange-500",
   },
   "nav.groupIslamic": {
-    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconColor: "text-emerald-700 dark:text-emerald-400",
     iconBg: "bg-emerald-50 dark:bg-emerald-950/50 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/50",
     badge: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/60",
     hoverBorder: "hover:border-emerald-300/60 dark:hover:border-emerald-700/60",
+    accentLine: "bg-emerald-500",
   },
 };
 
 const FEATURES = [
-  { icon: BadgeCheck, titleKey: "home.features.accurate.title", bodyKey: "home.features.accurate.body", iconColor: "text-emerald-600 dark:text-emerald-400", iconBg: "bg-emerald-50 dark:bg-emerald-950/50" },
-  { icon: MapPin, titleKey: "home.features.malaysia.title", bodyKey: "home.features.malaysia.body", iconColor: "text-blue-600 dark:text-blue-400", iconBg: "bg-blue-50 dark:bg-blue-950/50" },
-  { icon: Globe, titleKey: "home.features.multilingual.title", bodyKey: "home.features.multilingual.body", iconColor: "text-violet-600 dark:text-violet-400", iconBg: "bg-violet-50 dark:bg-violet-950/50" },
+  { icon: BadgeCheck, titleKey: "home.features.accurate.title", bodyKey: "home.features.accurate.body", iconColor: "text-emerald-700 dark:text-emerald-400", iconBg: "bg-emerald-50 dark:bg-emerald-950/50" },
+  { icon: MapPin, titleKey: "home.features.malaysia.title", bodyKey: "home.features.malaysia.body", iconColor: "text-blue-700 dark:text-blue-400", iconBg: "bg-blue-50 dark:bg-blue-950/50" },
+  { icon: Globe, titleKey: "home.features.multilingual.title", bodyKey: "home.features.multilingual.body", iconColor: "text-orange-600 dark:text-orange-400", iconBg: "bg-orange-50 dark:bg-orange-950/50" },
   { icon: Lock, titleKey: "home.features.private.title", bodyKey: "home.features.private.body", iconColor: "text-amber-600 dark:text-amber-400", iconBg: "bg-amber-50 dark:bg-amber-950/50" },
 ] as const;
 
@@ -211,46 +214,77 @@ export default function HomePage() {
 
       {/* ── Hero ── */}
       <section className="hero-gradient rounded-3xl border p-6 sm:p-10 shadow-sm overflow-hidden relative">
-        <Badge className="mb-4 border" variant="secondary">
-          <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
-          {t("home.hero.badge")}
-        </Badge>
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">
-          <span className="gradient-text">{t("brand.tagline")}</span>
-        </h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
-          {t("home.hero.subtitle")}
-        </p>
+        {/* Dot grid overlay */}
+        <div className="absolute inset-0 hero-grid rounded-3xl pointer-events-none" aria-hidden="true" />
 
-        {/* Prominent search */}
-        <div className="mt-6 max-w-xl">
-          <ToolSearchBar />
-        </div>
-
-        {/* Secondary CTAs */}
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Button asChild size="sm" className="shadow-sm shadow-primary/20 hover:shadow-md hover:shadow-primary/25 transition-shadow">
-            <Link href="/salary">{t("home.hero.ctaSalary")}</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline" className="hover:border-primary/40">
-            <Link href="/faraid">{t("home.hero.ctaFaraid")}</Link>
-          </Button>
-        </div>
-
-        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t pt-6">
-          {(
-            [
-              { value: "7", labelKey: "home.stats.tools" },
-              { value: "3", labelKey: "home.stats.locales" },
-              { value: "2026", labelKey: "home.stats.updated" },
-              { value: "100%", labelKey: "home.stats.free" },
-            ] as const
-          ).map(({ value, labelKey }) => (
-            <div key={labelKey} className="text-center">
-              <div className="text-2xl font-bold gradient-text">{value}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{t(labelKey)}</div>
-            </div>
+        {/* Floating math symbols — desktop decoration */}
+        <div className="hidden lg:block absolute top-0 right-0 bottom-0 w-80 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+          {[
+            { char: "%",  top: "10%",  right: "22%", size: "text-6xl",  opacity: "opacity-[0.055]", rotate: "rotate-12" },
+            { char: "÷",  top: "35%",  right: "8%",  size: "text-8xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-6" },
+            { char: "+",  top: "60%",  right: "28%", size: "text-5xl",  opacity: "opacity-[0.06]",  rotate: "rotate-3" },
+            { char: "=",  top: "18%",  right: "46%", size: "text-4xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-15" },
+            { char: "∑",  top: "75%",  right: "6%",  size: "text-6xl",  opacity: "opacity-[0.05]",  rotate: "rotate-8" },
+            { char: "π",  top: "48%",  right: "44%", size: "text-5xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-3" },
+            { char: "×",  top: "82%",  right: "36%", size: "text-4xl",  opacity: "opacity-[0.045]", rotate: "rotate-20" },
+            { char: "√",  top: "5%",   right: "58%", size: "text-3xl",  opacity: "opacity-[0.035]", rotate: "-rotate-8" },
+          ].map(({ char, top, right, size, opacity, rotate }) => (
+            <span
+              key={char}
+              className={`absolute font-mono font-black text-foreground ${size} ${opacity} ${rotate}`}
+              style={{ top, right }}
+            >
+              {char}
+            </span>
           ))}
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10">
+          <Badge className="mb-4 border" variant="secondary">
+            <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
+            {t("home.hero.badge")}
+          </Badge>
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight max-w-lg">
+            <span className="gradient-text">{t("brand.tagline")}</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
+            {t("home.hero.subtitle")}
+          </p>
+
+          {/* Prominent search */}
+          <div className="mt-6 max-w-xl">
+            <ToolSearchBar />
+          </div>
+
+          {/* Secondary CTAs */}
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button asChild size="sm" className="shadow-sm shadow-primary/20 hover:shadow-md hover:shadow-primary/30 transition-shadow">
+              <Link href="/salary">
+                <Wallet className="w-3.5 h-3.5 mr-1.5" />
+                {t("home.hero.ctaSalary")}
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline" className="hover:border-primary/40">
+              <Link href="/faraid">{t("home.hero.ctaFaraid")}</Link>
+            </Button>
+          </div>
+
+          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 border-t pt-6">
+            {(
+              [
+                { value: "7",    labelKey: "home.stats.tools",   icon: "🧮" },
+                { value: "3",    labelKey: "home.stats.locales",  icon: "🌐" },
+                { value: "2026", labelKey: "home.stats.updated",  icon: "✅" },
+                { value: "100%", labelKey: "home.stats.free",     icon: "🆓" },
+              ] as const
+            ).map(({ value, labelKey, icon }) => (
+              <div key={labelKey} className="text-center">
+                <div className="text-xl sm:text-2xl font-bold gradient-text">{value}</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{icon} {t(labelKey)}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -298,6 +332,7 @@ export default function HomePage() {
             <FadeIn key={group.labelKey}>
               <section>
                 <div className="mb-4 flex items-center gap-3">
+                  <div className={`w-1 h-8 rounded-full shrink-0 ${colors.accentLine}`} aria-hidden="true" />
                   <div>
                     <h2 className="text-xl font-semibold">{t(group.labelKey)}</h2>
                     <p className="text-sm text-muted-foreground mt-0.5">{t(group.descKey)}</p>
@@ -306,7 +341,7 @@ export default function HomePage() {
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {groupTools.map((tool) => (
                     <Link key={tool.slug} href={tool.href}>
-                      <Card className={`h-full hover:shadow-md transition-all duration-200 cursor-pointer group ${colors.hoverBorder}`}>
+                      <Card className={`h-full hover:shadow-sm transition-all duration-200 cursor-pointer group border ${colors.hoverBorder}`}>
                         <CardContent className="p-5 flex flex-col gap-3 h-full">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2.5">

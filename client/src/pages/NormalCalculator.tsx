@@ -160,11 +160,11 @@ export default function NormalCalculator({ onCalculate }: Props) {
 
   const btnClass = (key: CalcKey) => {
     const base = "calc-btn h-16 text-base";
-    if (key === "=") return `${base} bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/35 hover:brightness-110`;
-    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 font-bold text-lg`;
-    if (key === "C") return `${base} bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50 hover:bg-rose-100 dark:hover:bg-rose-900/50`;
+    if (key === "=") return `${base} bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-md shadow-blue-600/30 hover:shadow-lg hover:shadow-blue-600/40 hover:brightness-110`;
+    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-300 border border-orange-200/70 dark:border-orange-900/60 hover:bg-orange-100 dark:hover:bg-orange-900/50 font-bold text-lg`;
+    if (key === "C") return `${base} bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/70 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/50`;
     if (["±", "%"].includes(key)) return `${base} bg-slate-100 dark:bg-muted/80 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-muted border border-slate-200/80 dark:border-border`;
-    if (key === "⌫") return `${base} bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/50`;
+    if (key === "⌫") return `${base} bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/50`;
     return `${base} bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-muted/40 border border-slate-200 dark:border-border text-foreground shadow-sm`;
   };
 

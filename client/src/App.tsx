@@ -178,12 +178,12 @@ function Layout() {
 
   return (
     <div className={`min-h-screen flex flex-col${location === "/faraid" ? " theme-faraid" : ""}`}>
-      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-lg border-b safe-area-top">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b safe-area-top">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
-              className="md:hidden p-2.5 rounded-lg hover:bg-muted active:bg-muted/80"
+              className="md:hidden p-2.5 rounded-xl hover:bg-muted active:bg-muted/80 transition-colors"
               aria-label={t("a11y.navToggle")}
               aria-expanded={showMobileNav}
               data-testid="button-mobile-menu"
@@ -193,7 +193,7 @@ function Layout() {
             <Link href="/" className="flex items-center gap-2 group">
               <img src="/favicon.svg" alt="" className="w-8 h-8" />
               <div className="hidden sm:block">
-                <span className="text-base font-bold block leading-tight" data-testid="text-site-title">
+                <span className="text-base font-bold block leading-tight gradient-text" data-testid="text-site-title">
                   {toolBrand.name}
                 </span>
               </div>
@@ -245,7 +245,7 @@ function Layout() {
             <LocaleSwitcher />
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`p-2.5 rounded-lg transition-colors ${
+              className={`p-2.5 rounded-xl transition-colors ${
                 showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
               }`}
               aria-label={t("a11y.historyToggle")}
@@ -256,7 +256,7 @@ function Layout() {
             </button>
             <button
               onClick={toggle}
-              className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground"
+              className="p-2.5 rounded-xl hover:bg-muted text-muted-foreground transition-colors"
               aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")}
               data-testid="button-theme-toggle"
             >

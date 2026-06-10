@@ -292,6 +292,7 @@ const translations = {
   "epf.results.yearly.salary": { en: "Salary", ms: "Gaji", id: "Gaji" },
   "epf.results.yearly.contrib": { en: "Contributions", ms: "Sumbangan", id: "Kontribusi" },
   "epf.results.yearly.div": { en: "Dividends", ms: "Dividen", id: "Dividen" },
+  "epf.results.yearly.total": { en: "Total", ms: "Jumlah", id: "Total" },
   "epf.results.yearly.endBal": { en: "End balance", ms: "Baki akhir", id: "Saldo akhir" },
   "epf.results.yearly.chartView": { en: "Chart", ms: "Carta", id: "Grafik" },
   "epf.results.yearly.tableView": { en: "Table", ms: "Jadual", id: "Tabel" },

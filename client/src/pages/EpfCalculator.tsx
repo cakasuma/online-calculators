@@ -506,13 +506,48 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
                               width={40}
                             />
                             <RechartsTooltip
-                              formatter={(value: number, name: string) => [money(value), name]}
-                              labelFormatter={(age) => `${t("epf.results.yearly.age")} ${age}`}
-                              contentStyle={{
-                                background: "hsl(var(--popover))",
-                                border: "1px solid hsl(var(--border))",
-                                borderRadius: 12,
-                                fontSize: 12,
+                              cursor={{ stroke: "hsl(var(--border))" }}
+                              content={({ active, payload, label }) => {
+                                if (!active || !payload || payload.length === 0) return null;
+                                const row = payload[0].payload as {
+                                  contributions: number;
+                                  dividends: number;
+                                  total: number;
+                                };
+                                return (
+                                  <div
+                                    style={{
+                                      background: "hsl(var(--popover))",
+                                      border: "1px solid hsl(var(--border))",
+                                      borderRadius: 12,
+                                      fontSize: 12,
+                                      padding: "8px 12px",
+                                      color: "hsl(var(--popover-foreground))",
+                                    }}
+                                  >
+                                    <p className="font-medium mb-1">
+                                      {t("epf.results.yearly.age")} {label}
+                                    </p>
+                                    <p className="flex items-center justify-between gap-4">
+                                      <span className="flex items-center gap-1.5 text-muted-foreground">
+                                        <span className="w-2 h-2 rounded-sm bg-primary/60" />
+                                        {t("epf.results.yearly.contrib")}
+                                      </span>
+                                      <span className="tabular-nums font-medium">{money(row.contributions)}</span>
+                                    </p>
+                                    <p className="flex items-center justify-between gap-4">
+                                      <span className="flex items-center gap-1.5 text-muted-foreground">
+                                        <span className="w-2 h-2 rounded-sm" style={{ background: "#10B981" }} />
+                                        {t("epf.results.yearly.div")}
+                                      </span>
+                                      <span className="tabular-nums font-medium">{money(row.dividends)}</span>
+                                    </p>
+                                    <p className="mt-1 flex items-center justify-between gap-4 border-t pt-1">
+                                      <span className="font-medium">{t("epf.results.yearly.total")}</span>
+                                      <span className="tabular-nums font-semibold">{money(row.total)}</span>
+                                    </p>
+                                  </div>
+                                );
                               }}
                             />
                             <ReferenceLine

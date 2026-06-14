@@ -290,6 +290,14 @@
   }
   .hk-hero-bg > * { position: relative; z-index: 1; }
 
+  /* ── Redesign: light article hero (theme-aware) ── */
+  .hk-article-hero {
+    background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 60%, #f9fafb 100%);
+  }
+  .dark .hk-article-hero {
+    background: linear-gradient(180deg, var(--hk-dark-900) 0%, var(--hk-dark-800) 70%, var(--hk-dark-900) 100%);
+  }
+
   /* ── Tool card hover ── */
   .hk-tool-card {
     transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;

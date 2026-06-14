@@ -208,10 +208,7 @@ export default function BlogArticle({ slug }: { slug: string }) {
 
       <div className="max-w-[1200px] mx-auto">
         {/* ── ARTICLE HERO ──────────────────────────────────────────────── */}
-        <div
-          className="-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 px-5 sm:px-8 py-10 mb-8"
-          style={{ background: "linear-gradient(180deg,#dbeafe 0%,#eff6ff 60%,#f9fafb 100%)" }}
-        >
+        <div className="hk-article-hero -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 px-5 sm:px-8 py-10 mb-8">
           <div className="max-w-[760px]">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6">

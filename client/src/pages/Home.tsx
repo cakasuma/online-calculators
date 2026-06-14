@@ -257,11 +257,14 @@ export default function HomePage() {
   const recentEntries = historyEntries.slice(0, 3);
   const [activeFilter, setActiveFilter] = useState<string>("All");
 
-  const filterGroups = ["All", ...TOOL_GROUPS.map((g) => t(g.labelKey))];
+  const filterGroups = [
+    { key: "All", label: "All" },
+    ...TOOL_GROUPS.map((g) => ({ key: g.labelKey, label: t(g.labelKey) })),
+  ];
 
   const filteredGroups = activeFilter === "All"
     ? TOOL_GROUPS
-    : TOOL_GROUPS.filter((g) => t(g.labelKey) === activeFilter);
+    : TOOL_GROUPS.filter((g) => g.labelKey === activeFilter);
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-0">
@@ -386,11 +389,11 @@ export default function HomePage() {
 
           {/* Filter tabs */}
           <div className="flex gap-2 mb-7 overflow-x-auto pb-1 -mx-1 px-1">
-            {filterGroups.map((label) => (
+            {filterGroups.map(({ key, label }) => (
               <button
-                key={label}
-                onClick={() => setActiveFilter(label)}
-                className={`hk-filter-tab shrink-0${activeFilter === label ? " active" : ""}`}
+                key={key}
+                onClick={() => setActiveFilter(key)}
+                className={`hk-filter-tab shrink-0${activeFilter === key ? " active" : ""}`}
               >
                 {label}
               </button>

@@ -16,11 +16,15 @@ function setMeta(attr: "name" | "property", key: string, value: string) {
   el.setAttribute("content", value);
 }
 
-function setLink(rel: string, href: string) {
-  let el = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
+function setLink(rel: string, href: string, hreflang?: string) {
+  const selector = hreflang
+    ? `link[rel="${rel}"][hreflang="${hreflang}"]`
+    : `link[rel="${rel}"]`;
+  let el = document.head.querySelector<HTMLLinkElement>(selector);
   if (!el) {
     el = document.createElement("link");
     el.setAttribute("rel", rel);
+    if (hreflang) el.setAttribute("hreflang", hreflang);
     document.head.appendChild(el);
   }
   el.setAttribute("href", href);
@@ -99,17 +103,37 @@ export default function BlogArticle({ slug }: { slug: string }) {
     if (!article) return;
 
     const fullTitle = `${article.title} | HelloKalku`;
+    const canonical = `${SITE_ORIGIN}/en/blog/${article.slug}`;
+    const ogImage = `${SITE_ORIGIN}/og-default.png`;
+
     document.title = fullTitle;
+    document.documentElement.lang = "en";
 
     setMeta("name", "description", article.description);
     setMeta("name", "keywords", article.keywords);
+    setMeta("name", "robots", "index,follow,max-image-preview:large");
+
     setMeta("property", "og:title", fullTitle);
     setMeta("property", "og:description", article.description);
     setMeta("property", "og:type", "article");
-    setMeta("property", "og:url", `${SITE_ORIGIN}/en/blog/${article.slug}`);
+    setMeta("property", "og:url", canonical);
+    setMeta("property", "og:locale", "en_US");
+    setMeta("property", "og:image", ogImage);
+    setMeta("property", "og:image:width", "1200");
+    setMeta("property", "og:image:height", "630");
+
+    setMeta("name", "twitter:card", "summary_large_image");
     setMeta("name", "twitter:title", fullTitle);
     setMeta("name", "twitter:description", article.description);
-    setLink("canonical", `${SITE_ORIGIN}/en/blog/${article.slug}`);
+    setMeta("name", "twitter:image", ogImage);
+
+    // Canonical + hreflang — blog articles are English-only so all locales
+    // point back to the same English canonical URL.
+    setLink("canonical", canonical);
+    setLink("alternate", canonical, "en");
+    setLink("alternate", canonical, "ms-MY");
+    setLink("alternate", canonical, "id-ID");
+    setLink("alternate", canonical, "x-default");
   }, [article]);
 
   if (!article) return <NotFound />;

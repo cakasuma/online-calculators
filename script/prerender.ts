@@ -14,6 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { routes, SITE_ORIGIN, canonicalUrl, type RouteSeoEntry } from "../client/src/config/seo";
 import { calculatorContent, type CalculatorContent } from "../client/src/config/content";
+import { blogArticles } from "../client/src/config/blog";
 import type { Locale } from "../client/src/lib/i18n";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -340,6 +341,18 @@ ${alts}
   </url>`,
       );
     }
+  }
+
+  // Blog articles — English-only, no hreflang alternates needed
+  for (const article of blogArticles) {
+    urls.push(
+      `  <url>
+    <loc>${SITE_ORIGIN}/en/blog/${article.slug}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`,
+    );
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

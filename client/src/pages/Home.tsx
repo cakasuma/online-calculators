@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, BadgeCheck, BookOpen, Clock, Globe, Lock, MapPin, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, BookOpen, Clock, Globe, Lock, MapPin, PiggyBank, Scale, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,28 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Salary & Tax": "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
   "EPF & Retirement": "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
   "Islamic Finance": "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+};
+
+type LucideIcon = typeof Wallet;
+const GUIDE_THUMBNAILS: Record<string, { icon: LucideIcon; gradient: string; iconColor: string; pattern: string }> = {
+  "Salary & Tax": {
+    icon: Wallet,
+    gradient: "from-blue-500/20 via-blue-400/10 to-transparent",
+    iconColor: "text-blue-500 dark:text-blue-400",
+    pattern: "opacity-[0.07]",
+  },
+  "EPF & Retirement": {
+    icon: PiggyBank,
+    gradient: "from-green-500/20 via-green-400/10 to-transparent",
+    iconColor: "text-green-600 dark:text-green-400",
+    pattern: "opacity-[0.07]",
+  },
+  "Islamic Finance": {
+    icon: Scale,
+    gradient: "from-amber-500/20 via-amber-400/10 to-transparent",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    pattern: "opacity-[0.07]",
+  },
 };
 
 const FEATURED_ARTICLES = blogArticles.slice(0, 6);
@@ -423,28 +445,42 @@ export default function HomePage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURED_ARTICLES.map((article) => {
               const catColor = CATEGORY_COLORS[article.categoryLabel] ?? "bg-muted text-muted-foreground";
+              const thumb = GUIDE_THUMBNAILS[article.categoryLabel];
+              const ThumbIcon = thumb?.icon ?? BookOpen;
               return (
                 <Link key={article.slug} href={`/blog/${article.slug}`}>
-                  <article className="group flex flex-col gap-3 rounded-xl border bg-card p-5 hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer h-full">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${catColor}`}>
-                        {article.categoryLabel}
-                      </span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                        <Clock className="w-3 h-3" />
-                        {article.readingTime} min
+                  <article className="group flex flex-col rounded-xl border bg-card hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer h-full overflow-hidden">
+                    {/* Thumbnail header — CSS gradient + icon, no HTTP request */}
+                    <div className={`relative flex items-center justify-center h-24 bg-gradient-to-br ${thumb?.gradient ?? "from-muted/60 to-transparent"} border-b border-border/50 overflow-hidden`}>
+                      {/* Large decorative background icon */}
+                      <ThumbIcon className={`absolute w-24 h-24 ${thumb?.iconColor ?? "text-muted-foreground"} ${thumb?.pattern ?? "opacity-[0.07]"} -rotate-6 translate-x-8`} aria-hidden="true" />
+                      {/* Centered foreground icon */}
+                      <div className="relative z-10 flex items-center justify-center w-10 h-10 rounded-xl bg-background/70 backdrop-blur-sm border border-border/60 shadow-sm">
+                        <ThumbIcon className={`w-5 h-5 ${thumb?.iconColor ?? "text-muted-foreground"}`} />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2.5 p-4 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${catColor}`}>
+                          {article.categoryLabel}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                          <Clock className="w-3 h-3" />
+                          {article.readingTime} min
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">
+                        {article.description}
+                      </p>
+                      <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-auto pt-1">
+                        Read guide
+                        <ArrowRight className="w-3 h-3" />
                       </span>
                     </div>
-                    <h3 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                      {article.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">
-                      {article.description}
-                    </p>
-                    <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-auto">
-                      Read guide
-                      <ArrowRight className="w-3 h-3" />
-                    </span>
                   </article>
                 </Link>
               );

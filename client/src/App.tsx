@@ -24,6 +24,7 @@ import {
   Star,
   Wallet,
   BookOpen,
+  Github,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -85,6 +86,40 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const FOOTER_COLS = [
+  {
+    heading: "Finance",
+    links: [
+      { label: "Salary Calculator", href: "/salary" },
+      { label: "EPF Retirement", href: "/epf-retirement" },
+    ],
+  },
+  {
+    heading: "Islamic Finance",
+    links: [
+      { label: "Faraid Calculator", href: "/faraid" },
+      { label: "Zakat Calculator", href: "/zakat" },
+      { label: "Wasiat Guide", href: "/wasiat" },
+    ],
+  },
+  {
+    heading: "Math",
+    links: [
+      { label: "Basic Calculator", href: "/normal" },
+      { label: "Scientific Calculator", href: "/scientific" },
+    ],
+  },
+  {
+    heading: "Company",
+    links: [
+      { label: "Guides", href: "/blog" },
+      { label: "Partners", href: "/partners" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Use", href: "/terms" },
+    ],
+  },
+];
+
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
 const adsenseSlotTop = import.meta.env.VITE_ADSENSE_SLOT_TOP?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
@@ -119,12 +154,12 @@ function Layout() {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [location] = useLocation();
 
-  useEffect(() => {
-    initAnalytics();
-  }, []);
+  useEffect(() => { initAnalytics(); }, []);
+
+  // Close mobile nav on route change
+  useEffect(() => { setShowMobileNav(false); }, [location]);
 
   useEffect(() => {
-    // Blog article pages manage their own meta tags via the BlogArticle component
     if (/^\/blog\/.+/.test(location)) {
       track("pageview", { path: location });
       return;
@@ -135,14 +170,12 @@ function Layout() {
     document.documentElement.lang = locale;
     setMetaTag("name", "description", copy.description);
     if (copy.keywords) setMetaTag("name", "keywords", copy.keywords);
-
     const canonical = canonicalUrl(locale, route.path);
     setLinkTag("canonical", canonical);
     for (const alt of SUPPORTED_LOCALES) {
       setLinkTag("alternate", canonicalUrl(alt, route.path), alt);
     }
     setLinkTag("alternate", canonicalUrl("en", route.path), "x-default");
-
     setMetaTag("property", "og:title", copy.title);
     setMetaTag("property", "og:description", copy.description);
     setMetaTag("property", "og:url", canonical);
@@ -151,7 +184,6 @@ function Layout() {
     setMetaTag("property", "og:locale", ogLocale);
     setMetaTag("name", "twitter:title", copy.title);
     setMetaTag("name", "twitter:description", copy.description);
-
     track("pageview", { path: location });
   }, [location, locale]);
 
@@ -164,10 +196,8 @@ function Layout() {
       document.head.appendChild(accountMeta);
     }
     accountMeta.setAttribute("content", adsenseClient);
-
     const existing = document.querySelector(`script[data-adsense-client="${adsenseClient}"]`);
     if (existing) return;
-
     const script = document.createElement("script");
     script.async = true;
     script.crossOrigin = "anonymous";
@@ -186,57 +216,65 @@ function Layout() {
 
   return (
     <div className={`min-h-screen flex flex-col${location === "/faraid" ? " theme-faraid" : ""}`}>
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b safe-area-top">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
+      {/* ── NAV ── */}
+      <header className="sticky top-0 z-50 border-b border-border/60 safe-area-top hk-nav">
+        <div className="max-w-[1200px] mx-auto px-5 sm:px-8 h-[60px] flex items-center justify-between gap-3">
+
+          {/* Left: hamburger (mobile) + logo */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
-              className="md:hidden p-2.5 rounded-xl hover:bg-muted active:bg-muted/80 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-muted active:bg-muted/80 transition-colors"
               aria-label={t("a11y.navToggle")}
               aria-expanded={showMobileNav}
               data-testid="button-mobile-menu"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <Link href="/" className="flex items-center gap-2 group">
-              <img src="/favicon.svg" alt="" className="w-8 h-8" />
-              <div className="hidden sm:block">
-                <span className="text-base font-bold block leading-tight gradient-text" data-testid="text-site-title">
-                  {toolBrand.name}
-                </span>
+
+            <Link href="/" className="flex items-center gap-2 group shrink-0">
+              {/* Brand logo icon */}
+              <div className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0">
+                <span className="text-white font-extrabold text-[13px] leading-none">HK</span>
               </div>
+              <span className="hidden sm:block text-[17px] font-bold text-foreground" data-testid="text-site-title">
+                {toolBrand.name}
+              </span>
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-0.5" data-testid="nav-desktop">
-            {/* Home direct link */}
+          {/* Centre: desktop nav */}
+          <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center" data-testid="nav-desktop">
             <Link href="/">
-              <span className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                location === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                location === "/"
+                  ? "bg-[#eff6ff] text-[#2563eb] font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}>
-                <HomeIcon className="w-4 h-4" />
                 {t("nav.home")}
               </span>
             </Link>
 
-            {/* Blog / Guides link */}
             <Link href="/blog">
-              <span className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                location.startsWith("/blog") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                location.startsWith("/blog")
+                  ? "bg-[#eff6ff] text-[#2563eb] font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}>
-                <BookOpen className="w-4 h-4" />
+                <BookOpen className="w-3.5 h-3.5" />
                 Guides
               </span>
             </Link>
 
-            {/* Category dropdowns */}
             {NAV_GROUPS.map((group) => {
               const isGroupActive = group.items.some((item) => item.href === location);
               return (
                 <DropdownMenu key={group.labelKey}>
                   <DropdownMenuTrigger asChild>
-                    <button className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer outline-none ${
-                      isGroupActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    <button className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer outline-none ${
+                      isGroupActive
+                        ? "bg-[#eff6ff] text-[#2563eb] font-semibold"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     }`}>
                       {t(group.labelKey)}
                       <ChevronDown className="w-3.5 h-3.5 opacity-60" />
@@ -246,7 +284,7 @@ function Layout() {
                     {group.items.map((item) => (
                       <DropdownMenuItem key={item.href} asChild>
                         <Link href={item.href}>
-                          <span className={`flex items-center gap-2 w-full cursor-pointer ${item.href === location ? "text-primary" : ""}`}>
+                          <span className={`flex items-center gap-2 w-full cursor-pointer ${item.href === location ? "text-[#2563eb]" : ""}`}>
                             <item.icon className="w-4 h-4 shrink-0" />
                             {t(item.labelKey)}
                           </span>
@@ -259,74 +297,96 @@ function Layout() {
             })}
           </nav>
 
-          <div className="flex items-center gap-1">
+          {/* Right: locale + history + dark mode */}
+          <div className="flex items-center gap-1 shrink-0">
             <LocaleSwitcher />
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`p-2.5 rounded-xl transition-colors ${
-                showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
+              className={`p-2 rounded-lg border transition-colors text-sm font-medium ${
+                showHistory
+                  ? "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]"
+                  : "hover:bg-muted text-muted-foreground border-border"
               }`}
               aria-label={t("a11y.historyToggle")}
               aria-expanded={showHistory}
               data-testid="button-toggle-history"
             >
-              <History className="w-5 h-5" />
+              <History className="w-4 h-4" />
             </button>
             <button
               onClick={toggle}
-              className="p-2.5 rounded-xl hover:bg-muted text-muted-foreground transition-colors"
+              className="p-2 rounded-lg border border-border hover:bg-muted text-muted-foreground transition-colors"
               aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")}
               data-testid="button-theme-toggle"
             >
-              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
-        {showMobileNav && <div className="md:hidden fixed inset-0 z-40 top-14" onClick={() => setShowMobileNav(false)} aria-hidden="true" />}
-
+        {/* Mobile drawer overlay */}
         {showMobileNav && (
-          <div className="md:hidden border-t bg-background px-4 py-3 relative z-50" id="mobile-nav" data-testid="nav-mobile">
-            {/* Home */}
-            <Link href="/">
-              <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                location === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}>
-                <HomeIcon className="w-5 h-5" />
-                {t("nav.home")}
-              </span>
-            </Link>
-            {/* Blog / Guides */}
-            <Link href="/blog">
-              <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                location.startsWith("/blog") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}>
-                <BookOpen className="w-5 h-5" />
-                Guides
-              </span>
-            </Link>
-            {/* Category groups */}
-            {NAV_GROUPS.map((group) => (
-              <div key={group.labelKey} className="mt-3">
-                <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-                  {t(group.labelKey)}
-                </p>
-                {group.items.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                      item.href === location ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}>
-                      <item.icon className="w-5 h-5" />
-                      {t(item.labelKey)}
-                    </span>
-                  </Link>
-                ))}
+          <div className="md:hidden fixed inset-0 z-50 top-[60px] flex">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setShowMobileNav(false)}
+              aria-hidden="true"
+            />
+            {/* Slide-in panel from right */}
+            <div className="hk-mobile-drawer absolute right-0 top-0 bottom-0 w-72 bg-background border-l border-border overflow-y-auto p-4" id="mobile-nav" data-testid="nav-mobile">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Menu</span>
+                <button
+                  onClick={() => setShowMobileNav(false)}
+                  className="p-1.5 rounded-lg hover:bg-muted"
+                  aria-label="Close menu"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-            ))}
+
+              <Link href="/">
+                <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-1 ${
+                  location === "/" ? "bg-[#eff6ff] text-[#2563eb] font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}>
+                  <HomeIcon className="w-4 h-4" />
+                  {t("nav.home")}
+                </span>
+              </Link>
+
+              <Link href="/blog">
+                <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-1 ${
+                  location.startsWith("/blog") ? "bg-[#eff6ff] text-[#2563eb] font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}>
+                  <BookOpen className="w-4 h-4" />
+                  Guides
+                </span>
+              </Link>
+
+              {NAV_GROUPS.map((group) => (
+                <div key={group.labelKey} className="mt-4">
+                  <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                    {t(group.labelKey)}
+                  </p>
+                  {group.items.map((item) => (
+                    <Link key={item.href} href={item.href}>
+                      <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-0.5 ${
+                        item.href === location ? "bg-[#eff6ff] text-[#2563eb] font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      }`}>
+                        <item.icon className="w-4 h-4" />
+                        {t(item.labelKey)}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </header>
 
+      {/* ── MAIN CONTENT ── */}
       <div className="flex-1 flex w-full min-w-0">
         <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden pb-20 md:pb-8 lg:pb-8">
           <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
@@ -399,7 +459,7 @@ function Layout() {
         </div>
       )}
 
-      {/* Mobile bottom navigation — persistent quick access to key tools */}
+      {/* Mobile bottom nav */}
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t safe-area-bottom"
         aria-label={t("a11y.navToggle")}
@@ -414,11 +474,9 @@ function Layout() {
             const isActive = location === href;
             return (
               <Link key={href} href={href}>
-                <span
-                  className={`flex flex-col items-center justify-center gap-0.5 h-14 w-full cursor-pointer transition-colors ${
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
+                <span className={`flex flex-col items-center justify-center gap-0.5 h-14 w-full cursor-pointer transition-colors ${
+                  isActive ? "text-[#2563eb]" : "text-muted-foreground"
+                }`}>
                   <Icon className="w-5 h-5" />
                   <span className="text-[10px] font-medium leading-none">{t(labelKey)}</span>
                 </span>
@@ -428,7 +486,7 @@ function Layout() {
           <button
             onClick={() => setShowHistory(!showHistory)}
             className={`flex flex-col items-center justify-center gap-0.5 h-14 w-full cursor-pointer transition-colors ${
-              showHistory ? "text-primary" : "text-muted-foreground"
+              showHistory ? "text-[#2563eb]" : "text-muted-foreground"
             }`}
             aria-label={t("a11y.historyToggle")}
             aria-expanded={showHistory}
@@ -439,42 +497,60 @@ function Layout() {
         </div>
       </nav>
 
-      <footer className="border-t py-6 px-4 pb-20 md:pb-6 safe-area-bottom">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div>
-            <span className="font-medium text-foreground">{toolBrand.name}</span>
-            <p>{t("brand.tagline")}</p>
-            <p className="mt-1">
-              {t("footer.builtBy")}{" "}
-              <a
-                href="https://amammustofa.com"
-                target="_blank"
-                rel="noopener noreferrer me"
-                className="text-primary hover:underline underline-offset-2"
-              >
-                amammustofa.com
-              </a>
-            </p>
-          </div>
-          <nav className="flex items-center gap-3 flex-wrap justify-center" aria-label={t("footer.quickLinks")}>
-            {tools.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <span className="hover:text-foreground transition-colors cursor-pointer">{t(`tools.${item.slug}.name` as any)}</span>
-              </Link>
+      {/* ── FOOTER (redesigned) ── */}
+      <footer className="hk-footer pb-20 md:pb-0 safe-area-bottom">
+        <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12 md:py-16">
+          {/* Top row: brand + 4-col links */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12">
+            {/* Brand column */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0">
+                  <span className="text-white font-extrabold text-[13px] leading-none">HK</span>
+                </div>
+                <span className="text-white font-bold text-[16px]">{toolBrand.name}</span>
+              </div>
+              <p className="text-[13px] text-white/45 leading-relaxed max-w-[200px]">
+                {t("brand.tagline")}
+              </p>
+              <p className="text-[12px] text-white/30 mt-3">
+                {t("footer.builtBy")}{" "}
+                <a
+                  href="https://amammustofa.com"
+                  target="_blank"
+                  rel="noopener noreferrer me"
+                  className="text-white/50 hover:text-white transition-colors underline underline-offset-2"
+                >
+                  amammustofa.com
+                </a>
+              </p>
+            </div>
+
+            {/* Link columns */}
+            {FOOTER_COLS.map((col) => (
+              <div key={col.heading}>
+                <p className="text-[11px] font-bold text-white/30 uppercase tracking-widest mb-3">{col.heading}</p>
+                {col.links.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    <span className="block text-[13px] text-white/55 hover:text-white transition-colors cursor-pointer mb-2">
+                      {link.label}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             ))}
-            <Link href="/blog">
-              <span className="hover:text-foreground transition-colors cursor-pointer">Guides</span>
-            </Link>
-            <Link href="/partners">
-              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.partners")}</span>
-            </Link>
-            <Link href="/privacy">
-              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.privacy")}</span>
-            </Link>
-            <Link href="/terms">
-              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.terms")}</span>
-            </Link>
-          </nav>
+          </div>
+
+          {/* Bottom row: copyright + locale switcher */}
+          <div className="border-t border-white/8 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <p className="text-[12px] text-white/30">
+              © {new Date().getFullYear()} {toolBrand.name}. Free to use.
+            </p>
+            <div className="flex items-center gap-3">
+              {/* Re-use the existing LocaleSwitcher but it renders in dark context */}
+              <LocaleSwitcher />
+            </div>
+          </div>
         </div>
       </footer>
 

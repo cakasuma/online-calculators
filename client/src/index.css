@@ -2,7 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE — Bold navy + amber palette */
+/* ── Brand design tokens (hex, for direct use across components) ───────── */
+:root {
+  --hk-blue-50:   #eff6ff;
+  --hk-blue-100:  #dbeafe;
+  --hk-blue-200:  #bfdbfe;
+  --hk-blue-500:  #3b82f6;
+  --hk-blue-600:  #2563eb;
+  --hk-blue-700:  #1d4ed8;
+  --hk-blue-900:  #1e3a8a;
+  --hk-dark-900:  #0f172a;
+  --hk-dark-800:  #1e3a8a;
+  --hk-green-400: #4ade80;
+  --hk-green-500: #22c55e;
+  --hk-red-500:   #ef4444;
+  --hk-amber-500: #f59e0b;
+  --hk-purple-500:#a855f7;
+  --hk-teal-400:  #2dd4bf;
+  --hk-gray-50:   #f9fafb;
+  --hk-gray-100:  #f3f4f6;
+  --hk-gray-200:  #e5e7eb;
+  --hk-gray-300:  #d1d5db;
+  --hk-gray-400:  #9ca3af;
+  --hk-gray-500:  #6b7280;
+  --hk-gray-600:  #4b5563;
+  --hk-gray-700:  #374151;
+  --hk-gray-800:  #1f2937;
+  --hk-gray-900:  #111827;
+}
+
+/* LIGHT MODE */
 :root {
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
@@ -57,8 +86,6 @@
   --shadow-2xl: 0px 16px 32px hsl(224 30% 10% / 0.14);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
-
-  /* Fallback for older browsers */
   --sidebar-primary-border: hsl(var(--sidebar-primary));
   --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --sidebar-accent-border: hsl(var(--sidebar-accent));
@@ -124,7 +151,6 @@
   --shadow-lg: 0px 8px 16px hsl(0 0% 0% / 0.25), 0px 4px 6px -1px hsl(0 0% 0% / 0.10);
   --shadow-xl: 0px 12px 24px hsl(0 0% 0% / 0.30), 0px 8px 10px -1px hsl(0 0% 0% / 0.10);
   --shadow-2xl: 0px 16px 32px hsl(0 0% 0% / 0.35);
-
   --sidebar-primary-border: hsl(var(--sidebar-primary));
   --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --sidebar-accent-border: hsl(var(--sidebar-accent));
@@ -139,6 +165,11 @@
   --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
   --destructive-border: hsl(var(--destructive));
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Dark overrides for brand tokens */
+  --hk-gray-50:  #1f2937;
+  --hk-gray-100: #374151;
+  --hk-gray-200: #4b5563;
 }
 
 /* FARAID PAGE — Islamic green & gold palette (light) */
@@ -208,41 +239,28 @@
     @apply border-border;
   }
   html {
-    /* Prevent iOS from auto-zooming on input focus */
     -webkit-text-size-adjust: 100%;
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
     font-size: 16px;
-    /* Avoid horizontal scroll on small screens when a child overflows */
     overflow-x: hidden;
   }
 }
 
-/* iOS safe-area support for notched devices */
+/* iOS safe-area */
 @supports (padding: env(safe-area-inset-top)) {
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
-  }
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .safe-area-x {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
+  .safe-area-top    { padding-top: env(safe-area-inset-top); }
+  .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-area-x      { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 }
 
-/* Calculator-specific utilities */
 @layer utilities {
-  .calc-display {
-    @apply font-mono text-right;
-  }
+  .calc-display { @apply font-mono text-right; }
 
   .calc-btn {
     @apply flex items-center justify-center rounded-2xl font-semibold transition-all duration-100 select-none;
     @apply active:scale-[0.93];
-    /* Minimum touch target for mobile accessibility */
     min-height: 52px;
   }
 
@@ -250,9 +268,92 @@
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(215 82% 38%), hsl(195 100% 42%));
   }
-
   .dark .gradient-text {
     background-image: linear-gradient(135deg, hsl(215 78% 65%), hsl(195 90% 55%));
+  }
+
+  /* ── Redesign: dark hero gradient ── */
+  .hk-hero-bg {
+    background: linear-gradient(135deg, var(--hk-dark-900) 0%, var(--hk-dark-800) 50%, var(--hk-blue-700) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hk-hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 70% 50%, rgba(59,130,246,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(45,212,191,0.15) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hk-hero-bg > * { position: relative; z-index: 1; }
+
+  /* ── Tool card hover ── */
+  .hk-tool-card {
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .hk-tool-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  /* ── Tool CTA pill ── */
+  .hk-tool-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hk-blue-600);
+    background: var(--hk-blue-50);
+    padding: 5px 12px;
+    border-radius: 7px;
+    transition: background 0.15s;
+  }
+  .dark .hk-tool-cta {
+    color: #93c5fd;
+    background: rgba(59,130,246,0.15);
+  }
+
+  /* ── Guide filter tab (pill) ── */
+  .hk-filter-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    border: 1.5px solid var(--hk-gray-200);
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hk-gray-600);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .dark .hk-filter-tab {
+    background: #1f2937;
+    border-color: #374151;
+    color: #9ca3af;
+  }
+  .hk-filter-tab.active,
+  .hk-filter-tab:hover {
+    background: var(--hk-blue-600);
+    border-color: var(--hk-blue-600);
+    color: white;
+  }
+
+  /* ── Article reading progress bar ── */
+  .hk-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--hk-blue-500);
+    z-index: 200;
+    transition: width 0.1s linear;
   }
 
   .hero-grid {
@@ -260,9 +361,7 @@
     background-size: 28px 28px;
   }
 
-  input[type="search"]::-webkit-search-cancel-button {
-    @apply hidden;
-  }
+  input[type="search"]::-webkit-search-cancel-button { @apply hidden; }
 
   [contenteditable][data-placeholder]:empty::before {
     content: attr(data-placeholder);
@@ -272,26 +371,12 @@
 }
 
 @media print {
-  nav,
-  header,
-  footer,
-  .print\:hidden {
-    display: none !important;
-  }
-
-  body {
-    background: white;
-    color: black;
-  }
-
-  .max-w-2xl {
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
+  nav, header, footer, .print\:hidden { display: none !important; }
+  body { background: white; color: black; }
+  .max-w-2xl { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
 }
 
-/* ── Animations ─────────────────────────────────────────────────────────── */
+/* ── Animations ───────────────────────────────────────────────────────────── */
 
 .hero-gradient {
   background:
@@ -301,23 +386,44 @@
     hsl(var(--card));
 }
 
-/* Scroll-triggered fade-in — toggle .in-view to animate */
 .fade-in-section {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
-
 .fade-in-section.in-view {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Respect user motion preference */
 @media (prefers-reduced-motion: reduce) {
-  .fade-in-section {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
+  .fade-in-section { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Nav ──────────────────────────────────────────────────────────────────── */
+/* 60px sticky header with blur — light & dark */
+.hk-nav {
+  height: 60px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+}
+.dark .hk-nav {
+  background: rgba(17,24,39,0.95);
+}
+
+/* Mobile slide-in drawer from the right */
+@keyframes hk-slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.hk-mobile-drawer {
+  animation: hk-slide-in-right 0.22s ease;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.hk-footer {
+  background: var(--hk-gray-900);
+}
+.dark .hk-footer {
+  background: #030712;
 }

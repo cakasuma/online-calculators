@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, BadgeCheck, Clock, Globe, Lock, MapPin, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, BookOpen, Clock, Globe, Lock, MapPin, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AdSlot } from "@/components/AdSlot";
 import { toolBrand, tools } from "@/config/tools";
+import { blogArticles } from "@/config/blog";
 import { useLocale } from "@/hooks/use-locale";
 import { useInView } from "@/hooks/use-in-view";
 import { useHistory } from "@/hooks/use-history";
@@ -64,13 +65,13 @@ const FEATURES = [
   { icon: Lock, titleKey: "home.features.private.title", bodyKey: "home.features.private.body", iconColor: "text-amber-600 dark:text-amber-400", iconBg: "bg-amber-50 dark:bg-amber-950/50" },
 ] as const;
 
-const FAQ_PAIRS = [
-  ["home.faq.q1", "home.faq.a1"],
-  ["home.faq.q2", "home.faq.a2"],
-  ["home.faq.q3", "home.faq.a3"],
-  ["home.faq.q4", "home.faq.a4"],
-  ["home.faq.q5", "home.faq.a5"],
-] as const;
+const CATEGORY_COLORS: Record<string, string> = {
+  "Salary & Tax": "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  "EPF & Retirement": "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  "Islamic Finance": "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+};
+
+const FEATURED_ARTICLES = blogArticles.slice(0, 6);
 
 /** Wraps children with a gentle scroll-triggered fade-in. */
 function FadeIn({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -400,18 +401,64 @@ export default function HomePage() {
         </section>
       </FadeIn>
 
-      {/* ── FAQ ── */}
+      {/* ── Guides ── */}
       <FadeIn>
-        <section className="rounded-2xl border bg-card p-6 sm:p-8">
-          <h2 className="text-xl font-semibold">{t("home.faq.title")}</h2>
-          <dl className="mt-5 divide-y">
-            {FAQ_PAIRS.map(([qKey, aKey]) => (
-              <div key={qKey} className="py-4 first:pt-0 last:pb-0">
-                <dt className="font-medium text-sm">{t(qKey)}</dt>
-                <dd className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{t(aKey)}</dd>
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-8 rounded-full bg-primary shrink-0" aria-hidden="true" />
+              <div>
+                <h2 className="text-xl font-semibold">Guides &amp; Education</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">In-depth articles to help you understand the numbers</p>
               </div>
-            ))}
-          </dl>
+            </div>
+            <Link href="/blog">
+              <span className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline underline-offset-2 cursor-pointer shrink-0">
+                See all guides
+                <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURED_ARTICLES.map((article) => {
+              const catColor = CATEGORY_COLORS[article.categoryLabel] ?? "bg-muted text-muted-foreground";
+              return (
+                <Link key={article.slug} href={`/blog/${article.slug}`}>
+                  <article className="group flex flex-col gap-3 rounded-xl border bg-card p-5 hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer h-full">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${catColor}`}>
+                        {article.categoryLabel}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                        <Clock className="w-3 h-3" />
+                        {article.readingTime} min
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">
+                      {article.description}
+                    </p>
+                    <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-auto">
+                      Read guide
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </article>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="mt-4 sm:hidden">
+            <Link href="/blog">
+              <span className="flex items-center justify-center gap-1.5 text-sm font-medium text-primary py-2 cursor-pointer">
+                <BookOpen className="w-4 h-4" />
+                See all guides
+              </span>
+            </Link>
+          </div>
         </section>
       </FadeIn>
 

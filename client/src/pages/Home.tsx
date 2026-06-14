@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, BadgeCheck, Clock, Globe, Lock, MapPin, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, BookOpen, Clock, Globe, Lock, MapPin, PiggyBank, Scale, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AdSlot } from "@/components/AdSlot";
 import { toolBrand, tools } from "@/config/tools";
+import { blogArticles } from "@/config/blog";
 import { useLocale } from "@/hooks/use-locale";
 import { useInView } from "@/hooks/use-in-view";
 import { useHistory } from "@/hooks/use-history";
@@ -64,13 +65,35 @@ const FEATURES = [
   { icon: Lock, titleKey: "home.features.private.title", bodyKey: "home.features.private.body", iconColor: "text-amber-600 dark:text-amber-400", iconBg: "bg-amber-50 dark:bg-amber-950/50" },
 ] as const;
 
-const FAQ_PAIRS = [
-  ["home.faq.q1", "home.faq.a1"],
-  ["home.faq.q2", "home.faq.a2"],
-  ["home.faq.q3", "home.faq.a3"],
-  ["home.faq.q4", "home.faq.a4"],
-  ["home.faq.q5", "home.faq.a5"],
-] as const;
+const CATEGORY_COLORS: Record<string, string> = {
+  "Salary & Tax": "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  "EPF & Retirement": "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  "Islamic Finance": "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+};
+
+type LucideIcon = typeof Wallet;
+const GUIDE_THUMBNAILS: Record<string, { icon: LucideIcon; gradient: string; iconColor: string; pattern: string }> = {
+  "Salary & Tax": {
+    icon: Wallet,
+    gradient: "from-blue-500/20 via-blue-400/10 to-transparent",
+    iconColor: "text-blue-500 dark:text-blue-400",
+    pattern: "opacity-[0.07]",
+  },
+  "EPF & Retirement": {
+    icon: PiggyBank,
+    gradient: "from-green-500/20 via-green-400/10 to-transparent",
+    iconColor: "text-green-600 dark:text-green-400",
+    pattern: "opacity-[0.07]",
+  },
+  "Islamic Finance": {
+    icon: Scale,
+    gradient: "from-amber-500/20 via-amber-400/10 to-transparent",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    pattern: "opacity-[0.07]",
+  },
+};
+
+const FEATURED_ARTICLES = blogArticles.slice(0, 6);
 
 /** Wraps children with a gentle scroll-triggered fade-in. */
 function FadeIn({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -400,18 +423,78 @@ export default function HomePage() {
         </section>
       </FadeIn>
 
-      {/* ── FAQ ── */}
+      {/* ── Guides ── */}
       <FadeIn>
-        <section className="rounded-2xl border bg-card p-6 sm:p-8">
-          <h2 className="text-xl font-semibold">{t("home.faq.title")}</h2>
-          <dl className="mt-5 divide-y">
-            {FAQ_PAIRS.map(([qKey, aKey]) => (
-              <div key={qKey} className="py-4 first:pt-0 last:pb-0">
-                <dt className="font-medium text-sm">{t(qKey)}</dt>
-                <dd className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{t(aKey)}</dd>
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-8 rounded-full bg-primary shrink-0" aria-hidden="true" />
+              <div>
+                <h2 className="text-xl font-semibold">Guides &amp; Education</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">In-depth articles to help you understand the numbers</p>
               </div>
-            ))}
-          </dl>
+            </div>
+            <Link href="/blog">
+              <span className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline underline-offset-2 cursor-pointer shrink-0">
+                See all guides
+                <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURED_ARTICLES.map((article) => {
+              const catColor = CATEGORY_COLORS[article.categoryLabel] ?? "bg-muted text-muted-foreground";
+              const thumb = GUIDE_THUMBNAILS[article.categoryLabel];
+              const ThumbIcon = thumb?.icon ?? BookOpen;
+              return (
+                <Link key={article.slug} href={`/blog/${article.slug}`}>
+                  <article className="group flex flex-col rounded-xl border bg-card hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer h-full overflow-hidden">
+                    {/* Thumbnail header — CSS gradient + icon, no HTTP request */}
+                    <div className={`relative flex items-center justify-center h-24 bg-gradient-to-br ${thumb?.gradient ?? "from-muted/60 to-transparent"} border-b border-border/50 overflow-hidden`}>
+                      {/* Large decorative background icon */}
+                      <ThumbIcon className={`absolute w-24 h-24 ${thumb?.iconColor ?? "text-muted-foreground"} ${thumb?.pattern ?? "opacity-[0.07]"} -rotate-6 translate-x-8`} aria-hidden="true" />
+                      {/* Centered foreground icon */}
+                      <div className="relative z-10 flex items-center justify-center w-10 h-10 rounded-xl bg-background/70 backdrop-blur-sm border border-border/60 shadow-sm">
+                        <ThumbIcon className={`w-5 h-5 ${thumb?.iconColor ?? "text-muted-foreground"}`} />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2.5 p-4 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${catColor}`}>
+                          {article.categoryLabel}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                          <Clock className="w-3 h-3" />
+                          {article.readingTime} min
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">
+                        {article.description}
+                      </p>
+                      <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-auto pt-1">
+                        Read guide
+                        <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </article>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="mt-4 sm:hidden">
+            <Link href="/blog">
+              <span className="flex items-center justify-center gap-1.5 text-sm font-medium text-primary py-2 cursor-pointer">
+                <BookOpen className="w-4 h-4" />
+                See all guides
+              </span>
+            </Link>
+          </div>
         </section>
       </FadeIn>
 

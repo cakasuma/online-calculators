@@ -17,6 +17,7 @@ export type RouteSlug =
   | "faraid"
   | "zakat"
   | "wasiat"
+  | "blog"
   | "partners"
   | "privacy"
   | "terms";
@@ -295,6 +296,37 @@ export const routes: RouteSeoEntry[] = [
           "Susun wasiat Islam langkah demi langkah dengan checklist mencakup aset, wasi, ahli waris, dan ketentuan syariah.",
         heading: "Panduan wasiat",
         tagline: "Alur kerja wasiat Islam dengan checklist dan langkah praktis.",
+      },
+    },
+  },
+  {
+    slug: "blog",
+    path: "/blog",
+    prerender: true,
+    sitemap: { priority: 0.85, changefreq: "weekly" },
+    copy: {
+      en: {
+        title: "Calculator Guides & Financial Education | HelloKalku",
+        description:
+          "In-depth guides on Malaysian salary deductions, EPF, income tax, zakat, faraid inheritance, wasiat, and SOCSO. Learn how every number on your payslip and tax form works.",
+        keywords:
+          "malaysia financial guides, EPF guide, income tax malaysia guide, zakat guide, faraid guide, salary deductions explained",
+        heading: "Guides & Financial Education",
+        tagline: "In-depth articles on Malaysian finance, Islamic wealth planning, and calculator tools.",
+      },
+      ms: {
+        title: "Panduan Kalkulator & Pendidikan Kewangan | HelloKalku",
+        description:
+          "Panduan mendalam tentang potongan gaji Malaysia, EPF, cukai pendapatan, zakat, faraid, wasiat, dan SOCSO.",
+        heading: "Panduan & Pendidikan Kewangan",
+        tagline: "Artikel mendalam tentang kewangan Malaysia dan perancangan kekayaan Islam.",
+      },
+      id: {
+        title: "Panduan Kalkulator & Edukasi Keuangan | HelloKalku",
+        description:
+          "Panduan mendalam tentang potongan gaji Malaysia, EPF, pajak penghasilan, zakat, faraid, wasiat, dan SOCSO.",
+        heading: "Panduan & Edukasi Keuangan",
+        tagline: "Artikel mendalam tentang keuangan Malaysia dan perencanaan kekayaan Islam.",
       },
     },
   },

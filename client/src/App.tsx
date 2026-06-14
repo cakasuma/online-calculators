@@ -128,16 +128,9 @@ const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
 /** Padded, centred wrapper for pages that are NOT full-bleed redesigns
  *  (static/legal pages, 404). Restores the old contained layout now that
- *  <main> is layout-neutral. Carries the global top ad slot. */
-function PageContainer({ children, withAd = false }: { children: React.ReactNode; withAd?: boolean }) {
-  return (
-    <div className="hk-container py-6 md:py-10 max-w-[900px]">
-      {withAd && (
-        <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
-      )}
-      {children}
-    </div>
-  );
+ *  <main> is layout-neutral. */
+function PageContainer({ children }: { children: React.ReactNode }) {
+  return <div className="hk-container py-6 md:py-10 max-w-[900px]">{children}</div>;
 }
 
 function setMetaTag(attr: "name" | "property", key: string, content: string) {
@@ -387,6 +380,13 @@ function Layout() {
 
       {/* ── MAIN (layout-neutral; redesigned pages are full-bleed) ── */}
       <main className="flex-1 min-w-0 w-full pb-16 md:pb-0">
+        {/* Global top ad — only mounts in production when a slot is configured,
+            so the full-bleed hero stays flush under the nav everywhere else. */}
+        {adsenseEnabled && adsenseSlotTop && (
+          <div className="hk-container pt-4">
+            <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-2" />
+          </div>
+        )}
         <Switch>
           <Route path="/" component={HomePage} />
           <Route path="/salary">

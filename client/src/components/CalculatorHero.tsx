@@ -20,7 +20,7 @@ interface CalculatorHeroProps {
  */
 export function CalculatorHero({ category, title, subtitle, badges, result }: CalculatorHeroProps) {
   return (
-    <section className="hk-hero-bg">
+    <section className="hk-hero-bg print:hidden">
       <div className={`hk-container py-12 md:py-14 grid items-center gap-8 ${result ? "md:grid-cols-[1fr_380px]" : ""}`}>
         <div className="min-w-0">
           <nav className="flex items-center gap-1.5 text-[13px] mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>

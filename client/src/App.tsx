@@ -23,6 +23,7 @@ import {
   PiggyBank,
   Star,
   Wallet,
+  BookOpen,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -52,6 +53,8 @@ import EpfCalculator from "@/pages/EpfCalculator";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Partners from "@/pages/Partners";
 import TermsOfUse from "@/pages/TermsOfUse";
+import Blog from "@/pages/Blog";
+import BlogArticle from "@/pages/BlogArticle";
 import NotFound from "@/pages/not-found";
 
 type NavItem = { href: string; labelKey: TranslationKey; icon: typeof HomeIcon };
@@ -121,6 +124,11 @@ function Layout() {
   }, []);
 
   useEffect(() => {
+    // Blog article pages manage their own meta tags via the BlogArticle component
+    if (/^\/blog\/.+/.test(location)) {
+      track("pageview", { path: location });
+      return;
+    }
     const route = seoRoutes.find((r) => r.path === location) ?? seoRoutes[0];
     const copy = route.copy[locale] ?? route.copy.en;
     document.title = copy.title;
@@ -211,6 +219,16 @@ function Layout() {
               </span>
             </Link>
 
+            {/* Blog / Guides link */}
+            <Link href="/blog">
+              <span className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                location.startsWith("/blog") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}>
+                <BookOpen className="w-4 h-4" />
+                Guides
+              </span>
+            </Link>
+
             {/* Category dropdowns */}
             {NAV_GROUPS.map((group) => {
               const isGroupActive = group.items.some((item) => item.href === location);
@@ -278,6 +296,15 @@ function Layout() {
                 {t("nav.home")}
               </span>
             </Link>
+            {/* Blog / Guides */}
+            <Link href="/blog">
+              <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
+                location.startsWith("/blog") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}>
+                <BookOpen className="w-5 h-5" />
+                Guides
+              </span>
+            </Link>
             {/* Category groups */}
             {NAV_GROUPS.map((group) => (
               <div key={group.labelKey} className="mt-3">
@@ -332,6 +359,10 @@ function Layout() {
             <Route path="/zakat">
               <ZakatCalculator onCalculate={handleCalculate("zakat")} />
               <CalculatorContent slug="zakat" />
+            </Route>
+            <Route path="/blog" component={Blog} />
+            <Route path="/blog/:slug">
+              {(params: { slug?: string }) => <BlogArticle slug={params?.slug ?? ""} />}
             </Route>
             <Route path="/partners" component={Partners} />
             <Route path="/privacy" component={PrivacyPolicy} />
@@ -431,6 +462,9 @@ function Layout() {
                 <span className="hover:text-foreground transition-colors cursor-pointer">{t(`tools.${item.slug}.name` as any)}</span>
               </Link>
             ))}
+            <Link href="/blog">
+              <span className="hover:text-foreground transition-colors cursor-pointer">Guides</span>
+            </Link>
             <Link href="/partners">
               <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.partners")}</span>
             </Link>

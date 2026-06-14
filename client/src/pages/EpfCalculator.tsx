@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CalculatorHero } from "@/components/CalculatorHero";
 import { useLocale } from "@/hooks/use-locale";
 import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n";
 import { recordServerEvent, track } from "@/lib/analytics";
@@ -272,12 +273,9 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
   }, [projection, parsedInputs.currentBalance, parsedInputs.currentAge]);
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t("epf.title")}</h1>
-        <p className="text-base text-muted-foreground max-w-2xl">{t("epf.subtitle")}</p>
-      </header>
-
+    <div className="w-full">
+      <CalculatorHero category="Finance" title={t("epf.title")} subtitle={t("epf.subtitle")} />
+      <div className="hk-container py-8 space-y-6">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         {/* Inputs */}
         <Card className="rounded-3xl">
@@ -624,6 +622,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
 
           <RelatedToolsCard currentHref="/epf-retirement" />
         </div>
+      </div>
       </div>
     </div>
   );

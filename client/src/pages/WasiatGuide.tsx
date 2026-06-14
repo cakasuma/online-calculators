@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
+import { CalculatorHero } from "@/components/CalculatorHero";
 import { useLocale } from "@/hooks/use-locale";
 import {
   formatCurrency,
@@ -1117,7 +1118,10 @@ export default function WasiatGuide() {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4 print:space-y-3">
+    <div className="w-full">
+      <CalculatorHero category="Islamic & Planning" title={t("wasiat.title")} />
+      <div className="hk-container py-8">
+      <div className="max-w-2xl mx-auto space-y-4 print:space-y-3">
       {/* Resume saved plan banner */}
       {savedBanner && (
         <div className="flex items-center justify-between gap-2 p-3 rounded-lg bg-primary/10 border border-primary/30 text-sm print:hidden">
@@ -1144,16 +1148,6 @@ export default function WasiatGuide() {
         <p className="text-amber-800 dark:text-amber-200">{t("wasiat.disclaimer")}</p>
       </div>
 
-      {/* Page title */}
-      <div className="flex items-center gap-3 print:mb-4">
-        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-          <FileText className="w-5 h-5 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold">{t("wasiat.title")}</h1>
-        </div>
-      </div>
-
       {StepIndicator()}
 
       <AdSlot id="wasiat-top" variant="banner" className="print:hidden" />
@@ -1161,6 +1155,8 @@ export default function WasiatGuide() {
       {step === 1 && Step1()}
       {step === 2 && Step2()}
       {step === 3 && Step3()}
+      </div>
+      </div>
     </div>
   );
 }

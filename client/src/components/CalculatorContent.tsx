@@ -29,7 +29,7 @@ export function CalculatorContent({ slug }: Props) {
     .filter((x): x is { slug: RouteSlug; name: string; href: string; description: string } => x !== null);
 
   return (
-    <section className="mt-10 max-w-3xl mx-auto" data-prerender-content={slug}>
+    <section className="mt-10 max-w-3xl mx-auto px-5 sm:px-8 pb-4" data-prerender-content={slug}>
       <p className="text-base leading-relaxed text-muted-foreground">{content.intro}</p>
 
       <div className="mt-8">

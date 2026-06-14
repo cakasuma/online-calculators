@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
+import { CalculatorHero } from "@/components/CalculatorHero";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -361,38 +362,31 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const showResults = hasCalculated && isValid;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8 min-w-0">
-      <section className="relative overflow-hidden rounded-3xl sm:rounded-[2rem] border bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-4 sm:p-6 md:p-10 text-white shadow-2xl">
-        <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl pointer-events-none" />
-        <div className="relative grid gap-6 sm:gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end min-w-0">
-          <div className="space-y-3 sm:space-y-4 min-w-0">
-            <Badge className="w-fit border-white/15 bg-white/10 text-emerald-100 hover:bg-white/10">
-              {t("salary.badge")}
-            </Badge>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight break-words">{t("salary.title")}</h1>
-            <p className="max-w-2xl text-sm sm:text-base md:text-lg leading-6 sm:leading-7 text-slate-300">
-              {t("salary.subtitle")}
+    <div className="w-full">
+      <CalculatorHero
+        category="Finance"
+        title={t("salary.title")}
+        subtitle={t("salary.subtitle")}
+        badges={[t("salary.badge")]}
+        result={
+          <div className="rounded-[20px] border border-white/12 bg-white/[0.08] p-6 backdrop-blur-xl text-white">
+            <p className="text-[13px] text-emerald-100">{t("salary.takeHomePay")}</p>
+            <p className="mt-2 text-3xl md:text-4xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
+            <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
+              <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
+            </div>
+            <p className="mt-2 text-[13px] text-white/60">
+              {!isValid
+                ? t("salary.fixInputErrors")
+                : showResults
+                ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
+                : t("salary.cta.tapToReveal")}
             </p>
           </div>
-          <Card className="hidden lg:block border-white/10 bg-white/10 text-white backdrop-blur min-w-0">
-            <CardContent className="p-4 sm:p-6 min-w-0">
-              <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
-              <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
-              <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
-                <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
-              </div>
-              <p className="mt-2 text-sm text-slate-300">
-                {!isValid
-                  ? t("salary.fixInputErrors")
-                  : showResults
-                  ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                  : t("salary.cta.tapToReveal")}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+        }
+      />
 
+      <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
       <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] min-w-0">
         <Card className="rounded-2xl sm:rounded-3xl border-slate-200/80 shadow-sm dark:border-slate-800 min-w-0">
           <CardContent className="space-y-5 p-4 sm:p-6">
@@ -644,6 +638,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
 
           {showResults && <RelatedToolsCard currentHref="/salary" />}
         </div>
+      </div>
       </div>
     </div>
   );

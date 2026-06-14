@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Delete } from "lucide-react";
 import { useLocale } from "@/hooks/use-locale";
+import { CalculatorHero } from "@/components/CalculatorHero";
 import { recordServerEvent, track } from "@/lib/analytics";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -169,7 +170,10 @@ export default function NormalCalculator({ onCalculate }: Props) {
   };
 
   return (
-    <div className="max-w-sm mx-auto w-full">
+    <div className="w-full">
+      <CalculatorHero category="Math" title={t("nav.basic")} />
+      <div className="hk-container py-8">
+      <div className="max-w-sm mx-auto w-full">
       {/* Display */}
       <div className="mb-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 border border-slate-700/50 dark:border-slate-800 min-h-[100px] flex flex-col justify-end items-end overflow-hidden shadow-lg">
         {expression && (
@@ -199,6 +203,8 @@ export default function NormalCalculator({ onCalculate }: Props) {
             {key === "⌫" ? <Delete className="w-5 h-5" aria-hidden="true" /> : key}
           </button>
         ))}
+      </div>
+      </div>
       </div>
     </div>
   );

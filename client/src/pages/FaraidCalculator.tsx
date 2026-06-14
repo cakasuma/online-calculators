@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
+import { CalculatorHero } from "@/components/CalculatorHero";
 import { recordServerEvent, track } from "@/lib/analytics";
 import { TermTooltip } from "@/components/TermTooltip";
 import { AdSlot } from "@/components/AdSlot";
@@ -965,7 +966,10 @@ export default function FaraidCalculator({ onCalculate }: Props) {
   const liveNet = Math.max(0, estate - debts - wasiyyah);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4 print:space-y-3 min-w-0">
+    <div className="w-full">
+      <CalculatorHero category="Islamic & Planning" title={t("nav.faraid")} />
+      <div className="hk-container py-8">
+      <div className="max-w-2xl mx-auto space-y-4 print:space-y-3 min-w-0">
       {/* Disclaimer */}
       <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-sm print:hidden">
         <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
@@ -1803,6 +1807,8 @@ export default function FaraidCalculator({ onCalculate }: Props) {
           </Accordion>
         </CardContent>
       </Card>
+      </div>
+      </div>
     </div>
   );
 }

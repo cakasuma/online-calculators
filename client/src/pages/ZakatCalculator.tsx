@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
+import { CalculatorHero } from "@/components/CalculatorHero";
 import { recordServerEvent, track } from "@/lib/analytics";
 import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
@@ -427,18 +428,15 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
 
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-2xl mx-auto space-y-5 min-w-0">
-      {/* Header */}
-      <div className="min-w-0">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight break-words">{t("zakat.title")}</h1>
-          <Badge variant="secondary" className="text-xs">
-            {t("home.zakat.badge")}
-          </Badge>
-        </div>
-        <p className="text-muted-foreground text-base leading-relaxed">{t("zakat.subtitle")}</p>
-      </div>
-
+    <div className="w-full">
+      <CalculatorHero
+        category="Islamic & Planning"
+        title={t("zakat.title")}
+        subtitle={t("zakat.subtitle")}
+        badges={[t("home.zakat.badge")]}
+      />
+      <div className="hk-container py-8">
+      <div className="max-w-2xl mx-auto space-y-5 min-w-0">
       {/* Disclaimer */}
       <Card className="border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20">
         <CardContent className="p-4 flex items-start gap-3">
@@ -1145,6 +1143,8 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
             ← Back to Home
           </Button>
         </Link>
+      </div>
+      </div>
       </div>
     </div>
   );

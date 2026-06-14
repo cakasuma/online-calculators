@@ -321,3 +321,248 @@
     transition: none;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   HelloKalku redesign — design system
+   Brand hex tokens are used only for the blue accent family and the dark
+   hero gradients (dark by design in both themes). Everything else leans on
+   the shadcn semantic tokens / Tailwind `dark:` variants so the .dark class
+   themes it automatically.
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --hk-blue-50: #eff6ff;
+  --hk-blue-100: #dbeafe;
+  --hk-blue-500: #3b82f6;
+  --hk-blue-600: #2563eb;
+  --hk-blue-700: #1d4ed8;
+  --hk-dark-900: #0f172a;
+  --hk-dark-800: #1e3a8a;
+  --hk-teal-400: #2dd4bf;
+}
+
+/* Full-bleed section helper: breaks out of any padded parent to the viewport
+   edges, then re-centres an inner container. Pair with .hk-container. */
+.hk-bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+.hk-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+@media (min-width: 640px) {
+  .hk-container { padding-left: 32px; padding-right: 32px; }
+}
+
+/* ── Dark hero (homepage + calculator pages) ── */
+.hk-hero-bg {
+  background: linear-gradient(135deg, var(--hk-dark-900) 0%, var(--hk-dark-800) 50%, var(--hk-blue-700) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hk-hero-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 50%, rgba(59, 130, 246, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(45, 212, 191, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hk-hero-bg > * { position: relative; z-index: 1; }
+.hk-hero-gradient-text {
+  background: linear-gradient(90deg, #60a5fa, #2dd4bf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Light article hero (theme-aware) ── */
+.hk-article-hero {
+  background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 60%, #f9fafb 100%);
+}
+.dark .hk-article-hero {
+  background: linear-gradient(180deg, var(--hk-dark-900) 0%, var(--hk-dark-800) 70%, var(--hk-dark-900) 100%);
+}
+
+/* ── Dark "why" section + blue pre-footer ── */
+.hk-why { background: var(--hk-dark-900); }
+.dark .hk-why { background: #060c18; }
+.hk-prefooter { background: var(--hk-blue-600); }
+.dark .hk-prefooter { background: var(--hk-blue-700); }
+
+/* ── Category filter tab (pill) ── */
+.hk-cat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1.5px solid hsl(var(--border));
+  background: hsl(var(--card));
+  font-size: 13px;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.hk-cat-tab:hover { color: var(--hk-blue-600); border-color: #93c5fd; }
+.dark .hk-cat-tab:hover { color: #93c5fd; border-color: #1d4ed8; }
+.hk-cat-tab.active {
+  background: var(--hk-blue-600);
+  border-color: var(--hk-blue-600);
+  color: #fff;
+}
+.dark .hk-cat-tab.active { background: var(--hk-blue-600); border-color: var(--hk-blue-600); }
+
+/* ── Tool / guide card hover lift ── */
+.hk-card {
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+}
+.hk-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+.dark .hk-card:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+
+/* ── Inputs (calculator) ── */
+.hk-input {
+  width: 100%;
+  border: 1.5px solid hsl(var(--border));
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.hk-input:focus {
+  border-color: var(--hk-blue-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.hk-input-prefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+}
+
+/* ── Segmented control (radio toggle) ── */
+.hk-segmented {
+  display: inline-flex;
+  width: 100%;
+  padding: 3px;
+  gap: 3px;
+  border-radius: 10px;
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+}
+.hk-segmented button {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: all 0.15s;
+}
+.hk-segmented button[data-active="true"] {
+  background: hsl(var(--card));
+  color: var(--hk-blue-600);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.dark .hk-segmented button[data-active="true"] { color: #93c5fd; }
+
+/* ── Result breakdown bar ── */
+.hk-breakdown-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 100px;
+  overflow: hidden;
+  gap: 2px;
+  background: hsl(var(--muted));
+}
+.hk-bar-seg { height: 100%; transition: width 0.4s ease; }
+
+/* ── Callout / formula / inline CTA (article + explainer) ── */
+.hk-callout {
+  border-left: 3px solid var(--hk-blue-500);
+  background: var(--hk-blue-50);
+  color: #1e3a8a;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  font-size: 15px;
+}
+.dark .hk-callout { background: rgba(59, 130, 246, 0.1); color: #bfdbfe; }
+.hk-formula-box {
+  background: var(--hk-dark-900);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hk-formula-box code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #4ade80;
+}
+.hk-inline-cta {
+  background: linear-gradient(135deg, var(--hk-dark-900), var(--hk-dark-800));
+  border-radius: 14px;
+}
+
+/* ── Reading progress bar ── */
+.hk-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--hk-blue-500);
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ── Sticky guides filter bar ── */
+.hk-filter-bar {
+  position: sticky;
+  top: 60px;
+  z-index: 30;
+  background: hsl(var(--background) / 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+/* ── Mobile nav drawer slide-in from right ── */
+@keyframes hk-drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.hk-drawer { animation: hk-drawer-in 0.22s ease-out; }
+
+/* One-shot entrance — content is visible by default; this only plays a gentle
+   reveal once the element is observed in view. Never hides content. */
+@keyframes hk-fade-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hk-faded-in { animation: hk-fade-in 0.5s ease both; }
+@media (prefers-reduced-motion: reduce) {
+  .hk-faded-in { animation: none; }
+}
+.hk-no-scrollbar::-webkit-scrollbar { display: none; }
+.hk-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

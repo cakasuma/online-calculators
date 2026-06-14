@@ -39,7 +39,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { tools, toolBrand } from "@/config/tools";
+import { toolBrand } from "@/config/tools";
 import { initAnalytics, track } from "@/lib/analytics";
 
 import HomePage from "@/pages/Home";
@@ -85,9 +85,60 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+type FooterLink = { labelKey?: TranslationKey; label?: string; href: string };
+type FooterCol = { heading: string; links: FooterLink[] };
+
+const FOOTER_COLS: FooterCol[] = [
+  {
+    heading: "Finance",
+    links: [
+      { labelKey: "nav.salary", href: "/salary" },
+      { labelKey: "nav.epf", href: "/epf-retirement" },
+    ],
+  },
+  {
+    heading: "Islamic",
+    links: [
+      { labelKey: "nav.faraid", href: "/faraid" },
+      { labelKey: "nav.zakat", href: "/zakat" },
+      { labelKey: "nav.wasiat", href: "/wasiat" },
+    ],
+  },
+  {
+    heading: "Math",
+    links: [
+      { labelKey: "nav.basic", href: "/normal" },
+      { labelKey: "nav.scientific", href: "/scientific" },
+    ],
+  },
+  {
+    heading: "Learn",
+    links: [
+      { label: "Guides", href: "/blog" },
+      { labelKey: "footer.partners", href: "/partners" },
+      { labelKey: "footer.privacy", href: "/privacy" },
+      { labelKey: "footer.terms", href: "/terms" },
+    ],
+  },
+];
+
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
 const adsenseSlotTop = import.meta.env.VITE_ADSENSE_SLOT_TOP?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
+
+/** Padded, centred wrapper for pages that are NOT full-bleed redesigns
+ *  (static/legal pages, 404). Restores the old contained layout now that
+ *  <main> is layout-neutral. Carries the global top ad slot. */
+function PageContainer({ children, withAd = false }: { children: React.ReactNode; withAd?: boolean }) {
+  return (
+    <div className="hk-container py-6 md:py-10 max-w-[900px]">
+      {withAd && (
+        <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
+      )}
+      {children}
+    </div>
+  );
+}
 
 function setMetaTag(attr: "name" | "property", key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
@@ -122,6 +173,11 @@ function Layout() {
   useEffect(() => {
     initAnalytics();
   }, []);
+
+  // Close the mobile nav drawer whenever the route changes
+  useEffect(() => {
+    setShowMobileNav(false);
+  }, [location]);
 
   useEffect(() => {
     // Blog article pages manage their own meta tags via the BlogArticle component
@@ -186,57 +242,53 @@ function Layout() {
 
   return (
     <div className={`min-h-screen flex flex-col${location === "/faraid" ? " theme-faraid" : ""}`}>
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b safe-area-top">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
+      {/* ── NAV (60px, sticky, blurred) ── */}
+      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border safe-area-top">
+        <div className="hk-container h-[60px] flex items-center justify-between gap-3">
+          {/* Left: hamburger (mobile) + logo */}
+          <div className="flex items-center gap-2.5">
             <button
-              onClick={() => setShowMobileNav(!showMobileNav)}
-              className="md:hidden p-2.5 rounded-xl hover:bg-muted active:bg-muted/80 transition-colors"
+              onClick={() => setShowMobileNav(true)}
+              className="md:hidden p-2 -ml-1 rounded-lg hover:bg-muted text-foreground transition-colors"
               aria-label={t("a11y.navToggle")}
               aria-expanded={showMobileNav}
               data-testid="button-mobile-menu"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <Link href="/" className="flex items-center gap-2 group">
-              <img src="/favicon.svg" alt="" className="w-8 h-8" />
-              <div className="hidden sm:block">
-                <span className="text-base font-bold block leading-tight gradient-text" data-testid="text-site-title">
-                  {toolBrand.name}
-                </span>
-              </div>
+            <Link href="/" className="flex items-center gap-2 shrink-0">
+              <span className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0">
+                <span className="text-white font-extrabold text-[13px] leading-none tracking-tight">HK</span>
+              </span>
+              <span className="text-[17px] font-bold text-foreground" data-testid="text-site-title">
+                {toolBrand.name}
+              </span>
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-0.5" data-testid="nav-desktop">
-            {/* Home direct link */}
+          {/* Centre: desktop nav */}
+          <nav className="hidden md:flex items-center gap-1" data-testid="nav-desktop">
             <Link href="/">
-              <span className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                location === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              <span className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                location === "/" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
               }`}>
-                <HomeIcon className="w-4 h-4" />
                 {t("nav.home")}
               </span>
             </Link>
-
-            {/* Blog / Guides link */}
             <Link href="/blog">
-              <span className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                location.startsWith("/blog") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              <span className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                location.startsWith("/blog") ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
               }`}>
-                <BookOpen className="w-4 h-4" />
                 Guides
               </span>
             </Link>
-
-            {/* Category dropdowns */}
             {NAV_GROUPS.map((group) => {
               const isGroupActive = group.items.some((item) => item.href === location);
               return (
                 <DropdownMenu key={group.labelKey}>
                   <DropdownMenuTrigger asChild>
-                    <button className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer outline-none ${
-                      isGroupActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    <button className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer outline-none ${
+                      isGroupActive ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                     }`}>
                       {t(group.labelKey)}
                       <ChevronDown className="w-3.5 h-3.5 opacity-60" />
@@ -259,64 +311,70 @@ function Layout() {
             })}
           </nav>
 
-          <div className="flex items-center gap-1">
+          {/* Right: locale + history + theme */}
+          <div className="flex items-center gap-1.5">
             <LocaleSwitcher />
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`p-2.5 rounded-xl transition-colors ${
-                showHistory ? "bg-primary/10 text-primary" : "hover:bg-muted text-muted-foreground"
+              className={`p-2 rounded-lg border transition-colors ${
+                showHistory ? "bg-primary/10 text-primary border-primary/30" : "border-border hover:bg-muted text-muted-foreground"
               }`}
               aria-label={t("a11y.historyToggle")}
               aria-expanded={showHistory}
               data-testid="button-toggle-history"
             >
-              <History className="w-5 h-5" />
+              <History className="w-4 h-4" />
             </button>
             <button
               onClick={toggle}
-              className="p-2.5 rounded-xl hover:bg-muted text-muted-foreground transition-colors"
+              className="p-2 rounded-lg border border-border hover:bg-muted text-muted-foreground transition-colors"
               aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")}
               data-testid="button-theme-toggle"
             >
-              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           </div>
         </div>
+      </header>
 
-        {showMobileNav && <div className="md:hidden fixed inset-0 z-40 top-14" onClick={() => setShowMobileNav(false)} aria-hidden="true" />}
-
-        {showMobileNav && (
-          <div className="md:hidden border-t bg-background px-4 py-3 relative z-50" id="mobile-nav" data-testid="nav-mobile">
-            {/* Home */}
+      {/* ── MOBILE NAV DRAWER (slide-in from right) ── */}
+      {showMobileNav && (
+        <div className="md:hidden fixed inset-0 z-[60]">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileNav(false)} aria-hidden="true" />
+          <div className="hk-drawer absolute right-0 top-0 bottom-0 w-72 max-w-[85vw] bg-background border-l border-border overflow-y-auto p-4" id="mobile-nav" data-testid="nav-mobile">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Menu</span>
+              <button onClick={() => setShowMobileNav(false)} className="p-1.5 rounded-lg hover:bg-muted" aria-label={t("a11y.navToggle")}>
+                <X className="w-4 h-4" />
+              </button>
+            </div>
             <Link href="/">
-              <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                location === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-0.5 ${
+                location === "/" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
               }`}>
-                <HomeIcon className="w-5 h-5" />
+                <HomeIcon className="w-4 h-4" />
                 {t("nav.home")}
               </span>
             </Link>
-            {/* Blog / Guides */}
             <Link href="/blog">
-              <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                location.startsWith("/blog") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-0.5 ${
+                location.startsWith("/blog") ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
               }`}>
-                <BookOpen className="w-5 h-5" />
+                <BookOpen className="w-4 h-4" />
                 Guides
               </span>
             </Link>
-            {/* Category groups */}
             {NAV_GROUPS.map((group) => (
-              <div key={group.labelKey} className="mt-3">
-                <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+              <div key={group.labelKey} className="mt-4">
+                <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
                   {t(group.labelKey)}
                 </p>
                 {group.items.map((item) => (
                   <Link key={item.href} href={item.href}>
-                    <span onClick={() => setShowMobileNav(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium cursor-pointer transition-colors ${
-                      item.href === location ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-0.5 ${
+                      item.href === location ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                     }`}>
-                      <item.icon className="w-5 h-5" />
+                      <item.icon className="w-4 h-4" />
                       {t(item.labelKey)}
                     </span>
                   </Link>
@@ -324,73 +382,60 @@ function Layout() {
               </div>
             ))}
           </div>
-        )}
-      </header>
+        </div>
+      )}
 
-      <div className="flex-1 flex w-full min-w-0">
-        <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden pb-20 md:pb-8 lg:pb-8">
-          <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-4" />
-          <Switch>
-            <Route path="/" component={HomePage} />
-            <Route path="/salary">
-              <SalaryCalculator onCalculate={handleCalculate("salary")} />
-              <CalculatorContent slug="salary" />
-            </Route>
-            <Route path="/epf-retirement">
-              <EpfCalculator onCalculate={handleCalculate("epf")} />
-              <CalculatorContent slug="epf" />
-            </Route>
-            <Route path="/normal">
-              <NormalCalculator onCalculate={handleCalculate("normal")} />
-              <CalculatorContent slug="normal" />
-            </Route>
-            <Route path="/scientific">
-              <ScientificCalculator onCalculate={handleCalculate("scientific")} />
-              <CalculatorContent slug="scientific" />
-            </Route>
-            <Route path="/faraid">
-              <FaraidCalculator onCalculate={handleCalculate("faraid")} />
-              <CalculatorContent slug="faraid" />
-            </Route>
-            <Route path="/wasiat">
-              <WasiatGuide />
-              <CalculatorContent slug="wasiat" />
-            </Route>
-            <Route path="/zakat">
-              <ZakatCalculator onCalculate={handleCalculate("zakat")} />
-              <CalculatorContent slug="zakat" />
-            </Route>
-            <Route path="/blog" component={Blog} />
-            <Route path="/blog/:slug">
-              {(params: { slug?: string }) => <BlogArticle slug={params?.slug ?? ""} />}
-            </Route>
-            <Route path="/partners" component={Partners} />
-            <Route path="/privacy" component={PrivacyPolicy} />
-            <Route path="/terms" component={TermsOfUse} />
-            <Route component={NotFound} />
-          </Switch>
-        </main>
+      {/* ── MAIN (layout-neutral; redesigned pages are full-bleed) ── */}
+      <main className="flex-1 min-w-0 w-full pb-16 md:pb-0">
+        <Switch>
+          <Route path="/" component={HomePage} />
+          <Route path="/salary">
+            <SalaryCalculator onCalculate={handleCalculate("salary")} />
+            <CalculatorContent slug="salary" />
+          </Route>
+          <Route path="/epf-retirement">
+            <EpfCalculator onCalculate={handleCalculate("epf")} />
+            <CalculatorContent slug="epf" />
+          </Route>
+          <Route path="/normal">
+            <NormalCalculator onCalculate={handleCalculate("normal")} />
+            <CalculatorContent slug="normal" />
+          </Route>
+          <Route path="/scientific">
+            <ScientificCalculator onCalculate={handleCalculate("scientific")} />
+            <CalculatorContent slug="scientific" />
+          </Route>
+          <Route path="/faraid">
+            <FaraidCalculator onCalculate={handleCalculate("faraid")} />
+            <CalculatorContent slug="faraid" />
+          </Route>
+          <Route path="/wasiat">
+            <WasiatGuide />
+            <CalculatorContent slug="wasiat" />
+          </Route>
+          <Route path="/zakat">
+            <ZakatCalculator onCalculate={handleCalculate("zakat")} />
+            <CalculatorContent slug="zakat" />
+          </Route>
+          <Route path="/blog" component={Blog} />
+          <Route path="/blog/:slug">
+            {(params: { slug?: string }) => <BlogArticle slug={params?.slug ?? ""} />}
+          </Route>
+          <Route path="/partners"><PageContainer><Partners /></PageContainer></Route>
+          <Route path="/privacy"><PageContainer><PrivacyPolicy /></PageContainer></Route>
+          <Route path="/terms"><PageContainer><TermsOfUse /></PageContainer></Route>
+          <Route><PageContainer><NotFound /></PageContainer></Route>
+        </Switch>
+      </main>
 
-        {showHistory && (
-          <aside className="w-72 lg:w-80 border-l bg-card/50 p-4 hidden md:block overflow-y-auto max-h-[calc(100vh-3rem)]">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-base font-semibold">{t("common.history")}</h2>
-              <button onClick={() => setShowHistory(false)} className="p-1.5 rounded-lg hover:bg-muted" data-testid="button-close-history">
-                <X className="w-4 h-4 text-muted-foreground" />
-              </button>
-            </div>
-            <HistoryPanel entries={history.entries} onClear={history.clear} onRemove={history.remove} />
-          </aside>
-        )}
-      </div>
-
+      {/* ── HISTORY (right-side overlay drawer, all sizes) ── */}
       {showHistory && (
-        <div className="md:hidden fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowHistory(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background border-l p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[60]">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowHistory(false)} aria-hidden="true" />
+          <div className="hk-drawer absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background border-l border-border p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-semibold">{t("common.history")}</h2>
-              <button onClick={() => setShowHistory(false)} className="p-2 rounded-lg hover:bg-muted">
+              <button onClick={() => setShowHistory(false)} className="p-2 rounded-lg hover:bg-muted" data-testid="button-close-history">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -399,9 +444,9 @@ function Layout() {
         </div>
       )}
 
-      {/* Mobile bottom navigation — persistent quick access to key tools */}
+      {/* ── MOBILE BOTTOM NAV ── */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t safe-area-bottom"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-border safe-area-bottom"
         aria-label={t("a11y.navToggle")}
       >
         <div className="grid grid-cols-5 h-14">
@@ -439,42 +484,45 @@ function Layout() {
         </div>
       </nav>
 
-      <footer className="border-t py-6 px-4 pb-20 md:pb-6 safe-area-bottom">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div>
-            <span className="font-medium text-foreground">{toolBrand.name}</span>
-            <p>{t("brand.tagline")}</p>
-            <p className="mt-1">
-              {t("footer.builtBy")}{" "}
-              <a
-                href="https://amammustofa.com"
-                target="_blank"
-                rel="noopener noreferrer me"
-                className="text-primary hover:underline underline-offset-2"
-              >
-                amammustofa.com
-              </a>
-            </p>
-          </div>
-          <nav className="flex items-center gap-3 flex-wrap justify-center" aria-label={t("footer.quickLinks")}>
-            {tools.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <span className="hover:text-foreground transition-colors cursor-pointer">{t(`tools.${item.slug}.name` as any)}</span>
-              </Link>
+      {/* ── FOOTER (dark, brand + 4 link cols + locale row) ── */}
+      <footer className="hk-why text-white pb-20 md:pb-0 safe-area-bottom">
+        <div className="hk-container py-12 md:py-16">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12">
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0">
+                  <span className="text-white font-extrabold text-[13px] leading-none tracking-tight">HK</span>
+                </span>
+                <span className="text-white font-bold text-[16px]">{toolBrand.name}</span>
+              </div>
+              <p className="text-[13px] text-white/45 leading-relaxed max-w-[220px]">{t("brand.tagline")}</p>
+              <p className="text-[12px] text-white/30 mt-3">
+                {t("footer.builtBy")}{" "}
+                <a href="https://amammustofa.com" target="_blank" rel="noopener noreferrer me"
+                  className="text-white/55 hover:text-white transition-colors underline underline-offset-2">
+                  amammustofa.com
+                </a>
+              </p>
+            </div>
+            {FOOTER_COLS.map((col) => (
+              <div key={col.heading}>
+                <p className="text-[11px] font-bold text-white/35 uppercase tracking-widest mb-3.5">{col.heading}</p>
+                {col.links.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    <span className="block text-[13px] text-white/55 hover:text-white transition-colors cursor-pointer mb-2.5">
+                      {link.labelKey ? t(link.labelKey) : link.label}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             ))}
-            <Link href="/blog">
-              <span className="hover:text-foreground transition-colors cursor-pointer">Guides</span>
-            </Link>
-            <Link href="/partners">
-              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.partners")}</span>
-            </Link>
-            <Link href="/privacy">
-              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.privacy")}</span>
-            </Link>
-            <Link href="/terms">
-              <span className="hover:text-foreground transition-colors cursor-pointer">{t("footer.terms")}</span>
-            </Link>
-          </nav>
+          </div>
+          <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <p className="text-[12px] text-white/35">
+              © {new Date().getFullYear()} {toolBrand.name}. Free to use.
+            </p>
+            <LocaleSwitcher />
+          </div>
         </div>
       </footer>
 

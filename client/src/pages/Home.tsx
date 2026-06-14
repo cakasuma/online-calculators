@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, BadgeCheck, BookOpen, Clock, Globe, Lock, MapPin, PiggyBank, Scale, Search, Sparkles, TrendingUp, Wallet, X } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, BadgeCheck, BookOpen, Clock, Globe, Lock, MapPin, PiggyBank, Scale, Search, Sparkles, Wallet, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { AdSlot } from "@/components/AdSlot";
 import { toolBrand, tools } from "@/config/tools";
 import { blogArticles } from "@/config/blog";
 import { useLocale } from "@/hooks/use-locale";
-import { useInView } from "@/hooks/use-in-view";
 import { useHistory } from "@/hooks/use-history";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -95,17 +92,11 @@ const GUIDE_THUMBNAILS: Record<string, { icon: LucideIcon; gradient: string; ico
 
 const FEATURED_ARTICLES = blogArticles.slice(0, 6);
 
-/** Wraps children with a gentle scroll-triggered fade-in. */
+/** Plain section wrapper — content is always fully visible. The mockups have
+ *  no scroll-reveal animation, and an opacity-based reveal risked leaving
+ *  content invisible/faint on fast scroll, so we render children directly. */
 function FadeIn({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const { ref, inView } = useInView();
-  return (
-    <div
-      ref={ref}
-      className={`fade-in-section${inView ? " in-view" : ""} ${className}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 /** Autocomplete search dropdown — shows matching tools as navigable results. */
@@ -227,94 +218,140 @@ const CALC_HREF: Record<string, string> = {
   wasiat: "/wasiat",
 };
 
+const HERO_STATS = [
+  { value: "7", labelKey: "home.stats.tools" as TranslationKey },
+  { value: "3", labelKey: "home.stats.locales" as TranslationKey },
+  { value: "2026", labelKey: "home.stats.updated" as TranslationKey },
+  { value: "100%", labelKey: "home.stats.free" as TranslationKey },
+];
+
+/** Static salary-preview card shown on the right of the hero (desktop only). */
+function HeroPreviewCard() {
+  const { t } = useLocale();
+  const rows = [
+    { label: "EPF (11%)", value: "− RM 550" },
+    { label: "SOCSO", value: "− RM 19.75" },
+    { label: "EIS", value: "− RM 9.75" },
+    { label: "PCB (Income Tax)", value: "− RM 121" },
+  ];
+  return (
+    <div className="rounded-[20px] border border-white/12 bg-white/[0.08] p-6 backdrop-blur-xl">
+      <div className="flex items-center gap-2.5 mb-5">
+        <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#3b82f6] to-[#2dd4bf] flex items-center justify-center">
+          <Wallet className="w-5 h-5 text-white" />
+        </div>
+        <div className="min-w-0">
+          <div className="text-white font-semibold text-[15px] leading-tight">{t("nav.salary")}</div>
+          <div className="text-white/50 text-[12px]">Malaysia · 2026 rates</div>
+        </div>
+        <span className="ml-auto rounded-full bg-emerald-400/20 text-emerald-300 text-[11px] font-semibold px-2 py-0.5">Live</span>
+      </div>
+      <div className="flex gap-2 mb-4">
+        <div className="flex-1 rounded-lg border border-white/12 bg-white/[0.08] px-3.5 py-2.5">
+          <span className="block text-white/40 text-[11px]">Gross Monthly Salary</span>
+          <span className="text-white text-[14px] font-medium">RM 5,000</span>
+        </div>
+        <span className="rounded-lg bg-[#3b82f6] text-white text-[13px] font-semibold px-4 flex items-center">Calculate</span>
+      </div>
+      {rows.map((r) => (
+        <div key={r.label} className="flex justify-between items-center py-2.5 border-b border-white/[0.07]">
+          <span className="text-white/60 text-[13px]">{r.label}</span>
+          <span className="text-red-400 font-semibold text-[13px]">{r.value}</span>
+        </div>
+      ))}
+      <div className="flex justify-between items-center pt-3">
+        <span className="text-white font-semibold text-[13px]">Take-Home Pay</span>
+        <span className="font-bold text-[18px] text-[#4ade80]">RM 4,299.50</span>
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { t } = useLocale();
   const { entries: historyEntries } = useHistory();
   const recentEntries = historyEntries.slice(0, 3);
+  const [activeFilter, setActiveFilter] = useState<string>("All");
+
+  const filterTabs = [
+    { key: "All", label: "All" },
+    ...TOOL_GROUPS.map((g) => ({ key: g.labelKey as string, label: t(g.labelKey) })),
+  ];
+  const visibleGroups = activeFilter === "All" ? TOOL_GROUPS : TOOL_GROUPS.filter((g) => g.labelKey === activeFilter);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-14">
+    <div className="w-full">
 
-      {/* ── Hero ── */}
-      <section className="hero-gradient rounded-3xl border p-6 sm:p-10 shadow-sm overflow-hidden relative">
-        {/* Dot grid overlay */}
-        <div className="absolute inset-0 hero-grid rounded-3xl pointer-events-none" aria-hidden="true" />
+      {/* ── HERO (full-bleed dark gradient) ── */}
+      <section className="hk-hero-bg">
+        <div className="hk-container py-16 md:py-20">
+          <div className="grid md:grid-cols-[1fr_440px] gap-10 lg:gap-16 items-center">
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-1.5 mb-5 px-3 py-1 rounded-full text-[12px] font-semibold uppercase tracking-wider"
+                style={{ background: "rgba(59,130,246,0.2)", border: "1px solid rgba(59,130,246,0.3)", color: "#93c5fd" }}>
+                <Sparkles className="w-3 h-3" />
+                {t("home.hero.badge")}
+              </span>
+              <h1 className="text-[34px] sm:text-[44px] md:text-[52px] font-extrabold leading-[1.08] tracking-[-0.02em] text-white">
+                {t("brand.tagline")}
+              </h1>
+              <p className="mt-5 max-w-[480px] text-[16px] sm:text-[17px] leading-[1.6]" style={{ color: "#93c5fd" }}>
+                {t("home.hero.subtitle")}
+              </p>
 
-        {/* Floating math symbols — desktop decoration */}
-        <div className="hidden lg:block absolute top-0 right-0 bottom-0 w-80 pointer-events-none select-none overflow-hidden" aria-hidden="true">
-          {[
-            { char: "%",  top: "10%",  right: "22%", size: "text-6xl",  opacity: "opacity-[0.055]", rotate: "rotate-12" },
-            { char: "÷",  top: "35%",  right: "8%",  size: "text-8xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-6" },
-            { char: "+",  top: "60%",  right: "28%", size: "text-5xl",  opacity: "opacity-[0.06]",  rotate: "rotate-3" },
-            { char: "=",  top: "18%",  right: "46%", size: "text-4xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-15" },
-            { char: "∑",  top: "75%",  right: "6%",  size: "text-6xl",  opacity: "opacity-[0.05]",  rotate: "rotate-8" },
-            { char: "π",  top: "48%",  right: "44%", size: "text-5xl",  opacity: "opacity-[0.04]",  rotate: "-rotate-3" },
-            { char: "×",  top: "82%",  right: "36%", size: "text-4xl",  opacity: "opacity-[0.045]", rotate: "rotate-20" },
-            { char: "√",  top: "5%",   right: "58%", size: "text-3xl",  opacity: "opacity-[0.035]", rotate: "-rotate-8" },
-          ].map(({ char, top, right, size, opacity, rotate }) => (
-            <span
-              key={char}
-              className={`absolute font-mono font-black text-foreground ${size} ${opacity} ${rotate}`}
-              style={{ top, right }}
-            >
-              {char}
-            </span>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10">
-          <Badge className="mb-4 border" variant="secondary">
-            <Sparkles className="w-3.5 h-3.5 mr-1 text-primary" />
-            {t("home.hero.badge")}
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight max-w-lg">
-            <span className="gradient-text">{t("brand.tagline")}</span>
-          </h1>
-          <p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
-            {t("home.hero.subtitle")}
-          </p>
-
-          {/* Prominent search */}
-          <div className="mt-6 max-w-xl">
-            <ToolSearchBar />
-          </div>
-
-          {/* Secondary CTAs */}
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Button asChild size="sm" className="shadow-sm shadow-primary/20 hover:shadow-md hover:shadow-primary/30 transition-shadow">
-              <Link href="/salary">
-                <Wallet className="w-3.5 h-3.5 mr-1.5" />
-                {t("home.hero.ctaSalary")}
-              </Link>
-            </Button>
-            <Button asChild size="sm" variant="outline" className="hover:border-primary/40">
-              <Link href="/faraid">{t("home.hero.ctaFaraid")}</Link>
-            </Button>
-          </div>
-
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 border-t pt-6">
-            {(
-              [
-                { value: "7",    labelKey: "home.stats.tools",   icon: "🧮" },
-                { value: "3",    labelKey: "home.stats.locales",  icon: "🌐" },
-                { value: "2026", labelKey: "home.stats.updated",  icon: "✅" },
-                { value: "100%", labelKey: "home.stats.free",     icon: "🆓" },
-              ] as const
-            ).map(({ value, labelKey, icon }) => (
-              <div key={labelKey} className="text-center">
-                <div className="text-xl sm:text-2xl font-bold gradient-text">{value}</div>
-                <div className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{icon} {t(labelKey)}</div>
+              <div className="mt-7 max-w-[520px] [&_input]:bg-white/10 [&_input]:border-white/15 [&_input]:text-white [&_input]:placeholder:text-white/40 [&_input]:backdrop-blur">
+                <ToolSearchBar />
               </div>
-            ))}
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href="/salary">
+                  <span className="inline-flex items-center gap-2 px-5 py-3 rounded-[10px] bg-white text-[#1d4ed8] font-bold text-[15px] cursor-pointer transition hover:-translate-y-0.5 shadow-lg shadow-black/20">
+                    <Wallet className="w-4 h-4" />
+                    {t("home.hero.ctaSalary")}
+                  </span>
+                </Link>
+                <Link href="/faraid">
+                  <span className="inline-flex items-center gap-2 px-5 py-3 rounded-[10px] font-semibold text-[15px] text-white cursor-pointer transition hover:bg-white/10"
+                    style={{ border: "1.5px solid rgba(255,255,255,0.3)" }}>
+                    {t("home.hero.ctaFaraid")}
+                  </span>
+                </Link>
+              </div>
+
+              <div className="mt-10 flex flex-wrap gap-x-6 gap-y-5 sm:gap-x-8">
+                {HERO_STATS.map(({ value, labelKey }, i) => (
+                  <div key={labelKey} className="flex items-center gap-4">
+                    {i > 0 && <div className="hidden sm:block w-px h-8 self-stretch bg-white/15" />}
+                    <div>
+                      <div className="text-[24px] sm:text-[26px] font-extrabold text-white leading-none">{value}</div>
+                      <div className="text-[11px] uppercase tracking-[0.04em] mt-1 text-white/50">{t(labelKey)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Live preview card — hidden below md */}
+            <div className="hidden md:block">
+              <HeroPreviewCard />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Recently used ── */}
+      {/* ── Trusted bar ── */}
+      <div className="border-y border-border bg-muted/40">
+        <div className="hk-container py-4 text-center">
+          <p className="text-[13px] text-muted-foreground font-medium">
+            {t("home.hero.partnersLink")}
+          </p>
+        </div>
+      </div>
+
+      {/* ── Recently used (contained) ── */}
       {recentEntries.length > 0 && (
         <FadeIn>
-          <section>
+          <section className="hk-container pt-12">
             <div className="flex items-center gap-2 mb-4">
               <Clock className="w-4 h-4 text-muted-foreground" />
               <h2 className="text-base font-semibold">{t("home.recentlyUsed.title")}</h2>
@@ -344,167 +381,205 @@ export default function HomePage() {
         </FadeIn>
       )}
 
-      {/* ── Tools by category ── */}
-      <div className="space-y-10">
-        {TOOL_GROUPS.map((group) => {
-          const groupTools = tools.filter((tool) =>
-            group.hrefs.includes(tool.href as (typeof group.hrefs)[number]),
-          );
-          const colors = GROUP_COLORS[group.labelKey];
-          return (
-            <FadeIn key={group.labelKey}>
-              <section>
-                <div className="mb-4 flex items-center gap-3">
-                  <div className={`w-1 h-8 rounded-full shrink-0 ${colors.accentLine}`} aria-hidden="true" />
-                  <div>
-                    <h2 className="text-xl font-semibold">{t(group.labelKey)}</h2>
-                    <p className="text-sm text-muted-foreground mt-0.5">{t(group.descKey)}</p>
+      {/* ── TOOLS (contained) ── */}
+      <section className="hk-container py-14">
+        <div className="mb-5">
+          <p className="text-[12px] font-bold text-primary uppercase tracking-[0.06em] mb-1 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+            Tools
+          </p>
+          <h2 className="text-[22px] sm:text-[26px] font-bold tracking-tight">{t("home.tools.title")}</h2>
+          <p className="text-sm text-muted-foreground mt-1">Everything runs in your browser — no sign-up, no data leaves your device.</p>
+        </div>
+
+        {/* Category tabs */}
+        <div className="flex gap-2 mb-8 overflow-x-auto hk-no-scrollbar pb-1 -mx-1 px-1">
+          {filterTabs.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveFilter(key)}
+              className={`hk-cat-tab${activeFilter === key ? " active" : ""}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tool groups */}
+        <div className="space-y-10">
+          {visibleGroups.map((group) => {
+            const groupTools = tools.filter((tool) =>
+              group.hrefs.includes(tool.href as (typeof group.hrefs)[number]),
+            );
+            const colors = GROUP_COLORS[group.labelKey];
+            return (
+              <FadeIn key={group.labelKey}>
+                <div>
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className={`w-1 h-7 rounded-full shrink-0 ${colors.accentLine}`} aria-hidden="true" />
+                    <div>
+                      <h3 className="text-[16px] font-semibold">{t(group.labelKey)}</h3>
+                      <p className="text-[13px] text-muted-foreground">{t(group.descKey)}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {groupTools.map((tool) => (
-                    <Link key={tool.slug} href={tool.href}>
-                      <Card className={`h-full hover:shadow-sm transition-all duration-200 cursor-pointer group border ${colors.hoverBorder}`}>
-                        <CardContent className="p-5 flex flex-col gap-3 h-full">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {groupTools.map((tool) => (
+                      <Link key={tool.slug} href={tool.href}>
+                        <div className={`hk-card group relative flex flex-col gap-3 p-5 bg-card rounded-[14px] border border-border cursor-pointer h-full hover:border-primary/40`}>
                           <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2.5">
-                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors shrink-0 ${colors.iconBg}`}>
-                                <tool.icon className={`w-5 h-5 ${colors.iconColor}`} />
-                              </div>
-                              <span className="font-semibold text-sm leading-tight">
-                                {t(`tools.${tool.slug}.name` as TranslationKey)}
-                              </span>
+                            <div className={`w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0 ${colors.iconBg}`}>
+                              <tool.icon className={`w-5 h-5 ${colors.iconColor}`} />
                             </div>
                             {tool.badge ? (
-                              <Badge variant="secondary" className={`text-xs shrink-0 border ${colors.badge}`}>
+                              <Badge variant="secondary" className={`text-[11px] shrink-0 border ${colors.badge}`}>
                                 {t(`tools.${tool.slug}.badge` as TranslationKey)}
                               </Badge>
                             ) : null}
                           </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed flex-1">
-                            {t(`tools.${tool.slug}.desc` as TranslationKey)}
-                          </p>
-                          <span className={`text-xs font-medium flex items-center gap-1 group-hover:gap-2 transition-all ${colors.iconColor}`}>
+                          <div>
+                            <p className="font-bold text-[15px] mb-1.5 leading-snug">
+                              {t(`tools.${tool.slug}.name` as TranslationKey)}
+                            </p>
+                            <p className="text-[13px] text-muted-foreground leading-relaxed">
+                              {t(`tools.${tool.slug}.desc` as TranslationKey)}
+                            </p>
+                          </div>
+                          <span className="mt-auto inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-lg w-fit group-hover:bg-primary/15 transition-colors">
                             {t("home.featured.openTool")}
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </span>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            </FadeIn>
-          );
-        })}
-      </div>
-
-      {adsenseEnabled && adsenseSlotHome ? (
-        <AdSlot slot={adsenseSlotHome} className="mx-auto" />
-      ) : null}
-
-      {/* ── Why HelloKalku ── */}
-      <FadeIn>
-        <section>
-          <h2 className="text-2xl font-semibold">{t("home.features.title")}</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            {FEATURES.map(({ icon: Icon, titleKey, bodyKey, iconColor, iconBg }) => (
-              <div key={titleKey} className="rounded-2xl border bg-card p-5 space-y-3 hover:shadow-sm transition-shadow">
-                <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
-                    <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
+                        </div>
+                      </Link>
+                    ))}
                   </div>
-                  <h3 className="font-semibold text-sm">{t(titleKey)}</h3>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{t(bodyKey)}</p>
+              </FadeIn>
+            );
+          })}
+        </div>
+
+        {adsenseEnabled && adsenseSlotHome ? (
+          <AdSlot slot={adsenseSlotHome} className="mx-auto mt-12" />
+        ) : null}
+      </section>
+
+      {/* ── WHY (full-bleed dark) ── */}
+      <section className="hk-why text-white">
+        <div className="hk-container py-16 md:py-20">
+          <div className="text-center mb-12">
+            <span className="inline-block rounded-full text-[12px] font-semibold uppercase tracking-[0.06em] px-3 py-1 mb-3"
+              style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa" }}>
+              {t("home.features.title")}
+            </span>
+            <h2 className="text-[28px] md:text-[36px] font-extrabold tracking-[-0.02em] leading-tight text-white">
+              Built differently, on purpose
+            </h2>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {FEATURES.map(({ icon: Icon, titleKey, bodyKey }) => (
+              <div key={titleKey} className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 transition-colors hover:bg-white/[0.07] hover:border-[#3b82f6]/30">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(59,130,246,0.15)" }}>
+                  <Icon className="w-6 h-6 text-[#60a5fa]" />
+                </div>
+                <h3 className="font-bold text-[16px] text-white mb-2">{t(titleKey)}</h3>
+                <p className="text-[13px] text-white/55 leading-relaxed">{t(bodyKey)}</p>
               </div>
             ))}
           </div>
-        </section>
-      </FadeIn>
+        </div>
+      </section>
 
-      {/* ── Guides ── */}
-      <FadeIn>
-        <section>
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-8 rounded-full bg-primary shrink-0" aria-hidden="true" />
-              <div>
-                <h2 className="text-xl font-semibold">Guides &amp; Education</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">In-depth articles to help you understand the numbers</p>
-              </div>
+      {/* ── GUIDES (contained) ── */}
+      <section className="hk-container py-14">
+        <div className="flex items-end justify-between mb-6 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 rounded-full bg-primary shrink-0" aria-hidden="true" />
+            <div>
+              <h2 className="text-[22px] sm:text-[26px] font-bold tracking-tight">Guides &amp; Education</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">In-depth articles to help you understand the numbers</p>
             </div>
-            <Link href="/blog">
-              <span className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline underline-offset-2 cursor-pointer shrink-0">
-                See all guides
-                <ArrowRight className="w-3.5 h-3.5" />
-              </span>
-            </Link>
           </div>
+          <Link href="/blog">
+            <span className="hidden sm:flex items-center gap-1 text-sm font-semibold text-primary hover:underline underline-offset-2 cursor-pointer shrink-0">
+              See all guides
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </Link>
+        </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURED_ARTICLES.map((article) => {
-              const catColor = CATEGORY_COLORS[article.categoryLabel] ?? "bg-muted text-muted-foreground";
-              const thumb = GUIDE_THUMBNAILS[article.categoryLabel];
-              const ThumbIcon = thumb?.icon ?? BookOpen;
-              return (
-                <Link key={article.slug} href={`/blog/${article.slug}`}>
-                  <article className="group flex flex-col rounded-xl border bg-card hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer h-full overflow-hidden">
-                    {/* Thumbnail header — CSS gradient + icon, no HTTP request */}
-                    <div className={`relative flex items-center justify-center h-24 bg-gradient-to-br ${thumb?.gradient ?? "from-muted/60 to-transparent"} border-b border-border/50 overflow-hidden`}>
-                      {/* Large decorative background icon */}
-                      <ThumbIcon className={`absolute w-24 h-24 ${thumb?.iconColor ?? "text-muted-foreground"} ${thumb?.pattern ?? "opacity-[0.07]"} -rotate-6 translate-x-8`} aria-hidden="true" />
-                      {/* Centered foreground icon */}
-                      <div className="relative z-10 flex items-center justify-center w-10 h-10 rounded-xl bg-background/70 backdrop-blur-sm border border-border/60 shadow-sm">
-                        <ThumbIcon className={`w-5 h-5 ${thumb?.iconColor ?? "text-muted-foreground"}`} />
-                      </div>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURED_ARTICLES.map((article) => {
+            const catColor = CATEGORY_COLORS[article.categoryLabel] ?? "bg-muted text-muted-foreground";
+            const thumb = GUIDE_THUMBNAILS[article.categoryLabel];
+            const ThumbIcon = thumb?.icon ?? BookOpen;
+            return (
+              <Link key={article.slug} href={`/blog/${article.slug}`}>
+                <article className="hk-card group flex flex-col rounded-[14px] border border-border bg-card hover:border-primary/40 cursor-pointer h-full overflow-hidden">
+                  <div className={`relative flex items-center justify-center h-[148px] bg-gradient-to-br ${thumb?.gradient ?? "from-muted/60 to-transparent"} overflow-hidden`}>
+                    <ThumbIcon className={`absolute w-28 h-28 ${thumb?.iconColor ?? "text-muted-foreground"} ${thumb?.pattern ?? "opacity-[0.07]"} -rotate-6 translate-x-8`} aria-hidden="true" />
+                    <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-xl bg-background/70 backdrop-blur-sm border border-border/60 shadow-sm">
+                      <ThumbIcon className={`w-6 h-6 ${thumb?.iconColor ?? "text-muted-foreground"}`} />
                     </div>
-
-                    <div className="flex flex-col gap-2.5 p-4 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${catColor}`}>
-                          {article.categoryLabel}
-                        </span>
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                          <Clock className="w-3 h-3" />
-                          {article.readingTime} min
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                        {article.title}
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">
-                        {article.description}
-                      </p>
-                      <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-auto pt-1">
-                        Read guide
-                        <ArrowRight className="w-3 h-3" />
+                  </div>
+                  <div className="flex flex-col gap-2.5 p-5 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${catColor}`}>
+                        {article.categoryLabel}
+                      </span>
+                      <span className="flex items-center gap-1 text-[12px] text-muted-foreground shrink-0">
+                        <Clock className="w-3 h-3" />
+                        {article.readingTime} min
                       </span>
                     </div>
-                  </article>
-                </Link>
-              );
-            })}
-          </div>
+                    <h3 className="text-[15px] font-bold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-[13px] text-muted-foreground leading-relaxed line-clamp-2 flex-1">
+                      {article.description}
+                    </p>
+                  </div>
+                </article>
+              </Link>
+            );
+          })}
+        </div>
 
-          <div className="mt-4 sm:hidden">
+        <div className="mt-5 sm:hidden">
+          <Link href="/blog">
+            <span className="flex items-center justify-center gap-1.5 text-sm font-semibold text-primary py-2 cursor-pointer">
+              <BookOpen className="w-4 h-4" />
+              See all guides
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      {/* ── PRE-FOOTER CTA (full-bleed blue) ── */}
+      <section className="hk-prefooter text-white">
+        <div className="hk-container py-14 text-center">
+          <h2 className="text-[24px] sm:text-[28px] font-extrabold tracking-[-0.01em] text-white">
+            Ready to run your numbers?
+          </h2>
+          <p className="text-[15px] sm:text-[16px] text-white/80 mt-2 mb-6">
+            No account needed. Start in seconds — everything stays in your browser.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/salary">
+              <span className="inline-flex items-center gap-2 px-5 py-3 rounded-[10px] bg-white text-[#1d4ed8] font-bold text-[15px] cursor-pointer transition hover:-translate-y-0.5 shadow-lg shadow-black/20">
+                <Wallet className="w-4 h-4" />
+                {t("home.hero.ctaSalary")}
+              </span>
+            </Link>
             <Link href="/blog">
-              <span className="flex items-center justify-center gap-1.5 text-sm font-medium text-primary py-2 cursor-pointer">
-                <BookOpen className="w-4 h-4" />
+              <span className="inline-flex items-center gap-2 px-5 py-3 rounded-[10px] font-semibold text-[15px] text-white cursor-pointer transition hover:bg-white/10"
+                style={{ border: "1.5px solid rgba(255,255,255,0.4)" }}>
                 See all guides
+                <ArrowRight className="w-4 h-4" />
               </span>
             </Link>
           </div>
-        </section>
-      </FadeIn>
-
-      <FadeIn>
-        <p className="text-sm text-muted-foreground text-center pb-2">
-          <Link href="/partners" className="hover:text-foreground underline-offset-2 hover:underline">
-            {t("home.hero.partnersLink")}
-          </Link>
-        </p>
-      </FadeIn>
+        </div>
+      </section>
     </div>
   );
 }

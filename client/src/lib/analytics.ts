@@ -48,7 +48,7 @@ export function track(event: string, props?: Record<string, unknown>): void {
 }
 
 export interface ServerEvent {
-  calculator: "faraid" | "wasiat" | "zakat" | "salary" | "normal" | "scientific" | "epf";
+  calculator: "faraid" | "wasiat" | "zakat" | "salary" | "normal" | "scientific" | "epf" | "housing" | "tax" | "bmi";
   event: string;
   payload?: Record<string, unknown>;
 }

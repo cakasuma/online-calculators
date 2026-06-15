@@ -50,6 +50,9 @@ import WasiatGuide from "@/pages/WasiatGuide";
 import ZakatCalculator from "@/pages/ZakatCalculator";
 import SalaryCalculator from "@/pages/SalaryCalculator";
 import EpfCalculator from "@/pages/EpfCalculator";
+import HousingLoanCalculator from "@/pages/HousingLoanCalculator";
+import IncomeTaxCalculator from "@/pages/IncomeTaxCalculator";
+import BmiCalculator from "@/pages/BmiCalculator";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Partners from "@/pages/Partners";
 import TermsOfUse from "@/pages/TermsOfUse";
@@ -226,7 +229,7 @@ function Layout() {
   }, [adsenseEnabled]);
 
   const handleCalculate = useCallback(
-    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf") =>
+    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf" | "housing" | "tax" | "bmi") =>
       (expression: string, result: string, url?: string) => {
         history.add(calculator, expression, result, url);
       },
@@ -396,6 +399,18 @@ function Layout() {
           <Route path="/epf-retirement">
             <EpfCalculator onCalculate={handleCalculate("epf")} />
             <CalculatorContent slug="epf" />
+          </Route>
+          <Route path="/housing-loan">
+            <HousingLoanCalculator onCalculate={handleCalculate("housing")} />
+            <CalculatorContent slug="housing" />
+          </Route>
+          <Route path="/income-tax">
+            <IncomeTaxCalculator onCalculate={handleCalculate("tax")} />
+            <CalculatorContent slug="tax" />
+          </Route>
+          <Route path="/bmi">
+            <BmiCalculator onCalculate={handleCalculate("bmi")} />
+            <CalculatorContent slug="bmi" />
           </Route>
           <Route path="/normal">
             <NormalCalculator onCalculate={handleCalculate("normal")} />

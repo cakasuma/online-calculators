@@ -12,6 +12,9 @@ export type RouteSlug =
   | "home"
   | "salary"
   | "epf"
+  | "housing"
+  | "tax"
+  | "bmi"
   | "normal"
   | "scientific"
   | "faraid"
@@ -140,6 +143,99 @@ export const routes: RouteSeoEntry[] = [
           "Proyeksikan saldo KWSP Anda pada usia pensiun. Bandingkan dengan target Basic Savings EPF 2026 (RM 270k @ 55, RM 390k @ 60) dan perkirakan pendapatan pensiun bulanan Anda.",
         heading: "Proyeksi pensiun EPF",
         tagline: "Proyeksikan saldo KWSP dan bandingkan dengan target Basic Savings.",
+      },
+    },
+  },
+  {
+    slug: "housing",
+    path: "/housing-loan",
+    prerender: true,
+    sitemap: { priority: 0.9, changefreq: "monthly" },
+    copy: {
+      en: {
+        title: "Housing Loan Calculator Malaysia 2026 (Stamp Duty + Legal Fees) | HelloKalku",
+        description:
+          "Calculate your Malaysia home loan monthly repayment plus stamp duty (MOT + loan agreement), legal fees, and total upfront cash. Includes first-home buyer exemption.",
+        keywords:
+          "housing loan calculator malaysia, home loan calculator, stamp duty calculator malaysia, mot stamp duty, legal fees calculator, loan agreement stamp duty",
+        heading: "Malaysia housing loan calculator",
+        tagline: "Monthly repayment plus stamp duty, legal fees, and upfront cash.",
+      },
+      ms: {
+        title: "Kalkulator Pinjaman Perumahan Malaysia 2026 (Duti Setem + Yuran Guaman) | HelloKalku",
+        description:
+          "Kira ansuran bulanan pinjaman rumah Malaysia berserta duti setem (MOT + perjanjian pinjaman), yuran guaman, dan jumlah tunai pendahuluan. Termasuk pengecualian pembeli rumah pertama.",
+        heading: "Kalkulator pinjaman perumahan Malaysia",
+        tagline: "Ansuran bulanan berserta duti setem, yuran guaman, dan tunai pendahuluan.",
+      },
+      id: {
+        title: "Kalkulator KPR Malaysia 2026 (Bea Meterai + Biaya Hukum) | HelloKalku",
+        description:
+          "Hitung cicilan bulanan pinjaman rumah Malaysia plus bea meterai (MOT + perjanjian pinjaman), biaya hukum, dan total uang muka. Termasuk pembebasan pembeli rumah pertama.",
+        heading: "Kalkulator pinjaman rumah Malaysia",
+        tagline: "Cicilan bulanan plus bea meterai, biaya hukum, dan uang muka.",
+      },
+    },
+  },
+  {
+    slug: "tax",
+    path: "/income-tax",
+    prerender: true,
+    sitemap: { priority: 0.9, changefreq: "monthly" },
+    copy: {
+      en: {
+        title: "Income Tax Calculator Malaysia 2026 (Reliefs + Rebate) | HelloKalku",
+        description:
+          "Estimate your Malaysia personal income tax for YA 2026. Apply EPF, lifestyle, medical, and education reliefs, see your chargeable income, rebate, tax payable, and effective rate.",
+        keywords:
+          "income tax calculator malaysia, lhdn tax calculator 2026, tax relief malaysia, pcb calculator, chargeable income, tax rebate malaysia",
+        heading: "Malaysia income tax calculator 2026",
+        tagline: "Reliefs, rebates, chargeable income, and effective tax rate.",
+      },
+      ms: {
+        title: "Kalkulator Cukai Pendapatan Malaysia 2026 (Pelepasan + Rebat) | HelloKalku",
+        description:
+          "Anggarkan cukai pendapatan peribadi Malaysia untuk TT 2026. Masukkan pelepasan EPF, gaya hidup, perubatan, dan pendidikan, lihat pendapatan bercukai, rebat, cukai kena dibayar, dan kadar berkesan.",
+        heading: "Kalkulator cukai pendapatan Malaysia 2026",
+        tagline: "Pelepasan, rebat, pendapatan bercukai, dan kadar cukai berkesan.",
+      },
+      id: {
+        title: "Kalkulator Pajak Penghasilan Malaysia 2026 (Keringanan + Rebat) | HelloKalku",
+        description:
+          "Perkirakan pajak penghasilan pribadi Malaysia untuk TP 2026. Terapkan keringanan EPF, gaya hidup, medis, dan pendidikan, lihat penghasilan kena pajak, rebat, pajak terutang, dan tarif efektif.",
+        heading: "Kalkulator pajak penghasilan Malaysia 2026",
+        tagline: "Keringanan, rebat, penghasilan kena pajak, dan tarif efektif.",
+      },
+    },
+  },
+  {
+    slug: "bmi",
+    path: "/bmi",
+    prerender: true,
+    sitemap: { priority: 0.85, changefreq: "monthly" },
+    copy: {
+      en: {
+        title: "BMI Calculator (with BMR & Daily Calories) | HelloKalku",
+        description:
+          "Calculate your Body Mass Index (BMI), healthy weight range, BMR, and daily calorie needs (TDEE) using the Mifflin-St Jeor formula. Free, instant, and private.",
+        keywords:
+          "bmi calculator, body mass index, bmr calculator, tdee calculator, daily calorie calculator, healthy weight range",
+        heading: "BMI calculator with BMR & calories",
+        tagline: "BMI, healthy weight range, BMR, and daily calorie needs.",
+      },
+      ms: {
+        title: "Kalkulator BMI (dengan BMR & Kalori Harian) | HelloKalku",
+        description:
+          "Kira Indeks Jisim Badan (BMI), julat berat sihat, BMR, dan keperluan kalori harian (TDEE) menggunakan formula Mifflin-St Jeor. Percuma, segera, dan peribadi.",
+        heading: "Kalkulator BMI dengan BMR & kalori",
+        tagline: "BMI, julat berat sihat, BMR, dan keperluan kalori harian.",
+      },
+      id: {
+        title: "Kalkulator BMI (dengan BMR & Kalori Harian) | HelloKalku",
+        description:
+          "Hitung Indeks Massa Tubuh (BMI), rentang berat sehat, BMR, dan kebutuhan kalori harian (TDEE) menggunakan rumus Mifflin-St Jeor. Gratis, instan, dan privat.",
+        heading: "Kalkulator BMI dengan BMR & kalori",
+        tagline: "BMI, rentang berat sehat, BMR, dan kebutuhan kalori harian.",
       },
     },
   },

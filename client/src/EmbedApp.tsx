@@ -21,6 +21,9 @@ import NormalCalculator from "@/pages/NormalCalculator";
 import ScientificCalculator from "@/pages/ScientificCalculator";
 import FaraidCalculator from "@/pages/FaraidCalculator";
 import ZakatCalculator from "@/pages/ZakatCalculator";
+import HousingLoanCalculator from "@/pages/HousingLoanCalculator";
+import IncomeTaxCalculator from "@/pages/IncomeTaxCalculator";
+import BmiCalculator from "@/pages/BmiCalculator";
 
 // Strip a referrer URL down to its eTLD+1 ("blog.example.com" → "example.com").
 // Pure heuristic — good enough for grouping; we do not need to be exact about
@@ -54,6 +57,9 @@ function EmbedAnalytics() {
   const [faraid] = useRoute("/faraid");
   const [normal] = useRoute("/normal");
   const [scientific] = useRoute("/scientific");
+  const [housing] = useRoute("/housing-loan");
+  const [tax] = useRoute("/income-tax");
+  const [bmi] = useRoute("/bmi");
   const calculator = salary
     ? "salary"
     : zakat
@@ -64,7 +70,13 @@ function EmbedAnalytics() {
           ? "normal"
           : scientific
             ? "scientific"
-            : null;
+            : housing
+              ? "housing"
+              : tax
+                ? "tax"
+                : bmi
+                  ? "bmi"
+                  : null;
 
   useEffect(() => {
     if (!calculator) return;
@@ -76,7 +88,7 @@ function EmbedAnalytics() {
     // captured data and storage retention risk.
     track("embed_view", { calculator, parentHost: host ?? "(unknown)" });
     recordServerEvent({
-      calculator: calculator as "salary" | "zakat" | "faraid" | "normal" | "scientific" | "epf",
+      calculator: calculator as "salary" | "zakat" | "faraid" | "normal" | "scientific" | "epf" | "housing" | "tax" | "bmi",
       event: "embed_view",
       payload: { parentHost: host },
     });
@@ -218,6 +230,27 @@ function EmbedRoutes() {
           <EmbedFrame>
             <div className="p-3">
               <ZakatCalculator />
+            </div>
+          </EmbedFrame>
+        </Route>
+        <Route path="/housing-loan">
+          <EmbedFrame>
+            <div className="p-3">
+              <HousingLoanCalculator />
+            </div>
+          </EmbedFrame>
+        </Route>
+        <Route path="/income-tax">
+          <EmbedFrame>
+            <div className="p-3">
+              <IncomeTaxCalculator />
+            </div>
+          </EmbedFrame>
+        </Route>
+        <Route path="/bmi">
+          <EmbedFrame>
+            <div className="p-3">
+              <BmiCalculator />
             </div>
           </EmbedFrame>
         </Route>

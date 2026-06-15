@@ -175,6 +175,12 @@ function Layout() {
     setShowMobileNav(false);
   }, [location]);
 
+  // Reset scroll to the top on navigation so a new page opens at its top,
+  // rather than inheriting the previous page's scroll position.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   useEffect(() => {
     // Blog article pages manage their own meta tags via the BlogArticle component
     if (/^\/blog\/.+/.test(location)) {

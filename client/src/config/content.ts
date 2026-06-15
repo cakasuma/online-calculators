@@ -996,6 +996,312 @@ export const calculatorContent: ContentMap = {
       related: ["normal", "salary", "zakat"],
     },
   },
+
+  housing: {
+    en: {
+      intro:
+        "Estimate the monthly repayment on a Malaysian home loan and, just as importantly, the cash you need upfront — down payment, stamp duty on the Memorandum of Transfer (MOT), stamp duty on the loan agreement, and legal fees. The calculator uses the 2024 ad-valorem stamp duty tiers and the standard legal-fee scale.",
+      howItWorks: {
+        heading: "How the housing loan calculator works",
+        paragraphs: [
+          "The monthly installment is computed with the standard amortization formula using your loan amount (price minus down payment), the annual interest rate, and the tenure in months.",
+          "MOT stamp duty is charged on the property price in tiers: 1% on the first RM100,000, 2% from RM100,001–500,000, 3% from RM500,001–1,000,000, and 4% above RM1,000,000.",
+          "Loan agreement stamp duty is a flat 0.5% of the loan amount. Legal fees follow the Solicitors' Remuneration Order scale and are charged on both the Sale & Purchase Agreement and the loan agreement.",
+          "First-home buyers purchasing a property priced at RM500,000 or below qualify for full stamp duty exemption on both the MOT and the loan agreement — toggle the first-home option to apply it.",
+        ],
+      },
+      formula: {
+        heading: "Monthly installment formula",
+        paragraphs: [
+          "M = P · r · (1 + r)^n / ((1 + r)^n − 1)",
+          "P = loan amount, r = monthly interest rate (annual rate ÷ 12 ÷ 100), n = number of months (years × 12).",
+        ],
+      },
+      rateTable: {
+        heading: "MOT stamp duty tiers (2024)",
+        columns: ["Property price band", "Rate"],
+        rows: [
+          ["First RM100,000", "1%"],
+          ["RM100,001 – RM500,000", "2%"],
+          ["RM500,001 – RM1,000,000", "3%"],
+          ["Above RM1,000,000", "4%"],
+        ],
+        note: "Loan agreement stamp duty is a separate flat 0.5% of the loan amount.",
+      },
+      examples: [
+        {
+          title: "RM500,000 home, 10% down, 35 years at 4%",
+          given: ["Loan amount: RM450,000", "Down payment: RM50,000", "Interest rate: 4% p.a."],
+          result: "≈ RM1,993/month, with roughly RM73,000 needed upfront (down payment + stamp duty + legal fees) for a non-first-home buyer.",
+        },
+      ],
+      faq: [
+        {
+          question: "How much down payment do I need for a house in Malaysia?",
+          answer: "Most banks finance up to 90% of the property value for your first two homes, so you typically need a 10% down payment plus the stamp duty and legal fees on top.",
+        },
+        {
+          question: "Is stamp duty really waived for first-home buyers?",
+          answer: "Yes — for eligible Malaysian first-home buyers, properties priced at RM500,000 or below receive full stamp duty exemption on both the transfer (MOT) and the loan agreement. Confirm the current year's terms with your lawyer.",
+        },
+        {
+          question: "Does this include MRTA or fire insurance?",
+          answer: "No. Mortgage Reducing Term Assurance (MRTA) and home/fire insurance are quoted separately by your bank and insurer, so add those to your upfront budget.",
+        },
+      ],
+      related: ["salary", "tax", "epf"],
+      lastReviewed: "2026-06-15",
+    },
+    ms: {
+      intro:
+        "Anggarkan ansuran bulanan pinjaman rumah di Malaysia dan, yang sama penting, tunai pendahuluan yang diperlukan — bayaran pendahuluan, duti setem Memorandum Pindah Milik (MOT), duti setem perjanjian pinjaman, dan yuran guaman. Kalkulator ini menggunakan kadar duti setem 2024 dan skala yuran guaman standard.",
+      howItWorks: {
+        heading: "Cara kalkulator pinjaman perumahan berfungsi",
+        paragraphs: [
+          "Ansuran bulanan dikira dengan formula amortisasi standard menggunakan jumlah pinjaman (harga tolak bayaran pendahuluan), kadar faedah tahunan, dan tempoh dalam bulan.",
+          "Duti setem MOT dikenakan secara berperingkat: 1% bagi RM100,000 pertama, 2% (RM100,001–500,000), 3% (RM500,001–1,000,000), dan 4% melebihi RM1,000,000.",
+          "Duti setem perjanjian pinjaman ialah 0.5% rata daripada jumlah pinjaman. Pembeli rumah pertama bagi hartanah RM500,000 ke bawah layak mendapat pengecualian penuh.",
+        ],
+      },
+      faq: [
+        {
+          question: "Berapa bayaran pendahuluan diperlukan untuk rumah di Malaysia?",
+          answer: "Kebanyakan bank membiayai sehingga 90% nilai hartanah untuk dua rumah pertama, jadi anda biasanya perlu 10% bayaran pendahuluan berserta duti setem dan yuran guaman.",
+        },
+        {
+          question: "Adakah duti setem benar-benar dikecualikan untuk rumah pertama?",
+          answer: "Ya — bagi pembeli rumah pertama yang layak, hartanah RM500,000 ke bawah mendapat pengecualian penuh duti setem MOT dan perjanjian pinjaman. Sahkan terma tahun semasa dengan peguam anda.",
+        },
+      ],
+      related: ["salary", "tax", "epf"],
+      lastReviewed: "2026-06-15",
+    },
+    id: {
+      intro:
+        "Perkirakan cicilan bulanan pinjaman rumah di Malaysia dan, yang sama pentingnya, uang muka yang dibutuhkan — uang muka, bea meterai Memorandum Pengalihan (MOT), bea meterai perjanjian pinjaman, dan biaya hukum. Kalkulator ini menggunakan tarif bea meterai 2024 dan skala biaya hukum standar.",
+      howItWorks: {
+        heading: "Cara kalkulator pinjaman rumah bekerja",
+        paragraphs: [
+          "Cicilan bulanan dihitung dengan rumus amortisasi standar menggunakan jumlah pinjaman (harga dikurangi uang muka), suku bunga tahunan, dan tenor dalam bulan.",
+          "Bea meterai MOT dikenakan bertingkat: 1% untuk RM100.000 pertama, 2% (RM100.001–500.000), 3% (RM500.001–1.000.000), dan 4% di atas RM1.000.000.",
+          "Bea meterai perjanjian pinjaman adalah 0,5% rata dari jumlah pinjaman. Pembeli rumah pertama dengan properti RM500.000 ke bawah mendapat pembebasan penuh.",
+        ],
+      },
+      faq: [
+        {
+          question: "Berapa uang muka untuk rumah di Malaysia?",
+          answer: "Kebanyakan bank membiayai hingga 90% nilai properti untuk dua rumah pertama, jadi Anda biasanya butuh 10% uang muka plus bea meterai dan biaya hukum.",
+        },
+      ],
+      related: ["salary", "tax", "epf"],
+      lastReviewed: "2026-06-15",
+    },
+  },
+
+  tax: {
+    en: {
+      intro:
+        "Estimate your Malaysian personal income tax for Year of Assessment 2026. Enter your annual income and the reliefs you can claim — EPF and life insurance, lifestyle, medical, education/SSPN, child and spouse relief — and the calculator returns your chargeable income, tax before and after rebate, total tax payable, effective rate, and an approximate monthly PCB.",
+      howItWorks: {
+        heading: "How the income tax calculator works",
+        paragraphs: [
+          "A personal relief of RM9,000 is applied automatically, then your other reliefs are added (each capped at its statutory limit) and subtracted from your annual income to give chargeable income.",
+          "Tax is computed on chargeable income using the resident progressive bands for YA 2026. A rebate of RM400 applies when chargeable income is RM35,000 or less, with an extra RM400 if spouse relief is claimed.",
+          "The effective rate is total tax payable divided by your annual income, and the monthly PCB is the annual tax spread across 12 months.",
+        ],
+      },
+      rateTable: {
+        heading: "Resident tax bands (YA 2026)",
+        columns: ["Chargeable income (RM)", "Rate on band"],
+        rows: [
+          ["0 – 5,000", "0%"],
+          ["5,001 – 20,000", "1%"],
+          ["20,001 – 35,000", "3%"],
+          ["35,001 – 50,000", "6%"],
+          ["50,001 – 70,000", "11%"],
+          ["70,001 – 100,000", "19%"],
+          ["100,001 – 400,000", "25%"],
+          ["400,001 – 600,000", "26%"],
+          ["600,001 – 2,000,000", "28%"],
+          ["Above 2,000,000", "30%"],
+        ],
+        note: "Tax is progressive — each rate applies only to income within that band.",
+      },
+      examples: [
+        {
+          title: "RM72,000 income with RM6,500 reliefs",
+          given: [
+            "Annual income: RM72,000",
+            "Reliefs: RM9,000 personal + RM4,000 EPF/life + RM2,500 lifestyle",
+            "No spouse or child relief",
+          ],
+          result: "Chargeable income RM56,500 → tax ≈ RM2,335 for the year (≈ RM195/month), an effective rate of about 3.2%.",
+        },
+      ],
+      faq: [
+        {
+          question: "Who needs to file income tax in Malaysia?",
+          answer: "Generally, residents earning more than RM34,000 a year after EPF deduction must register and file with LHDN. Filing for YA 2026 is typically done in early 2027.",
+        },
+        {
+          question: "Is this the same as PCB / MTD?",
+          answer: "PCB (Potongan Cukai Berjadual / Monthly Tax Deduction) is the monthly withholding by your employer. The monthly figure here is an annual-tax-over-12 estimate, which is close but not identical to the official PCB schedule.",
+        },
+        {
+          question: "Which reliefs are capped?",
+          answer: "Yes — EPF + life insurance is capped at RM7,000, lifestyle at RM2,500, medical at RM10,000, and education/SSPN at RM8,000. The calculator applies these caps for you.",
+        },
+      ],
+      related: ["salary", "epf", "housing"],
+      lastReviewed: "2026-06-15",
+    },
+    ms: {
+      intro:
+        "Anggarkan cukai pendapatan peribadi Malaysia anda untuk Tahun Taksiran 2026. Masukkan pendapatan tahunan dan pelepasan yang boleh dituntut — EPF dan insurans hayat, gaya hidup, perubatan, pendidikan/SSPN, pelepasan anak dan pasangan — dan kalkulator memaparkan pendapatan bercukai, cukai sebelum dan selepas rebat, jumlah cukai kena dibayar, kadar berkesan, dan anggaran PCB bulanan.",
+      howItWorks: {
+        heading: "Cara kalkulator cukai pendapatan berfungsi",
+        paragraphs: [
+          "Pelepasan diri RM9,000 dikira secara automatik, kemudian pelepasan lain ditambah (setiap satu dihadkan) dan ditolak daripada pendapatan tahunan untuk mendapat pendapatan bercukai.",
+          "Cukai dikira atas pendapatan bercukai menggunakan kadar berperingkat pemastautin TT 2026. Rebat RM400 dikenakan apabila pendapatan bercukai RM35,000 atau kurang.",
+        ],
+      },
+      faq: [
+        {
+          question: "Siapa perlu memfailkan cukai pendapatan di Malaysia?",
+          answer: "Secara amnya, pemastautin yang berpendapatan lebih RM34,000 setahun selepas potongan EPF perlu mendaftar dan memfailkan dengan LHDN.",
+        },
+      ],
+      related: ["salary", "epf", "housing"],
+      lastReviewed: "2026-06-15",
+    },
+    id: {
+      intro:
+        "Perkirakan pajak penghasilan pribadi Malaysia Anda untuk Tahun Penilaian 2026. Masukkan penghasilan tahunan dan keringanan yang dapat diklaim — EPF dan asuransi jiwa, gaya hidup, medis, pendidikan/SSPN, keringanan anak dan pasangan — dan kalkulator menampilkan penghasilan kena pajak, pajak sebelum dan sesudah rebat, total pajak terutang, tarif efektif, dan perkiraan PCB bulanan.",
+      howItWorks: {
+        heading: "Cara kalkulator pajak penghasilan bekerja",
+        paragraphs: [
+          "Keringanan pribadi RM9.000 diterapkan otomatis, lalu keringanan lain ditambahkan (masing-masing dibatasi) dan dikurangkan dari penghasilan tahunan untuk mendapat penghasilan kena pajak.",
+          "Pajak dihitung atas penghasilan kena pajak memakai tarif progresif penduduk TP 2026. Rebat RM400 berlaku jika penghasilan kena pajak RM35.000 atau kurang.",
+        ],
+      },
+      faq: [
+        {
+          question: "Siapa yang wajib lapor pajak di Malaysia?",
+          answer: "Umumnya, penduduk dengan penghasilan lebih dari RM34.000 per tahun setelah potongan EPF wajib mendaftar dan melapor ke LHDN.",
+        },
+      ],
+      related: ["salary", "epf", "housing"],
+      lastReviewed: "2026-06-15",
+    },
+  },
+
+  bmi: {
+    en: {
+      intro:
+        "Calculate your Body Mass Index (BMI) and see which WHO category you fall into, the healthy weight range for your height, your Basal Metabolic Rate (BMR), and the daily calories you need to maintain your weight (TDEE).",
+      howItWorks: {
+        heading: "How the BMI calculator works",
+        paragraphs: [
+          "BMI is your weight in kilograms divided by your height in metres squared. A BMI under 18.5 is underweight, 18.5–24.9 is normal, 25–29.9 is overweight, and 30 or above is obese.",
+          "BMR is estimated with the Mifflin-St Jeor equation, which uses your weight, height, age, and sex. TDEE then multiplies BMR by an activity factor from 1.2 (sedentary) to 1.9 (very active).",
+          "The healthy weight range is the weight that would put your BMI between 18.5 and 24.9 at your current height.",
+        ],
+      },
+      formula: {
+        heading: "Formulas used",
+        paragraphs: [
+          "BMI = weight(kg) ÷ height(m)²",
+          "BMR (male) = 10·kg + 6.25·cm − 5·age + 5",
+          "BMR (female) = 10·kg + 6.25·cm − 5·age − 161",
+          "TDEE = BMR × activity factor",
+        ],
+      },
+      rateTable: {
+        heading: "BMI categories (WHO)",
+        columns: ["BMI", "Category"],
+        rows: [
+          ["Below 18.5", "Underweight"],
+          ["18.5 – 24.9", "Normal weight"],
+          ["25.0 – 29.9", "Overweight"],
+          ["30.0 and above", "Obese"],
+        ],
+      },
+      faq: [
+        {
+          question: "Is BMI accurate for everyone?",
+          answer: "BMI is a quick screening tool, not a diagnosis. It does not distinguish muscle from fat, so very muscular people may read as overweight. It is also less precise across some ethnic groups — use it as a guide alongside other measures.",
+        },
+        {
+          question: "What is the difference between BMR and TDEE?",
+          answer: "BMR is the energy your body burns at complete rest. TDEE adds the calories you burn through daily activity and exercise — it is the number to aim for if you want to maintain your current weight.",
+        },
+        {
+          question: "How do I lose or gain weight from my TDEE?",
+          answer: "Eating roughly 300–500 kcal below your TDEE supports gradual weight loss; eating above it supports weight gain. Sustainable changes beat extreme deficits.",
+        },
+      ],
+      related: ["salary", "normal", "epf"],
+      lastReviewed: "2026-06-15",
+    },
+    ms: {
+      intro:
+        "Kira Indeks Jisim Badan (BMI) anda dan lihat kategori WHO yang sepadan, julat berat sihat untuk tinggi anda, Kadar Metabolik Asas (BMR), dan kalori harian yang diperlukan untuk mengekalkan berat anda (TDEE).",
+      howItWorks: {
+        heading: "Cara kalkulator BMI berfungsi",
+        paragraphs: [
+          "BMI ialah berat dalam kilogram dibahagi dengan kuasa dua tinggi dalam meter. BMI bawah 18.5 kurang berat, 18.5–24.9 normal, 25–29.9 berlebihan berat, dan 30 ke atas obes.",
+          "BMR dianggar dengan persamaan Mifflin-St Jeor menggunakan berat, tinggi, umur, dan jantina. TDEE mendarabkan BMR dengan faktor aktiviti dari 1.2 hingga 1.9.",
+        ],
+      },
+      rateTable: {
+        heading: "Kategori BMI (WHO)",
+        columns: ["BMI", "Kategori"],
+        rows: [
+          ["Bawah 18.5", "Kurang berat"],
+          ["18.5 – 24.9", "Berat normal"],
+          ["25.0 – 29.9", "Berlebihan berat"],
+          ["30.0 ke atas", "Obes"],
+        ],
+      },
+      faq: [
+        {
+          question: "Adakah BMI tepat untuk semua orang?",
+          answer: "BMI ialah alat saringan pantas, bukan diagnosis. Ia tidak membezakan otot daripada lemak, jadi orang yang sangat berotot mungkin terbaca berlebihan berat.",
+        },
+      ],
+      related: ["salary", "normal", "epf"],
+      lastReviewed: "2026-06-15",
+    },
+    id: {
+      intro:
+        "Hitung Indeks Massa Tubuh (BMI) Anda dan lihat kategori WHO yang sesuai, rentang berat sehat untuk tinggi Anda, Laju Metabolisme Basal (BMR), dan kalori harian yang dibutuhkan untuk mempertahankan berat Anda (TDEE).",
+      howItWorks: {
+        heading: "Cara kalkulator BMI bekerja",
+        paragraphs: [
+          "BMI adalah berat dalam kilogram dibagi kuadrat tinggi dalam meter. BMI di bawah 18.5 berat kurang, 18.5–24.9 normal, 25–29.9 kelebihan berat, dan 30 ke atas obesitas.",
+          "BMR diperkirakan dengan persamaan Mifflin-St Jeor menggunakan berat, tinggi, usia, dan jenis kelamin. TDEE mengalikan BMR dengan faktor aktivitas dari 1.2 hingga 1.9.",
+        ],
+      },
+      rateTable: {
+        heading: "Kategori BMI (WHO)",
+        columns: ["BMI", "Kategori"],
+        rows: [
+          ["Di bawah 18.5", "Berat kurang"],
+          ["18.5 – 24.9", "Berat normal"],
+          ["25.0 – 29.9", "Kelebihan berat"],
+          ["30.0 ke atas", "Obesitas"],
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah BMI akurat untuk semua orang?",
+          answer: "BMI adalah alat skrining cepat, bukan diagnosis. Ia tidak membedakan otot dari lemak, jadi orang yang sangat berotot bisa terbaca kelebihan berat.",
+        },
+      ],
+      related: ["salary", "normal", "epf"],
+      lastReviewed: "2026-06-15",
+    },
+  },
 };
 
 export function getCalculatorContent(

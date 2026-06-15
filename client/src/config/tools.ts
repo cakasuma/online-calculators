@@ -3,15 +3,18 @@ import {
   CircleDollarSign,
   FileText,
   FlaskConical,
+  HeartPulse,
+  Home,
   Landmark,
   PiggyBank,
+  Receipt,
   Scale,
   Sigma,
   Star,
   type LucideIcon,
 } from "lucide-react";
 
-export type ToolCategory = "Finance" | "Math" | "Islamic" | "Documents";
+export type ToolCategory = "Finance" | "Math" | "Islamic" | "Documents" | "Health";
 
 export interface ToolMeta {
   slug: string;
@@ -29,6 +32,7 @@ export const toolCategories: { name: ToolCategory; description: string; icon: Lu
   { name: "Math", description: "Daily and advanced calculation helpers", icon: Sigma },
   { name: "Islamic", description: "Shariah-aware planning and guidance", icon: Landmark },
   { name: "Documents", description: "Guides and generators for legal paperwork", icon: FileText },
+  { name: "Health", description: "Everyday body and fitness calculators", icon: HeartPulse },
 ];
 
 export const tools: ToolMeta[] = [
@@ -50,6 +54,25 @@ export const tools: ToolMeta[] = [
     category: "Finance",
     icon: PiggyBank,
     featured: true,
+    badge: "New",
+  },
+  {
+    slug: "housing-loan-calculator",
+    href: "/housing-loan",
+    name: "Housing Loan Calculator (Malaysia)",
+    description: "Monthly home loan repayment plus stamp duty, legal fees, and total upfront cash needed.",
+    category: "Finance",
+    icon: Home,
+    featured: true,
+    badge: "New",
+  },
+  {
+    slug: "income-tax-calculator",
+    href: "/income-tax",
+    name: "Income Tax Calculator 2026",
+    description: "Estimate your Malaysia income tax with reliefs, rebates, and effective rate for YA 2026.",
+    category: "Finance",
+    icon: Receipt,
     badge: "New",
   },
   {
@@ -93,9 +116,29 @@ export const tools: ToolMeta[] = [
     category: "Documents",
     icon: FileText,
   },
+  {
+    slug: "bmi-calculator",
+    href: "/bmi",
+    name: "BMI Calculator (with BMR & Calories)",
+    description: "Check your BMI, healthy weight range, BMR, and daily calorie needs (TDEE).",
+    category: "Health",
+    icon: HeartPulse,
+    featured: true,
+  },
 ];
 
-export const navTools = ["/salary", "/epf-retirement", "/normal", "/scientific", "/faraid", "/zakat", "/wasiat"];
+export const navTools = [
+  "/salary",
+  "/epf-retirement",
+  "/housing-loan",
+  "/income-tax",
+  "/normal",
+  "/scientific",
+  "/faraid",
+  "/zakat",
+  "/wasiat",
+  "/bmi",
+];
 
 export const toolBrand = {
   name: "HelloKalku",

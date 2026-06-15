@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocale } from "@/hooks/use-locale";
 import { SITE_ORIGIN } from "@/config/seo";
 
-type Calculator = "salary" | "zakat" | "faraid" | "normal" | "scientific" | "epf";
+type Calculator = "salary" | "zakat" | "faraid" | "normal" | "scientific" | "epf" | "housing" | "tax" | "bmi";
 
 interface EmbedDialogProps {
   calculator: Calculator;

@@ -17,7 +17,12 @@ const TOOL_GROUPS = [
   {
     labelKey: "nav.groupFinance" as TranslationKey,
     descKey: "home.category.Finance.desc" as TranslationKey,
-    hrefs: ["/salary", "/epf-retirement"],
+    hrefs: ["/salary", "/epf-retirement", "/housing-loan", "/income-tax"],
+  },
+  {
+    labelKey: "nav.groupHealth" as TranslationKey,
+    descKey: "home.category.Health.desc" as TranslationKey,
+    hrefs: ["/bmi"],
   },
   {
     labelKey: "nav.groupMath" as TranslationKey,
@@ -52,6 +57,13 @@ const GROUP_COLORS: Record<string, { iconColor: string; iconBg: string; badge: s
     badge: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/60",
     hoverBorder: "hover:border-emerald-300/60 dark:hover:border-emerald-700/60",
     accentLine: "bg-emerald-500",
+  },
+  "nav.groupHealth": {
+    iconColor: "text-rose-600 dark:text-rose-400",
+    iconBg: "bg-rose-50 dark:bg-rose-950/50 group-hover:bg-rose-100 dark:group-hover:bg-rose-900/50",
+    badge: "bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/60",
+    hoverBorder: "hover:border-rose-300/60 dark:hover:border-rose-700/60",
+    accentLine: "bg-rose-500",
   },
 };
 
@@ -211,6 +223,9 @@ function ToolSearchBar() {
 const CALC_HREF: Record<string, string> = {
   salary: "/salary",
   epf: "/epf-retirement",
+  housing: "/housing-loan",
+  tax: "/income-tax",
+  bmi: "/bmi",
   normal: "/normal",
   scientific: "/scientific",
   faraid: "/faraid",
@@ -219,7 +234,7 @@ const CALC_HREF: Record<string, string> = {
 };
 
 const HERO_STATS = [
-  { value: "7", labelKey: "home.stats.tools" as TranslationKey },
+  { value: "10", labelKey: "home.stats.tools" as TranslationKey },
   { value: "3", labelKey: "home.stats.locales" as TranslationKey },
   { value: "2026", labelKey: "home.stats.updated" as TranslationKey },
   { value: "100%", labelKey: "home.stats.free" as TranslationKey },

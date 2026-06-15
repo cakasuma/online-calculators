@@ -24,6 +24,9 @@ import {
   Star,
   Wallet,
   BookOpen,
+  Landmark,
+  Receipt,
+  HeartPulse,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -63,12 +66,17 @@ import NotFound from "@/pages/not-found";
 type NavItem = { href: string; labelKey: TranslationKey; icon: typeof HomeIcon };
 type NavGroup = { labelKey: TranslationKey; items: NavItem[] };
 
+// Single source of truth for the calculator navigation. Drives the desktop
+// top-nav dropdowns, the mobile slide-in drawer, AND the footer columns, so
+// these surfaces stay in sync — add a calculator here and it shows everywhere.
 const NAV_GROUPS: NavGroup[] = [
   {
     labelKey: "nav.groupFinance",
     items: [
       { href: "/salary", labelKey: "nav.salary", icon: Wallet },
       { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
+      { href: "/housing-loan", labelKey: "nav.housing", icon: Landmark },
+      { href: "/income-tax", labelKey: "nav.tax", icon: Receipt },
     ],
   },
   {
@@ -86,43 +94,24 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
     ],
   },
+  {
+    labelKey: "nav.groupHealth",
+    items: [
+      { href: "/bmi", labelKey: "nav.bmi", icon: HeartPulse },
+    ],
+  },
 ];
 
 type FooterLink = { labelKey?: TranslationKey; label?: string; href: string };
-type FooterCol = { heading: string; links: FooterLink[] };
 
-const FOOTER_COLS: FooterCol[] = [
-  {
-    heading: "Finance",
-    links: [
-      { labelKey: "nav.salary", href: "/salary" },
-      { labelKey: "nav.epf", href: "/epf-retirement" },
-    ],
-  },
-  {
-    heading: "Islamic",
-    links: [
-      { labelKey: "nav.faraid", href: "/faraid" },
-      { labelKey: "nav.zakat", href: "/zakat" },
-      { labelKey: "nav.wasiat", href: "/wasiat" },
-    ],
-  },
-  {
-    heading: "Math",
-    links: [
-      { labelKey: "nav.basic", href: "/normal" },
-      { labelKey: "nav.scientific", href: "/scientific" },
-    ],
-  },
-  {
-    heading: "Learn",
-    links: [
-      { label: "Guides", href: "/blog" },
-      { labelKey: "footer.partners", href: "/partners" },
-      { labelKey: "footer.privacy", href: "/privacy" },
-      { labelKey: "footer.terms", href: "/terms" },
-    ],
-  },
+// The footer's calculator columns are derived from NAV_GROUPS (see the footer
+// render below) so they always match the top nav. Only the non-calculator
+// "Learn" column is defined here.
+const FOOTER_LEARN_LINKS: FooterLink[] = [
+  { label: "Guides", href: "/blog" },
+  { labelKey: "footer.partners", href: "/partners" },
+  { labelKey: "footer.privacy", href: "/privacy" },
+  { labelKey: "footer.terms", href: "/terms" },
 ];
 
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
@@ -465,7 +454,8 @@ function Layout() {
         </div>
       )}
 
-      {/* ── MOBILE BOTTOM NAV ── */}
+      {/* ── MOBILE BOTTOM NAV (curated 5-slot quick bar; the full calculator
+           list lives in the hamburger drawer above, sourced from NAV_GROUPS) ── */}
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-border safe-area-bottom"
         aria-label={t("a11y.navToggle")}
@@ -505,10 +495,10 @@ function Layout() {
         </div>
       </nav>
 
-      {/* ── FOOTER (dark, brand + 4 link cols + locale row) ── */}
+      {/* ── FOOTER (dark, brand + calculator cols + Learn col + locale row) ── */}
       <footer className="hk-why text-white pb-20 md:pb-0 safe-area-bottom">
         <div className="hk-container py-12 md:py-16">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8 md:gap-12">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-3">
                 <span className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0">
@@ -525,18 +515,30 @@ function Layout() {
                 </a>
               </p>
             </div>
-            {FOOTER_COLS.map((col) => (
-              <div key={col.heading}>
-                <p className="text-[11px] font-bold text-white/35 uppercase tracking-widest mb-3.5">{col.heading}</p>
-                {col.links.map((link) => (
-                  <Link key={link.href} href={link.href}>
+            {/* Calculator columns — derived from NAV_GROUPS to stay in sync with the top nav */}
+            {NAV_GROUPS.map((group) => (
+              <div key={group.labelKey}>
+                <p className="text-[11px] font-bold text-white/35 uppercase tracking-widest mb-3.5">{t(group.labelKey)}</p>
+                {group.items.map((item) => (
+                  <Link key={item.href} href={item.href}>
                     <span className="block text-[13px] text-white/55 hover:text-white transition-colors cursor-pointer mb-2.5">
-                      {link.labelKey ? t(link.labelKey) : link.label}
+                      {t(item.labelKey)}
                     </span>
                   </Link>
                 ))}
               </div>
             ))}
+            {/* Learn column */}
+            <div>
+              <p className="text-[11px] font-bold text-white/35 uppercase tracking-widest mb-3.5">Learn</p>
+              {FOOTER_LEARN_LINKS.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  <span className="block text-[13px] text-white/55 hover:text-white transition-colors cursor-pointer mb-2.5">
+                    {link.labelKey ? t(link.labelKey) : link.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
           <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <p className="text-[12px] text-white/35">

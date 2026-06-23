@@ -51,6 +51,193 @@ export interface CalculatorContent {
 type ContentMap = Partial<Record<RouteSlug, Record<Locale, CalculatorContent>>>;
 
 export const calculatorContent: ContentMap = {
+  carloan: {
+    en: {
+      intro:
+        "Estimate the monthly instalment on a Malaysian car loan and, crucially, the true cost of borrowing. Car loans here are hire purchase agreements that use a flat interest rate — you pay interest on the full original amount for the entire tenure, so the real (effective) rate you pay is roughly double the headline flat rate.",
+      howItWorks: {
+        heading: "How the car loan calculator works",
+        paragraphs: [
+          "The amount financed is the vehicle price minus your down payment (usually at least 10%).",
+          "Total interest is the flat rate applied to the full amount financed for every year of the tenure: amount × flat rate × years. Unlike a housing loan, it does not reduce as you pay down the balance.",
+          "The monthly instalment is simply the total payable (amount financed + total interest) divided evenly across every month of the tenure.",
+          "We also show an approximate effective rate — the reducing-balance equivalent — so you can compare a hire purchase fairly against other loans.",
+        ],
+      },
+      formula: {
+        heading: "Flat-rate hire purchase formula",
+        paragraphs: [
+          "Total interest = P · f · Y, where P = amount financed, f = flat rate (÷100), Y = years.",
+          "Monthly instalment = (P + total interest) ÷ (Y × 12).",
+          "Effective rate ≈ (2 · 12 · total interest) ÷ (P · (N + 1)), where N = total months.",
+        ],
+      },
+      examples: [
+        {
+          title: "RM90,000 car, 10% down, 3% flat over 9 years",
+          given: ["Amount financed: RM81,000", "Flat rate: 3% p.a.", "Tenure: 9 years (108 months)"],
+          result: "≈ RM952.50/month. Total interest is RM21,870, and the effective rate is about 5.9% — nearly double the 3% flat rate.",
+        },
+      ],
+      faq: [
+        {
+          question: "Why is the effective rate higher than the advertised flat rate?",
+          answer: "Because a flat rate charges interest on the full original loan for the whole tenure, even though your outstanding balance falls each month. The effective (reducing-balance) rate reflects what you truly pay and is usually close to double the flat rate.",
+        },
+        {
+          question: "How much down payment do I need for a car in Malaysia?",
+          answer: "Banks typically finance up to 90% of the price, so you generally need at least a 10% down payment. A larger down payment lowers the amount financed and the total interest.",
+        },
+        {
+          question: "Can I save money by paying off a hire purchase early?",
+          answer: "Settling early can reduce the interest under the Rule of 78 rebate, but the saving is smaller than with a reducing-balance loan because most interest is front-loaded. Ask your bank for the exact settlement figure.",
+        },
+      ],
+      related: ["housing", "salary", "tax"],
+      lastReviewed: "2026-06-23",
+    },
+    ms: {
+      intro:
+        "Anggarkan ansuran bulanan pinjaman kereta di Malaysia dan, yang penting, kos sebenar pinjaman. Pinjaman kereta di sini ialah perjanjian sewa beli yang menggunakan kadar faedah rata — anda membayar faedah atas jumlah asal penuh sepanjang tempoh, jadi kadar berkesan sebenar lebih kurang dua kali ganda kadar rata yang diiklankan.",
+      howItWorks: {
+        heading: "Cara kalkulator pinjaman kereta berfungsi",
+        paragraphs: [
+          "Jumlah dibiayai ialah harga kenderaan tolak bayaran pendahuluan (biasanya sekurang-kurangnya 10%).",
+          "Jumlah faedah ialah kadar rata atas jumlah penuh dibiayai bagi setiap tahun tempoh: jumlah × kadar rata × tahun. Ia tidak berkurangan apabila baki dibayar.",
+          "Ansuran bulanan ialah jumlah perlu dibayar (jumlah dibiayai + faedah) dibahagi sama rata sepanjang tempoh.",
+        ],
+      },
+      faq: [
+        {
+          question: "Mengapa kadar berkesan lebih tinggi daripada kadar rata yang diiklankan?",
+          answer: "Kerana kadar rata mengenakan faedah atas pinjaman asal penuh sepanjang tempoh walaupun baki anda berkurangan setiap bulan. Kadar berkesan mencerminkan bayaran sebenar dan biasanya hampir dua kali ganda kadar rata.",
+        },
+        {
+          question: "Berapa bayaran pendahuluan diperlukan untuk kereta di Malaysia?",
+          answer: "Bank biasanya membiayai sehingga 90% harga, jadi anda biasanya perlu sekurang-kurangnya 10% bayaran pendahuluan. Bayaran pendahuluan lebih besar mengurangkan jumlah dibiayai dan faedah.",
+        },
+      ],
+      related: ["housing", "salary", "tax"],
+      lastReviewed: "2026-06-23",
+    },
+    id: {
+      intro:
+        "Perkirakan cicilan bulanan kredit mobil di Malaysia dan, yang penting, biaya pinjaman sebenarnya. Kredit mobil di sini adalah perjanjian sewa beli yang memakai suku bunga flat — Anda membayar bunga atas jumlah awal penuh selama tenor, sehingga tarif efektif sebenarnya kira-kira dua kali lipat suku bunga flat yang diiklankan.",
+      howItWorks: {
+        heading: "Cara kalkulator kredit mobil bekerja",
+        paragraphs: [
+          "Jumlah dibiayai adalah harga kendaraan dikurangi uang muka (biasanya minimal 10%).",
+          "Total bunga adalah suku bunga flat atas jumlah penuh dibiayai untuk setiap tahun tenor: jumlah × suku bunga flat × tahun. Tidak berkurang saat saldo dibayar.",
+          "Cicilan bulanan adalah total yang harus dibayar (jumlah dibiayai + bunga) dibagi rata selama tenor.",
+        ],
+      },
+      faq: [
+        {
+          question: "Mengapa tarif efektif lebih tinggi dari suku bunga flat yang diiklankan?",
+          answer: "Karena suku bunga flat mengenakan bunga atas pinjaman awal penuh selama tenor meskipun saldo Anda turun setiap bulan. Tarif efektif mencerminkan pembayaran sebenarnya dan biasanya hampir dua kali lipat suku bunga flat.",
+        },
+        {
+          question: "Berapa uang muka yang dibutuhkan untuk mobil di Malaysia?",
+          answer: "Bank biasanya membiayai hingga 90% harga, jadi Anda umumnya butuh minimal 10% uang muka. Uang muka lebih besar menurunkan jumlah dibiayai dan total bunga.",
+        },
+      ],
+      related: ["housing", "salary", "tax"],
+      lastReviewed: "2026-06-23",
+    },
+  },
+  fd: {
+    en: {
+      intro:
+        "Work out the interest and maturity value of a Malaysian fixed deposit (FD). For a single placement, banks pay simple interest pro-rated to the tenure. If you let the FD auto-renew and roll the interest back in, the return compounds — this calculator shows both so you can see the difference. FD interest from licensed banks is tax-exempt for individuals.",
+      howItWorks: {
+        heading: "How the fixed deposit calculator works",
+        paragraphs: [
+          "Simple interest is your principal multiplied by the annual rate and the fraction of a year you hold the deposit: principal × rate × (months ÷ 12).",
+          "The maturity value is principal plus that interest, paid out when the FD matures.",
+          "If you auto-renew each month, interest is added to the principal and earns further interest — the compounded maturity value is principal × (1 + rate ÷ 12)^months.",
+          "The longer the tenure and the higher the rate, the bigger the gap between simple and compounded returns.",
+        ],
+      },
+      formula: {
+        heading: "Fixed deposit formulas",
+        paragraphs: [
+          "Simple maturity = P × (1 + r × months ÷ 12).",
+          "Compounded maturity = P × (1 + r ÷ 12)^months, where P = principal, r = annual rate (÷100).",
+        ],
+      },
+      examples: [
+        {
+          title: "RM10,000 at 3.5% p.a. for 12 months",
+          given: ["Principal: RM10,000", "Rate: 3.5% p.a.", "Tenure: 12 months"],
+          result: "Simple interest of RM350 → RM10,350 at maturity. With monthly auto-renewal it compounds to about RM10,355.67 — roughly RM5.67 extra.",
+        },
+      ],
+      faq: [
+        {
+          question: "Is fixed deposit interest taxable in Malaysia?",
+          answer: "Interest earned on deposits with licensed banks and finance companies is tax-exempt for resident individuals, so you keep the full amount shown.",
+        },
+        {
+          question: "Should I pick a long or short tenure?",
+          answer: "Longer tenures often carry slightly higher rates but lock up your money for longer. Many savers ladder several FDs across different tenures so some matures regularly while still earning competitive rates.",
+        },
+        {
+          question: "What happens if I withdraw before maturity?",
+          answer: "Early withdrawal usually means you forfeit some or all of the interest for that placement, depending on the bank's terms. The principal is protected and insured by PIDM up to RM250,000 per depositor per bank.",
+        },
+      ],
+      related: ["epf", "salary", "tax"],
+      lastReviewed: "2026-06-23",
+    },
+    ms: {
+      intro:
+        "Kira faedah dan nilai matang simpanan tetap (FD) Malaysia. Bagi satu simpanan, bank membayar faedah mudah berkadar dengan tempoh. Jika anda membiarkan FD dibaharui automatik, pulangan dikompaun — kalkulator ini menunjukkan kedua-duanya. Faedah FD daripada bank berlesen dikecualikan cukai untuk individu.",
+      howItWorks: {
+        heading: "Cara kalkulator simpanan tetap berfungsi",
+        paragraphs: [
+          "Faedah mudah ialah pokok didarab kadar tahunan dan pecahan tahun anda menyimpan: pokok × kadar × (bulan ÷ 12).",
+          "Nilai matang ialah pokok campur faedah, dibayar apabila FD matang.",
+          "Jika dibaharui automatik setiap bulan, faedah ditambah kepada pokok dan memperoleh faedah lanjut: pokok × (1 + kadar ÷ 12)^bulan.",
+        ],
+      },
+      faq: [
+        {
+          question: "Adakah faedah simpanan tetap dikenakan cukai di Malaysia?",
+          answer: "Faedah daripada simpanan di bank dan syarikat kewangan berlesen dikecualikan cukai untuk individu pemastautin, jadi anda menyimpan jumlah penuh yang ditunjukkan.",
+        },
+        {
+          question: "Patutkah saya pilih tempoh panjang atau pendek?",
+          answer: "Tempoh lebih panjang selalunya memberi kadar lebih tinggi tetapi mengunci wang anda lebih lama. Ramai penyimpan membuat 'ladder' beberapa FD pada tempoh berbeza supaya ada yang matang secara berkala.",
+        },
+      ],
+      related: ["epf", "salary", "tax"],
+      lastReviewed: "2026-06-23",
+    },
+    id: {
+      intro:
+        "Hitung bunga dan nilai jatuh tempo deposito (FD) Malaysia. Untuk satu penempatan, bank membayar bunga sederhana sesuai proporsi tenor. Jika Anda membiarkan deposito diperpanjang otomatis, hasilnya majemuk — kalkulator ini menampilkan keduanya. Bunga deposito dari bank berlisensi bebas pajak untuk individu.",
+      howItWorks: {
+        heading: "Cara kalkulator deposito bekerja",
+        paragraphs: [
+          "Bunga sederhana adalah pokok dikali tarif tahunan dan fraksi tahun Anda menyimpan: pokok × tarif × (bulan ÷ 12).",
+          "Nilai jatuh tempo adalah pokok ditambah bunga itu, dibayar saat deposito jatuh tempo.",
+          "Jika diperpanjang otomatis setiap bulan, bunga ditambahkan ke pokok dan memperoleh bunga lebih lanjut: pokok × (1 + tarif ÷ 12)^bulan.",
+        ],
+      },
+      faq: [
+        {
+          question: "Apakah bunga deposito kena pajak di Malaysia?",
+          answer: "Bunga dari simpanan di bank dan perusahaan keuangan berlisensi bebas pajak untuk individu penduduk, jadi Anda menyimpan jumlah penuh yang ditampilkan.",
+        },
+        {
+          question: "Sebaiknya pilih tenor panjang atau pendek?",
+          answer: "Tenor lebih panjang sering memberi tarif sedikit lebih tinggi tetapi mengunci dana Anda lebih lama. Banyak penabung membuat 'ladder' beberapa deposito pada tenor berbeda agar ada yang jatuh tempo secara berkala.",
+        },
+      ],
+      related: ["epf", "salary", "tax"],
+      lastReviewed: "2026-06-23",
+    },
+  },
   salary: {
     en: {
       intro:

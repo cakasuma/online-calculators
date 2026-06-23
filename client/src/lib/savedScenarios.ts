@@ -5,7 +5,7 @@
 
 export interface SavedScenario {
   id: string;
-  calculator: "salary" | "zakat" | "faraid" | "wasiat" | "normal" | "scientific" | "epf" | "housing" | "tax" | "bmi";
+  calculator: "salary" | "zakat" | "faraid" | "wasiat" | "normal" | "scientific" | "epf" | "housing" | "tax" | "bmi" | "carloan" | "fd";
   name: string;
   /** Full shareable URL that recreates the scenario. */
   url: string;

@@ -27,6 +27,8 @@ import {
   Landmark,
   Receipt,
   HeartPulse,
+  Car,
+  Banknote,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -55,6 +57,8 @@ import SalaryCalculator from "@/pages/SalaryCalculator";
 import EpfCalculator from "@/pages/EpfCalculator";
 import HousingLoanCalculator from "@/pages/HousingLoanCalculator";
 import IncomeTaxCalculator from "@/pages/IncomeTaxCalculator";
+import CarLoanCalculator from "@/pages/CarLoanCalculator";
+import FixedDepositCalculator from "@/pages/FixedDepositCalculator";
 import BmiCalculator from "@/pages/BmiCalculator";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Partners from "@/pages/Partners";
@@ -77,6 +81,8 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
       { href: "/housing-loan", labelKey: "nav.housing", icon: Landmark },
       { href: "/income-tax", labelKey: "nav.tax", icon: Receipt },
+      { href: "/car-loan", labelKey: "nav.carloan", icon: Car },
+      { href: "/fixed-deposit", labelKey: "nav.fd", icon: Banknote },
     ],
   },
   {
@@ -224,7 +230,7 @@ function Layout() {
   }, [adsenseEnabled]);
 
   const handleCalculate = useCallback(
-    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf" | "housing" | "tax" | "bmi") =>
+    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf" | "housing" | "tax" | "bmi" | "carloan" | "fd") =>
       (expression: string, result: string, url?: string) => {
         history.add(calculator, expression, result, url);
       },
@@ -402,6 +408,14 @@ function Layout() {
           <Route path="/income-tax">
             <IncomeTaxCalculator onCalculate={handleCalculate("tax")} />
             <CalculatorContent slug="tax" />
+          </Route>
+          <Route path="/car-loan">
+            <CarLoanCalculator onCalculate={handleCalculate("carloan")} />
+            <CalculatorContent slug="carloan" />
+          </Route>
+          <Route path="/fixed-deposit">
+            <FixedDepositCalculator onCalculate={handleCalculate("fd")} />
+            <CalculatorContent slug="fd" />
           </Route>
           <Route path="/bmi">
             <BmiCalculator onCalculate={handleCalculate("bmi")} />

@@ -23,6 +23,11 @@ export const CALCULATOR_KEYS = [
   "normal",
   "scientific",
   "epf",
+  "housing",
+  "tax",
+  "bmi",
+  "carloan",
+  "fd",
 ] as const;
 
 export const LEAD_INTENTS = [

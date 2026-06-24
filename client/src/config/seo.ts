@@ -14,6 +14,8 @@ export type RouteSlug =
   | "epf"
   | "housing"
   | "tax"
+  | "carloan"
+  | "fd"
   | "bmi"
   | "normal"
   | "scientific"
@@ -205,6 +207,68 @@ export const routes: RouteSeoEntry[] = [
           "Perkirakan pajak penghasilan pribadi Malaysia untuk TP 2026. Terapkan keringanan EPF, gaya hidup, medis, dan pendidikan, lihat penghasilan kena pajak, rebat, pajak terutang, dan tarif efektif.",
         heading: "Kalkulator pajak penghasilan Malaysia 2026",
         tagline: "Keringanan, rebat, penghasilan kena pajak, dan tarif efektif.",
+      },
+    },
+  },
+  {
+    slug: "carloan",
+    path: "/car-loan",
+    prerender: true,
+    sitemap: { priority: 0.85, changefreq: "monthly" },
+    copy: {
+      en: {
+        title: "Car Loan Calculator Malaysia (Hire Purchase + Effective Rate) | HelloKalku",
+        description:
+          "Calculate your Malaysian car loan instalment from the flat hire purchase rate, plus the true reducing-balance effective interest you actually pay. Free, instant, and private.",
+        keywords:
+          "car loan calculator malaysia, hire purchase calculator, kereta loan calculator, flat rate vs effective rate, monthly car instalment malaysia",
+        heading: "Malaysia car loan calculator",
+        tagline: "Monthly hire purchase instalment and the true effective interest rate.",
+      },
+      ms: {
+        title: "Kalkulator Pinjaman Kereta Malaysia (Sewa Beli + Kadar Berkesan) | HelloKalku",
+        description:
+          "Kira ansuran pinjaman kereta Malaysia anda daripada kadar sewa beli rata, berserta faedah berkesan baki berkurangan sebenar yang anda bayar. Percuma, segera, dan peribadi.",
+        heading: "Kalkulator pinjaman kereta Malaysia",
+        tagline: "Ansuran sewa beli bulanan dan kadar faedah berkesan sebenar.",
+      },
+      id: {
+        title: "Kalkulator Kredit Mobil Malaysia (Sewa Beli + Tarif Efektif) | HelloKalku",
+        description:
+          "Hitung cicilan kredit mobil Malaysia Anda dari suku bunga flat sewa beli, plus bunga efektif saldo menurun sebenarnya yang Anda bayar. Gratis, instan, dan privat.",
+        heading: "Kalkulator kredit mobil Malaysia",
+        tagline: "Cicilan sewa beli bulanan dan tarif bunga efektif sebenarnya.",
+      },
+    },
+  },
+  {
+    slug: "fd",
+    path: "/fixed-deposit",
+    prerender: true,
+    sitemap: { priority: 0.85, changefreq: "monthly" },
+    copy: {
+      en: {
+        title: "Fixed Deposit Calculator Malaysia (FD Interest + Maturity) | HelloKalku",
+        description:
+          "Work out the interest and maturity value of a Malaysian fixed deposit, and see how much more you earn by letting it auto-renew and compound. FD interest is tax-exempt for individuals.",
+        keywords:
+          "fixed deposit calculator malaysia, fd calculator, fd interest calculator, fixed deposit maturity, fd rate malaysia, simpanan tetap",
+        heading: "Malaysia fixed deposit calculator",
+        tagline: "FD interest, maturity value, and auto-renewal compounding.",
+      },
+      ms: {
+        title: "Kalkulator Simpanan Tetap Malaysia (Faedah FD + Matang) | HelloKalku",
+        description:
+          "Kira faedah dan nilai matang simpanan tetap Malaysia, dan lihat berapa lebih yang anda peroleh jika dibaharui automatik dan dikompaun. Faedah FD dikecualikan cukai untuk individu.",
+        heading: "Kalkulator simpanan tetap Malaysia",
+        tagline: "Faedah FD, nilai matang, dan pengkompaunan pembaharuan automatik.",
+      },
+      id: {
+        title: "Kalkulator Deposito Malaysia (Bunga FD + Jatuh Tempo) | HelloKalku",
+        description:
+          "Hitung bunga dan nilai jatuh tempo deposito Malaysia, dan lihat berapa lebih yang Anda peroleh jika diperpanjang otomatis dan majemuk. Bunga deposito bebas pajak untuk individu.",
+        heading: "Kalkulator deposito Malaysia",
+        tagline: "Bunga FD, nilai jatuh tempo, dan bunga majemuk perpanjangan otomatis.",
       },
     },
   },

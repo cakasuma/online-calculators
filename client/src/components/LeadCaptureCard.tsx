@@ -7,7 +7,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { getUtmParams, recordServerEvent, track } from "@/lib/analytics";
 import { useLocale } from "@/hooks/use-locale";
 
-type Calculator = "faraid" | "wasiat" | "zakat" | "salary" | "normal" | "scientific" | "epf" | "housing" | "tax" | "bmi";
+type Calculator = "faraid" | "wasiat" | "zakat" | "salary" | "normal" | "scientific" | "epf" | "housing" | "tax" | "bmi" | "carloan" | "fd";
 type Intent = "consult" | "reminder" | "partner" | "newsletter" | "report";
 
 export interface LeadCaptureCardProps {

@@ -39,17 +39,26 @@ export function stringField<T, K extends keyof T>(key: string): UrlField<T, K> {
   };
 }
 
-export function numberField<T, K extends keyof T>(key: string): UrlField<T, K> {
+export function numberField<T, K extends keyof T>(
+  key: string,
+  opts: { keepZero?: boolean } = {},
+): UrlField<T, K> {
   return {
     key,
     parse: (raw) => {
       const n = Number(raw);
       return (Number.isFinite(n) ? n : undefined) as T[K] | undefined;
     },
+    // By default we omit 0 to keep links short (most fields treat 0 as "unset").
+    // Pass { keepZero: true } for fields where 0 is a meaningful, non-default
+    // choice (e.g. 0% down payment or 0% interest) — otherwise a shared link
+    // would drop the param and the recipient falls back to the schema default.
     serialize: (v) => {
       if (v == null) return null;
       const n = Number(v);
-      return Number.isFinite(n) && n !== 0 ? String(n) : null;
+      if (!Number.isFinite(n)) return null;
+      if (n === 0 && !opts.keepZero) return null;
+      return String(n);
     },
   };
 }

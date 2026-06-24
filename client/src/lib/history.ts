@@ -1,6 +1,6 @@
 export interface HistoryEntry {
   id: string;
-  calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf" | "housing" | "tax" | "bmi";
+  calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf" | "housing" | "tax" | "bmi" | "carloan" | "fd";
   expression: string;
   result: string;
   timestamp: number;

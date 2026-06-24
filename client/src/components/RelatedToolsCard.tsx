@@ -7,9 +7,11 @@ import type { TranslationKey } from "@/lib/i18n";
 
 const RELATED: Record<string, string[]> = {
   "/salary":         ["/income-tax", "/epf-retirement"],
-  "/epf-retirement": ["/salary", "/housing-loan"],
-  "/housing-loan":   ["/salary", "/income-tax"],
+  "/epf-retirement": ["/salary", "/fixed-deposit"],
+  "/housing-loan":   ["/salary", "/car-loan"],
   "/income-tax":     ["/salary", "/epf-retirement"],
+  "/car-loan":       ["/housing-loan", "/salary"],
+  "/fixed-deposit":  ["/epf-retirement", "/salary"],
   "/faraid":         ["/wasiat", "/zakat"],
   "/zakat":          ["/faraid", "/salary"],
   "/normal":         ["/scientific"],

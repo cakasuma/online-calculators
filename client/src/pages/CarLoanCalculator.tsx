@@ -34,8 +34,21 @@ const money2 = (value: number) =>
 
 function parseNumberInput(value: string): number {
   if (!value.trim()) return 0;
-  const normalized = value.replace(/[,_\s]/g, "");
-  const parsed = Number(normalized);
+  let s = value.replace(/[_\s]/g, "");
+  if (s.includes(",") && s.includes(".")) {
+    // Both separators present: assume "," = thousands, "." = decimal.
+    s = s.replace(/,/g, "");
+  } else if (s.includes(",")) {
+    // Only commas. Treat a single comma followed by 1–2 digits as a decimal
+    // separator (e.g. the "3,5" rates shown in the Indonesian locale);
+    // otherwise treat commas as thousands separators (e.g. "90,000").
+    const parts = s.split(",");
+    s =
+      parts.length === 2 && parts[1].length > 0 && parts[1].length <= 2
+        ? `${parts[0]}.${parts[1]}`
+        : s.replace(/,/g, "");
+  }
+  const parsed = Number(s);
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
@@ -96,8 +109,10 @@ function NumberField({
 
 const URL_SCHEMA: UrlSchema<CarLoanInputs> = {
   price: numberField("price"),
-  downPct: numberField("down"),
-  flatRate: numberField("rate"),
+  // 0% down and 0% flat interest are valid, non-default choices — keep them in
+  // shared links so the recipient sees the same scenario.
+  downPct: numberField("down", { keepZero: true }),
+  flatRate: numberField("rate", { keepZero: true }),
   tenureYears: numberField("tenure"),
 };
 

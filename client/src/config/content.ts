@@ -1290,11 +1290,13 @@ export const calculatorContent: ContentMap = {
   tax: {
     en: {
       intro:
-        "Estimate your Malaysian personal income tax for Year of Assessment 2026. Enter your annual income and the reliefs you can claim — EPF and life insurance, lifestyle, medical, education/SSPN, child and spouse relief — and the calculator returns your chargeable income, tax before and after rebate, total tax payable, effective rate, and an approximate monthly PCB.",
+        "Estimate your Malaysian personal income tax for Year of Assessment 2026. Enter your annual income and the reliefs you can claim — EPF, life insurance, medical, parents' medical, SSPN, PRS, SOCSO/EIS, lifestyle, sports, childcare, and child and spouse relief — plus any zakat paid, and the calculator returns your chargeable income, tax before and after rebates, total tax payable, effective rate, and an approximate monthly PCB.",
       howItWorks: {
         heading: "How the income tax calculator works",
         paragraphs: [
-          "A personal relief of RM9,000 is applied automatically, then your other reliefs are added (each capped at its statutory limit) and subtracted from your annual income to give chargeable income.",
+          "A personal relief of RM9,000 is applied automatically, then your other reliefs are added — each capped at its own statutory limit, independently of the others — and subtracted from your annual income to give chargeable income.",
+          "Child relief is tiered rather than flat: RM2,000 for a child under 18, RM8,000 for a child aged 18 and over in tertiary education at diploma level or above, RM6,000 for a disabled child, and RM14,000 for a disabled child in higher education.",
+          "Zakat is a rebate, not a relief. That makes it far more valuable than a relief of the same size: RM1 of relief only saves you your marginal rate, while RM1 of zakat cancels RM1 of tax outright. It cannot create a refund, so it is capped at the tax still standing.",
           "Tax is computed on chargeable income using the resident progressive bands for YA 2026. A rebate of RM400 applies when chargeable income is RM35,000 or less, with an extra RM400 if spouse relief is claimed.",
           "The effective rate is total tax payable divided by your annual income, and the monthly PCB is the annual tax spread across 12 months.",
         ],
@@ -1318,13 +1320,13 @@ export const calculatorContent: ContentMap = {
       },
       examples: [
         {
-          title: "RM72,000 income with RM6,500 reliefs",
+          title: "RM72,000 income with RM15,500 of reliefs",
           given: [
             "Annual income: RM72,000",
-            "Reliefs: RM9,000 personal + RM4,000 EPF/life + RM2,500 lifestyle",
+            "Reliefs: RM9,000 personal + RM4,000 EPF + RM2,500 lifestyle",
             "No spouse or child relief",
           ],
-          result: "Chargeable income RM56,500 → tax ≈ RM2,335 for the year (≈ RM195/month), an effective rate of about 3.2%.",
+          result: "Chargeable income RM56,500 → tax of RM2,215 for the year (≈ RM185/month), an effective rate of about 3.08%.",
         },
       ],
       faq: [
@@ -1338,7 +1340,7 @@ export const calculatorContent: ContentMap = {
         },
         {
           question: "Which reliefs are capped?",
-          answer: "Yes — EPF + life insurance is capped at RM7,000, lifestyle at RM2,500, medical at RM10,000, and education/SSPN at RM8,000. The calculator applies these caps for you.",
+          answer: "Every relief has its own independent cap, and they do not pool. EPF is capped at RM4,000 and life insurance/takaful separately at RM3,000 — these are often quoted together as \"RM7,000\", but unused life insurance headroom cannot absorb EPF beyond RM4,000. Lifestyle is RM2,500 with a separate RM1,000 for sports, medical RM10,000, SSPN RM8,000, PRS RM3,000, and SOCSO/EIS RM350. The calculator applies each cap for you and shows which ones you have maxed out.",
         },
       ],
       related: ["salary", "epf", "housing"],
@@ -1346,7 +1348,7 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Anggarkan cukai pendapatan peribadi Malaysia anda untuk Tahun Taksiran 2026. Masukkan pendapatan tahunan dan pelepasan yang boleh dituntut — EPF dan insurans hayat, gaya hidup, perubatan, pendidikan/SSPN, pelepasan anak dan pasangan — dan kalkulator memaparkan pendapatan bercukai, cukai sebelum dan selepas rebat, jumlah cukai kena dibayar, kadar berkesan, dan anggaran PCB bulanan.",
+        "Anggarkan cukai pendapatan peribadi Malaysia anda untuk Tahun Taksiran 2026. Masukkan pendapatan tahunan dan pelepasan yang boleh dituntut — KWSP, insurans hayat, perubatan, perubatan ibu bapa, SSPN, PRS, PERKESO/SIP, gaya hidup, sukan, taska, serta pelepasan anak dan pasangan — dan zakat yang dibayar, dan kalkulator memaparkan pendapatan bercukai, cukai sebelum dan selepas rebat, jumlah cukai kena dibayar, kadar berkesan, dan anggaran PCB bulanan.",
       howItWorks: {
         heading: "Cara kalkulator cukai pendapatan berfungsi",
         paragraphs: [
@@ -1365,7 +1367,7 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Perkirakan pajak penghasilan pribadi Malaysia Anda untuk Tahun Penilaian 2026. Masukkan penghasilan tahunan dan keringanan yang dapat diklaim — EPF dan asuransi jiwa, gaya hidup, medis, pendidikan/SSPN, keringanan anak dan pasangan — dan kalkulator menampilkan penghasilan kena pajak, pajak sebelum dan sesudah rebat, total pajak terutang, tarif efektif, dan perkiraan PCB bulanan.",
+        "Perkirakan pajak penghasilan pribadi Malaysia Anda untuk Tahun Penilaian 2026. Masukkan penghasilan tahunan dan keringanan yang dapat diklaim — EPF, asuransi jiwa, medis, medis orang tua, SSPN, PRS, SOCSO/EIS, gaya hidup, olahraga, penitipan anak, serta keringanan anak dan pasangan — dan zakat yang dibayar, dan kalkulator menampilkan penghasilan kena pajak, pajak sebelum dan sesudah rebat, total pajak terutang, tarif efektif, dan perkiraan PCB bulanan.",
       howItWorks: {
         heading: "Cara kalkulator pajak penghasilan bekerja",
         paragraphs: [

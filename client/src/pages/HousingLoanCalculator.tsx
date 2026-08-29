@@ -1,7 +1,8 @@
-import { ArrowRight, Calculator as CalculatorIcon, Home, Info, Receipt, Wallet } from "lucide-react";
+import { ArrowRight, Calculator as CalculatorIcon, Home, Info, PiggyBank, Receipt, Wallet } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
@@ -10,6 +11,13 @@ import { SaveButton } from "@/components/SaveButton";
 import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
+  calculateHousingLoan,
+  HOUSING_LOAN_DEFAULTS,
+  type BuyerType,
+  type HousingLoanInputs,
+} from "@/lib/housingLoan";
+import {
+  boolField,
   buildShareUrl,
   enumField,
   mergeFromUrl,
@@ -18,22 +26,6 @@ import {
   useUrlSync,
   type UrlSchema,
 } from "@/lib/urlState";
-
-interface HousingInputs {
-  price: number;
-  downPct: number;
-  tenureYears: number;
-  rate: number;
-  firstHome: "yes" | "no";
-}
-
-const DEFAULT_INPUTS: HousingInputs = {
-  price: 500000,
-  downPct: 10,
-  tenureYears: 35,
-  rate: 4,
-  firstHome: "no",
-};
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-MY", {
@@ -68,82 +60,6 @@ function formatInputNumber(value: string, maxDecimals = 2): string {
 
 function toInputString(value: number): string {
   return value === 0 ? "" : new Intl.NumberFormat("en-MY", { maximumFractionDigits: 2 }).format(value);
-}
-
-/** Memorandum of Transfer (MOT) ad-valorem stamp duty — 2024 Malaysian tiers. */
-function motStampDuty(price: number): number {
-  const tiers = [
-    { upTo: 100000, rate: 0.01 },
-    { upTo: 500000, rate: 0.02 },
-    { upTo: 1000000, rate: 0.03 },
-    { upTo: Infinity, rate: 0.04 },
-  ];
-  let duty = 0;
-  let prev = 0;
-  for (const tier of tiers) {
-    if (price > prev) {
-      duty += (Math.min(price, tier.upTo) - prev) * tier.rate;
-      prev = tier.upTo;
-    } else break;
-  }
-  return duty;
-}
-
-/** Legal fees scale (Solicitors' Remuneration Order) applied to a sum. */
-function legalScale(amount: number): number {
-  const tiers = [
-    { upTo: 500000, rate: 0.0125 },
-    { upTo: 1000000, rate: 0.01 },
-    { upTo: 3000000, rate: 0.007 },
-    { upTo: Infinity, rate: 0.006 },
-  ];
-  let fee = 0;
-  let prev = 0;
-  for (const tier of tiers) {
-    if (amount > prev) {
-      fee += (Math.min(amount, tier.upTo) - prev) * tier.rate;
-      prev = tier.upTo;
-    } else break;
-  }
-  return fee;
-}
-
-function calculate(input: HousingInputs) {
-  const downPayment = input.price * (input.downPct / 100);
-  const loanAmount = Math.max(0, input.price - downPayment);
-  const months = Math.max(1, Math.round(input.tenureYears * 12));
-  const monthlyRate = input.rate / 100 / 12;
-
-  const monthlyInstallment =
-    monthlyRate === 0
-      ? loanAmount / months
-      : (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-        (Math.pow(1 + monthlyRate, months) - 1);
-
-  const totalPayment = monthlyInstallment * months;
-  const totalInterest = totalPayment - loanAmount;
-
-  // First-home buyers enjoy full stamp-duty exemption (MOT + loan agreement)
-  // when the property price is RM500,000 or below.
-  const exempt = input.firstHome === "yes" && input.price <= 500000;
-  const motDuty = exempt ? 0 : motStampDuty(input.price);
-  const loanDuty = exempt ? 0 : loanAmount * 0.005; // loan agreement stamp duty = 0.5%
-  const legalFees = legalScale(input.price) + legalScale(loanAmount); // SPA + loan agreement
-
-  const totalUpfront = downPayment + motDuty + loanDuty + legalFees;
-
-  return {
-    downPayment,
-    loanAmount,
-    monthlyInstallment,
-    totalPayment,
-    totalInterest,
-    motDuty,
-    loanDuty,
-    legalFees,
-    totalUpfront,
-    exempt,
-  };
 }
 
 function NumberField({
@@ -187,12 +103,71 @@ function NumberField({
   );
 }
 
-const URL_SCHEMA: UrlSchema<HousingInputs> = {
+function ToggleRow({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex items-center justify-between gap-3 rounded-2xl bg-muted/40 px-4 py-3">
+      <span className="text-sm font-medium">{label}</span>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </label>
+  );
+}
+
+/** One line of the upfront cost breakdown, struck through when a waiver applies. */
+function CostRow({
+  label,
+  gross,
+  payable,
+  helper,
+  waivedLabel,
+}: {
+  label: string;
+  gross: number;
+  payable: number;
+  helper: string;
+  waivedLabel?: string;
+}) {
+  const waived = waivedLabel != null && gross > 0 && payable === 0;
+  return (
+    <div className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+      <div className="flex items-center justify-between gap-3 min-w-0">
+        <span className="text-sm text-muted-foreground min-w-0 break-words">{label}</span>
+        <span className="font-semibold tabular-nums text-right break-words">
+          {waived ? (
+            <>
+              <span className="mr-2 font-normal text-muted-foreground line-through">{money(gross)}</span>
+              {money(0)}
+            </>
+          ) : (
+            money(payable)
+          )}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">{waived ? waivedLabel : helper}</p>
+    </div>
+  );
+}
+
+const URL_SCHEMA: UrlSchema<HousingLoanInputs> = {
   price: numberField("price"),
+  rebatePct: numberField("rebate"),
   downPct: numberField("down"),
   tenureYears: numberField("tenure"),
   rate: numberField("rate"),
-  firstHome: enumField<HousingInputs, "firstHome">("first", ["yes", "no"]),
+  buyerType: enumField<HousingLoanInputs, "buyerType">("buyer", ["citizen", "pr", "foreigner"]),
+  firstHome: enumField<HousingLoanInputs, "firstHome">("first", ["yes", "no"]),
+  developerAbsorbsLegal: boolField("nolegal"),
+  developerAbsorbsMot: boolField("nomot"),
+  mrtaPremium: numberField("mrta"),
+  financeMrta: boolField("finmrta"),
+  extraMonthly: numberField("extra"),
 };
 
 interface Props {
@@ -201,33 +176,59 @@ interface Props {
 
 export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
-  const [initial] = useState<HousingInputs>(() => mergeFromUrl<HousingInputs>(DEFAULT_INPUTS, URL_SCHEMA));
+  const [initial] = useState<HousingLoanInputs>(() =>
+    mergeFromUrl<HousingLoanInputs>(HOUSING_LOAN_DEFAULTS, URL_SCHEMA),
+  );
   const arrivedViaShare = useMemo(() => urlHasSchemaParams(URL_SCHEMA), []);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const [priceInput, setPriceInput] = useState(toInputString(initial.price));
+  const [rebateInput, setRebateInput] = useState(toInputString(initial.rebatePct));
   const [downInput, setDownInput] = useState(toInputString(initial.downPct));
   const [tenureInput, setTenureInput] = useState(toInputString(initial.tenureYears));
   const [rateInput, setRateInput] = useState(toInputString(initial.rate));
+  const [mrtaInput, setMrtaInput] = useState(toInputString(initial.mrtaPremium));
+  const [extraInput, setExtraInput] = useState(toInputString(initial.extraMonthly));
+  const [buyerType, setBuyerType] = useState<BuyerType>(initial.buyerType);
   const [firstHome, setFirstHome] = useState<"yes" | "no">(initial.firstHome);
+  const [absorbLegal, setAbsorbLegal] = useState(initial.developerAbsorbsLegal);
+  const [absorbMot, setAbsorbMot] = useState(initial.developerAbsorbsMot);
+  const [financeMrta, setFinanceMrta] = useState(initial.financeMrta);
+  const [showSchedule, setShowSchedule] = useState(false);
 
-  const parsed = useMemo<HousingInputs>(
+  const parsed = useMemo<HousingLoanInputs>(
     () => ({
       price: Math.max(0, parseNumberInput(priceInput)),
+      rebatePct: Math.max(0, Math.min(100, parseNumberInput(rebateInput))),
       downPct: Math.max(0, Math.min(100, parseNumberInput(downInput))),
       tenureYears: Math.max(1, Math.min(40, parseNumberInput(tenureInput) || 1)),
       rate: Math.max(0, Math.min(15, parseNumberInput(rateInput))),
+      buyerType,
       firstHome,
+      developerAbsorbsLegal: absorbLegal,
+      developerAbsorbsMot: absorbMot,
+      mrtaPremium: Math.max(0, parseNumberInput(mrtaInput)),
+      financeMrta,
+      extraMonthly: Math.max(0, parseNumberInput(extraInput)),
     }),
-    [priceInput, downInput, tenureInput, rateInput, firstHome],
+    [
+      priceInput, rebateInput, downInput, tenureInput, rateInput, mrtaInput, extraInput,
+      buyerType, firstHome, absorbLegal, absorbMot, financeMrta,
+    ],
   );
 
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.price > 0;
   const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
-  const result = useMemo(() => calculate(parsed), [parsed]);
+  const result = useMemo(() => calculateHousingLoan(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
+
+  // Widest year drives the bar chart scale so the columns stay comparable.
+  const peakYearTotal = useMemo(
+    () => result.schedule.reduce((max, y) => Math.max(max, y.principalPaid + y.interestPaid), 0),
+    [result.schedule],
+  );
 
   function handleCalculate() {
     if (!isValid) return;
@@ -240,32 +241,44 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
 
     const payload = {
       price: Math.round(parsed.price),
+      rebatePct: parsed.rebatePct,
       downPct: parsed.downPct,
       tenureYears: parsed.tenureYears,
       rate: parsed.rate,
+      buyerType: parsed.buyerType,
       firstHome: parsed.firstHome,
       monthlyInstallment: Math.round(result.monthlyInstallment),
-      totalUpfront: Math.round(result.totalUpfront),
+      netCashRequired: Math.round(result.netCashRequired),
     };
     track("calculator_complete", { calculator: "housing", ...payload });
     recordServerEvent({ calculator: "housing", event: "calculator_complete", payload });
 
     if (onCalculate) {
       const expression = `RM ${Math.round(parsed.price)} • ${parsed.downPct}% down • ${parsed.tenureYears}yr @ ${parsed.rate}%`;
-      const resultStr = `RM ${Math.round(result.monthlyInstallment)}/mo • RM ${Math.round(result.totalUpfront)} upfront`;
+      const resultStr = `RM ${Math.round(result.monthlyInstallment)}/mo • RM ${Math.round(result.netCashRequired)} cash`;
       const url = buildShareUrl(parsed, URL_SCHEMA);
       onCalculate(expression, resultStr, url);
     }
   }
 
   function resetForm() {
-    setPriceInput(toInputString(DEFAULT_INPUTS.price));
-    setDownInput(toInputString(DEFAULT_INPUTS.downPct));
-    setTenureInput(toInputString(DEFAULT_INPUTS.tenureYears));
-    setRateInput(toInputString(DEFAULT_INPUTS.rate));
-    setFirstHome(DEFAULT_INPUTS.firstHome);
+    setPriceInput(toInputString(HOUSING_LOAN_DEFAULTS.price));
+    setRebateInput(toInputString(HOUSING_LOAN_DEFAULTS.rebatePct));
+    setDownInput(toInputString(HOUSING_LOAN_DEFAULTS.downPct));
+    setTenureInput(toInputString(HOUSING_LOAN_DEFAULTS.tenureYears));
+    setRateInput(toInputString(HOUSING_LOAN_DEFAULTS.rate));
+    setMrtaInput(toInputString(HOUSING_LOAN_DEFAULTS.mrtaPremium));
+    setExtraInput(toInputString(HOUSING_LOAN_DEFAULTS.extraMonthly));
+    setBuyerType(HOUSING_LOAN_DEFAULTS.buyerType);
+    setFirstHome(HOUSING_LOAN_DEFAULTS.firstHome);
+    setAbsorbLegal(HOUSING_LOAN_DEFAULTS.developerAbsorbsLegal);
+    setAbsorbMot(HOUSING_LOAN_DEFAULTS.developerAbsorbsMot);
+    setFinanceMrta(HOUSING_LOAN_DEFAULTS.financeMrta);
     setHasCalculated(false);
   }
+
+  const savedYears = Math.floor(result.monthsSaved / 12);
+  const savedMonths = result.monthsSaved % 12;
 
   return (
     <div className="w-full">
@@ -335,17 +348,71 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
               </div>
 
               <label className="block space-y-2">
-                <span className="text-sm font-medium">{t("housing.inputs.firstHome")}</span>
+                <span className="text-sm font-medium">{t("housing.inputs.buyerType")}</span>
                 <select
-                  value={firstHome}
-                  onChange={(event) => setFirstHome(event.target.value as "yes" | "no")}
+                  value={buyerType}
+                  onChange={(event) => setBuyerType(event.target.value as BuyerType)}
                   className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
                 >
-                  <option value="no">{t("common.no")}</option>
-                  <option value="yes">{t("common.yes")}</option>
+                  <option value="citizen">{t("housing.buyerType.citizen")}</option>
+                  <option value="pr">{t("housing.buyerType.pr")}</option>
+                  <option value="foreigner">{t("housing.buyerType.foreigner")}</option>
                 </select>
-                <span className="text-xs text-muted-foreground">{t("housing.inputs.firstHome.hint")}</span>
+                <span className="text-xs text-muted-foreground">{t("housing.buyerType.hint")}</span>
               </label>
+
+              {buyerType === "citizen" && (
+                <label className="block space-y-2">
+                  <span className="text-sm font-medium">{t("housing.inputs.firstHome")}</span>
+                  <select
+                    value={firstHome}
+                    onChange={(event) => setFirstHome(event.target.value as "yes" | "no")}
+                    className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                  >
+                    <option value="no">{t("common.no")}</option>
+                    <option value="yes">{t("common.yes")}</option>
+                  </select>
+                  <span className="text-xs text-muted-foreground">{t("housing.firstHome.eligibility")}</span>
+                </label>
+              )}
+
+              <div className="space-y-2">
+                <div>
+                  <h3 className="text-sm font-semibold">{t("housing.developerPackage")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("housing.developerPackage.hint")}</p>
+                </div>
+                <NumberField
+                  label={t("housing.inputs.rebate")}
+                  value={rebateInput}
+                  onChange={setRebateInput}
+                  placeholder="e.g. 10"
+                  suffix="%"
+                  hint={t("housing.inputs.rebate.hint")}
+                />
+                <ToggleRow label={t("housing.inputs.absorbLegal")} checked={absorbLegal} onChange={setAbsorbLegal} />
+                <ToggleRow label={t("housing.inputs.absorbMot")} checked={absorbMot} onChange={setAbsorbMot} />
+              </div>
+
+              <div className="space-y-2">
+                <NumberField
+                  label={t("housing.inputs.mrta")}
+                  value={mrtaInput}
+                  onChange={setMrtaInput}
+                  placeholder="e.g. 20,000"
+                  hint={t("housing.inputs.mrta.hint")}
+                />
+                {parsed.mrtaPremium > 0 && (
+                  <ToggleRow label={t("housing.inputs.financeMrta")} checked={financeMrta} onChange={setFinanceMrta} />
+                )}
+              </div>
+
+              <NumberField
+                label={t("housing.inputs.extraMonthly")}
+                value={extraInput}
+                onChange={setExtraInput}
+                placeholder="e.g. 500"
+                hint={t("housing.inputs.extraMonthly.hint")}
+              />
 
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
                 <div className="flex gap-2">
@@ -414,6 +481,33 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   ))}
                 </div>
 
+                {result.monthsSaved > 0 && (
+                  <Card className="rounded-2xl sm:rounded-3xl border-emerald-200 bg-emerald-50/60 shadow-sm dark:border-emerald-900/50 dark:bg-emerald-950/20 min-w-0">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                        <PiggyBank className="h-5 w-5 flex-shrink-0" />
+                        <h3 className="font-semibold">{t("housing.savings.title")}</h3>
+                      </div>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">{t("housing.savings.interest")}</p>
+                          <p className="mt-0.5 text-xl font-bold tabular-nums break-words text-emerald-700 dark:text-emerald-300">
+                            {money(result.interestSaved)}
+                          </p>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">{t("housing.savings.time")}</p>
+                          <p className="mt-0.5 text-xl font-bold tabular-nums break-words text-emerald-700 dark:text-emerald-300">
+                            {t("housing.savings.yearsMonths")
+                              .replace("{years}", String(savedYears))
+                              .replace("{months}", String(savedMonths))}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
                   <CardContent className="p-4 sm:p-6 min-w-0">
                     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -433,30 +527,164 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      {([
-                        [t("housing.downPayment"), result.downPayment, `${parsed.downPct}% ${t("housing.ofPrice")}`],
-                        [t("housing.motStampDuty"), result.motDuty, result.exempt ? t("housing.exempt") : t("housing.motStampDuty.hint")],
-                        [t("housing.loanStampDuty"), result.loanDuty, result.exempt ? t("housing.exempt") : t("housing.loanStampDuty.hint")],
-                        [t("housing.legalFees"), result.legalFees, t("housing.legalFees.hint")],
-                      ] as [string, number, string][]).map(([label, value, helper]) => (
-                        <div key={label} className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                      <CostRow
+                        label={t("housing.downPayment")}
+                        gross={result.downPayment}
+                        payable={result.downPayment}
+                        helper={`${parsed.downPct}% ${t("housing.ofPrice")}`}
+                      />
+                      <CostRow
+                        label={t("housing.motStampDuty")}
+                        gross={result.motDuty}
+                        payable={result.payableMot}
+                        helper={
+                          result.exempt
+                            ? t("housing.exempt")
+                            : buyerType === "foreigner"
+                              ? t("housing.foreignRate")
+                              : t("housing.motStampDuty.hint")
+                        }
+                        waivedLabel={t("housing.coveredByDeveloper")}
+                      />
+                      <CostRow
+                        label={t("housing.loanStampDuty")}
+                        gross={result.loanDuty}
+                        payable={result.payableLoanDuty}
+                        helper={result.exempt ? t("housing.exempt") : t("housing.loanStampDuty.hint")}
+                      />
+                      <CostRow
+                        label={t("housing.legalFees")}
+                        gross={result.legalFees}
+                        payable={result.payableLegal}
+                        helper={t("housing.legalFees.hint")}
+                        waivedLabel={t("housing.coveredByDeveloper")}
+                      />
+                      <CostRow
+                        label={t("housing.valuationFee")}
+                        gross={result.valuationFee}
+                        payable={result.valuationFee}
+                        helper={t("housing.valuationFee.hint")}
+                      />
+                      <CostRow
+                        label={t("housing.disbursements")}
+                        gross={result.disbursements}
+                        payable={result.disbursements}
+                        helper={t("housing.disbursements.hint")}
+                      />
+                      {parsed.mrtaPremium > 0 && (
+                        <CostRow
+                          label={t("housing.mrtaUpfront")}
+                          gross={parsed.mrtaPremium}
+                          payable={result.mrtaUpfront}
+                          helper={t("housing.inputs.mrta.hint")}
+                          waivedLabel={t("housing.mrtaFinanced")}
+                        />
+                      )}
+
+                      {result.rebateAmount > 0 && (
+                        <div className="rounded-2xl bg-emerald-50 px-3 sm:px-4 py-3 min-w-0 dark:bg-emerald-950/20">
                           <div className="flex items-center justify-between gap-3 min-w-0">
-                            <span className="text-sm text-muted-foreground min-w-0 break-words">{label}</span>
-                            <span className="font-semibold tabular-nums text-right break-words">{money(value)}</span>
+                            <span className="text-sm text-emerald-700 min-w-0 break-words dark:text-emerald-300">
+                              {t("housing.rebateApplied")}
+                            </span>
+                            <span className="font-semibold tabular-nums text-right break-words text-emerald-700 dark:text-emerald-300">
+                              −{money(result.rebateAmount)}
+                            </span>
                           </div>
-                          <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">{t("housing.inputs.rebate.hint")}</p>
                         </div>
-                      ))}
+                      )}
+
                       <div className="rounded-2xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
                         <div className="flex items-center justify-between gap-3 min-w-0">
-                          <span className="text-sm font-semibold min-w-0 break-words">{t("housing.totalUpfront")}</span>
+                          <span className="text-sm font-semibold min-w-0 break-words">{t("housing.netCash")}</span>
                           <span className="text-lg font-bold tabular-nums text-right text-primary break-words">
-                            {money(result.totalUpfront)}
+                            {money(result.netCashRequired)}
                           </span>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">{t("housing.totalUpfront.hint")}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{t("housing.netCash.hint")}</p>
                       </div>
+
+                      {result.rebateSurplus > 0 && (
+                        <div className="rounded-2xl bg-emerald-100/70 px-3 sm:px-4 py-3 min-w-0 dark:bg-emerald-900/30">
+                          <div className="flex items-center justify-between gap-3 min-w-0">
+                            <span className="text-sm font-semibold min-w-0 break-words">{t("housing.rebateSurplus")}</span>
+                            <span className="font-bold tabular-nums text-right break-words text-emerald-700 dark:text-emerald-300">
+                              {money(result.rebateSurplus)}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">{t("housing.rebateSurplus.hint")}</p>
+                        </div>
+                      )}
                     </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                  <CardContent className="p-4 sm:p-6 min-w-0">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h2 className="text-xl font-semibold">{t("housing.schedule.title")}</h2>
+                      <Button
+                        variant="outline"
+                        className="rounded-xl"
+                        onClick={() => setShowSchedule((open) => !open)}
+                      >
+                        {showSchedule ? t("housing.schedule.hide") : t("housing.schedule.show")}
+                      </Button>
+                    </div>
+
+                    <div className="mt-4 flex items-end gap-[2px] h-28" aria-hidden="true">
+                      {result.schedule.map((year) => {
+                        const total = year.principalPaid + year.interestPaid;
+                        const height = peakYearTotal > 0 ? (total / peakYearTotal) * 100 : 0;
+                        const principalShare = total > 0 ? (year.principalPaid / total) * 100 : 0;
+                        return (
+                          <div
+                            key={year.year}
+                            className="flex-1 flex flex-col justify-end rounded-t-sm overflow-hidden bg-muted/40"
+                            style={{ height: `${height}%` }}
+                          >
+                            <div className="w-full bg-amber-400/70" style={{ height: `${100 - principalShare}%` }} />
+                            <div className="w-full bg-primary" style={{ height: `${principalShare}%` }} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-sm bg-primary" />
+                        {t("housing.schedule.principal")}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-sm bg-amber-400/70" />
+                        {t("housing.schedule.interest")}
+                      </span>
+                    </div>
+
+                    {showSchedule && (
+                      <div className="mt-4 overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b text-left text-muted-foreground">
+                              <th className="py-2 pr-3 font-medium">{t("housing.schedule.year")}</th>
+                              <th className="py-2 px-3 font-medium text-right">{t("housing.schedule.principal")}</th>
+                              <th className="py-2 px-3 font-medium text-right">{t("housing.schedule.interest")}</th>
+                              <th className="py-2 pl-3 font-medium text-right">{t("housing.schedule.balance")}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {result.schedule.map((year) => (
+                              <tr key={year.year} className="border-b border-muted last:border-0">
+                                <td className="py-2 pr-3 tabular-nums">{year.year}</td>
+                                <td className="py-2 px-3 text-right tabular-nums">{money(year.principalPaid)}</td>
+                                <td className="py-2 px-3 text-right tabular-nums">{money(year.interestPaid)}</td>
+                                <td className="py-2 pl-3 text-right tabular-nums">{money(year.closingBalance)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 

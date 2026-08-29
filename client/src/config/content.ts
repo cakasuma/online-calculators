@@ -1187,14 +1187,16 @@ export const calculatorContent: ContentMap = {
   housing: {
     en: {
       intro:
-        "Estimate the monthly repayment on a Malaysian home loan and, just as importantly, the cash you need upfront — down payment, stamp duty on the Memorandum of Transfer (MOT), stamp duty on the loan agreement, and legal fees. The calculator uses the 2024 ad-valorem stamp duty tiers and the standard legal-fee scale.",
+        "Estimate the monthly repayment on a Malaysian home loan and, just as importantly, the cash you need upfront — down payment, stamp duty on the Memorandum of Transfer (MOT), stamp duty on the loan agreement, legal fees, valuation, and MRTA. The calculator uses the 2026 ad-valorem stamp duty tiers and the standard legal-fee scale, and lets you model a developer rebate and absorbed fees.",
       howItWorks: {
         heading: "How the housing loan calculator works",
         paragraphs: [
           "The monthly installment is computed with the standard amortization formula using your loan amount (price minus down payment), the annual interest rate, and the tenure in months.",
           "MOT stamp duty is charged on the property price in tiers: 1% on the first RM100,000, 2% from RM100,001–500,000, 3% from RM500,001–1,000,000, and 4% above RM1,000,000.",
           "Loan agreement stamp duty is a flat 0.5% of the loan amount. Legal fees follow the Solicitors' Remuneration Order scale and are charged on both the Sale & Purchase Agreement and the loan agreement.",
-          "First-home buyers purchasing a property priced at RM500,000 or below qualify for full stamp duty exemption on both the MOT and the loan agreement — toggle the first-home option to apply it.",
+          "Malaysian citizens buying their first home at RM500,000 or below qualify for full stamp duty exemption on both the MOT and the loan agreement. Budget 2026 extended this to 31 December 2027. Permanent residents pay the normal tiers but do not qualify for the exemption, and from 1 January 2026 non-citizens and foreign companies pay a flat 8% on the transfer instead of the tiers.",
+          "On a new launch the developer often absorbs the legal fees and the MOT stamp duty, and quotes a rebate off the price. Switch those on to see your net cash required — with a large enough rebate it can fall to zero, which is what a \"zero down payment\" package really means. The rebate offsets your cash only: the bank still finances against the full price, and duty and legal fees are still assessed on it.",
+          "An MRTA or MLTA premium can be paid upfront or rolled into the loan. Financing it raises the amount borrowed and therefore the monthly instalment. Any extra monthly payment goes straight to principal, which is why even a small amount shortens a 35-year loan by years.",
         ],
       },
       formula: {
@@ -1205,7 +1207,7 @@ export const calculatorContent: ContentMap = {
         ],
       },
       rateTable: {
-        heading: "MOT stamp duty tiers (2024)",
+        heading: "MOT stamp duty tiers (2026)",
         columns: ["Property price band", "Rate"],
         rows: [
           ["First RM100,000", "1%"],
@@ -1213,13 +1215,13 @@ export const calculatorContent: ContentMap = {
           ["RM500,001 – RM1,000,000", "3%"],
           ["Above RM1,000,000", "4%"],
         ],
-        note: "Loan agreement stamp duty is a separate flat 0.5% of the loan amount.",
+        note: "Loan agreement stamp duty is a separate flat 0.5% of the loan amount. Non-citizens and foreign companies pay a flat 8% on the transfer instead of these tiers.",
       },
       examples: [
         {
           title: "RM500,000 home, 10% down, 35 years at 4%",
           given: ["Loan amount: RM450,000", "Down payment: RM50,000", "Interest rate: 4% p.a."],
-          result: "≈ RM1,993/month, with roughly RM73,000 needed upfront (down payment + stamp duty + legal fees) for a non-first-home buyer.",
+          result: "≈ RM1,993/month, with roughly RM76,000 needed upfront (down payment + stamp duty + legal fees + valuation + disbursements) for a Malaysian citizen who is not a first-home buyer.",
         },
       ],
       faq: [
@@ -1229,11 +1231,11 @@ export const calculatorContent: ContentMap = {
         },
         {
           question: "Is stamp duty really waived for first-home buyers?",
-          answer: "Yes — for eligible Malaysian first-home buyers, properties priced at RM500,000 or below receive full stamp duty exemption on both the transfer (MOT) and the loan agreement. Confirm the current year's terms with your lawyer.",
+          answer: "Yes — for eligible Malaysian citizens buying their first home, properties priced at RM500,000 or below receive full stamp duty exemption on both the transfer (MOT) and the loan agreement, worth about RM11,250 on a RM500,000 home. Budget 2026 extended it to 31 December 2027. Above RM500,000 there is no relief: the 75% remission that once applied to the RM500,001–RM1,000,000 band lapsed at the end of 2023.",
         },
         {
           question: "Does this include MRTA or fire insurance?",
-          answer: "No. Mortgage Reducing Term Assurance (MRTA) and home/fire insurance are quoted separately by your bank and insurer, so add those to your upfront budget.",
+          answer: "MRTA is included if you enter a premium — you can pay it upfront or finance it into the loan. Home and fire insurance are quoted separately by your insurer and are not included, so budget for those on top.",
         },
       ],
       related: ["salary", "tax", "epf"],
@@ -1241,7 +1243,7 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Anggarkan ansuran bulanan pinjaman rumah di Malaysia dan, yang sama penting, tunai pendahuluan yang diperlukan — bayaran pendahuluan, duti setem Memorandum Pindah Milik (MOT), duti setem perjanjian pinjaman, dan yuran guaman. Kalkulator ini menggunakan kadar duti setem 2024 dan skala yuran guaman standard.",
+        "Anggarkan ansuran bulanan pinjaman rumah di Malaysia dan, yang sama penting, tunai pendahuluan yang diperlukan — bayaran pendahuluan, duti setem Memorandum Pindah Milik (MOT), duti setem perjanjian pinjaman, yuran guaman, penilaian, dan MRTA. Kalkulator ini menggunakan kadar duti setem 2026 dan skala yuran guaman standard, serta membolehkan anda memodelkan rebat pemaju dan yuran yang ditanggung pemaju.",
       howItWorks: {
         heading: "Cara kalkulator pinjaman perumahan berfungsi",
         paragraphs: [
@@ -1265,7 +1267,7 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Perkirakan cicilan bulanan pinjaman rumah di Malaysia dan, yang sama pentingnya, uang muka yang dibutuhkan — uang muka, bea meterai Memorandum Pengalihan (MOT), bea meterai perjanjian pinjaman, dan biaya hukum. Kalkulator ini menggunakan tarif bea meterai 2024 dan skala biaya hukum standar.",
+        "Perkirakan cicilan bulanan pinjaman rumah di Malaysia dan, yang sama pentingnya, uang muka yang dibutuhkan — uang muka, bea meterai Memorandum Pengalihan (MOT), bea meterai perjanjian pinjaman, biaya hukum, penilaian, dan MRTA. Kalkulator ini menggunakan tarif bea meterai 2026 dan skala biaya hukum standar, serta memungkinkan Anda memodelkan rabat pengembang dan biaya yang ditanggung pengembang.",
       howItWorks: {
         heading: "Cara kalkulator pinjaman rumah bekerja",
         paragraphs: [

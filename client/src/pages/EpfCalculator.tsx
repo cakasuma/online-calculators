@@ -18,7 +18,6 @@ import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n"
 import { recordServerEvent, track } from "@/lib/analytics";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import {
   EPF_DEFAULTS,
@@ -414,7 +413,6 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
                       schema={EPF_URL_SCHEMA}
                       defaultName={`EPF age ${parsedInputs.currentAge}→${parsedInputs.retirementAge}`}
                     />
-                    <EmbedDialog calculator="epf" />
                   </div>
                 </CardContent>
               </Card>

@@ -54,15 +54,6 @@ const SLUG_STYLE: Record<string, { accent: string; tagShort: string; tagLong: Re
     tagShort: "SCI",
     tagLong: { en: "Scientific calculator", ms: "Kalkulator saintifik", id: "Kalkulator saintifik" },
   },
-  partners: {
-    accent: "#14B8A6",
-    tagShort: "PARTNERS",
-    tagLong: {
-      en: "Embedded everywhere",
-      ms: "Dibenamkan di mana-mana",
-      id: "Disematkan di mana-mana",
-    },
-  },
   epf: {
     accent: "#7C3AED",
     tagShort: "EPF",

@@ -9,7 +9,6 @@ import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
   calculateIncomeTax,
@@ -674,7 +673,6 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                           schema={URL_SCHEMA}
                           defaultName={`Tax RM ${Math.round(parsed.annualIncome)}/yr`}
                         />
-                        <EmbedDialog calculator="tax" />
                       </div>
                     </div>
                     <div className="space-y-3">

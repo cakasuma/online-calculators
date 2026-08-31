@@ -7,7 +7,6 @@ import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
   ACTIVITY_FACTOR,
@@ -420,7 +419,6 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                     schema={URL_SCHEMA}
                     defaultName={`BMI ${num(result.bmi)} • ${parsed.weight}kg`}
                   />
-                  <EmbedDialog calculator="bmi" />
                 </div>
 
                 <RelatedToolsCard currentHref="/bmi" />

@@ -23,7 +23,6 @@ export type RouteSlug =
   | "zakat"
   | "wasiat"
   | "blog"
-  | "partners"
   | "privacy"
   | "terms";
 
@@ -487,36 +486,6 @@ export const routes: RouteSeoEntry[] = [
           "Panduan mendalam tentang potongan gaji Malaysia, EPF, pajak penghasilan, zakat, faraid, wasiat, dan SOCSO.",
         heading: "Panduan & Edukasi Keuangan",
         tagline: "Artikel mendalam tentang keuangan Malaysia dan perencanaan kekayaan Islam.",
-      },
-    },
-  },
-  {
-    slug: "partners",
-    path: "/partners",
-    prerender: true,
-    sitemap: { priority: 0.4, changefreq: "weekly" },
-    copy: {
-      en: {
-        title: "Sites embedding HelloKalku | Partners",
-        description:
-          "HelloKalku calculators are embedded on personal finance blogs, fintech sites, and educational platforms across Malaysia and Southeast Asia.",
-        keywords: "hellokalku partners, embed calculator malaysia, calculator widget partners",
-        heading: "Sites that embed HelloKalku",
-        tagline: "Free, private calculators trusted by writers, planners, and platforms.",
-      },
-      ms: {
-        title: "Laman web yang membenamkan HelloKalku | Rakan kongsi",
-        description:
-          "Kalkulator HelloKalku dibenamkan pada blog kewangan peribadi, laman fintech, dan platform pendidikan di Malaysia dan Asia Tenggara.",
-        heading: "Laman yang membenamkan HelloKalku",
-        tagline: "Kalkulator percuma dan tepat yang dipercayai penulis, perancang, dan platform.",
-      },
-      id: {
-        title: "Situs yang menyematkan HelloKalku | Mitra",
-        description:
-          "Kalkulator HelloKalku disematkan di blog keuangan pribadi, situs fintech, dan platform pendidikan di seluruh Malaysia dan Asia Tenggara.",
-        heading: "Situs yang menyematkan HelloKalku",
-        tagline: "Kalkulator gratis dan akurat yang dipercaya penulis, perencana, dan platform.",
       },
     },
   },

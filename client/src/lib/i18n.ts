@@ -453,34 +453,6 @@ const translations = {
     id: "Belum ada skenario tersimpan",
   },
 
-  // ── Embed widget ──
-  "embed.button": { en: "Embed", ms: "Benamkan", id: "Sematkan" },
-  "embed.dialogTitle": {
-    en: "Embed this calculator on your site",
-    ms: "Benamkan kalkulator ini di laman anda",
-    id: "Sematkan kalkulator ini di situs Anda",
-  },
-  "embed.dialogDesc": {
-    en: "Paste this snippet anywhere on your page. The iframe auto-resizes as users interact.",
-    ms: "Tampalkan keratan ini di mana-mana pada halaman anda. Iframe akan ubah saiz secara automatik semasa pengguna berinteraksi.",
-    id: "Tempelkan cuplikan ini di mana saja pada halaman Anda. Iframe akan menyesuaikan ukuran secara otomatis saat pengguna berinteraksi.",
-  },
-  "embed.htmlSnippet": { en: "HTML snippet", ms: "Keratan HTML", id: "Cuplikan HTML" },
-  "embed.urlOnly": { en: "Direct URL only", ms: "URL sahaja", id: "URL saja" },
-  "embed.copy": { en: "Copy", ms: "Salin", id: "Salin" },
-  "embed.copied": { en: "Copied!", ms: "Disalin!", id: "Tersalin!" },
-  "embed.copyError": { en: "Could not copy", ms: "Tidak boleh disalin", id: "Tidak dapat menyalin" },
-  "embed.snippetHint": {
-    en: "Includes the auto-resize helper script. Drop the snippet into any HTML or CMS rich-text block.",
-    ms: "Termasuk skrip pembantu ubah saiz automatik. Letakkan keratan dalam mana-mana HTML atau blok teks kaya CMS.",
-    id: "Termasuk skrip bantu ubah ukuran otomatis. Tempel cuplikan ke dalam HTML atau blok teks kaya CMS apa pun.",
-  },
-  "embed.urlHint": {
-    en: "Useful if you only want the URL — your own iframe wrapper, or a sandboxed preview.",
-    ms: "Berguna jika anda mahu URL sahaja — pembalut iframe sendiri, atau pratonton sandboxed.",
-    id: "Berguna jika Anda hanya ingin URL — pembungkus iframe sendiri, atau pratinjau ber-sandbox.",
-  },
-
   // ── Home Page ──
   "home.title": { en: "Islamic Inheritance Calculator", ms: "Kalkulator Waris Islam", id: "Kalkulator Waris Islam" },
   "home.subtitle": { en: "Accurately calculate Faraid (Islamic inheritance) distribution based on Quran and Sunnah.", ms: "Kira pembahagian Faraid (waris Islam) secara tepat berdasarkan Al-Qur'an dan Sunnah.", id: "Hitung pembagian Faraid (waris Islam) secara akurat berdasarkan Al-Qur'an dan Sunnah." },
@@ -849,85 +821,8 @@ const translations = {
   "footer.builtBy": { en: "Built by", ms: "Dibuat oleh", id: "Dibuat oleh" },
   "footer.privacy": { en: "Privacy", ms: "Privasi", id: "Privasi" },
   "footer.terms": { en: "Terms", ms: "Syarat", id: "Syarat" },
-  "footer.partners": { en: "Partners", ms: "Rakan kongsi", id: "Mitra" },
-  "home.hero.partnersLink": {
-    en: "Trusted by writers, blogs, and platforms — see who embeds HelloKalku →",
-    ms: "Dipercayai penulis, blog, dan platform — lihat siapa membenamkan HelloKalku →",
-    id: "Dipercaya penulis, blog, dan platform — lihat siapa yang menyematkan HelloKalku →",
-  },
 
   // ── Partners page ──
-  "partners.stat.sites": {
-    en: "Embedding sites",
-    ms: "Laman membenamkan",
-    id: "Situs menyematkan",
-  },
-  "partners.stat.views": {
-    en: "Embed views",
-    ms: "Tontonan benaman",
-    id: "Tayangan sematan",
-  },
-  "partners.stat.windowNote": {
-    en: "Last 6 months",
-    ms: "6 bulan lepas",
-    id: "6 bulan terakhir",
-  },
-  "partners.stat.calculators": {
-    en: "Embeddable calculators",
-    ms: "Kalkulator boleh dibenamkan",
-    id: "Kalkulator dapat disematkan",
-  },
-  "partners.stat.calcList": {
-    en: "Salary · Zakat · Faraid · Basic · Scientific",
-    ms: "Gaji · Zakat · Faraid · Asas · Saintifik",
-    id: "Gaji · Zakat · Faraid · Dasar · Ilmiah",
-  },
-  "partners.embedViews": { en: "embed views", ms: "tontonan", id: "tayangan" },
-  "partners.pitch.title": {
-    en: "Embed any HelloKalku calculator on your site",
-    ms: "Benamkan mana-mana kalkulator HelloKalku di laman anda",
-    id: "Sematkan kalkulator HelloKalku mana pun di situs Anda",
-  },
-  "partners.pitch.body": {
-    en: "Drop a single iframe + script tag into your page and your readers get an interactive calculator that auto-resizes and stays up-to-date with the latest Malaysia tax, zakat, and inheritance rules. No maintenance, no fees, no signup.",
-    ms: "Letakkan satu iframe + tag skrip ke halaman anda dan pembaca anda dapat kalkulator interaktif yang ubah saiz secara automatik serta sentiasa terkini dengan peraturan cukai, zakat, dan waris Malaysia terbaharu. Tiada penyelenggaraan, tiada bayaran, tiada pendaftaran.",
-    id: "Tempelkan satu iframe + tag skrip ke halaman Anda dan pembaca Anda mendapat kalkulator interaktif yang menyesuaikan ukuran otomatis serta selalu terbaru dengan aturan pajak, zakat, dan waris Malaysia terkini. Tanpa pemeliharaan, tanpa biaya, tanpa pendaftaran.",
-  },
-  "partners.pitch.cta": {
-    en: "Open any calculator and click the Embed button to copy the snippet.",
-    ms: "Buka mana-mana kalkulator dan klik butang Benamkan untuk menyalin keratan.",
-    id: "Buka kalkulator mana pun dan klik tombol Sematkan untuk menyalin cuplikan.",
-  },
-  "partners.list.title": {
-    en: "Where HelloKalku is embedded",
-    ms: "Di mana HelloKalku dibenamkan",
-    id: "Di mana HelloKalku disematkan",
-  },
-  "partners.list.loading": {
-    en: "Loading partner list…",
-    ms: "Memuatkan senarai rakan kongsi…",
-    id: "Memuat daftar mitra…",
-  },
-  "partners.list.error": {
-    en: "Could not load the partner list right now. Please try again later.",
-    ms: "Tidak dapat memuatkan senarai rakan kongsi sekarang. Cuba lagi nanti.",
-    id: "Tidak dapat memuat daftar mitra sekarang. Silakan coba lagi nanti.",
-  },
-  "partners.list.empty": {
-    en: "No partner sites have reached the listing threshold yet.",
-    ms: "Belum ada laman rakan kongsi mencapai ambang penyenaraian.",
-    id: "Belum ada situs mitra yang mencapai ambang pencatatan.",
-  },
-  "partners.list.emptyHint": {
-    en: "Sites with at least 5 embed views in the last 6 months show up here.",
-    ms: "Laman dengan sekurang-kurangnya 5 tontonan benaman dalam 6 bulan lepas akan muncul di sini.",
-    id: "Situs dengan minimal 5 tayangan sematan dalam 6 bulan terakhir akan muncul di sini.",
-  },
-  "partners.list.disclosure": {
-    en: "Domains are detected automatically from embed traffic. Hosts can opt out by emailing us — see Privacy.",
-    ms: "Domain dikesan secara automatik daripada trafik benaman. Hos boleh menarik diri dengan menghantar e-mel kepada kami — lihat Privasi.",
-    id: "Domain dideteksi secara otomatis dari lalu lintas sematan. Host dapat memilih keluar dengan mengirim email kepada kami — lihat Privasi.",
-  },
 
   // ── Brand ──
   "brand.tagline": { en: "Smart calculators for everyday decisions", ms: "Kalkulator cerdas untuk keputusan harian", id: "Kalkulator cerdas untuk keputusan sehari-hari" },

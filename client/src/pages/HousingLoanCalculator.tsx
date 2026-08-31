@@ -8,7 +8,6 @@ import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
   calculateHousingLoan,
@@ -523,7 +522,6 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                           schema={URL_SCHEMA}
                           defaultName={`RM ${Math.round(parsed.price)} home`}
                         />
-                        <EmbedDialog calculator="housing" />
                       </div>
                     </div>
                     <div className="space-y-3">

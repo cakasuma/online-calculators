@@ -25,8 +25,13 @@ export interface HousingLoanInputs {
   price: number;
   /** Developer rebate as a percentage of the SPA price. */
   rebatePct: number;
-  /** Down payment as a percentage of the SPA price. */
-  downPct: number;
+  /**
+   * Margin of finance — the percentage of the SPA price the bank lends. This is
+   * how banks and buyers quote a home loan; the down payment is the remainder.
+   * Typically up to 90% for a citizen's first two homes, and lower for a
+   * non-citizen.
+   */
+  marginPct: number;
   /** Loan tenure in years. */
   tenureYears: number;
   /** Annual interest rate (percent), reducing balance. */
@@ -35,8 +40,13 @@ export interface HousingLoanInputs {
   firstHome: "yes" | "no";
   /** Developer absorbs the SPA and loan agreement legal fees ("free legal fee"). */
   developerAbsorbsLegal: boolean;
-  /** Developer absorbs the transfer stamp duty ("free MOT"). */
-  developerAbsorbsMot: boolean;
+  /**
+   * Percentage of the transfer stamp duty the developer absorbs. Zero means the
+   * buyer pays all of it, 100 is a "free MOT" package, and a share in between
+   * covers the common case of a developer meeting part of the bill — half of a
+   * non-citizen's 8% duty leaves an effective 4%.
+   */
+  motAbsorbedPct: number;
   /** MRTA/MLTA premium in RM. Zero means no cover taken. */
   mrtaPremium: number;
   /** Roll the MRTA premium into the loan rather than paying it upfront. */
@@ -130,6 +140,8 @@ export { buildSchedule, type AmortYear, type Schedule } from "./amortisation";
 
 export interface HousingLoanResult {
   downPayment: number;
+  /** Margin of finance actually applied, after clamping. */
+  marginPct: number;
   /** Amount financed, including the MRTA premium when it is rolled into the loan. */
   loanAmount: number;
   monthlyInstallment: number;
@@ -153,6 +165,8 @@ export interface HousingLoanResult {
   disbursements: number;
 
   payableMot: number;
+  /** Portion of the transfer duty met by the developer. */
+  motAbsorbed: number;
   payableLoanDuty: number;
   payableLegal: number;
   /** MRTA premium falling due upfront — zero when it is financed. */
@@ -172,12 +186,13 @@ export interface HousingLoanResult {
 
 export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResult {
   const price = Math.max(0, input.price);
-  const downPct = Math.max(0, Math.min(100, input.downPct));
+  const marginPct = Math.max(0, Math.min(100, input.marginPct));
   const rate = Math.max(0, input.rate);
   const mrtaPremium = Math.max(0, input.mrtaPremium);
 
-  const downPayment = price * (downPct / 100);
-  const baseLoan = Math.max(0, price - downPayment);
+  // The bank lends the margin; the buyer finds the rest.
+  const baseLoan = price * (marginPct / 100);
+  const downPayment = Math.max(0, price - baseLoan);
   // A financed premium becomes part of the sum the loan agreement is executed for,
   // so it drives the instalment, the loan duty, and the loan legal fee alike.
   const loanAmount = baseLoan + (input.financeMrta ? mrtaPremium : 0);
@@ -197,7 +212,9 @@ export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResul
   const legalFees = legalScale(price) + legalScale(loanAmount);
   const valuation = valuationFee(price);
 
-  const payableMot = input.developerAbsorbsMot ? 0 : motDuty;
+  const motAbsorbedPct = Math.max(0, Math.min(100, input.motAbsorbedPct));
+  const motAbsorbed = motDuty * (motAbsorbedPct / 100);
+  const payableMot = motDuty - motAbsorbed;
   const payableLegal = input.developerAbsorbsLegal ? 0 : legalFees;
   // The loan agreement duty belongs to the financing rather than the sale, so a
   // developer package never covers it.
@@ -224,6 +241,7 @@ export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResul
 
   return {
     downPayment,
+    marginPct,
     loanAmount,
     monthlyInstallment: actual.monthlyInstallment,
     totalPayment: loanAmount + actual.totalInterest,
@@ -240,6 +258,7 @@ export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResul
     disbursements: LEGAL_DISBURSEMENTS_ESTIMATE,
 
     payableMot,
+    motAbsorbed,
     payableLoanDuty,
     payableLegal,
     mrtaUpfront,
@@ -256,13 +275,13 @@ export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResul
 export const HOUSING_LOAN_DEFAULTS: HousingLoanInputs = {
   price: 500000,
   rebatePct: 0,
-  downPct: 10,
+  marginPct: 90,
   tenureYears: 35,
   rate: 4,
   buyerType: "citizen",
   firstHome: "no",
   developerAbsorbsLegal: false,
-  developerAbsorbsMot: false,
+  motAbsorbedPct: 0,
   mrtaPremium: 0,
   financeMrta: false,
   extraMonthly: 0,

@@ -157,13 +157,13 @@ function CostRow({
 const URL_SCHEMA: UrlSchema<HousingLoanInputs> = {
   price: numberField("price"),
   rebatePct: numberField("rebate"),
-  downPct: numberField("down"),
+  marginPct: numberField("margin"),
   tenureYears: numberField("tenure"),
   rate: numberField("rate"),
   buyerType: enumField<HousingLoanInputs, "buyerType">("buyer", ["citizen", "pr", "foreigner"]),
   firstHome: enumField<HousingLoanInputs, "firstHome">("first", ["yes", "no"]),
   developerAbsorbsLegal: boolField("nolegal"),
-  developerAbsorbsMot: boolField("nomot"),
+  motAbsorbedPct: numberField("motshare", { keepZero: true }),
   mrtaPremium: numberField("mrta"),
   financeMrta: boolField("finmrta"),
   extraMonthly: numberField("extra"),
@@ -175,15 +175,35 @@ interface Props {
 
 export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
-  const [initial] = useState<HousingLoanInputs>(() =>
-    mergeFromUrl<HousingLoanInputs>(HOUSING_LOAN_DEFAULTS, URL_SCHEMA),
+  const [initial] = useState<HousingLoanInputs>(() => {
+    const merged = mergeFromUrl<HousingLoanInputs>(HOUSING_LOAN_DEFAULTS, URL_SCHEMA);
+    // Links shared before this calculator moved to margin of finance carry a
+    // down-payment percentage instead. Convert rather than silently ignoring it,
+    // so an old link still opens the scenario its sender saw.
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const legacyDown = params.get("down");
+      if (legacyDown != null && params.get("margin") == null) {
+        const down = Number(legacyDown);
+        if (Number.isFinite(down)) {
+          merged.marginPct = Math.max(0, Math.min(100, 100 - down));
+        }
+      }
+    }
+    return merged;
+  });
+  const arrivedViaShare = useMemo(
+    () =>
+      urlHasSchemaParams(URL_SCHEMA) ||
+      // A legacy link may carry only the old down-payment parameter.
+      (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("down")),
+    [],
   );
-  const arrivedViaShare = useMemo(() => urlHasSchemaParams(URL_SCHEMA), []);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const [priceInput, setPriceInput] = useState(toInputString(initial.price));
   const [rebateInput, setRebateInput] = useState(toInputString(initial.rebatePct));
-  const [downInput, setDownInput] = useState(toInputString(initial.downPct));
+  const [marginInput, setMarginInput] = useState(toInputString(initial.marginPct));
   const [tenureInput, setTenureInput] = useState(toInputString(initial.tenureYears));
   const [rateInput, setRateInput] = useState(toInputString(initial.rate));
   const [mrtaInput, setMrtaInput] = useState(toInputString(initial.mrtaPremium));
@@ -191,7 +211,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
   const [buyerType, setBuyerType] = useState<BuyerType>(initial.buyerType);
   const [firstHome, setFirstHome] = useState<"yes" | "no">(initial.firstHome);
   const [absorbLegal, setAbsorbLegal] = useState(initial.developerAbsorbsLegal);
-  const [absorbMot, setAbsorbMot] = useState(initial.developerAbsorbsMot);
+  const [motShareInput, setMotShareInput] = useState(toInputString(initial.motAbsorbedPct));
   const [financeMrta, setFinanceMrta] = useState(initial.financeMrta);
   const [showSchedule, setShowSchedule] = useState(false);
 
@@ -199,20 +219,20 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
     () => ({
       price: Math.max(0, parseNumberInput(priceInput)),
       rebatePct: Math.max(0, Math.min(100, parseNumberInput(rebateInput))),
-      downPct: Math.max(0, Math.min(100, parseNumberInput(downInput))),
+      marginPct: Math.max(0, Math.min(100, parseNumberInput(marginInput))),
       tenureYears: Math.max(1, Math.min(40, parseNumberInput(tenureInput) || 1)),
       rate: Math.max(0, Math.min(15, parseNumberInput(rateInput))),
       buyerType,
       firstHome,
       developerAbsorbsLegal: absorbLegal,
-      developerAbsorbsMot: absorbMot,
+      motAbsorbedPct: Math.max(0, Math.min(100, parseNumberInput(motShareInput))),
       mrtaPremium: Math.max(0, parseNumberInput(mrtaInput)),
       financeMrta,
       extraMonthly: Math.max(0, parseNumberInput(extraInput)),
     }),
     [
-      priceInput, rebateInput, downInput, tenureInput, rateInput, mrtaInput, extraInput,
-      buyerType, firstHome, absorbLegal, absorbMot, financeMrta,
+      priceInput, rebateInput, marginInput, tenureInput, rateInput, mrtaInput, extraInput,
+      motShareInput, buyerType, firstHome, absorbLegal, financeMrta,
     ],
   );
 
@@ -241,7 +261,8 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
     const payload = {
       price: Math.round(parsed.price),
       rebatePct: parsed.rebatePct,
-      downPct: parsed.downPct,
+      marginPct: parsed.marginPct,
+      motAbsorbedPct: parsed.motAbsorbedPct,
       tenureYears: parsed.tenureYears,
       rate: parsed.rate,
       buyerType: parsed.buyerType,
@@ -253,7 +274,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
     recordServerEvent({ calculator: "housing", event: "calculator_complete", payload });
 
     if (onCalculate) {
-      const expression = `RM ${Math.round(parsed.price)} • ${parsed.downPct}% down • ${parsed.tenureYears}yr @ ${parsed.rate}%`;
+      const expression = `RM ${Math.round(parsed.price)} • ${parsed.marginPct}% margin • ${parsed.tenureYears}yr @ ${parsed.rate}%`;
       const resultStr = `RM ${Math.round(result.monthlyInstallment)}/mo • RM ${Math.round(result.netCashRequired)} cash`;
       const url = buildShareUrl(parsed, URL_SCHEMA);
       onCalculate(expression, resultStr, url);
@@ -263,7 +284,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
   function resetForm() {
     setPriceInput(toInputString(HOUSING_LOAN_DEFAULTS.price));
     setRebateInput(toInputString(HOUSING_LOAN_DEFAULTS.rebatePct));
-    setDownInput(toInputString(HOUSING_LOAN_DEFAULTS.downPct));
+    setMarginInput(toInputString(HOUSING_LOAN_DEFAULTS.marginPct));
     setTenureInput(toInputString(HOUSING_LOAN_DEFAULTS.tenureYears));
     setRateInput(toInputString(HOUSING_LOAN_DEFAULTS.rate));
     setMrtaInput(toInputString(HOUSING_LOAN_DEFAULTS.mrtaPremium));
@@ -271,7 +292,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
     setBuyerType(HOUSING_LOAN_DEFAULTS.buyerType);
     setFirstHome(HOUSING_LOAN_DEFAULTS.firstHome);
     setAbsorbLegal(HOUSING_LOAN_DEFAULTS.developerAbsorbsLegal);
-    setAbsorbMot(HOUSING_LOAN_DEFAULTS.developerAbsorbsMot);
+    setMotShareInput(toInputString(HOUSING_LOAN_DEFAULTS.motAbsorbedPct));
     setFinanceMrta(HOUSING_LOAN_DEFAULTS.financeMrta);
     setHasCalculated(false);
   }
@@ -321,12 +342,16 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   placeholder="e.g. 500,000"
                 />
                 <NumberField
-                  label={t("housing.inputs.downPct")}
-                  value={downInput}
-                  onChange={setDownInput}
-                  placeholder="e.g. 10"
+                  label={t("housing.inputs.margin")}
+                  value={marginInput}
+                  onChange={setMarginInput}
+                  placeholder="e.g. 90"
                   suffix="%"
-                  hint={t("housing.inputs.downPct.hint")}
+                  hint={
+                    buyerType === "foreigner"
+                      ? t("housing.inputs.margin.hintForeign")
+                      : t("housing.inputs.margin.hint")
+                  }
                 />
                 <NumberField
                   label={t("housing.inputs.tenure")}
@@ -389,7 +414,14 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   hint={t("housing.inputs.rebate.hint")}
                 />
                 <ToggleRow label={t("housing.inputs.absorbLegal")} checked={absorbLegal} onChange={setAbsorbLegal} />
-                <ToggleRow label={t("housing.inputs.absorbMot")} checked={absorbMot} onChange={setAbsorbMot} />
+                <NumberField
+                  label={t("housing.inputs.motShare")}
+                  value={motShareInput}
+                  onChange={setMotShareInput}
+                  placeholder="e.g. 50"
+                  suffix="%"
+                  hint={t("housing.inputs.motShare.hint")}
+                />
               </div>
 
               <div className="space-y-2">
@@ -461,15 +493,16 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
               <>
                 <div className="grid gap-4 sm:grid-cols-2 min-w-0">
                   {([
-                    [t("housing.loanAmount"), result.loanAmount, Wallet],
-                    [t("housing.totalInterest"), result.totalInterest, Receipt],
-                  ] as [string, number, typeof Wallet][]).map(([label, value, Icon]) => (
+                    [t("housing.loanAmount"), result.loanAmount, Wallet, `${result.marginPct}% ${t("housing.marginOfFinance").toLowerCase()}`],
+                    [t("housing.totalInterest"), result.totalInterest, Receipt, ""],
+                  ] as [string, number, typeof Wallet, string][]).map(([label, value, Icon, sub]) => (
                     <Card key={label} className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
                       <CardContent className="p-4 sm:p-5">
                         <div className="flex items-center justify-between gap-3 min-w-0">
                           <div className="min-w-0 flex-1">
                             <p className="text-xs sm:text-sm text-muted-foreground">{label}</p>
                             <p className="mt-1 text-xl sm:text-2xl font-bold break-words tabular-nums">{money(value)}</p>
+                            {sub ? <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p> : null}
                           </div>
                           <div className="rounded-2xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
                             <Icon className="h-5 w-5" />
@@ -529,7 +562,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                         label={t("housing.downPayment")}
                         gross={result.downPayment}
                         payable={result.downPayment}
-                        helper={`${parsed.downPct}% ${t("housing.ofPrice")}`}
+                        helper={`${100 - result.marginPct}% ${t("housing.ofPrice")}`}
                       />
                       <CostRow
                         label={t("housing.motStampDuty")}
@@ -538,9 +571,11 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                         helper={
                           result.exempt
                             ? t("housing.exempt")
-                            : buyerType === "foreigner"
-                              ? t("housing.foreignRate")
-                              : t("housing.motStampDuty.hint")
+                            : result.motAbsorbed > 0
+                              ? `${t("housing.motAbsorbed")}: ${money(result.motAbsorbed)} ${t("housing.of")} ${money(result.motDuty)}`
+                              : buyerType === "foreigner"
+                                ? t("housing.foreignRate")
+                                : t("housing.motStampDuty.hint")
                         }
                         waivedLabel={t("housing.coveredByDeveloper")}
                       />

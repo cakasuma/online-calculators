@@ -15,13 +15,13 @@ import {
 const base: HousingLoanInputs = {
   price: 500000,
   rebatePct: 0,
-  downPct: 10,
+  marginPct: 90,
   tenureYears: 35,
   rate: 4,
   buyerType: "citizen",
   firstHome: "no",
   developerAbsorbsLegal: false,
-  developerAbsorbsMot: false,
+  motAbsorbedPct: 0,
   mrtaPremium: 0,
   financeMrta: false,
   extraMonthly: 0,
@@ -168,13 +168,13 @@ describe("developer-absorbed fees", () => {
   });
 
   it("zeroes the payable MOT duty but keeps the gross figure visible", () => {
-    const r = calculateHousingLoan(inputs({ developerAbsorbsMot: true }));
+    const r = calculateHousingLoan(inputs({ motAbsorbedPct: 100 }));
     expect(r.motDuty).toBeCloseTo(9000, 6);
     expect(r.payableMot).toBe(0);
   });
 
   it("leaves the loan agreement duty with the buyer", () => {
-    const r = calculateHousingLoan(inputs({ developerAbsorbsMot: true, developerAbsorbsLegal: true }));
+    const r = calculateHousingLoan(inputs({ motAbsorbedPct: 100, developerAbsorbsLegal: true }));
     expect(r.payableLoanDuty).toBeCloseTo(r.loanDuty, 6);
     expect(r.payableLoanDuty).toBeGreaterThan(0);
   });
@@ -182,7 +182,7 @@ describe("developer-absorbed fees", () => {
   it("waives only its own line, not the other", () => {
     const legalOnly = calculateHousingLoan(inputs({ developerAbsorbsLegal: true }));
     expect(legalOnly.payableMot).toBeCloseTo(9000, 6);
-    const motOnly = calculateHousingLoan(inputs({ developerAbsorbsMot: true }));
+    const motOnly = calculateHousingLoan(inputs({ motAbsorbedPct: 100 }));
     expect(motOnly.payableLegal).toBeGreaterThan(0);
   });
 });
@@ -289,14 +289,85 @@ describe("calculateHousingLoan", () => {
     expect(r.monthlyInstallment).toBeCloseTo(450000 / 420, 6);
   });
 
-  it("clamps the down payment percentage to 0-100", () => {
-    expect(calculateHousingLoan(inputs({ downPct: 150 })).loanAmount).toBe(0);
-    expect(calculateHousingLoan(inputs({ downPct: -20 })).downPayment).toBe(0);
+  it("clamps the margin of finance to 0-100", () => {
+    expect(calculateHousingLoan(inputs({ marginPct: -50 })).loanAmount).toBe(0);
+    expect(calculateHousingLoan(inputs({ marginPct: 150 })).downPayment).toBe(0);
   });
 
   it("ships defaults that produce a usable result", () => {
     const r = calculateHousingLoan(HOUSING_LOAN_DEFAULTS);
     expect(r.monthlyInstallment).toBeGreaterThan(0);
     expect(r.netCashRequired).toBeGreaterThan(0);
+  });
+});
+
+describe("margin of finance", () => {
+  it("derives the loan from the margin rather than a down payment", () => {
+    const r = calculateHousingLoan(inputs({ marginPct: 80 }));
+    expect(r.loanAmount).toBeCloseTo(400000, 6);
+    expect(r.downPayment).toBeCloseTo(100000, 6);
+    expect(r.marginPct).toBe(80);
+  });
+
+  it("lends the full price at a 100% margin", () => {
+    const r = calculateHousingLoan(inputs({ marginPct: 100 }));
+    expect(r.downPayment).toBe(0);
+    expect(r.loanAmount).toBeCloseTo(500000, 6);
+  });
+
+  it("moves the loan amount when the margin moves", () => {
+    const ninety = calculateHousingLoan(inputs({ marginPct: 90 }));
+    const eighty = calculateHousingLoan(inputs({ marginPct: 80 }));
+    expect(eighty.loanAmount).toBeLessThan(ninety.loanAmount);
+    expect(eighty.downPayment).toBeGreaterThan(ninety.downPayment);
+    // A smaller loan also means less loan agreement duty and a smaller instalment.
+    expect(eighty.loanDuty).toBeLessThan(ninety.loanDuty);
+    expect(eighty.monthlyInstallment).toBeLessThan(ninety.monthlyInstallment);
+  });
+});
+
+describe("partial MOT absorption", () => {
+  it("halves the payable duty when the developer covers half", () => {
+    // A foreign buyer's flat 8% becomes an effective 4%.
+    const r = calculateHousingLoan(inputs({ buyerType: "foreigner", motAbsorbedPct: 50 }));
+    expect(r.motDuty).toBeCloseTo(40000, 6);
+    expect(r.payableMot).toBeCloseTo(20000, 6);
+    expect(r.motAbsorbed).toBeCloseTo(20000, 6);
+  });
+
+  it("leaves the whole duty payable at zero absorption", () => {
+    const r = calculateHousingLoan(inputs({ motAbsorbedPct: 0 }));
+    expect(r.payableMot).toBeCloseTo(r.motDuty, 6);
+    expect(r.motAbsorbed).toBe(0);
+  });
+
+  it("waives the whole duty at full absorption", () => {
+    const r = calculateHousingLoan(inputs({ motAbsorbedPct: 100 }));
+    expect(r.payableMot).toBe(0);
+    expect(r.motAbsorbed).toBeCloseTo(r.motDuty, 6);
+  });
+
+  it("keeps the gross duty visible whatever the developer covers", () => {
+    const r = calculateHousingLoan(inputs({ motAbsorbedPct: 30 }));
+    expect(r.motDuty).toBeCloseTo(9000, 6);
+    expect(r.payableMot + r.motAbsorbed).toBeCloseTo(r.motDuty, 6);
+  });
+
+  it("clamps the absorbed share to 0-100", () => {
+    expect(calculateHousingLoan(inputs({ motAbsorbedPct: -20 })).payableMot).toBeCloseTo(9000, 6);
+    expect(calculateHousingLoan(inputs({ motAbsorbedPct: 200 })).payableMot).toBe(0);
+  });
+
+  it("absorbs nothing when the buyer is already exempt", () => {
+    const r = calculateHousingLoan(inputs({ firstHome: "yes", motAbsorbedPct: 100 }));
+    expect(r.motDuty).toBe(0);
+    expect(r.motAbsorbed).toBe(0);
+    expect(r.payableMot).toBe(0);
+  });
+
+  it("reduces net cash by the share the developer covers", () => {
+    const none = calculateHousingLoan(inputs({ motAbsorbedPct: 0 }));
+    const half = calculateHousingLoan(inputs({ motAbsorbedPct: 50 }));
+    expect(half.netCashRequired).toBeCloseTo(none.netCashRequired - 4500, 6);
   });
 });

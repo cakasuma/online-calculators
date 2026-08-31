@@ -54,29 +54,29 @@ export const calculatorContent: ContentMap = {
   carloan: {
     en: {
       intro:
-        "Estimate the monthly instalment on a Malaysian car loan and, crucially, the true cost of borrowing. Car loans here are hire purchase agreements that use a flat interest rate — you pay interest on the full original amount for the entire tenure, so the real (effective) rate you pay is roughly double the headline flat rate.",
+        "Estimate the monthly instalment on a Malaysian car loan and the true cost of borrowing. Car loans here are hire purchase agreements, and the rules changed on 1 June 2026: the Hire-Purchase (Amendment) Act abolished the flat rate and the Rule of 78 for new agreements, which now price on a reducing balance and must disclose an effective interest rate and a repayment schedule. Agreements signed before that date keep their original flat-rate terms, so this calculator models both.",
       howItWorks: {
         heading: "How the car loan calculator works",
         paragraphs: [
           "The amount financed is the vehicle price minus your down payment (usually at least 10%).",
-          "Total interest is the flat rate applied to the full amount financed for every year of the tenure: amount × flat rate × years. Unlike a housing loan, it does not reduce as you pay down the balance.",
-          "The monthly instalment is simply the total payable (amount financed + total interest) divided evenly across every month of the tenure.",
-          "We also show an approximate effective rate — the reducing-balance equivalent — so you can compare a hire purchase fairly against other loans.",
+          "For a new agreement, interest is charged only on what you still owe. The balance falls every month, so the interest portion of each instalment falls with it and the effective rate stays close to the headline rate.",
+          "For an agreement signed before 1 June 2026, the flat rate applies: interest is charged on the full amount financed for every year of the tenure, regardless of how much you have repaid. That is why the effective cost works out at roughly double the headline flat rate.",
+          "Choose which agreement you have. The calculator labels the rate accordingly, because the same number means very different money under the two bases.",
         ],
       },
       formula: {
-        heading: "Flat-rate hire purchase formula",
+        heading: "How each basis is calculated",
         paragraphs: [
-          "Total interest = P · f · Y, where P = amount financed, f = flat rate (÷100), Y = years.",
-          "Monthly instalment = (P + total interest) ÷ (Y × 12).",
-          "Effective rate ≈ (2 · 12 · total interest) ÷ (P · (N + 1)), where N = total months.",
+          "Reducing balance (new agreements): instalment = P · r · (1 + r)^N / ((1 + r)^N − 1), where P = amount financed, r = monthly rate, N = total months.",
+          "Flat rate (pre-June-2026 agreements): total interest = P · f · Y, and instalment = (P + total interest) ÷ (Y × 12).",
+          "Rule of 78 rebate on early settlement of a flat-rate agreement = total interest · n(n + 1) ÷ N(N + 1), where n = complete months still to run.",
         ],
       },
       examples: [
         {
-          title: "RM90,000 car, 10% down, 3% flat over 9 years",
-          given: ["Amount financed: RM81,000", "Flat rate: 3% p.a.", "Tenure: 9 years (108 months)"],
-          result: "≈ RM952.50/month. Total interest is RM21,870, and the effective rate is about 5.9% — nearly double the 3% flat rate.",
+          title: "RM90,000 car, 10% down, 9 years — what a flat quote really cost",
+          given: ["Amount financed: RM81,000", "Quoted: 3% flat p.a.", "Tenure: 9 years (108 months)"],
+          result: "RM952.50/month and RM21,870 of interest, at an effective rate of about 5.9% — nearly double the 3% headline. A 3% flat quote was never a 3% loan, which is the practice the 2026 amendment ended.",
         },
       ],
       faq: [
@@ -90,7 +90,7 @@ export const calculatorContent: ContentMap = {
         },
         {
           question: "Can I save money by paying off a hire purchase early?",
-          answer: "Settling early can reduce the interest under the Rule of 78 rebate, but the saving is smaller than with a reducing-balance loan because most interest is front-loaded. Ask your bank for the exact settlement figure.",
+          answer: "On a new agreement, yes — interest stops accruing on principal you have repaid, so you only pay for the time you borrowed. On a pre-June-2026 agreement the Rule of 78 still applies, and because it front-loads interest the rebate is smaller than a reducing balance would have given. Banks have voluntarily agreed to offer goodwill discounts on early settlement of those older loans to close that gap, so it is worth asking. Switch the calculator to your agreement type to see both figures.",
         },
       ],
       related: ["housing", "salary", "tax"],
@@ -98,7 +98,7 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Anggarkan ansuran bulanan pinjaman kereta di Malaysia dan, yang penting, kos sebenar pinjaman. Pinjaman kereta di sini ialah perjanjian sewa beli yang menggunakan kadar faedah rata — anda membayar faedah atas jumlah asal penuh sepanjang tempoh, jadi kadar berkesan sebenar lebih kurang dua kali ganda kadar rata yang diiklankan.",
+        "Anggarkan ansuran bulanan pinjaman kereta di Malaysia dan kos sebenar pinjaman. Pinjaman kereta di sini ialah perjanjian sewa beli, dan peraturannya berubah pada 1 Jun 2026: Akta Sewa Beli (Pindaan) memansuhkan kadar rata dan Rule of 78 bagi perjanjian baharu, yang kini dikira atas baki berkurangan serta wajib mendedahkan kadar faedah berkesan dan jadual bayaran balik. Perjanjian sebelum tarikh itu kekal pada terma kadar rata asal, jadi kalkulator ini memodelkan kedua-duanya.",
       howItWorks: {
         heading: "Cara kalkulator pinjaman kereta berfungsi",
         paragraphs: [
@@ -122,7 +122,7 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Perkirakan cicilan bulanan kredit mobil di Malaysia dan, yang penting, biaya pinjaman sebenarnya. Kredit mobil di sini adalah perjanjian sewa beli yang memakai suku bunga flat — Anda membayar bunga atas jumlah awal penuh selama tenor, sehingga tarif efektif sebenarnya kira-kira dua kali lipat suku bunga flat yang diiklankan.",
+        "Perkirakan cicilan bulanan kredit mobil di Malaysia dan biaya pinjaman sebenarnya. Kredit mobil di sini adalah perjanjian sewa beli, dan aturannya berubah pada 1 Juni 2026: UU Sewa Beli (Amandemen) menghapus tarif flat dan Rule of 78 untuk perjanjian baru, yang kini dihitung atas saldo menurun serta wajib mengungkapkan suku bunga efektif dan jadwal pembayaran. Perjanjian sebelum tanggal itu tetap pada ketentuan tarif flat aslinya, jadi kalkulator ini memodelkan keduanya.",
       howItWorks: {
         heading: "Cara kalkulator kredit mobil bekerja",
         paragraphs: [

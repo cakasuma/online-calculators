@@ -16,6 +16,8 @@
  * normal tiers rather than the higher non-citizen rate, but the first-home
  * exemption is restricted to Malaysian citizens.
  */
+import { buildSchedule, type AmortYear } from "./amortisation";
+
 export type BuyerType = "citizen" | "pr" | "foreigner";
 
 export interface HousingLoanInputs {
@@ -122,83 +124,9 @@ export function valuationFee(price: number): number {
   return applyTiers(Math.max(0, price), VALUATION_FEE_TIERS);
 }
 
-/** One calendar year of the repayment schedule. */
-export interface AmortYear {
-  year: number;
-  openingBalance: number;
-  principalPaid: number;
-  interestPaid: number;
-  closingBalance: number;
-}
-
-export interface Schedule {
-  years: AmortYear[];
-  /** Months actually taken to clear the loan — shorter than the term if extra is paid. */
-  months: number;
-  totalInterest: number;
-  /** The contractual instalment, before any extra principal. */
-  monthlyInstallment: number;
-}
-
-/** The contractual reducing-balance instalment. */
-function instalmentFor(principal: number, monthlyRate: number, months: number): number {
-  if (principal <= 0 || months <= 0) return 0;
-  if (monthlyRate === 0) return principal / months;
-  const growth = Math.pow(1 + monthlyRate, months);
-  return (principal * monthlyRate * growth) / (growth - 1);
-}
-
-/**
- * Amortise a loan month by month, aggregated into calendar years.
- *
- * Any `extraMonthly` goes straight to principal on top of the contractual
- * instalment, so the loan clears early — `months` reports how long it actually
- * took, which is what makes the interest saving visible.
- */
-export function buildSchedule(
-  principal: number,
-  annualRate: number,
-  months: number,
-  extraMonthly: number,
-): Schedule {
-  const monthlyRate = Math.max(0, annualRate) / 100 / 12;
-  const term = Math.max(0, Math.round(months));
-  const extra = Math.max(0, extraMonthly);
-  const monthlyInstallment = instalmentFor(principal, monthlyRate, term);
-
-  const years: AmortYear[] = [];
-  let balance = Math.max(0, principal);
-  let totalInterest = 0;
-  let elapsed = 0;
-  let current: AmortYear | null = null;
-
-  for (let month = 1; month <= term && balance > 0.005; month++) {
-    if (!current || month % 12 === 1) {
-      current = {
-        year: years.length + 1,
-        openingBalance: balance,
-        principalPaid: 0,
-        interestPaid: 0,
-        closingBalance: balance,
-      };
-      years.push(current);
-    }
-
-    const interest = balance * monthlyRate;
-    // The final payment is capped at whatever is left to clear.
-    const principalPart = Math.min(balance, monthlyInstallment - interest + extra);
-
-    balance -= principalPart;
-    totalInterest += interest;
-    elapsed = month;
-
-    current.principalPaid += principalPart;
-    current.interestPaid += interest;
-    current.closingBalance = balance;
-  }
-
-  return { years, months: elapsed, totalInterest, monthlyInstallment };
-}
+// The amortisation loop is shared with the car loan calculator, which needs the
+// same reducing-balance maths under the post-2026 hire purchase rules.
+export { buildSchedule, type AmortYear, type Schedule } from "./amortisation";
 
 export interface HousingLoanResult {
   downPayment: number;

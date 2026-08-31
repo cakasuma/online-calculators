@@ -54,29 +54,29 @@ export const calculatorContent: ContentMap = {
   carloan: {
     en: {
       intro:
-        "Estimate the monthly instalment on a Malaysian car loan and, crucially, the true cost of borrowing. Car loans here are hire purchase agreements that use a flat interest rate — you pay interest on the full original amount for the entire tenure, so the real (effective) rate you pay is roughly double the headline flat rate.",
+        "Estimate the monthly instalment on a Malaysian car loan and the true cost of borrowing. Car loans here are hire purchase agreements, and the rules changed on 1 June 2026: the Hire-Purchase (Amendment) Act abolished the flat rate and the Rule of 78 for new agreements, which now price on a reducing balance and must disclose an effective interest rate and a repayment schedule. Agreements signed before that date keep their original flat-rate terms, so this calculator models both.",
       howItWorks: {
         heading: "How the car loan calculator works",
         paragraphs: [
           "The amount financed is the vehicle price minus your down payment (usually at least 10%).",
-          "Total interest is the flat rate applied to the full amount financed for every year of the tenure: amount × flat rate × years. Unlike a housing loan, it does not reduce as you pay down the balance.",
-          "The monthly instalment is simply the total payable (amount financed + total interest) divided evenly across every month of the tenure.",
-          "We also show an approximate effective rate — the reducing-balance equivalent — so you can compare a hire purchase fairly against other loans.",
+          "For a new agreement, interest is charged only on what you still owe. The balance falls every month, so the interest portion of each instalment falls with it and the effective rate stays close to the headline rate.",
+          "For an agreement signed before 1 June 2026, the flat rate applies: interest is charged on the full amount financed for every year of the tenure, regardless of how much you have repaid. That is why the effective cost works out at roughly double the headline flat rate.",
+          "Choose which agreement you have. The calculator labels the rate accordingly, because the same number means very different money under the two bases.",
         ],
       },
       formula: {
-        heading: "Flat-rate hire purchase formula",
+        heading: "How each basis is calculated",
         paragraphs: [
-          "Total interest = P · f · Y, where P = amount financed, f = flat rate (÷100), Y = years.",
-          "Monthly instalment = (P + total interest) ÷ (Y × 12).",
-          "Effective rate ≈ (2 · 12 · total interest) ÷ (P · (N + 1)), where N = total months.",
+          "Reducing balance (new agreements): instalment = P · r · (1 + r)^N / ((1 + r)^N − 1), where P = amount financed, r = monthly rate, N = total months.",
+          "Flat rate (pre-June-2026 agreements): total interest = P · f · Y, and instalment = (P + total interest) ÷ (Y × 12).",
+          "Rule of 78 rebate on early settlement of a flat-rate agreement = total interest · n(n + 1) ÷ N(N + 1), where n = complete months still to run.",
         ],
       },
       examples: [
         {
-          title: "RM90,000 car, 10% down, 3% flat over 9 years",
-          given: ["Amount financed: RM81,000", "Flat rate: 3% p.a.", "Tenure: 9 years (108 months)"],
-          result: "≈ RM952.50/month. Total interest is RM21,870, and the effective rate is about 5.9% — nearly double the 3% flat rate.",
+          title: "RM90,000 car, 10% down, 9 years — what a flat quote really cost",
+          given: ["Amount financed: RM81,000", "Quoted: 3% flat p.a.", "Tenure: 9 years (108 months)"],
+          result: "RM952.50/month and RM21,870 of interest, at an effective rate of about 5.9% — nearly double the 3% headline. A 3% flat quote was never a 3% loan, which is the practice the 2026 amendment ended.",
         },
       ],
       faq: [
@@ -90,7 +90,7 @@ export const calculatorContent: ContentMap = {
         },
         {
           question: "Can I save money by paying off a hire purchase early?",
-          answer: "Settling early can reduce the interest under the Rule of 78 rebate, but the saving is smaller than with a reducing-balance loan because most interest is front-loaded. Ask your bank for the exact settlement figure.",
+          answer: "On a new agreement, yes — interest stops accruing on principal you have repaid, so you only pay for the time you borrowed. On a pre-June-2026 agreement the Rule of 78 still applies, and because it front-loads interest the rebate is smaller than a reducing balance would have given. Banks have voluntarily agreed to offer goodwill discounts on early settlement of those older loans to close that gap, so it is worth asking. Switch the calculator to your agreement type to see both figures.",
         },
       ],
       related: ["housing", "salary", "tax"],
@@ -98,7 +98,7 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Anggarkan ansuran bulanan pinjaman kereta di Malaysia dan, yang penting, kos sebenar pinjaman. Pinjaman kereta di sini ialah perjanjian sewa beli yang menggunakan kadar faedah rata — anda membayar faedah atas jumlah asal penuh sepanjang tempoh, jadi kadar berkesan sebenar lebih kurang dua kali ganda kadar rata yang diiklankan.",
+        "Anggarkan ansuran bulanan pinjaman kereta di Malaysia dan kos sebenar pinjaman. Pinjaman kereta di sini ialah perjanjian sewa beli, dan peraturannya berubah pada 1 Jun 2026: Akta Sewa Beli (Pindaan) memansuhkan kadar rata dan Rule of 78 bagi perjanjian baharu, yang kini dikira atas baki berkurangan serta wajib mendedahkan kadar faedah berkesan dan jadual bayaran balik. Perjanjian sebelum tarikh itu kekal pada terma kadar rata asal, jadi kalkulator ini memodelkan kedua-duanya.",
       howItWorks: {
         heading: "Cara kalkulator pinjaman kereta berfungsi",
         paragraphs: [
@@ -122,7 +122,7 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Perkirakan cicilan bulanan kredit mobil di Malaysia dan, yang penting, biaya pinjaman sebenarnya. Kredit mobil di sini adalah perjanjian sewa beli yang memakai suku bunga flat — Anda membayar bunga atas jumlah awal penuh selama tenor, sehingga tarif efektif sebenarnya kira-kira dua kali lipat suku bunga flat yang diiklankan.",
+        "Perkirakan cicilan bulanan kredit mobil di Malaysia dan biaya pinjaman sebenarnya. Kredit mobil di sini adalah perjanjian sewa beli, dan aturannya berubah pada 1 Juni 2026: UU Sewa Beli (Amandemen) menghapus tarif flat dan Rule of 78 untuk perjanjian baru, yang kini dihitung atas saldo menurun serta wajib mengungkapkan suku bunga efektif dan jadwal pembayaran. Perjanjian sebelum tanggal itu tetap pada ketentuan tarif flat aslinya, jadi kalkulator ini memodelkan keduanya.",
       howItWorks: {
         heading: "Cara kalkulator kredit mobil bekerja",
         paragraphs: [
@@ -148,28 +148,31 @@ export const calculatorContent: ContentMap = {
   fd: {
     en: {
       intro:
-        "Work out the interest and maturity value of a Malaysian fixed deposit (FD). For a single placement, banks pay simple interest pro-rated to the tenure. If you let the FD auto-renew and roll the interest back in, the return compounds — this calculator shows both so you can see the difference. FD interest from licensed banks is tax-exempt for individuals.",
+        "Work out the interest and maturity value of a Malaysian fixed deposit (FD). Banks pay simple interest pro-rated to the tenure, paid at maturity — nothing compounds inside a tenure. Compounding happens only when you renew and roll the interest into the new placement, once per tenure. The calculator also models breaking the deposit early and checks the maturity value against the PIDM protection limit. FD interest from licensed banks is tax-exempt for individuals.",
       howItWorks: {
         heading: "How the fixed deposit calculator works",
         paragraphs: [
           "Simple interest is your principal multiplied by the annual rate and the fraction of a year you hold the deposit: principal × rate × (months ÷ 12).",
           "The maturity value is principal plus that interest, paid out when the FD matures.",
-          "If you auto-renew each month, interest is added to the principal and earns further interest — the compounded maturity value is principal × (1 + rate ÷ 12)^months.",
-          "The longer the tenure and the higher the rate, the bigger the gap between simple and compounded returns.",
+          "Nothing compounds during a tenure. If you renew the deposit, the interest earned is rolled into the new principal and earns interest in the next cycle — so compounding happens once per completed tenure, not monthly. A single placement earns no compounding bonus at all.",
+          "Because of that, a shorter tenure rolled over repeatedly compounds more often than a long one, which is why the calculator reports an effective annual return alongside the headline rate.",
+          "Breaking the deposit early is costly. Common bank practice pays nothing at all before three completed months, and about half the contracted rate after that, on completed months only. Terms vary between banks.",
+          "PIDM protects RM250,000 per depositor per member bank, and the limit counts principal and interest together — so a placement that starts under the cap can mature above it. Conventional and Islamic deposits are protected separately.",
         ],
       },
       formula: {
         heading: "Fixed deposit formulas",
         paragraphs: [
           "Simple maturity = P × (1 + r × months ÷ 12).",
-          "Compounded maturity = P × (1 + r ÷ 12)^months, where P = principal, r = annual rate (÷100).",
+          "Value after n renewals = P × (1 + r × months ÷ 12)^n, where P = principal, r = annual rate (÷100) and months is the tenure of one placement.",
+          "Early withdrawal interest = P × (r ÷ 2) × completed months ÷ 12, and zero before three completed months.",
         ],
       },
       examples: [
         {
           title: "RM10,000 at 3.5% p.a. for 12 months",
           given: ["Principal: RM10,000", "Rate: 3.5% p.a.", "Tenure: 12 months"],
-          result: "Simple interest of RM350 → RM10,350 at maturity. With monthly auto-renewal it compounds to about RM10,355.67 — roughly RM5.67 extra.",
+          result: "Simple interest of RM350 → RM10,350 at maturity, and no compounding bonus, because a single placement does not compound. Renew it for a second 12-month term and the interest rolls in: RM10,712.25, or RM12.25 more than simple interest over the same two years. Break it at month 6 instead and you would receive RM10,087.50 — half the rate on completed months only, giving up RM262.50.",
         },
       ],
       faq: [
@@ -191,13 +194,13 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Kira faedah dan nilai matang simpanan tetap (FD) Malaysia. Bagi satu simpanan, bank membayar faedah mudah berkadar dengan tempoh. Jika anda membiarkan FD dibaharui automatik, pulangan dikompaun — kalkulator ini menunjukkan kedua-duanya. Faedah FD daripada bank berlesen dikecualikan cukai untuk individu.",
+        "Kira faedah dan nilai matang simpanan tetap (FD) Malaysia. Bank membayar faedah mudah berkadar dengan tempoh, dibayar pada tarikh matang — tiada apa berkompaun dalam satu tempoh. Kompaun hanya berlaku apabila anda membaharui dan menggulung faedah ke dalam penempatan baharu, sekali setiap tempoh. Kalkulator ini juga memodelkan pemecahan awal dan menyemak nilai matang terhadap had perlindungan PIDM. Faedah FD daripada bank berlesen dikecualikan cukai untuk individu.",
       howItWorks: {
         heading: "Cara kalkulator simpanan tetap berfungsi",
         paragraphs: [
           "Faedah mudah ialah pokok didarab kadar tahunan dan pecahan tahun anda menyimpan: pokok × kadar × (bulan ÷ 12).",
           "Nilai matang ialah pokok campur faedah, dibayar apabila FD matang.",
-          "Jika dibaharui automatik setiap bulan, faedah ditambah kepada pokok dan memperoleh faedah lanjut: pokok × (1 + kadar ÷ 12)^bulan.",
+          "Tiada apa berkompaun dalam satu tempoh. Jika anda membaharui, faedah digulung ke dalam pokok baharu dan memperoleh faedah pada kitaran seterusnya — jadi kompaun berlaku sekali setiap tempoh, bukan setiap bulan. Satu penempatan tunggal tidak memperoleh bonus kompaun langsung.",
         ],
       },
       faq: [
@@ -215,13 +218,13 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Hitung bunga dan nilai jatuh tempo deposito (FD) Malaysia. Untuk satu penempatan, bank membayar bunga sederhana sesuai proporsi tenor. Jika Anda membiarkan deposito diperpanjang otomatis, hasilnya majemuk — kalkulator ini menampilkan keduanya. Bunga deposito dari bank berlisensi bebas pajak untuk individu.",
+        "Hitung bunga dan nilai jatuh tempo deposito (FD) Malaysia. Bank membayar bunga sederhana sesuai proporsi tenor, dibayar saat jatuh tempo — tidak ada yang berbunga majemuk di dalam satu tenor. Bunga majemuk hanya terjadi saat Anda memperpanjang dan menggulung bunga ke penempatan baru, sekali per tenor. Kalkulator ini juga memodelkan pencairan dini dan memeriksa nilai jatuh tempo terhadap batas perlindungan PIDM. Bunga deposito dari bank berlisensi bebas pajak untuk individu.",
       howItWorks: {
         heading: "Cara kalkulator deposito bekerja",
         paragraphs: [
           "Bunga sederhana adalah pokok dikali tarif tahunan dan fraksi tahun Anda menyimpan: pokok × tarif × (bulan ÷ 12).",
           "Nilai jatuh tempo adalah pokok ditambah bunga itu, dibayar saat deposito jatuh tempo.",
-          "Jika diperpanjang otomatis setiap bulan, bunga ditambahkan ke pokok dan memperoleh bunga lebih lanjut: pokok × (1 + tarif ÷ 12)^bulan.",
+          "Tidak ada yang berbunga majemuk di dalam satu tenor. Jika Anda memperpanjang, bunga digulung ke pokok baru dan memperoleh bunga pada siklus berikutnya — jadi bunga majemuk terjadi sekali per tenor, bukan tiap bulan. Satu penempatan tunggal tidak memperoleh bonus majemuk sama sekali.",
         ],
       },
       faq: [
@@ -256,7 +259,7 @@ export const calculatorContent: ContentMap = {
         heading: "Salary deduction formulas",
         paragraphs: [
           "Net monthly take-home = Gross salary − EPF − SOCSO − EIS − PCB.",
-          "EPF (employee, default) = 11% × gross monthly wage, rounded up to the nearest ringgit. The combined employer + employee contribution feeds two accounts (Akaun Persaraan 75% and Akaun Sejahtera 25% under the 2024 restructure).",
+          "EPF (employee, default) = 11% × gross monthly wage, rounded up to the nearest ringgit. Since the restructure of 11 May 2024, the combined employer and employee contribution feeds three accounts: Akaun Persaraan (75%), Akaun Sejahtera (15%) and Akaun Fleksibel (10%).",
           "SOCSO (employee) is calculated from a tiered table where the maximum employee contribution is RM 24.75 per month for wages of RM 4,000 and above. The employer share for the same band is RM 86.65.",
           "EIS (employee) = 0.2% of monthly wages, capped at RM 9.90 per month (wage ceiling RM 5,000). Employer contributes a matching 0.2%.",
           "PCB (resident) = MAX(0, lookup(annualised taxable income − reliefs, progressive brackets) − previously-paid PCB − zakat paid through payroll) ÷ months remaining in the year. Non-resident PCB = 30% × monthly chargeable income.",
@@ -432,9 +435,9 @@ export const calculatorContent: ContentMap = {
         heading: "How the EPF retirement projection works",
         paragraphs: [
           "The projection starts from your current EPF balance and simulates each remaining year until your chosen retirement age. Each year it adds your employee contribution (default 11% of gross salary), your employer contribution (12% for salaries above RM 5,000; 13% for RM 5,000 and below), any voluntary top-ups (e.g. i-Saraan), and any bonus-month contributions, then credits dividends on the end-of-year balance.",
-          "EPF dividends compound annually. The calculator defaults to 5.5% — a conservative figure within KWSP's recent 5.50%–6.40% range. Because dividends are declared on the total balance rather than new contributions alone, even a half-percentage-point change meaningfully shifts the 20- or 30-year projection.",
+          "EPF dividends compound annually. The calculator defaults to 6.0%, just under the 6.30% declared for 2024 and the 6.15% for 2025. Because dividends are declared on the total balance rather than new contributions alone, even a half-percentage-point change meaningfully shifts the 20- or 30-year projection.",
           "Your salary is assumed to grow by the percentage you enter each year. A 3%–5% annual growth rate is typical for most Malaysian employees; adjust downward if you are near the peak of your earning years or upward if you expect rapid career progression.",
-          "The 2024 KWSP account restructure split contributions between Akaun Persaraan (75%) and Akaun Sejahtera (25%). This calculator treats the combined balance as the retirement balance since both accounts ultimately fund retirement, though Akaun Sejahtera allows limited withdrawals before retirement age.",
+          "Since 11 May 2024, new contributions are split across three accounts: Akaun Persaraan (75%), locked until 55; Akaun Sejahtera (15%), for housing, education and health; and Akaun Fleksibel (10%), withdrawable at any time. The calculator projects all three, so you can see how much of the total is genuinely locked away for retirement rather than reachable before then. The three accounts consolidate into Akaun 55 once you reach 55.",
           "The Basic Savings target is the KWSP benchmark designed to fund 20 years of retirement at the poverty line — RM 270,000 at age 55 (early withdrawal) and RM 390,000 at age 60 (full withdrawal) by 2028. The gap analysis shows whether your projected balance is on track to meet this target.",
         ],
       },
@@ -454,10 +457,10 @@ export const calculatorContent: ContentMap = {
           "Employer rates depend on the employee's monthly salary and whether the employee is below or above 60 years old.",
         columns: ["Monthly salary", "Age below 60 — employer rate", "Age 60 & above — employer rate"],
         rows: [
-          ["RM 5,000 and below", "13%", "6.5%"],
-          ["Above RM 5,000", "12%", "6%"],
+          ["RM 5,000 and below", "13%", "4%"],
+          ["Above RM 5,000", "12%", "4%"],
         ],
-        note: "Employee default rate: 11% (age below 60); 5.5% (age 60 and above). Members may voluntarily contribute more. Foreign employees contribute a flat RM 5 employer / variable employee amount unless they opt into the standard scheme.",
+        note: "The employer rate for employees aged 60 to 75 was cut to a flat 4% with effect from the January 2019 wage, and the employee side became voluntary (0% by default). Contributions stop entirely at 75. Members below 60 may voluntarily contribute more than 11%. Since 1 October 2025, EPF is mandatory for non-citizens under 75 at 2% from the employer and 2% from the employee.",
       },
       examples: [
         {
@@ -499,12 +502,12 @@ export const calculatorContent: ContentMap = {
         {
           question: "Should I use 55 or 60 as my retirement age?",
           answer:
-            "Age 55 unlocks partial EPF withdrawals from Akaun Persaraan. Full flexible withdrawal is available at age 60. If you plan to work until 60, use 60 for a more accurate projection. The Basic Savings target for age 55 (RM 270,000) is lower because the remaining 5 years of contributions are counted separately.",
+            "Age 55 unlocks partial EPF withdrawals, and the three accounts consolidate into Akaun 55 at that point. Full flexible withdrawal is available at age 60. If you plan to work until 60, use 60 for a more accurate projection. The Basic Savings target for age 55 is lower than the age-60 figure because the remaining five years of contributions are counted separately.",
         },
         {
           question: "How accurate is the dividend rate assumption?",
           answer:
-            "KWSP has paid dividends between 5.50% (Akaun Persaraan, 2024) and 6.40% in recent years. The default 5.5% is conservative. Using a higher rate (e.g. 6%) will project a meaningfully larger balance over a 20–30 year horizon due to compounding. For planning purposes, model both a pessimistic (5%) and optimistic (6.5%) scenario.",
+            "KWSP declared 6.30% for 2024 and 6.15% for 2025, for both Simpanan Konvensional and Simpanan Shariah. The 6.0% default is slightly below both, which keeps the projection on the conservative side. Small differences compound heavily over a 20-30 year horizon, so it is worth modelling a pessimistic (5%) and an optimistic (6.5%) scenario as well.",
         },
         {
           question: "Are voluntary contributions (i-Saraan) worth it?",
@@ -1187,14 +1190,17 @@ export const calculatorContent: ContentMap = {
   housing: {
     en: {
       intro:
-        "Estimate the monthly repayment on a Malaysian home loan and, just as importantly, the cash you need upfront — down payment, stamp duty on the Memorandum of Transfer (MOT), stamp duty on the loan agreement, and legal fees. The calculator uses the 2024 ad-valorem stamp duty tiers and the standard legal-fee scale.",
+        "Estimate the monthly repayment on a Malaysian home loan and, just as importantly, the cash you need upfront — down payment, stamp duty on the Memorandum of Transfer (MOT), stamp duty on the loan agreement, legal fees, valuation, and MRTA. The calculator uses the 2026 ad-valorem stamp duty tiers and the standard legal-fee scale, and lets you model a developer rebate and absorbed fees.",
       howItWorks: {
         heading: "How the housing loan calculator works",
         paragraphs: [
-          "The monthly installment is computed with the standard amortization formula using your loan amount (price minus down payment), the annual interest rate, and the tenure in months.",
+          "You enter the margin of finance — the share of the price the bank lends, quoted as 90% or 80% the way banks and buyers talk about it. The loan amount follows from that, and the down payment is whatever is left. Dropping the margin from 90% to 80% shrinks the loan, the loan agreement stamp duty and the monthly instalment, and raises the cash you need on completion day.",
+          "The monthly installment is then computed with the standard amortization formula using that loan amount, the annual interest rate, and the tenure in months.",
           "MOT stamp duty is charged on the property price in tiers: 1% on the first RM100,000, 2% from RM100,001–500,000, 3% from RM500,001–1,000,000, and 4% above RM1,000,000.",
           "Loan agreement stamp duty is a flat 0.5% of the loan amount. Legal fees follow the Solicitors' Remuneration Order scale and are charged on both the Sale & Purchase Agreement and the loan agreement.",
-          "First-home buyers purchasing a property priced at RM500,000 or below qualify for full stamp duty exemption on both the MOT and the loan agreement — toggle the first-home option to apply it.",
+          "Malaysian citizens buying their first home at RM500,000 or below qualify for full stamp duty exemption on both the MOT and the loan agreement. Budget 2026 extended this to 31 December 2027. Permanent residents pay the normal tiers but do not qualify for the exemption, and from 1 January 2026 non-citizens and foreign companies pay a flat 8% on the transfer instead of the tiers.",
+          "On a new launch the developer often absorbs the legal fees and some or all of the MOT stamp duty, and quotes a rebate off the price. The MOT contribution is entered as the share the developer covers, because it is frequently partial rather than a clean waiver — a developer meeting half of a non-citizen's 8% duty leaves an effective 4%. Set those, and the net cash required falls accordingly; with a large enough rebate it reaches zero, which is what a \"zero down payment\" package really means. The rebate offsets your cash only: the bank still finances against the full price, and duty and legal fees are still assessed on it.",
+          "An MRTA or MLTA premium can be paid upfront or rolled into the loan. Financing it raises the amount borrowed and therefore the monthly instalment. Any extra monthly payment goes straight to principal, which is why even a small amount shortens a 35-year loan by years.",
         ],
       },
       formula: {
@@ -1205,7 +1211,7 @@ export const calculatorContent: ContentMap = {
         ],
       },
       rateTable: {
-        heading: "MOT stamp duty tiers (2024)",
+        heading: "MOT stamp duty tiers (2026)",
         columns: ["Property price band", "Rate"],
         rows: [
           ["First RM100,000", "1%"],
@@ -1213,13 +1219,13 @@ export const calculatorContent: ContentMap = {
           ["RM500,001 – RM1,000,000", "3%"],
           ["Above RM1,000,000", "4%"],
         ],
-        note: "Loan agreement stamp duty is a separate flat 0.5% of the loan amount.",
+        note: "Loan agreement stamp duty is a separate flat 0.5% of the loan amount. Non-citizens and foreign companies pay a flat 8% on the transfer instead of these tiers.",
       },
       examples: [
         {
           title: "RM500,000 home, 10% down, 35 years at 4%",
           given: ["Loan amount: RM450,000", "Down payment: RM50,000", "Interest rate: 4% p.a."],
-          result: "≈ RM1,993/month, with roughly RM73,000 needed upfront (down payment + stamp duty + legal fees) for a non-first-home buyer.",
+          result: "≈ RM1,993/month, with roughly RM76,000 needed upfront (down payment + stamp duty + legal fees + valuation + disbursements) for a Malaysian citizen who is not a first-home buyer.",
         },
       ],
       faq: [
@@ -1229,11 +1235,11 @@ export const calculatorContent: ContentMap = {
         },
         {
           question: "Is stamp duty really waived for first-home buyers?",
-          answer: "Yes — for eligible Malaysian first-home buyers, properties priced at RM500,000 or below receive full stamp duty exemption on both the transfer (MOT) and the loan agreement. Confirm the current year's terms with your lawyer.",
+          answer: "Yes — for eligible Malaysian citizens buying their first home, properties priced at RM500,000 or below receive full stamp duty exemption on both the transfer (MOT) and the loan agreement, worth about RM11,250 on a RM500,000 home. Budget 2026 extended it to 31 December 2027. Above RM500,000 there is no relief: the 75% remission that once applied to the RM500,001–RM1,000,000 band lapsed at the end of 2023.",
         },
         {
           question: "Does this include MRTA or fire insurance?",
-          answer: "No. Mortgage Reducing Term Assurance (MRTA) and home/fire insurance are quoted separately by your bank and insurer, so add those to your upfront budget.",
+          answer: "MRTA is included if you enter a premium — you can pay it upfront or finance it into the loan. Home and fire insurance are quoted separately by your insurer and are not included, so budget for those on top.",
         },
       ],
       related: ["salary", "tax", "epf"],
@@ -1241,7 +1247,7 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Anggarkan ansuran bulanan pinjaman rumah di Malaysia dan, yang sama penting, tunai pendahuluan yang diperlukan — bayaran pendahuluan, duti setem Memorandum Pindah Milik (MOT), duti setem perjanjian pinjaman, dan yuran guaman. Kalkulator ini menggunakan kadar duti setem 2024 dan skala yuran guaman standard.",
+        "Anggarkan ansuran bulanan pinjaman rumah di Malaysia dan, yang sama penting, tunai pendahuluan yang diperlukan — bayaran pendahuluan, duti setem Memorandum Pindah Milik (MOT), duti setem perjanjian pinjaman, yuran guaman, penilaian, dan MRTA. Kalkulator ini menggunakan kadar duti setem 2026 dan skala yuran guaman standard, serta membolehkan anda memodelkan rebat pemaju dan yuran yang ditanggung pemaju.",
       howItWorks: {
         heading: "Cara kalkulator pinjaman perumahan berfungsi",
         paragraphs: [
@@ -1265,7 +1271,7 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Perkirakan cicilan bulanan pinjaman rumah di Malaysia dan, yang sama pentingnya, uang muka yang dibutuhkan — uang muka, bea meterai Memorandum Pengalihan (MOT), bea meterai perjanjian pinjaman, dan biaya hukum. Kalkulator ini menggunakan tarif bea meterai 2024 dan skala biaya hukum standar.",
+        "Perkirakan cicilan bulanan pinjaman rumah di Malaysia dan, yang sama pentingnya, uang muka yang dibutuhkan — uang muka, bea meterai Memorandum Pengalihan (MOT), bea meterai perjanjian pinjaman, biaya hukum, penilaian, dan MRTA. Kalkulator ini menggunakan tarif bea meterai 2026 dan skala biaya hukum standar, serta memungkinkan Anda memodelkan rabat pengembang dan biaya yang ditanggung pengembang.",
       howItWorks: {
         heading: "Cara kalkulator pinjaman rumah bekerja",
         paragraphs: [
@@ -1288,11 +1294,13 @@ export const calculatorContent: ContentMap = {
   tax: {
     en: {
       intro:
-        "Estimate your Malaysian personal income tax for Year of Assessment 2026. Enter your annual income and the reliefs you can claim — EPF and life insurance, lifestyle, medical, education/SSPN, child and spouse relief — and the calculator returns your chargeable income, tax before and after rebate, total tax payable, effective rate, and an approximate monthly PCB.",
+        "Estimate your Malaysian personal income tax for Year of Assessment 2026. Enter your annual income and the reliefs you can claim — EPF, life insurance, medical, parents' medical, SSPN, PRS, SOCSO/EIS, lifestyle, sports, childcare, and child and spouse relief — plus any zakat paid, and the calculator returns your chargeable income, tax before and after rebates, total tax payable, effective rate, and an approximate monthly PCB.",
       howItWorks: {
         heading: "How the income tax calculator works",
         paragraphs: [
-          "A personal relief of RM9,000 is applied automatically, then your other reliefs are added (each capped at its statutory limit) and subtracted from your annual income to give chargeable income.",
+          "A personal relief of RM9,000 is applied automatically, then your other reliefs are added — each capped at its own statutory limit, independently of the others — and subtracted from your annual income to give chargeable income.",
+          "Child relief is tiered rather than flat: RM2,000 for a child under 18, RM8,000 for a child aged 18 and over in tertiary education at diploma level or above, RM6,000 for a disabled child, and RM14,000 for a disabled child in higher education.",
+          "Zakat is a rebate, not a relief. That makes it far more valuable than a relief of the same size: RM1 of relief only saves you your marginal rate, while RM1 of zakat cancels RM1 of tax outright. It cannot create a refund, so it is capped at the tax still standing.",
           "Tax is computed on chargeable income using the resident progressive bands for YA 2026. A rebate of RM400 applies when chargeable income is RM35,000 or less, with an extra RM400 if spouse relief is claimed.",
           "The effective rate is total tax payable divided by your annual income, and the monthly PCB is the annual tax spread across 12 months.",
         ],
@@ -1316,13 +1324,13 @@ export const calculatorContent: ContentMap = {
       },
       examples: [
         {
-          title: "RM72,000 income with RM6,500 reliefs",
+          title: "RM72,000 income with RM15,500 of reliefs",
           given: [
             "Annual income: RM72,000",
-            "Reliefs: RM9,000 personal + RM4,000 EPF/life + RM2,500 lifestyle",
+            "Reliefs: RM9,000 personal + RM4,000 EPF + RM2,500 lifestyle",
             "No spouse or child relief",
           ],
-          result: "Chargeable income RM56,500 → tax ≈ RM2,335 for the year (≈ RM195/month), an effective rate of about 3.2%.",
+          result: "Chargeable income RM56,500 → tax of RM2,215 for the year (≈ RM185/month), an effective rate of about 3.08%.",
         },
       ],
       faq: [
@@ -1336,7 +1344,7 @@ export const calculatorContent: ContentMap = {
         },
         {
           question: "Which reliefs are capped?",
-          answer: "Yes — EPF + life insurance is capped at RM7,000, lifestyle at RM2,500, medical at RM10,000, and education/SSPN at RM8,000. The calculator applies these caps for you.",
+          answer: "Every relief has its own independent cap, and they do not pool. EPF is capped at RM4,000 and life insurance/takaful separately at RM3,000 — these are often quoted together as \"RM7,000\", but unused life insurance headroom cannot absorb EPF beyond RM4,000. Lifestyle is RM2,500 with a separate RM1,000 for sports, medical RM10,000, SSPN RM8,000, PRS RM3,000, and SOCSO/EIS RM350. The calculator applies each cap for you and shows which ones you have maxed out.",
         },
       ],
       related: ["salary", "epf", "housing"],
@@ -1344,7 +1352,7 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Anggarkan cukai pendapatan peribadi Malaysia anda untuk Tahun Taksiran 2026. Masukkan pendapatan tahunan dan pelepasan yang boleh dituntut — EPF dan insurans hayat, gaya hidup, perubatan, pendidikan/SSPN, pelepasan anak dan pasangan — dan kalkulator memaparkan pendapatan bercukai, cukai sebelum dan selepas rebat, jumlah cukai kena dibayar, kadar berkesan, dan anggaran PCB bulanan.",
+        "Anggarkan cukai pendapatan peribadi Malaysia anda untuk Tahun Taksiran 2026. Masukkan pendapatan tahunan dan pelepasan yang boleh dituntut — KWSP, insurans hayat, perubatan, perubatan ibu bapa, SSPN, PRS, PERKESO/SIP, gaya hidup, sukan, taska, serta pelepasan anak dan pasangan — dan zakat yang dibayar, dan kalkulator memaparkan pendapatan bercukai, cukai sebelum dan selepas rebat, jumlah cukai kena dibayar, kadar berkesan, dan anggaran PCB bulanan.",
       howItWorks: {
         heading: "Cara kalkulator cukai pendapatan berfungsi",
         paragraphs: [
@@ -1363,7 +1371,7 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Perkirakan pajak penghasilan pribadi Malaysia Anda untuk Tahun Penilaian 2026. Masukkan penghasilan tahunan dan keringanan yang dapat diklaim — EPF dan asuransi jiwa, gaya hidup, medis, pendidikan/SSPN, keringanan anak dan pasangan — dan kalkulator menampilkan penghasilan kena pajak, pajak sebelum dan sesudah rebat, total pajak terutang, tarif efektif, dan perkiraan PCB bulanan.",
+        "Perkirakan pajak penghasilan pribadi Malaysia Anda untuk Tahun Penilaian 2026. Masukkan penghasilan tahunan dan keringanan yang dapat diklaim — EPF, asuransi jiwa, medis, medis orang tua, SSPN, PRS, SOCSO/EIS, gaya hidup, olahraga, penitipan anak, serta keringanan anak dan pasangan — dan zakat yang dibayar, dan kalkulator menampilkan penghasilan kena pajak, pajak sebelum dan sesudah rebat, total pajak terutang, tarif efektif, dan perkiraan PCB bulanan.",
       howItWorks: {
         heading: "Cara kalkulator pajak penghasilan bekerja",
         paragraphs: [
@@ -1385,13 +1393,15 @@ export const calculatorContent: ContentMap = {
   bmi: {
     en: {
       intro:
-        "Calculate your Body Mass Index (BMI) and see which WHO category you fall into, the healthy weight range for your height, your Basal Metabolic Rate (BMR), and the daily calories you need to maintain your weight (TDEE).",
+        "Calculate your Body Mass Index (BMI) and see which category you fall into under Malaysia's national clinical guideline, the healthy weight range for your height, your Basal Metabolic Rate (BMR), and the daily calories you need to maintain your weight (TDEE). Malaysia uses lower BMI thresholds than the international chart, so the answer here may differ from other calculators.",
       howItWorks: {
         heading: "How the BMI calculator works",
         paragraphs: [
-          "BMI is your weight in kilograms divided by your height in metres squared. A BMI under 18.5 is underweight, 18.5–24.9 is normal, 25–29.9 is overweight, and 30 or above is obese.",
+          "BMI is your weight in kilograms divided by your height in metres squared. Malaysia's Clinical Practice Guidelines for the Management of Obesity (2nd edition, 2023), issued by the Ministry of Health with the Malaysian Endocrine and Metabolic Society, set pre-obesity at a BMI of 23 and obesity above 27.5.",
+          "Those thresholds are lower than the international 25 and 30 because the international chart was drawn from a Caucasian reference population. Asians — including Malaysia's Malay, Chinese and Indian populations — carry more body fat at the same BMI and develop diabetes and cardiovascular disease at lower values, so the risk begins earlier. The calculator applies the Malaysian figures and tells you when the international chart would have said something different.",
           "BMR is estimated with the Mifflin-St Jeor equation, which uses your weight, height, age, and sex. TDEE then multiplies BMR by an activity factor from 1.2 (sedentary) to 1.9 (very active).",
-          "The healthy weight range is the weight that would put your BMI between 18.5 and 24.9 at your current height.",
+          "The healthy weight range is the weight that would put your BMI between 18.5 and 23 at your current height — the upper bound is the Malaysian pre-obesity cut-off, not the international one.",
+          "BMI categories apply to adults only. For anyone under 18 the guideline directs that the WHO BMI-for-age chart be used instead, because a healthy BMI changes with a child's age and sex. The calculator shows the BMI figure for a child but withholds the category rather than applying an adult threshold that does not fit.",
         ],
       },
       formula: {
@@ -1404,13 +1414,15 @@ export const calculatorContent: ContentMap = {
         ],
       },
       rateTable: {
-        heading: "BMI categories (WHO)",
-        columns: ["BMI", "Category"],
+        heading: "BMI categories for Malaysian adults (MOH CPG 2023)",
+        caption:
+          "Applies to adults aged 18 and over. Under-18s should be assessed with the WHO BMI-for-age chart.",
+        columns: ["BMI", "Category", "International chart would say"],
         rows: [
-          ["Below 18.5", "Underweight"],
-          ["18.5 – 24.9", "Normal weight"],
-          ["25.0 – 29.9", "Overweight"],
-          ["30.0 and above", "Obese"],
+          ["Below 18.5", "Underweight", "Underweight"],
+          ["18.5 – 22.9", "Normal weight", "Normal weight"],
+          ["23.0 – 27.5", "Pre-obese (overweight)", "Normal up to 25, then overweight"],
+          ["Above 27.5", "Obese", "Overweight until 30, then obese"],
         ],
       },
       faq: [
@@ -1436,18 +1448,19 @@ export const calculatorContent: ContentMap = {
       howItWorks: {
         heading: "Cara kalkulator BMI berfungsi",
         paragraphs: [
-          "BMI ialah berat dalam kilogram dibahagi dengan kuasa dua tinggi dalam meter. BMI bawah 18.5 kurang berat, 18.5–24.9 normal, 25–29.9 berlebihan berat, dan 30 ke atas obes.",
+          "BMI ialah berat dalam kilogram dibahagi dengan kuasa dua tinggi dalam meter. Garis Panduan Amalan Klinikal Pengurusan Obesiti Malaysia (edisi ke-2, 2023), terbitan Kementerian Kesihatan bersama Persatuan Endokrin dan Metabolik Malaysia, menetapkan pra-obesiti pada BMI 23 dan obesiti melebihi 27.5.",
+          "Nilai ini lebih rendah daripada 25 dan 30 antarabangsa kerana carta antarabangsa dibina daripada populasi rujukan Kaukasia. Orang Asia mempunyai lebih lemak badan pada BMI yang sama dan menghidap diabetes serta penyakit kardiovaskular pada nilai lebih rendah. Kalkulator ini menggunakan angka Malaysia dan memberitahu anda apabila carta antarabangsa memberi jawapan berbeza.",
           "BMR dianggar dengan persamaan Mifflin-St Jeor menggunakan berat, tinggi, umur, dan jantina. TDEE mendarabkan BMR dengan faktor aktiviti dari 1.2 hingga 1.9.",
         ],
       },
       rateTable: {
-        heading: "Kategori BMI (WHO)",
+        heading: "Kategori BMI dewasa Malaysia (CPG KKM 2023)",
         columns: ["BMI", "Kategori"],
         rows: [
           ["Bawah 18.5", "Kurang berat"],
-          ["18.5 – 24.9", "Berat normal"],
-          ["25.0 – 29.9", "Berlebihan berat"],
-          ["30.0 ke atas", "Obes"],
+          ["18.5 – 22.9", "Berat normal"],
+          ["23.0 – 27.5", "Pra-obes (berlebihan berat)"],
+          ["Melebihi 27.5", "Obes"],
         ],
       },
       faq: [
@@ -1465,18 +1478,19 @@ export const calculatorContent: ContentMap = {
       howItWorks: {
         heading: "Cara kalkulator BMI bekerja",
         paragraphs: [
-          "BMI adalah berat dalam kilogram dibagi kuadrat tinggi dalam meter. BMI di bawah 18.5 berat kurang, 18.5–24.9 normal, 25–29.9 kelebihan berat, dan 30 ke atas obesitas.",
+          "BMI adalah berat dalam kilogram dibagi kuadrat tinggi dalam meter. Pedoman Praktik Klinis Penanganan Obesitas Malaysia (edisi ke-2, 2023), terbitan Kementerian Kesehatan bersama Malaysian Endocrine and Metabolic Society, menetapkan pra-obesitas pada BMI 23 dan obesitas di atas 27,5.",
+          "Ambang ini lebih rendah dari 25 dan 30 internasional karena bagan internasional disusun dari populasi rujukan Kaukasia. Orang Asia memiliki lebih banyak lemak tubuh pada BMI yang sama dan mengalami diabetes serta penyakit kardiovaskular pada nilai lebih rendah. Kalkulator ini memakai angka Malaysia dan memberi tahu Anda bila bagan internasional memberi jawaban berbeda.",
           "BMR diperkirakan dengan persamaan Mifflin-St Jeor menggunakan berat, tinggi, usia, dan jenis kelamin. TDEE mengalikan BMR dengan faktor aktivitas dari 1.2 hingga 1.9.",
         ],
       },
       rateTable: {
-        heading: "Kategori BMI (WHO)",
+        heading: "Kategori BMI dewasa Malaysia (CPG KKM 2023)",
         columns: ["BMI", "Kategori"],
         rows: [
           ["Di bawah 18.5", "Berat kurang"],
-          ["18.5 – 24.9", "Berat normal"],
-          ["25.0 – 29.9", "Kelebihan berat"],
-          ["30.0 ke atas", "Obesitas"],
+          ["18.5 – 22.9", "Berat normal"],
+          ["23,0 – 27,5", "Pra-obesitas (kelebihan berat)"],
+          ["Di atas 27,5", "Obesitas"],
         ],
       },
       faq: [

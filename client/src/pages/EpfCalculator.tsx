@@ -18,7 +18,6 @@ import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n"
 import { recordServerEvent, track } from "@/lib/analytics";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import {
   EPF_DEFAULTS,
@@ -27,9 +26,11 @@ import {
   projectEpf,
   type EpfInputs,
   type EpfProjection,
+  type WorkerType,
 } from "@/lib/epf";
 import {
   buildShareUrl,
+  enumField,
   mergeFromUrl,
   numberField,
   urlHasSchemaParams,
@@ -48,6 +49,7 @@ const EPF_URL_SCHEMA: UrlSchema<EpfInputs> = {
   employerRate: numberField<EpfInputs, "employerRate">("er"),
   voluntaryAnnual: numberField<EpfInputs, "voluntaryAnnual">("vol"),
   bonusMonths: numberField<EpfInputs, "bonusMonths">("bon"),
+  workerType: enumField<EpfInputs, "workerType">("who", ["citizen", "foreigner"]),
 };
 
 interface Props {
@@ -125,6 +127,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
   );
   const [voluntaryAnnual, setVoluntaryAnnual] = useState(formatInputValue(String(initial.voluntaryAnnual), locale));
   const [bonusMonths, setBonusMonths] = useState(String(initial.bonusMonths));
+  const [workerType, setWorkerType] = useState<WorkerType>(initial.workerType ?? "citizen");
 
   // UI state
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -154,6 +157,9 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
       employerRate: empOverride,
       voluntaryAnnual: Math.max(0, p(voluntaryAnnual)),
       bonusMonths: p(bonusMonths),
+      workerType,
+      // Drives which phase of the Basic Savings target applies.
+      currentYear: new Date().getFullYear(),
     };
   }, [
     currentAge,
@@ -298,6 +304,17 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </FieldRow>
             </div>
 
+            <FieldRow label={t("epf.inputs.workerType")} hint={t("epf.workerType.hint")}>
+              <select
+                value={workerType}
+                onChange={(event) => setWorkerType(event.target.value as WorkerType)}
+                className="w-full rounded-xl border bg-background px-3 py-2 text-sm shadow-sm"
+              >
+                <option value="citizen">{t("epf.workerType.citizen")}</option>
+                <option value="foreigner">{t("epf.workerType.foreigner")}</option>
+              </select>
+            </FieldRow>
+
             {/* Advanced / optional fields */}
             <div>
               <button
@@ -396,7 +413,6 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
                       schema={EPF_URL_SCHEMA}
                       defaultName={`EPF age ${parsedInputs.currentAge}→${parsedInputs.retirementAge}`}
                     />
-                    <EmbedDialog calculator="epf" />
                   </div>
                 </CardContent>
               </Card>
@@ -426,6 +442,95 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">{t("epf.results.targetSource")}</p>
+                  {projection.basicSavingsIsEstimate && (
+                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                      {t("epf.results.targetEstimate")}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Account split — new contributions have been divided three ways since May 2024 */}
+              <Card className="rounded-3xl">
+                <CardContent className="p-6 space-y-3">
+                  <div>
+                    <h2 className="text-base font-semibold">{t("epf.accounts.title")}</h2>
+                    <p className="text-sm text-muted-foreground">{t("epf.accounts.subtitle")}</p>
+                  </div>
+                  {projection.accounts ? (
+                    <>
+                      <div className="flex h-3 overflow-hidden rounded-full">
+                        <div className="bg-primary" style={{ width: "75%" }} />
+                        <div className="bg-sky-400" style={{ width: "15%" }} />
+                        <div className="bg-emerald-400" style={{ width: "10%" }} />
+                      </div>
+                      <div className="space-y-2">
+                        {([
+                          ["persaraan", projection.accounts.persaraan, "bg-primary"],
+                          ["sejahtera", projection.accounts.sejahtera, "bg-sky-400"],
+                          ["fleksibel", projection.accounts.fleksibel, "bg-emerald-400"],
+                        ] as [string, number, string][]).map(([key, value, colour]) => (
+                          <div key={key} className="rounded-2xl bg-muted/50 px-4 py-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="flex items-center gap-2 text-sm font-medium">
+                                <span className={`h-2.5 w-2.5 rounded-sm ${colour}`} />
+                                {t(`epf.accounts.${key}` as never)}
+                              </span>
+                              <span className="font-semibold tabular-nums">{money(value)}</span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {t(`epf.accounts.${key}.hint` as never)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                      {parsedInputs.currentBalance > 0 && (
+                        <p className="text-xs text-muted-foreground">{t("epf.accounts.openingNote")}</p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">{t("epf.accounts.consolidated")}</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Retirement Income Adequacy tiers */}
+              <Card className="rounded-3xl">
+                <CardContent className="p-6 space-y-3">
+                  <div>
+                    <h2 className="text-base font-semibold">{t("epf.tiers.title")}</h2>
+                    <p className="text-sm text-muted-foreground">{t("epf.tiers.subtitle")}</p>
+                  </div>
+                  <div className="space-y-2">
+                    {([
+                      ["basic", projection.riaTiers.basic],
+                      ["adequate", projection.riaTiers.adequate],
+                      ["enhanced", projection.riaTiers.enhanced],
+                    ] as [string, number][]).map(([key, amount]) => {
+                      const reached = projection.finalBalance >= amount;
+                      return (
+                        <div
+                          key={key}
+                          className={`flex items-center justify-between gap-3 rounded-2xl px-4 py-3 ${
+                            reached ? "bg-emerald-500/10" : "bg-muted/50"
+                          }`}
+                        >
+                          <span className="text-sm font-medium">{t(`epf.tiers.${key}` as never)}</span>
+                          <span className="flex items-center gap-2">
+                            <span className="font-semibold tabular-nums">{money(amount)}</span>
+                            {reached && (
+                              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-300">
+                                {t("epf.tiers.reached")}
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {projection.tierReached === "none" && (
+                    <p className="text-xs text-muted-foreground">{t("epf.tiers.none")}</p>
+                  )}
                 </CardContent>
               </Card>
 

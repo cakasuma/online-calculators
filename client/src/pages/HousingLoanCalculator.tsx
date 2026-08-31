@@ -1,4 +1,4 @@
-import { ArrowRight, Calculator as CalculatorIcon, Home, Info, PiggyBank, Receipt, Wallet } from "lucide-react";
+import { ArrowRight, Calculator as CalculatorIcon, Home, Info, PiggyBank } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -116,6 +116,42 @@ function ToggleRow({
       <span className="text-sm font-medium">{label}</span>
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
+  );
+}
+
+/** A heading that separates the two halves of the breakdown. */
+function GroupHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{children}</p>
+  );
+}
+
+/** A plain label-and-figure row. */
+function Row({
+  label,
+  value,
+  helper,
+  emphasis = false,
+}: {
+  label: string;
+  value: string;
+  helper?: string;
+  emphasis?: boolean;
+}) {
+  return (
+    <div className={`rounded-2xl px-3 sm:px-4 py-3 min-w-0 ${emphasis ? "bg-primary/10" : "bg-muted/50"}`}>
+      <div className="flex items-center justify-between gap-3 min-w-0">
+        <span className={`text-sm min-w-0 break-words ${emphasis ? "font-semibold" : "text-muted-foreground"}`}>
+          {label}
+        </span>
+        <span
+          className={`tabular-nums text-right break-words ${emphasis ? "text-lg font-bold text-primary" : "font-semibold"}`}
+        >
+          {value}
+        </span>
+      </div>
+      {helper ? <p className="mt-1 text-xs text-muted-foreground">{helper}</p> : null}
+    </div>
   );
 }
 
@@ -467,18 +503,6 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
-            <Card className="lg:hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 border-indigo-900/50 text-white">
-              <CardContent className="p-4 sm:p-6">
-                <p className="text-sm text-indigo-100">{t("housing.monthlyInstallment")}</p>
-                <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">
-                  {money2(showResults ? result.monthlyInstallment : 0)}
-                </p>
-                <p className="mt-3 text-sm text-slate-300">
-                  {showResults ? `${t("housing.over")} ${parsed.tenureYears} ${t("housing.years")}` : t("housing.cta.tapToReveal")}
-                </p>
-              </CardContent>
-            </Card>
-
             {!showResults ? (
               <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
                 <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
@@ -491,28 +515,6 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
               </Card>
             ) : (
               <>
-                <div className="grid gap-4 sm:grid-cols-2 min-w-0">
-                  {([
-                    [t("housing.loanAmount"), result.loanAmount, Wallet, `${result.marginPct}% ${t("housing.marginOfFinance").toLowerCase()}`],
-                    [t("housing.totalInterest"), result.totalInterest, Receipt, ""],
-                  ] as [string, number, typeof Wallet, string][]).map(([label, value, Icon, sub]) => (
-                    <Card key={label} className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
-                      <CardContent className="p-4 sm:p-5">
-                        <div className="flex items-center justify-between gap-3 min-w-0">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm text-muted-foreground">{label}</p>
-                            <p className="mt-1 text-xl sm:text-2xl font-bold break-words tabular-nums">{money(value)}</p>
-                            {sub ? <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p> : null}
-                          </div>
-                          <div className="rounded-2xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
-                            <Icon className="h-5 w-5" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
                 {result.monthsSaved > 0 && (
                   <Card className="rounded-2xl sm:rounded-3xl border-emerald-200 bg-emerald-50/60 shadow-sm dark:border-emerald-900/50 dark:bg-emerald-950/20 min-w-0">
                     <CardContent className="p-4 sm:p-5">
@@ -544,8 +546,8 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   <CardContent className="p-4 sm:p-6 min-w-0">
                     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <h2 className="text-xl font-semibold">{t("housing.upfront.title")}</h2>
-                        <p className="text-sm text-muted-foreground">{t("housing.upfront.subtitle")}</p>
+                        <h2 className="text-xl font-semibold">{t("housing.breakdown.title")}</h2>
+                        <p className="text-sm text-muted-foreground">{t("housing.breakdown.subtitle")}</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <ShareButton calculator="housing" state={parsed} schema={URL_SCHEMA} />
@@ -558,6 +560,26 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                       </div>
                     </div>
                     <div className="space-y-3">
+                      <GroupHeading>{t("housing.group.loan")}</GroupHeading>
+                      <Row label={t("housing.propertyPrice")} value={money(parsed.price)} />
+                      <Row
+                        label={t("housing.loanAmount")}
+                        value={money(result.loanAmount)}
+                        helper={`${result.marginPct}% ${t("housing.marginOfFinance").toLowerCase()}`}
+                      />
+                      <Row
+                        label={t("housing.monthlyInstallment")}
+                        value={money2(result.monthlyInstallment)}
+                        helper={`${t("housing.over")} ${parsed.tenureYears} ${t("housing.years")} ${t("housing.atRate")} ${parsed.rate}%`}
+                      />
+                      <Row label={t("housing.totalInterest")} value={money(result.totalInterest)} />
+                      <Row
+                        label={t("housing.totalRepayment")}
+                        value={money(result.totalPayment)}
+                        helper={t("housing.totalRepayment.hint")}
+                      />
+
+                      <GroupHeading>{t("housing.group.cash")}</GroupHeading>
                       <CostRow
                         label={t("housing.downPayment")}
                         gross={result.downPayment}

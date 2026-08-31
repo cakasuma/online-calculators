@@ -256,7 +256,7 @@ export const calculatorContent: ContentMap = {
         heading: "Salary deduction formulas",
         paragraphs: [
           "Net monthly take-home = Gross salary − EPF − SOCSO − EIS − PCB.",
-          "EPF (employee, default) = 11% × gross monthly wage, rounded up to the nearest ringgit. The combined employer + employee contribution feeds two accounts (Akaun Persaraan 75% and Akaun Sejahtera 25% under the 2024 restructure).",
+          "EPF (employee, default) = 11% × gross monthly wage, rounded up to the nearest ringgit. Since the restructure of 11 May 2024, the combined employer and employee contribution feeds three accounts: Akaun Persaraan (75%), Akaun Sejahtera (15%) and Akaun Fleksibel (10%).",
           "SOCSO (employee) is calculated from a tiered table where the maximum employee contribution is RM 24.75 per month for wages of RM 4,000 and above. The employer share for the same band is RM 86.65.",
           "EIS (employee) = 0.2% of monthly wages, capped at RM 9.90 per month (wage ceiling RM 5,000). Employer contributes a matching 0.2%.",
           "PCB (resident) = MAX(0, lookup(annualised taxable income − reliefs, progressive brackets) − previously-paid PCB − zakat paid through payroll) ÷ months remaining in the year. Non-resident PCB = 30% × monthly chargeable income.",
@@ -434,7 +434,7 @@ export const calculatorContent: ContentMap = {
           "The projection starts from your current EPF balance and simulates each remaining year until your chosen retirement age. Each year it adds your employee contribution (default 11% of gross salary), your employer contribution (12% for salaries above RM 5,000; 13% for RM 5,000 and below), any voluntary top-ups (e.g. i-Saraan), and any bonus-month contributions, then credits dividends on the end-of-year balance.",
           "EPF dividends compound annually. The calculator defaults to 5.5% — a conservative figure within KWSP's recent 5.50%–6.40% range. Because dividends are declared on the total balance rather than new contributions alone, even a half-percentage-point change meaningfully shifts the 20- or 30-year projection.",
           "Your salary is assumed to grow by the percentage you enter each year. A 3%–5% annual growth rate is typical for most Malaysian employees; adjust downward if you are near the peak of your earning years or upward if you expect rapid career progression.",
-          "The 2024 KWSP account restructure split contributions between Akaun Persaraan (75%) and Akaun Sejahtera (25%). This calculator treats the combined balance as the retirement balance since both accounts ultimately fund retirement, though Akaun Sejahtera allows limited withdrawals before retirement age.",
+          "Since 11 May 2024, new contributions are split across three accounts: Akaun Persaraan (75%), locked until 55; Akaun Sejahtera (15%), for housing, education and health; and Akaun Fleksibel (10%), withdrawable at any time. The calculator projects all three, so you can see how much of the total is genuinely locked away for retirement rather than reachable before then. The three accounts consolidate into Akaun 55 once you reach 55.",
           "The Basic Savings target is the KWSP benchmark designed to fund 20 years of retirement at the poverty line — RM 270,000 at age 55 (early withdrawal) and RM 390,000 at age 60 (full withdrawal) by 2028. The gap analysis shows whether your projected balance is on track to meet this target.",
         ],
       },
@@ -454,10 +454,10 @@ export const calculatorContent: ContentMap = {
           "Employer rates depend on the employee's monthly salary and whether the employee is below or above 60 years old.",
         columns: ["Monthly salary", "Age below 60 — employer rate", "Age 60 & above — employer rate"],
         rows: [
-          ["RM 5,000 and below", "13%", "6.5%"],
-          ["Above RM 5,000", "12%", "6%"],
+          ["RM 5,000 and below", "13%", "4%"],
+          ["Above RM 5,000", "12%", "4%"],
         ],
-        note: "Employee default rate: 11% (age below 60); 5.5% (age 60 and above). Members may voluntarily contribute more. Foreign employees contribute a flat RM 5 employer / variable employee amount unless they opt into the standard scheme.",
+        note: "The employer rate for employees aged 60 to 75 was cut to a flat 4% with effect from the January 2019 wage, and the employee side became voluntary (0% by default). Contributions stop entirely at 75. Members below 60 may voluntarily contribute more than 11%. Since 1 October 2025, EPF is mandatory for non-citizens under 75 at 2% from the employer and 2% from the employee.",
       },
       examples: [
         {
@@ -499,12 +499,12 @@ export const calculatorContent: ContentMap = {
         {
           question: "Should I use 55 or 60 as my retirement age?",
           answer:
-            "Age 55 unlocks partial EPF withdrawals from Akaun Persaraan. Full flexible withdrawal is available at age 60. If you plan to work until 60, use 60 for a more accurate projection. The Basic Savings target for age 55 (RM 270,000) is lower because the remaining 5 years of contributions are counted separately.",
+            "Age 55 unlocks partial EPF withdrawals, and the three accounts consolidate into Akaun 55 at that point. Full flexible withdrawal is available at age 60. If you plan to work until 60, use 60 for a more accurate projection. The Basic Savings target for age 55 is lower than the age-60 figure because the remaining five years of contributions are counted separately.",
         },
         {
           question: "How accurate is the dividend rate assumption?",
           answer:
-            "KWSP has paid dividends between 5.50% (Akaun Persaraan, 2024) and 6.40% in recent years. The default 5.5% is conservative. Using a higher rate (e.g. 6%) will project a meaningfully larger balance over a 20–30 year horizon due to compounding. For planning purposes, model both a pessimistic (5%) and optimistic (6.5%) scenario.",
+            "KWSP declared 6.30% for 2024 and 6.15% for 2025, for both Simpanan Konvensional and Simpanan Shariah. The 6.0% default is slightly below both, which keeps the projection on the conservative side. Small differences compound heavily over a 20-30 year horizon, so it is worth modelling a pessimistic (5%) and an optimistic (6.5%) scenario as well.",
         },
         {
           question: "Are voluntary contributions (i-Saraan) worth it?",

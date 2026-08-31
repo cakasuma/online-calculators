@@ -148,28 +148,31 @@ export const calculatorContent: ContentMap = {
   fd: {
     en: {
       intro:
-        "Work out the interest and maturity value of a Malaysian fixed deposit (FD). For a single placement, banks pay simple interest pro-rated to the tenure. If you let the FD auto-renew and roll the interest back in, the return compounds — this calculator shows both so you can see the difference. FD interest from licensed banks is tax-exempt for individuals.",
+        "Work out the interest and maturity value of a Malaysian fixed deposit (FD). Banks pay simple interest pro-rated to the tenure, paid at maturity — nothing compounds inside a tenure. Compounding happens only when you renew and roll the interest into the new placement, once per tenure. The calculator also models breaking the deposit early and checks the maturity value against the PIDM protection limit. FD interest from licensed banks is tax-exempt for individuals.",
       howItWorks: {
         heading: "How the fixed deposit calculator works",
         paragraphs: [
           "Simple interest is your principal multiplied by the annual rate and the fraction of a year you hold the deposit: principal × rate × (months ÷ 12).",
           "The maturity value is principal plus that interest, paid out when the FD matures.",
-          "If you auto-renew each month, interest is added to the principal and earns further interest — the compounded maturity value is principal × (1 + rate ÷ 12)^months.",
-          "The longer the tenure and the higher the rate, the bigger the gap between simple and compounded returns.",
+          "Nothing compounds during a tenure. If you renew the deposit, the interest earned is rolled into the new principal and earns interest in the next cycle — so compounding happens once per completed tenure, not monthly. A single placement earns no compounding bonus at all.",
+          "Because of that, a shorter tenure rolled over repeatedly compounds more often than a long one, which is why the calculator reports an effective annual return alongside the headline rate.",
+          "Breaking the deposit early is costly. Common bank practice pays nothing at all before three completed months, and about half the contracted rate after that, on completed months only. Terms vary between banks.",
+          "PIDM protects RM250,000 per depositor per member bank, and the limit counts principal and interest together — so a placement that starts under the cap can mature above it. Conventional and Islamic deposits are protected separately.",
         ],
       },
       formula: {
         heading: "Fixed deposit formulas",
         paragraphs: [
           "Simple maturity = P × (1 + r × months ÷ 12).",
-          "Compounded maturity = P × (1 + r ÷ 12)^months, where P = principal, r = annual rate (÷100).",
+          "Value after n renewals = P × (1 + r × months ÷ 12)^n, where P = principal, r = annual rate (÷100) and months is the tenure of one placement.",
+          "Early withdrawal interest = P × (r ÷ 2) × completed months ÷ 12, and zero before three completed months.",
         ],
       },
       examples: [
         {
           title: "RM10,000 at 3.5% p.a. for 12 months",
           given: ["Principal: RM10,000", "Rate: 3.5% p.a.", "Tenure: 12 months"],
-          result: "Simple interest of RM350 → RM10,350 at maturity. With monthly auto-renewal it compounds to about RM10,355.67 — roughly RM5.67 extra.",
+          result: "Simple interest of RM350 → RM10,350 at maturity, and no compounding bonus, because a single placement does not compound. Renew it for a second 12-month term and the interest rolls in: RM10,712.25, or RM12.25 more than simple interest over the same two years. Break it at month 6 instead and you would receive RM10,087.50 — half the rate on completed months only, giving up RM262.50.",
         },
       ],
       faq: [
@@ -191,13 +194,13 @@ export const calculatorContent: ContentMap = {
     },
     ms: {
       intro:
-        "Kira faedah dan nilai matang simpanan tetap (FD) Malaysia. Bagi satu simpanan, bank membayar faedah mudah berkadar dengan tempoh. Jika anda membiarkan FD dibaharui automatik, pulangan dikompaun — kalkulator ini menunjukkan kedua-duanya. Faedah FD daripada bank berlesen dikecualikan cukai untuk individu.",
+        "Kira faedah dan nilai matang simpanan tetap (FD) Malaysia. Bank membayar faedah mudah berkadar dengan tempoh, dibayar pada tarikh matang — tiada apa berkompaun dalam satu tempoh. Kompaun hanya berlaku apabila anda membaharui dan menggulung faedah ke dalam penempatan baharu, sekali setiap tempoh. Kalkulator ini juga memodelkan pemecahan awal dan menyemak nilai matang terhadap had perlindungan PIDM. Faedah FD daripada bank berlesen dikecualikan cukai untuk individu.",
       howItWorks: {
         heading: "Cara kalkulator simpanan tetap berfungsi",
         paragraphs: [
           "Faedah mudah ialah pokok didarab kadar tahunan dan pecahan tahun anda menyimpan: pokok × kadar × (bulan ÷ 12).",
           "Nilai matang ialah pokok campur faedah, dibayar apabila FD matang.",
-          "Jika dibaharui automatik setiap bulan, faedah ditambah kepada pokok dan memperoleh faedah lanjut: pokok × (1 + kadar ÷ 12)^bulan.",
+          "Tiada apa berkompaun dalam satu tempoh. Jika anda membaharui, faedah digulung ke dalam pokok baharu dan memperoleh faedah pada kitaran seterusnya — jadi kompaun berlaku sekali setiap tempoh, bukan setiap bulan. Satu penempatan tunggal tidak memperoleh bonus kompaun langsung.",
         ],
       },
       faq: [
@@ -215,13 +218,13 @@ export const calculatorContent: ContentMap = {
     },
     id: {
       intro:
-        "Hitung bunga dan nilai jatuh tempo deposito (FD) Malaysia. Untuk satu penempatan, bank membayar bunga sederhana sesuai proporsi tenor. Jika Anda membiarkan deposito diperpanjang otomatis, hasilnya majemuk — kalkulator ini menampilkan keduanya. Bunga deposito dari bank berlisensi bebas pajak untuk individu.",
+        "Hitung bunga dan nilai jatuh tempo deposito (FD) Malaysia. Bank membayar bunga sederhana sesuai proporsi tenor, dibayar saat jatuh tempo — tidak ada yang berbunga majemuk di dalam satu tenor. Bunga majemuk hanya terjadi saat Anda memperpanjang dan menggulung bunga ke penempatan baru, sekali per tenor. Kalkulator ini juga memodelkan pencairan dini dan memeriksa nilai jatuh tempo terhadap batas perlindungan PIDM. Bunga deposito dari bank berlisensi bebas pajak untuk individu.",
       howItWorks: {
         heading: "Cara kalkulator deposito bekerja",
         paragraphs: [
           "Bunga sederhana adalah pokok dikali tarif tahunan dan fraksi tahun Anda menyimpan: pokok × tarif × (bulan ÷ 12).",
           "Nilai jatuh tempo adalah pokok ditambah bunga itu, dibayar saat deposito jatuh tempo.",
-          "Jika diperpanjang otomatis setiap bulan, bunga ditambahkan ke pokok dan memperoleh bunga lebih lanjut: pokok × (1 + tarif ÷ 12)^bulan.",
+          "Tidak ada yang berbunga majemuk di dalam satu tenor. Jika Anda memperpanjang, bunga digulung ke pokok baru dan memperoleh bunga pada siklus berikutnya — jadi bunga majemuk terjadi sekali per tenor, bukan tiap bulan. Satu penempatan tunggal tidak memperoleh bonus majemuk sama sekali.",
         ],
       },
       faq: [
@@ -432,7 +435,7 @@ export const calculatorContent: ContentMap = {
         heading: "How the EPF retirement projection works",
         paragraphs: [
           "The projection starts from your current EPF balance and simulates each remaining year until your chosen retirement age. Each year it adds your employee contribution (default 11% of gross salary), your employer contribution (12% for salaries above RM 5,000; 13% for RM 5,000 and below), any voluntary top-ups (e.g. i-Saraan), and any bonus-month contributions, then credits dividends on the end-of-year balance.",
-          "EPF dividends compound annually. The calculator defaults to 5.5% — a conservative figure within KWSP's recent 5.50%–6.40% range. Because dividends are declared on the total balance rather than new contributions alone, even a half-percentage-point change meaningfully shifts the 20- or 30-year projection.",
+          "EPF dividends compound annually. The calculator defaults to 6.0%, just under the 6.30% declared for 2024 and the 6.15% for 2025. Because dividends are declared on the total balance rather than new contributions alone, even a half-percentage-point change meaningfully shifts the 20- or 30-year projection.",
           "Your salary is assumed to grow by the percentage you enter each year. A 3%–5% annual growth rate is typical for most Malaysian employees; adjust downward if you are near the peak of your earning years or upward if you expect rapid career progression.",
           "Since 11 May 2024, new contributions are split across three accounts: Akaun Persaraan (75%), locked until 55; Akaun Sejahtera (15%), for housing, education and health; and Akaun Fleksibel (10%), withdrawable at any time. The calculator projects all three, so you can see how much of the total is genuinely locked away for retirement rather than reachable before then. The three accounts consolidate into Akaun 55 once you reach 55.",
           "The Basic Savings target is the KWSP benchmark designed to fund 20 years of retirement at the poverty line — RM 270,000 at age 55 (early withdrawal) and RM 390,000 at age 60 (full withdrawal) by 2028. The gap analysis shows whether your projected balance is on track to meet this target.",

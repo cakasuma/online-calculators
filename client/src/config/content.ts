@@ -1392,13 +1392,15 @@ export const calculatorContent: ContentMap = {
   bmi: {
     en: {
       intro:
-        "Calculate your Body Mass Index (BMI) and see which WHO category you fall into, the healthy weight range for your height, your Basal Metabolic Rate (BMR), and the daily calories you need to maintain your weight (TDEE).",
+        "Calculate your Body Mass Index (BMI) and see which category you fall into under Malaysia's national clinical guideline, the healthy weight range for your height, your Basal Metabolic Rate (BMR), and the daily calories you need to maintain your weight (TDEE). Malaysia uses lower BMI thresholds than the international chart, so the answer here may differ from other calculators.",
       howItWorks: {
         heading: "How the BMI calculator works",
         paragraphs: [
-          "BMI is your weight in kilograms divided by your height in metres squared. A BMI under 18.5 is underweight, 18.5–24.9 is normal, 25–29.9 is overweight, and 30 or above is obese.",
+          "BMI is your weight in kilograms divided by your height in metres squared. Malaysia's Clinical Practice Guidelines for the Management of Obesity (2nd edition, 2023), issued by the Ministry of Health with the Malaysian Endocrine and Metabolic Society, set pre-obesity at a BMI of 23 and obesity above 27.5.",
+          "Those thresholds are lower than the international 25 and 30 because the international chart was drawn from a Caucasian reference population. Asians — including Malaysia's Malay, Chinese and Indian populations — carry more body fat at the same BMI and develop diabetes and cardiovascular disease at lower values, so the risk begins earlier. The calculator applies the Malaysian figures and tells you when the international chart would have said something different.",
           "BMR is estimated with the Mifflin-St Jeor equation, which uses your weight, height, age, and sex. TDEE then multiplies BMR by an activity factor from 1.2 (sedentary) to 1.9 (very active).",
-          "The healthy weight range is the weight that would put your BMI between 18.5 and 24.9 at your current height.",
+          "The healthy weight range is the weight that would put your BMI between 18.5 and 23 at your current height — the upper bound is the Malaysian pre-obesity cut-off, not the international one.",
+          "BMI categories apply to adults only. For anyone under 18 the guideline directs that the WHO BMI-for-age chart be used instead, because a healthy BMI changes with a child's age and sex. The calculator shows the BMI figure for a child but withholds the category rather than applying an adult threshold that does not fit.",
         ],
       },
       formula: {
@@ -1411,13 +1413,15 @@ export const calculatorContent: ContentMap = {
         ],
       },
       rateTable: {
-        heading: "BMI categories (WHO)",
-        columns: ["BMI", "Category"],
+        heading: "BMI categories for Malaysian adults (MOH CPG 2023)",
+        caption:
+          "Applies to adults aged 18 and over. Under-18s should be assessed with the WHO BMI-for-age chart.",
+        columns: ["BMI", "Category", "International chart would say"],
         rows: [
-          ["Below 18.5", "Underweight"],
-          ["18.5 – 24.9", "Normal weight"],
-          ["25.0 – 29.9", "Overweight"],
-          ["30.0 and above", "Obese"],
+          ["Below 18.5", "Underweight", "Underweight"],
+          ["18.5 – 22.9", "Normal weight", "Normal weight"],
+          ["23.0 – 27.5", "Pre-obese (overweight)", "Normal up to 25, then overweight"],
+          ["Above 27.5", "Obese", "Overweight until 30, then obese"],
         ],
       },
       faq: [
@@ -1443,18 +1447,19 @@ export const calculatorContent: ContentMap = {
       howItWorks: {
         heading: "Cara kalkulator BMI berfungsi",
         paragraphs: [
-          "BMI ialah berat dalam kilogram dibahagi dengan kuasa dua tinggi dalam meter. BMI bawah 18.5 kurang berat, 18.5–24.9 normal, 25–29.9 berlebihan berat, dan 30 ke atas obes.",
+          "BMI ialah berat dalam kilogram dibahagi dengan kuasa dua tinggi dalam meter. Garis Panduan Amalan Klinikal Pengurusan Obesiti Malaysia (edisi ke-2, 2023), terbitan Kementerian Kesihatan bersama Persatuan Endokrin dan Metabolik Malaysia, menetapkan pra-obesiti pada BMI 23 dan obesiti melebihi 27.5.",
+          "Nilai ini lebih rendah daripada 25 dan 30 antarabangsa kerana carta antarabangsa dibina daripada populasi rujukan Kaukasia. Orang Asia mempunyai lebih lemak badan pada BMI yang sama dan menghidap diabetes serta penyakit kardiovaskular pada nilai lebih rendah. Kalkulator ini menggunakan angka Malaysia dan memberitahu anda apabila carta antarabangsa memberi jawapan berbeza.",
           "BMR dianggar dengan persamaan Mifflin-St Jeor menggunakan berat, tinggi, umur, dan jantina. TDEE mendarabkan BMR dengan faktor aktiviti dari 1.2 hingga 1.9.",
         ],
       },
       rateTable: {
-        heading: "Kategori BMI (WHO)",
+        heading: "Kategori BMI dewasa Malaysia (CPG KKM 2023)",
         columns: ["BMI", "Kategori"],
         rows: [
           ["Bawah 18.5", "Kurang berat"],
-          ["18.5 – 24.9", "Berat normal"],
-          ["25.0 – 29.9", "Berlebihan berat"],
-          ["30.0 ke atas", "Obes"],
+          ["18.5 – 22.9", "Berat normal"],
+          ["23.0 – 27.5", "Pra-obes (berlebihan berat)"],
+          ["Melebihi 27.5", "Obes"],
         ],
       },
       faq: [
@@ -1472,18 +1477,19 @@ export const calculatorContent: ContentMap = {
       howItWorks: {
         heading: "Cara kalkulator BMI bekerja",
         paragraphs: [
-          "BMI adalah berat dalam kilogram dibagi kuadrat tinggi dalam meter. BMI di bawah 18.5 berat kurang, 18.5–24.9 normal, 25–29.9 kelebihan berat, dan 30 ke atas obesitas.",
+          "BMI adalah berat dalam kilogram dibagi kuadrat tinggi dalam meter. Pedoman Praktik Klinis Penanganan Obesitas Malaysia (edisi ke-2, 2023), terbitan Kementerian Kesehatan bersama Malaysian Endocrine and Metabolic Society, menetapkan pra-obesitas pada BMI 23 dan obesitas di atas 27,5.",
+          "Ambang ini lebih rendah dari 25 dan 30 internasional karena bagan internasional disusun dari populasi rujukan Kaukasia. Orang Asia memiliki lebih banyak lemak tubuh pada BMI yang sama dan mengalami diabetes serta penyakit kardiovaskular pada nilai lebih rendah. Kalkulator ini memakai angka Malaysia dan memberi tahu Anda bila bagan internasional memberi jawaban berbeda.",
           "BMR diperkirakan dengan persamaan Mifflin-St Jeor menggunakan berat, tinggi, usia, dan jenis kelamin. TDEE mengalikan BMR dengan faktor aktivitas dari 1.2 hingga 1.9.",
         ],
       },
       rateTable: {
-        heading: "Kategori BMI (WHO)",
+        heading: "Kategori BMI dewasa Malaysia (CPG KKM 2023)",
         columns: ["BMI", "Kategori"],
         rows: [
           ["Di bawah 18.5", "Berat kurang"],
-          ["18.5 – 24.9", "Berat normal"],
-          ["25.0 – 29.9", "Kelebihan berat"],
-          ["30.0 ke atas", "Obesitas"],
+          ["18.5 – 22.9", "Berat normal"],
+          ["23,0 – 27,5", "Pra-obesitas (kelebihan berat)"],
+          ["Di atas 27,5", "Obesitas"],
         ],
       },
       faq: [

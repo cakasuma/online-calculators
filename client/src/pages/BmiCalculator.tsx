@@ -10,6 +10,16 @@ import { SaveButton } from "@/components/SaveButton";
 import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
+  ACTIVITY_FACTOR,
+  BMI_DEFAULTS,
+  calculateBmi,
+  MOH_CUTOFFS,
+  type ActivityLevel,
+  type BmiInputs as LibBmiInputs,
+  type CategoryKey,
+  type Sex,
+} from "@/lib/bmi";
+import {
   buildShareUrl,
   enumField,
   mergeFromUrl,
@@ -19,32 +29,9 @@ import {
   type UrlSchema,
 } from "@/lib/urlState";
 
-type Sex = "male" | "female";
-type Activity = "sedentary" | "light" | "moderate" | "active" | "very";
+type BmiInputs = LibBmiInputs;
 
-interface BmiInputs {
-  height: number; // cm
-  weight: number; // kg
-  age: number;
-  sex: Sex;
-  activity: Activity;
-}
-
-const DEFAULT_INPUTS: BmiInputs = {
-  height: 170,
-  weight: 70,
-  age: 30,
-  sex: "male",
-  activity: "moderate",
-};
-
-const ACTIVITY_FACTOR: Record<Activity, number> = {
-  sedentary: 1.2,
-  light: 1.375,
-  moderate: 1.55,
-  active: 1.725,
-  very: 1.9,
-};
+const DEFAULT_INPUTS: BmiInputs = BMI_DEFAULTS;
 
 function parseNumberInput(value: string): number {
   if (!value.trim()) return 0;
@@ -67,39 +54,12 @@ function toInputString(value: number): string {
   return value === 0 ? "" : new Intl.NumberFormat("en-MY", { maximumFractionDigits: 1 }).format(value);
 }
 
-type CategoryKey = "underweight" | "normal" | "overweight" | "obese";
-
-function bmiCategory(bmi: number): CategoryKey {
-  if (bmi < 18.5) return "underweight";
-  if (bmi < 25) return "normal";
-  if (bmi < 30) return "overweight";
-  return "obese";
-}
-
 const CATEGORY_COLOR: Record<CategoryKey, string> = {
   underweight: "#38bdf8",
   normal: "#34d399",
-  overweight: "#fbbf24",
+  preObese: "#fbbf24",
   obese: "#f87171",
 };
-
-function calculate(input: BmiInputs) {
-  const heightM = input.height / 100;
-  const bmi = heightM > 0 ? input.weight / (heightM * heightM) : 0;
-  const category = bmiCategory(bmi);
-
-  // Mifflin-St Jeor BMR.
-  const bmr =
-    input.sex === "male"
-      ? 10 * input.weight + 6.25 * input.height - 5 * input.age + 5
-      : 10 * input.weight + 6.25 * input.height - 5 * input.age - 161;
-  const tdee = bmr * ACTIVITY_FACTOR[input.activity];
-
-  const healthyMin = heightM > 0 ? 18.5 * heightM * heightM : 0;
-  const healthyMax = heightM > 0 ? 24.9 * heightM * heightM : 0;
-
-  return { bmi, category, bmr, tdee, healthyMin, healthyMax };
-}
 
 function NumberField({
   label,
@@ -161,7 +121,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
   const [weightInput, setWeightInput] = useState(toInputString(initial.weight));
   const [ageInput, setAgeInput] = useState(toInputString(initial.age));
   const [sex, setSex] = useState<Sex>(initial.sex);
-  const [activity, setActivity] = useState<Activity>(initial.activity);
+  const [activity, setActivity] = useState<ActivityLevel>(initial.activity);
 
   const parsed = useMemo<BmiInputs>(
     () => ({
@@ -178,7 +138,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
 
   const isValid = parsed.height > 0 && parsed.weight > 0 && parsed.age > 0;
   const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
-  const result = useMemo(() => calculate(parsed), [parsed]);
+  const result = useMemo(() => calculateBmi(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
 
   function handleCalculate() {
@@ -205,7 +165,10 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
 
     if (onCalculate) {
       const expression = `${parsed.height}cm • ${parsed.weight}kg • ${parsed.age}y • ${parsed.sex}`;
-      const resultStr = `BMI ${result.bmi.toFixed(1)} (${t(`bmi.category.${result.category}`)}) • ${Math.round(result.tdee)} kcal/day`;
+      const label = result.category
+        ? t(`bmi.category.${result.category}` as never)
+        : t("bmi.child.categoryUnavailable");
+      const resultStr = `BMI ${result.bmi.toFixed(1)} (${label}) • ${Math.round(result.tdee)} kcal/day`;
       const url = buildShareUrl(parsed, URL_SCHEMA);
       onCalculate(expression, resultStr, url);
     }
@@ -222,8 +185,12 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
 
   // BMI gauge fill: map 12–40 to 0–100%.
   const gaugePct = Math.max(0, Math.min(100, ((result.bmi - 12) / (40 - 12)) * 100));
-  const categoryLabel = t(`bmi.category.${result.category}`);
-  const categoryColor = CATEGORY_COLOR[result.category];
+  // An under-18 gets no category at all, so the label and colour fall back to a
+  // neutral "not classified" rather than borrowing an adult band.
+  const categoryLabel = result.category
+    ? t(`bmi.category.${result.category}` as never)
+    : t("bmi.child.categoryUnavailable");
+  const categoryColor = result.category ? CATEGORY_COLOR[result.category] : "#94a3b8";
   const num = (v: number, d = 1) =>
     new Intl.NumberFormat("en-MY", { maximumFractionDigits: d }).format(Number.isFinite(v) ? v : 0);
 
@@ -307,7 +274,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                 <span className="text-sm font-medium">{t("bmi.inputs.activity")}</span>
                 <select
                   value={activity}
-                  onChange={(event) => setActivity(event.target.value as Activity)}
+                  onChange={(event) => setActivity(event.target.value as ActivityLevel)}
                   className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="sedentary">{t("bmi.activity.sedentary")}</option>
@@ -384,11 +351,42 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                         <Scale className="h-6 w-6" />
                       </div>
                     </div>
-                    <p className="mt-3 text-sm text-muted-foreground">
-                      {t("bmi.healthyRange")}: <span className="font-semibold text-foreground">{num(result.healthyMin)}–{num(result.healthyMax)} kg</span>
-                    </p>
+                    {result.isAdult && (
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        {t("bmi.healthyRange")}: <span className="font-semibold text-foreground">{num(result.healthyMin)}–{num(result.healthyMax)} kg</span>
+                      </p>
+                    )}
+                    {result.isAdult && (
+                      <p className="mt-3 text-xs text-muted-foreground">{t("bmi.cutoffs.note")}</p>
+                    )}
+                    {result.categoriesDisagree && result.internationalCategory && (
+                      <div className="mt-3 rounded-2xl bg-muted/50 px-4 py-3">
+                        <p className="text-sm">
+                          {t("bmi.international.differs")}{" "}
+                          <span className="font-semibold">
+                            {t(`bmi.category.${result.internationalCategory}` as never)}
+                          </span>
+                          .
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">{t("bmi.international.hint")}</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
+
+                {!result.isAdult && (
+                  <Card className="rounded-2xl sm:rounded-3xl border-amber-200 bg-amber-50/60 shadow-sm dark:border-amber-900/50 dark:bg-amber-950/20 min-w-0">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex gap-2">
+                        <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-700 dark:text-amber-400" />
+                        <div>
+                          <h3 className="font-semibold text-amber-900 dark:text-amber-200">{t("bmi.child.title")}</h3>
+                          <p className="mt-1 text-sm text-amber-900/90 dark:text-amber-200/90">{t("bmi.child.body")}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
                 <div className="grid gap-4 sm:grid-cols-2 min-w-0">
                   {([

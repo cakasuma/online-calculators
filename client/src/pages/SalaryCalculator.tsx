@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
-import { CalculatorHero } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -194,7 +194,7 @@ function NumberField({
         onChange={(event) => onChange(event.target.value)}
         onBlur={() => onChange(formatInputNumber(value, maxDecimals ?? 2))}
         placeholder={placeholder}
-        className={`w-full rounded-2xl border bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:ring-4 dark:bg-slate-950 ${
+        className={`w-full rounded-xl border bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:ring-4 dark:bg-slate-950 ${
           error
             ? "border-red-400 focus:border-red-500 focus:ring-red-500/10 dark:border-red-500/70"
             : "border-slate-200 focus:border-primary focus:ring-primary/10 dark:border-slate-800"
@@ -356,26 +356,24 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
         subtitle={t("salary.subtitle")}
         badges={[t("salary.badge")]}
         result={
-          <div className="rounded-[20px] border border-white/12 bg-white/[0.08] p-6 backdrop-blur-xl text-white">
-            <p className="text-[13px] text-emerald-100">{t("salary.takeHomePay")}</p>
-            <p className="mt-2 text-3xl md:text-4xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
-            <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
-              <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
-            </div>
-            <p className="mt-2 text-[13px] text-white/60">
-              {!isValid
+          <HeadlineResult
+            label={t("salary.takeHomePay")}
+            value={money(showResults ? result.monthlyNet : 0)}
+            progress={{ pct: showResults ? takeHomeRatio : 0 }}
+            note={
+              !isValid
                 ? t("salary.fixInputErrors")
                 : showResults
                 ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                : t("salary.cta.tapToReveal")}
-            </p>
-          </div>
+                : t("salary.cta.tapToReveal")
+            }
+          />
         }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
       <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] min-w-0">
-        <Card className="rounded-2xl sm:rounded-3xl border-slate-200/80 shadow-sm dark:border-slate-800 min-w-0">
+        <Card className="rounded-xl min-w-0">
           <CardContent className="space-y-5 p-4 sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -431,7 +429,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 <select
                   value={workerType}
                   onChange={(event) => setWorkerType(event.target.value as WorkerType)}
-                  className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                  className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="malaysian">{t("salary.inputs.workerType.malaysian")}</option>
                   <option value="foreigner">{t("salary.inputs.workerType.foreigner")}</option>
@@ -442,7 +440,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 <select
                   value={residentStatus}
                   onChange={(event) => setResidentStatus(event.target.value as ResidentStatus)}
-                  className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                  className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="resident">{t("salary.inputs.resident")}</option>
                   <option value="non-resident">{t("salary.inputs.nonResident")}</option>
@@ -450,7 +448,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </label>
             </div>
 
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
               <div className="flex gap-2">
                 <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <p>{t("salary.disclaimer")}</p>
@@ -458,7 +456,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             </div>
 
             {hasNegativeTakeHome && isValid ? (
-              <div className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300">
+              <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300">
                 <div className="flex gap-2">
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <p>{t("salary.negativeWarning")}</p>
@@ -469,7 +467,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             <Button
               type="button"
               size="lg"
-              className="w-full gap-2 rounded-2xl text-base font-semibold"
+              className="w-full gap-2 rounded-xl text-base font-semibold"
               disabled={!isValid}
               onClick={handleCalculate}
             >
@@ -482,14 +480,14 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
 
         <div ref={resultsRef} className="space-y-6 min-w-0">
           {/* Mobile-only take-home summary — mirrors the hero card hidden on small screens */}
-          <Card className="lg:hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 border-emerald-900/50 text-white">
+          <Card className="lg:hidden ">
             <CardContent className="p-4 sm:p-6">
-              <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
+              <p className="text-sm text-muted-foreground">{t("salary.takeHomePay")}</p>
               <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
-              <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
-                <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
+              <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
               </div>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-muted-foreground">
                 {!isValid
                   ? t("salary.fixInputErrors")
                   : showResults
@@ -500,9 +498,9 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
           </Card>
 
           {!showResults ? (
-            <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
+            <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
               <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
-                <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                <div className="rounded-xl bg-primary/10 p-3 text-primary">
                   <CalculatorIcon className="h-6 w-6" />
                 </div>
                 <p className="text-base font-semibold">{t("salary.breakdown.ready")}</p>
@@ -519,7 +517,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 [t("salary.socsoMonth"), result.monthlySocso, percent(monthlySocsoRate), Info],
                 [t("salary.eisMonth"), result.monthlyEis, percent(monthlyEisRate), Info],
               ] as [string, number, string, typeof Wallet][]).map(([label, value, tooltipInfo, Icon]) => (
-                <Card key={label} className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                <Card key={label} className="rounded-xl shadow-sm min-w-0">
                   <CardContent className="p-4 sm:p-5">
                     <div className="flex items-center justify-between gap-3 min-w-0">
                       <div className="min-w-0 flex-1">
@@ -527,7 +525,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                         <p className="mt-1 text-xl sm:text-2xl font-bold break-words tabular-nums">{money(value)}</p>
                         <p className="mt-1 text-xs text-muted-foreground">{t("salary.rateEstimate")} {tooltipInfo}</p>
                       </div>
-                      <div className="rounded-2xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
+                      <div className="rounded-xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
                         <Icon className="h-5 w-5" />
                       </div>
                     </div>
@@ -559,12 +557,12 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 monthlyNet: Math.round(result.monthlyNet),
                 annualTax: Math.round(result.annualIncomeTax),
               })}
-              className="rounded-3xl"
+              className="rounded-xl"
             />
           )}
 
           {showResults && (
-            <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+            <Card className="rounded-xl shadow-sm min-w-0">
               <CardContent className="p-4 sm:p-6 min-w-0">
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <div>
@@ -585,7 +583,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                     />
                     <Button
                       variant="outline"
-                      className="gap-2 rounded-2xl"
+                      className="gap-2 rounded-xl"
                       onClick={() =>
                         downloadSalaryPdf({
                           inputs: parsedInput,
@@ -609,7 +607,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                     [t("salary.estimatedMonthlyTax"), result.monthlyTax, `${t("salary.approxMonthlyRate")} ${percent(monthlyTaxRate)}`],
                     [t("salary.monthlyDeductions"), result.monthlyDeductions, t("salary.deductionItems")],
                   ] as [string, number, string][]).map(([label, value, helper]) => (
-                    <div key={label} className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                    <div key={label} className="rounded-xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
                       <div className="flex items-center justify-between gap-3 min-w-0">
                         <span className="text-sm text-muted-foreground min-w-0 break-words">{label}</span>
                         <span className="font-semibold tabular-nums text-right break-words">{money(value)}</span>

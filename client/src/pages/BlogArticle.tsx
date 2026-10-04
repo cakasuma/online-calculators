@@ -6,11 +6,6 @@ import NotFound from "@/pages/not-found";
 
 const SITE_ORIGIN = "https://hellokalku.com";
 
-const CATEGORY_TAG: Record<string, string> = {
-  "Salary & Tax": "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-  "EPF & Retirement": "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-  "Islamic Finance": "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-};
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -188,7 +183,7 @@ export default function BlogArticle({ slug }: { slug: string }) {
     }
   }
 
-  const tagColor = CATEGORY_TAG[article.categoryLabel] ?? "bg-primary/10 text-primary";
+  const tagColor = "bg-muted text-foreground";
 
   const CalcCTA = article.relatedCalculator && (
     <div className="rounded-[14px] bg-primary text-primary-foreground p-5">
@@ -226,8 +221,8 @@ export default function BlogArticle({ slug }: { slug: string }) {
     <div className="w-full">
       <ReadingProgress />
 
-      {/* ── HERO (theme-aware light gradient) ── */}
-      <section className="hk-article-hero border-b border-border/60">
+      {/* ── Header ── */}
+      <section className="hk-pagehead">
         <div className="hk-container py-10 md:py-12">
           <div className="max-w-[760px]">
             <nav className="flex items-center gap-1.5 text-[13px] text-muted-foreground mb-5">
@@ -298,13 +293,13 @@ export default function BlogArticle({ slug }: { slug: string }) {
                   <SectionBlock section={section} id={id} />
                   {/* Inline calc CTA after the 2nd section */}
                   {i === 1 && article.relatedCalculator && (
-                    <div className="hk-inline-cta my-8 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white">
+                    <div className="my-8 rounded-xl border bg-accent/50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div>
-                        <h4 className="font-bold text-[16px] mb-1">Calculate your exact numbers</h4>
-                        <p className="text-[13px] text-white/70 leading-relaxed">Use the {article.relatedCalculator.label} to apply this to your own situation.</p>
+                        <h4 className="font-display font-semibold text-base mb-1">Calculate your exact numbers</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">Use the {article.relatedCalculator.label} to apply this to your own situation.</p>
                       </div>
                       <Link href={article.relatedCalculator.href}>
-                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-white text-[#1d4ed8] px-4 py-2 text-[13px] font-bold cursor-pointer shrink-0 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary text-primary-foreground px-4 min-h-[44px] text-sm font-semibold cursor-pointer shrink-0 whitespace-nowrap hover:bg-primary/90 transition-colors">
                           {article.relatedCalculator.label}
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
@@ -368,7 +363,7 @@ export default function BlogArticle({ slug }: { slug: string }) {
               {related.map((a) => (
                 <Link key={a.slug} href={`/blog/${a.slug}`}>
                   <article className="hk-card group rounded-[14px] border border-border bg-card p-5 cursor-pointer h-full hover:border-primary/40">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${CATEGORY_TAG[a.categoryLabel] ?? "bg-primary/10 text-primary"}`}>
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-muted text-foreground`}>
                       {a.categoryLabel}
                     </span>
                     <h4 className="mt-3 text-[15px] font-bold leading-snug group-hover:text-primary transition-colors line-clamp-2">{a.title}</h4>

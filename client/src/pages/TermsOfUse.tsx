@@ -22,27 +22,23 @@ const SECTIONS = [
     body: "All content, design, code, and materials on HelloKalku are the property of the site operator or its licensors and are protected by intellectual property laws. You may use HelloKalku for personal, non-commercial purposes. You may not reproduce, redistribute, or sell any part of this site without prior written permission. Third-party tool names, logos, and trademarks mentioned on this site (EPF, KWSP, LHDN, SOCSO, etc.) belong to their respective owners.",
   },
   {
-    heading: "6. Embed Widgets",
-    body: "HelloKalku offers free embeddable calculator widgets for third-party websites. By embedding a HelloKalku widget you agree to display it without modification, not to use it for illegal or misleading purposes, and to credit HelloKalku visibly on the embedding page. We reserve the right to discontinue or modify the embed service at any time.",
-  },
-  {
-    heading: "7. Third-Party Services",
+    heading: "6. Third-Party Services",
     body: "HelloKalku uses third-party services including Google AdSense for advertising, Vercel Analytics for anonymous usage statistics, and Vercel for hosting. Your interactions with those services are governed by their respective terms and privacy policies. We are not responsible for the practices of any third-party services.",
   },
   {
-    heading: "8. Limitation of Liability",
+    heading: "7. Limitation of Liability",
     body: "To the maximum extent permitted by applicable law, HelloKalku and its operator shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of or reliance on this site or its calculators, including but not limited to financial loss, tax penalties, or incorrect estate distribution. Your use of HelloKalku is entirely at your own risk.",
   },
   {
-    heading: "9. Availability",
+    heading: "8. Availability",
     body: "We aim to keep HelloKalku available at all times but do not guarantee uninterrupted access. We may update, modify, or discontinue any tool or feature at any time without notice.",
   },
   {
-    heading: "10. Governing Law",
+    heading: "9. Governing Law",
     body: "These Terms of Use are governed by the laws of Malaysia. Any disputes arising from your use of this site shall be subject to the exclusive jurisdiction of the courts of Malaysia.",
   },
   {
-    heading: "11. Contact",
+    heading: "10. Contact",
     body: "For questions about these Terms, please contact us via hellokalku.com. We aim to respond within 5 business days.",
   },
 ];

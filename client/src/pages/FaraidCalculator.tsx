@@ -15,7 +15,6 @@ import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency, type TranslationKey } from "@/lib/i18n";
 import {
@@ -1533,7 +1532,6 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                     schema={FARAID_URL_SCHEMA}
                     defaultName={`Faraid ${form.currency} ${form.totalEstate || "scenario"}`}
                   />
-                  <EmbedDialog calculator="faraid" />
                   <Button
                     variant="outline"
                     size="sm"

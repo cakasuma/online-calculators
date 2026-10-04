@@ -61,7 +61,6 @@ import CarLoanCalculator from "@/pages/CarLoanCalculator";
 import FixedDepositCalculator from "@/pages/FixedDepositCalculator";
 import BmiCalculator from "@/pages/BmiCalculator";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import Partners from "@/pages/Partners";
 import TermsOfUse from "@/pages/TermsOfUse";
 import Blog from "@/pages/Blog";
 import BlogArticle from "@/pages/BlogArticle";
@@ -115,7 +114,6 @@ type FooterLink = { labelKey?: TranslationKey; label?: string; href: string };
 // "Learn" column is defined here.
 const FOOTER_LEARN_LINKS: FooterLink[] = [
   { label: "Guides", href: "/blog" },
-  { labelKey: "footer.partners", href: "/partners" },
   { labelKey: "footer.privacy", href: "/privacy" },
   { labelKey: "footer.terms", href: "/terms" },
 ];
@@ -445,7 +443,6 @@ function Layout() {
           <Route path="/blog/:slug">
             {(params: { slug?: string }) => <BlogArticle slug={params?.slug ?? ""} />}
           </Route>
-          <Route path="/partners"><PageContainer><Partners /></PageContainer></Route>
           <Route path="/privacy"><PageContainer><PrivacyPolicy /></PageContainer></Route>
           <Route path="/terms"><PageContainer><TermsOfUse /></PageContainer></Route>
           <Route><PageContainer><NotFound /></PageContainer></Route>

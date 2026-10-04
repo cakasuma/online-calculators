@@ -14,7 +14,6 @@ import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { formatInputValue, formatCurrency, parseLocaleNumber } from "@/lib/i18n";
 import {
@@ -1058,7 +1057,6 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
                 schema={ZAKAT_URL_SCHEMA}
                 defaultName={`Zakat ${state.currency} ${Math.round(result.total)}`}
               />
-              <EmbedDialog calculator="zakat" />
               <Button
                 variant="outline"
                 size="default"

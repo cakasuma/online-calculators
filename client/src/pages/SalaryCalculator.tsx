@@ -10,8 +10,8 @@ import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { SalaryPercentile } from "@/components/SalaryPercentile";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
+import { TAX_BRACKETS } from "@/lib/incomeTax";
 import {
   buildShareUrl,
   enumField,
@@ -61,19 +61,6 @@ const money = (value: number) =>
   }).format(Number.isFinite(value) ? value : 0);
 
 const percent = (value: number) => `${value.toFixed(2)}%`;
-
-const TAX_BRACKETS = [
-  { threshold: 0, rate: 0 },
-  { threshold: 5000, rate: 0.01 },
-  { threshold: 20000, rate: 0.03 },
-  { threshold: 35000, rate: 0.06 },
-  { threshold: 50000, rate: 0.11 },
-  { threshold: 70000, rate: 0.19 },
-  { threshold: 100000, rate: 0.25 },
-  { threshold: 400000, rate: 0.26 },
-  { threshold: 600000, rate: 0.28 },
-  { threshold: 2000000, rate: 0.3 },
-];
 
 function toInputString(value: number): string {
   return value === 0 ? "" : new Intl.NumberFormat("en-MY", { maximumFractionDigits: 2 }).format(value);
@@ -596,7 +583,6 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                       schema={SALARY_URL_SCHEMA}
                       defaultName={`RM ${Math.round(parsedInput.monthlySalary)}/mo${parsedInput.annualBonus ? ` + bonus` : ""}`}
                     />
-                    <EmbedDialog calculator="salary" />
                     <Button
                       variant="outline"
                       className="gap-2 rounded-2xl"

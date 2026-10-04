@@ -354,15 +354,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Trusted bar ── */}
-      <div className="border-y border-border bg-muted/40">
-        <div className="hk-container py-4 text-center">
-          <p className="text-[13px] text-muted-foreground font-medium">
-            {t("home.hero.partnersLink")}
-          </p>
-        </div>
-      </div>
-
       {/* ── Recently used (contained) ── */}
       {recentEntries.length > 0 && (
         <FadeIn>

@@ -29,21 +29,10 @@ export function AdSlot({ id, className, variant = "banner", slot, client, enable
     }
   }, [isConfigured, slot, client]);
 
-  if (!isConfigured) {
-    return (
-      <div
-        id={id}
-        className={cn(
-          "ad-slot w-full rounded-lg border border-dashed border-muted-foreground/20 bg-muted/10 flex items-center justify-center text-xs text-muted-foreground/40 select-none",
-          variant === "banner" ? "min-h-[60px]" : "min-h-[120px]",
-          className,
-        )}
-        aria-hidden="true"
-      >
-        Advertisement
-      </div>
-    );
-  }
+  // Nothing to show until AdSense is actually configured. Rendering a dashed
+  // "Advertisement" placeholder just put an empty grey box in front of readers
+  // on every page where no ad was going to load.
+  if (!isConfigured) return null;
 
   return (
     <div

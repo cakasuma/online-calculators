@@ -1,16 +1,19 @@
-import { ArrowRight, Calculator as CalculatorIcon, Car, Percent, Receipt, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowRight, Calculator as CalculatorIcon, Car, Percent, PiggyBank, Receipt, Wallet } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { recordServerEvent, track } from "@/lib/analytics";
-import { calculateCarLoan, CAR_LOAN_DEFAULTS, type CarLoanInputs } from "@/lib/carLoan";
+import { calculateCarLoan, CAR_LOAN_DEFAULTS, type CarLoanInputs, type HpRegime } from "@/lib/carLoan";
 import {
+  boolField,
   buildShareUrl,
+  enumField,
   mergeFromUrl,
   numberField,
   urlHasSchemaParams,
@@ -109,11 +112,14 @@ function NumberField({
 
 const URL_SCHEMA: UrlSchema<CarLoanInputs> = {
   price: numberField("price"),
-  // 0% down and 0% flat interest are valid, non-default choices — keep them in
+  // 0% down and 0% interest are valid, non-default choices — keep them in
   // shared links so the recipient sees the same scenario.
   downPct: numberField("down", { keepZero: true }),
   flatRate: numberField("rate", { keepZero: true }),
   tenureYears: numberField("tenure"),
+  regime: enumField<CarLoanInputs, "regime">("regime", ["reducing", "flat"]),
+  // Month 0 is a real choice — settling before the first instalment.
+  settleAfterMonths: numberField("settle", { keepZero: true }),
 };
 
 interface Props {
@@ -130,15 +136,25 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
   const [downInput, setDownInput] = useState(toInputString(initial.downPct));
   const [rateInput, setRateInput] = useState(toInputString(initial.flatRate));
   const [tenureInput, setTenureInput] = useState(toInputString(initial.tenureYears));
+  const [regime, setRegime] = useState<HpRegime>(initial.regime ?? "reducing");
+  const [settleEnabled, setSettleEnabled] = useState(initial.settleAfterMonths != null);
+  const [settleInput, setSettleInput] = useState(toInputString(initial.settleAfterMonths ?? 0));
+  const [showSchedule, setShowSchedule] = useState(false);
+
+  const tenureYears = Math.max(1, Math.min(9, parseNumberInput(tenureInput) || 1));
 
   const parsed = useMemo<CarLoanInputs>(
     () => ({
       price: Math.max(0, parseNumberInput(priceInput)),
       downPct: Math.max(0, Math.min(100, parseNumberInput(downInput))),
       flatRate: Math.max(0, Math.min(15, parseNumberInput(rateInput))),
-      tenureYears: Math.max(1, Math.min(9, parseNumberInput(tenureInput) || 1)),
+      tenureYears,
+      regime,
+      settleAfterMonths: settleEnabled
+        ? Math.max(0, Math.min(tenureYears * 12, Math.round(parseNumberInput(settleInput))))
+        : undefined,
     }),
-    [priceInput, downInput, rateInput, tenureInput],
+    [priceInput, downInput, rateInput, tenureYears, regime, settleEnabled, settleInput],
   );
 
   useUrlSync(parsed, URL_SCHEMA);
@@ -162,6 +178,7 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
       downPct: parsed.downPct,
       flatRate: parsed.flatRate,
       tenureYears: parsed.tenureYears,
+      regime: parsed.regime,
       monthlyInstalment: Math.round(result.monthlyInstalment),
       totalInterest: Math.round(result.totalInterest),
     };
@@ -169,7 +186,8 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
     recordServerEvent({ calculator: "carloan", event: "calculator_complete", payload });
 
     if (onCalculate) {
-      const expression = `RM ${Math.round(parsed.price)} • ${parsed.downPct}% down • ${parsed.tenureYears}yr @ ${parsed.flatRate}% flat`;
+      const basis = parsed.regime === "flat" ? "flat" : "reducing";
+      const expression = `RM ${Math.round(parsed.price)} • ${parsed.downPct}% down • ${parsed.tenureYears}yr @ ${parsed.flatRate}% ${basis}`;
       const resultStr = `RM ${Math.round(result.monthlyInstalment)}/mo • ${result.effectiveRate.toFixed(2)}% eff.`;
       const url = buildShareUrl(parsed, URL_SCHEMA);
       onCalculate(expression, resultStr, url);
@@ -181,6 +199,9 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
     setDownInput(toInputString(CAR_LOAN_DEFAULTS.downPct));
     setRateInput(toInputString(CAR_LOAN_DEFAULTS.flatRate));
     setTenureInput(toInputString(CAR_LOAN_DEFAULTS.tenureYears));
+    setRegime(CAR_LOAN_DEFAULTS.regime ?? "reducing");
+    setSettleEnabled(false);
+    setSettleInput("");
     setHasCalculated(false);
   }
 
@@ -234,12 +255,12 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
                   hint={t("carloan.inputs.downPct.hint")}
                 />
                 <NumberField
-                  label={t("carloan.inputs.rate")}
+                  label={regime === "flat" ? t("carloan.rateFlat") : t("carloan.inputs.rate")}
                   value={rateInput}
                   onChange={setRateInput}
-                  placeholder="e.g. 3.0"
+                  placeholder={regime === "flat" ? "e.g. 3.0" : "e.g. 5.5"}
                   suffix="%"
-                  hint={t("carloan.inputs.rate.hint")}
+                  hint={regime === "flat" ? t("carloan.rateFlat.hint") : t("carloan.inputs.rate.hint")}
                 />
                 <NumberField
                   label={t("carloan.inputs.tenure")}
@@ -249,6 +270,46 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
                   maxDecimals={0}
                   suffix={t("carloan.years")}
                 />
+              </div>
+
+              <label className="block space-y-2">
+                <span className="text-sm font-medium">{t("carloan.inputs.regime")}</span>
+                <select
+                  value={regime}
+                  onChange={(event) => setRegime(event.target.value as HpRegime)}
+                  className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                >
+                  <option value="reducing">{t("carloan.regime.reducing")}</option>
+                  <option value="flat">{t("carloan.regime.flat")}</option>
+                </select>
+                <span className="text-xs text-muted-foreground">{t("carloan.regime.hint")}</span>
+              </label>
+
+              {regime === "flat" && (
+                <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-200">
+                  <div className="flex gap-2">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <p>{t("carloan.flatWarning")}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">{t("carloan.settle.title")}</h3>
+                <label className="flex items-center justify-between gap-3 rounded-2xl bg-muted/40 px-4 py-3">
+                  <span className="text-sm font-medium">{t("carloan.settle.enable")}</span>
+                  <Switch checked={settleEnabled} onCheckedChange={setSettleEnabled} />
+                </label>
+                {settleEnabled && (
+                  <NumberField
+                    label={t("carloan.settle.after")}
+                    value={settleInput}
+                    onChange={setSettleInput}
+                    placeholder={`0 - ${tenureYears * 12}`}
+                    maxDecimals={0}
+                    hint={t("carloan.settle.after.hint")}
+                  />
+                )}
               </div>
 
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
@@ -360,6 +421,128 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
                     </div>
                   </CardContent>
                 </Card>
+
+                {result.settlement && (
+                  <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                    <CardContent className="p-4 sm:p-6 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <PiggyBank className="h-5 w-5 flex-shrink-0 text-primary" />
+                        <h2 className="text-xl font-semibold">{t("carloan.settle.title")}</h2>
+                      </div>
+                      <div className="mt-4 space-y-3">
+                        <div className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                          <div className="flex items-center justify-between gap-3 min-w-0">
+                            <span className="text-sm text-muted-foreground min-w-0 break-words">
+                              {t("carloan.settle.paid")}
+                            </span>
+                            <span className="font-semibold tabular-nums text-right break-words">
+                              {money(result.settlement.instalmentsPaid)}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {result.settlement.afterMonths} / {result.months}
+                          </p>
+                        </div>
+
+                        {result.regime === "flat" && (
+                          <div className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                            <div className="flex items-center justify-between gap-3 min-w-0">
+                              <span className="text-sm text-muted-foreground min-w-0 break-words">
+                                {t("carloan.settle.rebate")}
+                              </span>
+                              <span className="font-semibold tabular-nums text-right break-words">
+                                {money(result.settlement.rebate)}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">{t("carloan.settle.rebate.hint")}</p>
+                          </div>
+                        )}
+
+                        <div className="rounded-2xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
+                          <div className="flex items-center justify-between gap-3 min-w-0">
+                            <span className="text-sm font-semibold min-w-0 break-words">
+                              {t("carloan.settle.amount")}
+                            </span>
+                            <span className="text-lg font-bold tabular-nums text-right text-primary break-words">
+                              {money(result.settlement.amountToSettle)}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">{t("carloan.settle.amount.hint")}</p>
+                        </div>
+
+                        {result.settlement.goodwillDiscount > 0 && (
+                          <>
+                            <div className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                              <div className="flex items-center justify-between gap-3 min-w-0">
+                                <span className="text-sm text-muted-foreground min-w-0 break-words">
+                                  {t("carloan.settle.reducing")}
+                                </span>
+                                <span className="font-semibold tabular-nums text-right break-words">
+                                  {money(result.settlement.reducingComparison)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="rounded-2xl bg-emerald-50 px-3 sm:px-4 py-3.5 min-w-0 dark:bg-emerald-950/20">
+                              <div className="flex items-center justify-between gap-3 min-w-0">
+                                <span className="text-sm font-semibold min-w-0 break-words text-emerald-700 dark:text-emerald-300">
+                                  {t("carloan.settle.goodwill")}
+                                </span>
+                                <span className="text-lg font-bold tabular-nums text-right break-words text-emerald-700 dark:text-emerald-300">
+                                  {money(result.settlement.goodwillDiscount)}
+                                </span>
+                              </div>
+                              <p className="mt-1 text-xs text-muted-foreground">{t("carloan.settle.goodwill.hint")}</p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {result.schedule.length > 0 && (
+                  <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                    <CardContent className="p-4 sm:p-6 min-w-0">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <h2 className="text-xl font-semibold">{t("carloan.schedule.title")}</h2>
+                          <p className="text-sm text-muted-foreground">{t("carloan.schedule.hint")}</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="rounded-xl"
+                          onClick={() => setShowSchedule((open) => !open)}
+                        >
+                          {showSchedule ? t("carloan.schedule.hide") : t("carloan.schedule.show")}
+                        </Button>
+                      </div>
+                      {showSchedule && (
+                        <div className="mt-4 overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b text-left text-muted-foreground">
+                                <th className="py-2 pr-3 font-medium">{t("carloan.schedule.year")}</th>
+                                <th className="py-2 px-3 font-medium text-right">{t("carloan.schedule.principal")}</th>
+                                <th className="py-2 px-3 font-medium text-right">{t("carloan.schedule.interest")}</th>
+                                <th className="py-2 pl-3 font-medium text-right">{t("carloan.schedule.balance")}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {result.schedule.map((year) => (
+                                <tr key={year.year} className="border-b border-muted last:border-0">
+                                  <td className="py-2 pr-3 tabular-nums">{year.year}</td>
+                                  <td className="py-2 px-3 text-right tabular-nums">{money(year.principalPaid)}</td>
+                                  <td className="py-2 px-3 text-right tabular-nums">{money(year.interestPaid)}</td>
+                                  <td className="py-2 pl-3 text-right tabular-nums">{money(year.closingBalance)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
 
                 <RelatedToolsCard currentHref="/car-loan" />
               </>

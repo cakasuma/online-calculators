@@ -2,6 +2,7 @@ import { ArrowRight, Calculator as CalculatorIcon, Coins, Landmark, PiggyBank, T
 import { useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
@@ -112,6 +113,9 @@ const URL_SCHEMA: UrlSchema<FixedDepositInputs> = {
   // A 0% rate is a valid, non-default choice — keep it in shared links.
   annualRate: numberField("rate", { keepZero: true }),
   tenureMonths: numberField("months"),
+  cycles: numberField("cycles"),
+  // Month 0 is a real choice — breaking the deposit almost immediately.
+  withdrawAfterMonths: numberField("break", { keepZero: true }),
 };
 
 interface Props {
@@ -127,14 +131,21 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
   const [principalInput, setPrincipalInput] = useState(toInputString(initial.principal));
   const [rateInput, setRateInput] = useState(toInputString(initial.annualRate));
   const [monthsInput, setMonthsInput] = useState(toInputString(initial.tenureMonths));
+  const [cyclesInput, setCyclesInput] = useState(toInputString(initial.cycles ?? 1));
+  const [breakEnabled, setBreakEnabled] = useState(initial.withdrawAfterMonths != null);
+  const [breakInput, setBreakInput] = useState(toInputString(initial.withdrawAfterMonths ?? 0));
 
   const parsed = useMemo<FixedDepositInputs>(
     () => ({
       principal: Math.max(0, parseNumberInput(principalInput)),
       annualRate: Math.max(0, Math.min(20, parseNumberInput(rateInput))),
       tenureMonths: Math.max(1, Math.min(120, parseNumberInput(monthsInput) || 1)),
+      cycles: Math.max(1, Math.min(40, Math.round(parseNumberInput(cyclesInput)) || 1)),
+      withdrawAfterMonths: breakEnabled
+        ? Math.max(0, Math.min(120, Math.round(parseNumberInput(breakInput))))
+        : undefined,
     }),
-    [principalInput, rateInput, monthsInput],
+    [principalInput, rateInput, monthsInput, cyclesInput, breakEnabled, breakInput],
   );
 
   useUrlSync(parsed, URL_SCHEMA);
@@ -236,6 +247,33 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
                   suffix={t("fd.months")}
                   hint={t("fd.inputs.tenure.hint")}
                 />
+                <NumberField
+                  label={t("fd.inputs.cycles")}
+                  value={cyclesInput}
+                  onChange={setCyclesInput}
+                  placeholder="1"
+                  maxDecimals={0}
+                  hint={t("fd.inputs.cycles.hint")}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">{t("fd.withdraw.title")}</h3>
+                <label className="flex items-center justify-between gap-3 rounded-2xl bg-muted/40 px-4 py-3">
+                  <span className="text-sm font-medium">{t("fd.withdraw.enable")}</span>
+                  <Switch checked={breakEnabled} onCheckedChange={setBreakEnabled} />
+                </label>
+                {breakEnabled && (
+                  <NumberField
+                    label={t("fd.withdraw.after")}
+                    value={breakInput}
+                    onChange={setBreakInput}
+                    placeholder={`0 - ${parsed.tenureMonths}`}
+                    maxDecimals={0}
+                    suffix={t("fd.months")}
+                    hint={t("fd.withdraw.after.hint")}
+                  />
+                )}
               </div>
 
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
@@ -323,7 +361,11 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
                       {([
                         [t("fd.principalLabel"), money(result.principal), ""],
                         [t("fd.simpleMaturity"), money(result.maturityValue), t("fd.simpleMaturity.hint")],
-                        [t("fd.compounded"), money(result.compoundedMaturityValue), t("fd.compounded.hint")],
+                        [
+                          t("fd.totalPeriod"),
+                          `${result.totalMonths} ${t("fd.months")}`,
+                          "",
+                        ],
                       ] as [string, string, string][]).map(([label, value, helper]) => (
                         <div key={label} className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
                           <div className="flex items-center justify-between gap-3 min-w-0">
@@ -333,19 +375,108 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
                           {helper ? <p className="mt-1 text-xs text-muted-foreground">{helper}</p> : null}
                         </div>
                       ))}
+
+                      {/* Compounding is real only when the deposit is actually renewed. */}
+                      {result.compoundingBonus > 0 ? (
+                        <>
+                          <div className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                            <div className="flex items-center justify-between gap-3 min-w-0">
+                              <span className="text-sm text-muted-foreground min-w-0 break-words">
+                                {t("fd.compounded")}
+                              </span>
+                              <span className="font-semibold tabular-nums text-right break-words">
+                                {money(result.finalValue)}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">{t("fd.compounded.hint")}</p>
+                          </div>
+                          <div className="rounded-2xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
+                            <div className="flex items-center justify-between gap-3 min-w-0">
+                              <span className="flex items-center gap-1.5 text-sm font-semibold min-w-0 break-words">
+                                <Landmark className="h-4 w-4 flex-shrink-0" />
+                                {t("fd.compoundingBonus")}
+                              </span>
+                              <span className="text-lg font-bold tabular-nums text-right text-primary break-words">
+                                {money2(result.compoundingBonus)}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">{t("fd.compoundingBonus.hint")}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <p className="px-1 text-xs text-muted-foreground">{t("fd.noCompounding")}</p>
+                      )}
+
                       <div className="rounded-2xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
                         <div className="flex items-center justify-between gap-3 min-w-0">
-                          <span className="flex items-center gap-1.5 text-sm font-semibold min-w-0 break-words">
-                            <Landmark className="h-4 w-4 flex-shrink-0" />
-                            {t("fd.compoundingBonus")}
-                          </span>
+                          <span className="text-sm font-semibold min-w-0 break-words">{t("fd.effectiveRate")}</span>
                           <span className="text-lg font-bold tabular-nums text-right text-primary break-words">
-                            {money2(result.compoundingBonus)}
+                            {result.effectiveAnnualRate.toFixed(2)}%
                           </span>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">{t("fd.compoundingBonus.hint")}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{t("fd.effectiveRate.hint")}</p>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+
+                {result.earlyWithdrawal && (
+                  <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                    <CardContent className="p-4 sm:p-6 min-w-0">
+                      <h2 className="text-xl font-semibold">{t("fd.withdraw.title")}</h2>
+                      <div className="mt-4 space-y-3">
+                        {result.earlyWithdrawal.interestPaid === 0 && (
+                          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
+                            {t("fd.withdraw.noInterest")}
+                          </div>
+                        )}
+                        {([
+                          [t("fd.withdraw.ratePaid"), `${result.earlyWithdrawal.ratePaidPct.toFixed(2)}%`],
+                          [t("fd.withdraw.interestPaid"), money2(result.earlyWithdrawal.interestPaid)],
+                          [t("fd.withdraw.forfeited"), money2(result.earlyWithdrawal.interestForfeited)],
+                        ] as [string, string][]).map(([label, value]) => (
+                          <div key={label} className="flex items-center justify-between gap-3 rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                            <span className="text-sm text-muted-foreground min-w-0 break-words">{label}</span>
+                            <span className="font-semibold tabular-nums text-right break-words">{value}</span>
+                          </div>
+                        ))}
+                        <div className="rounded-2xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
+                          <div className="flex items-center justify-between gap-3 min-w-0">
+                            <span className="text-sm font-semibold min-w-0 break-words">{t("fd.withdraw.received")}</span>
+                            <span className="text-lg font-bold tabular-nums text-right text-primary break-words">
+                              {money2(result.earlyWithdrawal.amountReceived)}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{t("fd.withdraw.hint")}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                  <CardContent className="p-4 sm:p-6 min-w-0">
+                    <h2 className="text-xl font-semibold">{t("fd.pidm.title")}</h2>
+                    <div
+                      className={`mt-3 rounded-2xl px-4 py-3 ${
+                        result.pidm.covered
+                          ? "bg-emerald-50 dark:bg-emerald-950/20"
+                          : "bg-amber-50 dark:bg-amber-950/20"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm font-semibold ${
+                          result.pidm.covered
+                            ? "text-emerald-700 dark:text-emerald-300"
+                            : "text-amber-800 dark:text-amber-300"
+                        }`}
+                      >
+                        {result.pidm.covered
+                          ? t("fd.pidm.covered")
+                          : `${t("fd.pidm.exceeded")} ${money2(result.pidm.excess)}`}
+                      </p>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">{t("fd.pidm.hint")}</p>
                   </CardContent>
                 </Card>
 

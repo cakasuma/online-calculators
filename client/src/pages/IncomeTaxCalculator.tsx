@@ -1,15 +1,23 @@
-import { ArrowRight, Calculator as CalculatorIcon, Info, Landmark, Percent, Receipt } from "lucide-react";
+import { ArrowRight, Calculator as CalculatorIcon, ChevronDown, Info, Landmark, Percent, Receipt } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { EmbedDialog } from "@/components/EmbedDialog";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
+  calculateIncomeTax,
+  INCOME_TAX_DEFAULTS,
+  type HousingLoanBand,
+  type IncomeTaxInputs,
+} from "@/lib/incomeTax";
+import {
+  boolField,
   buildShareUrl,
   enumField,
   mergeFromUrl,
@@ -19,50 +27,18 @@ import {
   type UrlSchema,
 } from "@/lib/urlState";
 
-interface TaxInputs {
-  annualIncome: number;
-  epfLife: number;
-  lifestyle: number;
-  medical: number;
-  education: number;
-  children: number;
-  spouse: "yes" | "no";
-}
-
-const DEFAULT_INPUTS: TaxInputs = {
-  annualIncome: 72000,
-  epfLife: 4000,
-  lifestyle: 2500,
-  medical: 0,
-  education: 0,
-  children: 0,
-  spouse: "no",
-};
-
-// Resident progressive bands — Malaysia YA 2026 (chargeable income).
-const TAX_BRACKETS = [
-  { threshold: 0, rate: 0 },
-  { threshold: 5000, rate: 0.01 },
-  { threshold: 20000, rate: 0.03 },
-  { threshold: 35000, rate: 0.06 },
-  { threshold: 50000, rate: 0.11 },
-  { threshold: 70000, rate: 0.19 },
-  { threshold: 100000, rate: 0.25 },
-  { threshold: 400000, rate: 0.26 },
-  { threshold: 600000, rate: 0.28 },
-  { threshold: 2000000, rate: 0.3 },
-];
-
-const PERSONAL_RELIEF = 9000;
-const SPOUSE_RELIEF = 4000;
-const CHILD_RELIEF = 2000;
-const CAP = { epfLife: 7000, lifestyle: 2500, medical: 10000, education: 8000 };
-
 const money = (value: number) =>
   new Intl.NumberFormat("en-MY", {
     style: "currency",
     currency: "MYR",
     maximumFractionDigits: 2,
+  }).format(Number.isFinite(value) ? value : 0);
+
+const money0 = (value: number) =>
+  new Intl.NumberFormat("en-MY", {
+    style: "currency",
+    currency: "MYR",
+    maximumFractionDigits: 0,
   }).format(Number.isFinite(value) ? value : 0);
 
 const percent = (value: number) => `${value.toFixed(2)}%`;
@@ -86,44 +62,6 @@ function formatInputNumber(value: string, maxDecimals = 2): string {
 
 function toInputString(value: number): string {
   return value === 0 ? "" : new Intl.NumberFormat("en-MY", { maximumFractionDigits: 2 }).format(value);
-}
-
-function progressiveTax(income: number) {
-  const chargeable = Math.max(0, income);
-  let tax = 0;
-  for (let i = 0; i < TAX_BRACKETS.length; i++) {
-    const current = TAX_BRACKETS[i];
-    const next = TAX_BRACKETS[i + 1];
-    const upper = next?.threshold ?? Infinity;
-    if (chargeable > current.threshold) {
-      tax += (Math.min(chargeable, upper) - current.threshold) * current.rate;
-    }
-  }
-  return tax;
-}
-
-function calculate(input: TaxInputs) {
-  const reliefs =
-    PERSONAL_RELIEF +
-    Math.min(input.epfLife, CAP.epfLife) +
-    Math.min(input.lifestyle, CAP.lifestyle) +
-    Math.min(input.medical, CAP.medical) +
-    Math.min(input.education, CAP.education) +
-    (input.spouse === "yes" ? SPOUSE_RELIEF : 0) +
-    Math.max(0, input.children) * CHILD_RELIEF;
-
-  const totalReliefs = reliefs;
-  const chargeableIncome = Math.max(0, input.annualIncome - totalReliefs);
-  const taxBeforeRebate = progressiveTax(chargeableIncome);
-
-  // Individual rebate: RM400 when chargeable income ≤ RM35,000, plus RM400
-  // more when a spouse relief is claimed.
-  const rebate = chargeableIncome <= 35000 ? 400 + (input.spouse === "yes" ? 400 : 0) : 0;
-  const taxPayable = Math.max(0, taxBeforeRebate - rebate);
-  const effectiveRate = input.annualIncome > 0 ? (taxPayable / input.annualIncome) * 100 : 0;
-  const monthlyPcb = taxPayable / 12;
-
-  return { totalReliefs, chargeableIncome, taxBeforeRebate, rebate, taxPayable, effectiveRate, monthlyPcb };
 }
 
 function NumberField({
@@ -167,14 +105,80 @@ function NumberField({
   );
 }
 
-const URL_SCHEMA: UrlSchema<TaxInputs> = {
+function ToggleRow({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex items-center justify-between gap-3 rounded-2xl bg-muted/40 px-4 py-3">
+      <span className="text-sm font-medium">{label}</span>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </label>
+  );
+}
+
+/**
+ * A collapsible group of relief inputs. There are too many statutory reliefs to
+ * show at once, so all but the first group start closed.
+ */
+function ReliefGroup({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+      >
+        <span className="text-sm font-semibold">{title}</span>
+        <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="space-y-4 border-t border-slate-200 px-4 py-4 dark:border-slate-800">{children}</div>}
+    </div>
+  );
+}
+
+const URL_SCHEMA: UrlSchema<IncomeTaxInputs> = {
   annualIncome: numberField("income"),
-  epfLife: numberField("epf"),
-  lifestyle: numberField("life"),
+  disabledSelf: boolField("oku"),
+  spouse: enumField<IncomeTaxInputs, "spouse">("spouse", ["yes", "no"]),
+  disabledSpouse: boolField("okuspouse"),
+  childrenUnder18: numberField("kids"),
+  childrenTertiary: numberField("kidsuni"),
+  disabledChildren: numberField("okukids"),
+  disabledChildrenTertiary: numberField("okukidsuni"),
   medical: numberField("med"),
-  education: numberField("edu"),
-  children: numberField("kids"),
-  spouse: enumField<TaxInputs, "spouse">("spouse", ["yes", "no"]),
+  parentsMedical: numberField("pmed"),
+  supportingEquipment: numberField("equip"),
+  lifeInsurance: numberField("life"),
+  educationMedicalInsurance: numberField("edumedins"),
+  epf: numberField("epf"),
+  socsoEis: numberField("socso"),
+  prs: numberField("prs"),
+  sspn: numberField("sspn"),
+  educationFees: numberField("edu"),
+  lifestyle: numberField("style"),
+  sports: numberField("sport"),
+  childcare: numberField("care"),
+  breastfeeding: numberField("bf"),
+  evCharging: numberField("ev"),
+  housingLoanInterest: numberField("hli"),
+  housingLoanBand: enumField<IncomeTaxInputs, "housingLoanBand">("hliband", ["upTo500k", "above500k"]),
+  zakat: numberField("zakat"),
 };
 
 interface Props {
@@ -183,36 +187,82 @@ interface Props {
 
 export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
-  const [initial] = useState<TaxInputs>(() => mergeFromUrl<TaxInputs>(DEFAULT_INPUTS, URL_SCHEMA));
+  const [initial] = useState<IncomeTaxInputs>(() =>
+    mergeFromUrl<IncomeTaxInputs>(INCOME_TAX_DEFAULTS, URL_SCHEMA),
+  );
   const arrivedViaShare = useMemo(() => urlHasSchemaParams(URL_SCHEMA), []);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const [incomeInput, setIncomeInput] = useState(toInputString(initial.annualIncome));
-  const [epfInput, setEpfInput] = useState(toInputString(initial.epfLife));
-  const [lifestyleInput, setLifestyleInput] = useState(toInputString(initial.lifestyle));
-  const [medicalInput, setMedicalInput] = useState(toInputString(initial.medical));
-  const [educationInput, setEducationInput] = useState(toInputString(initial.education));
-  const [childrenInput, setChildrenInput] = useState(toInputString(initial.children));
-  const [spouse, setSpouse] = useState<"yes" | "no">(initial.spouse);
+  // Numeric fields are held as strings so the user can type freely.
+  const [num, setNum] = useState<Record<string, string>>(() => ({
+    annualIncome: toInputString(initial.annualIncome),
+    childrenUnder18: toInputString(initial.childrenUnder18),
+    childrenTertiary: toInputString(initial.childrenTertiary),
+    disabledChildren: toInputString(initial.disabledChildren),
+    disabledChildrenTertiary: toInputString(initial.disabledChildrenTertiary),
+    medical: toInputString(initial.medical),
+    parentsMedical: toInputString(initial.parentsMedical),
+    supportingEquipment: toInputString(initial.supportingEquipment),
+    lifeInsurance: toInputString(initial.lifeInsurance),
+    educationMedicalInsurance: toInputString(initial.educationMedicalInsurance),
+    epf: toInputString(initial.epf),
+    socsoEis: toInputString(initial.socsoEis),
+    prs: toInputString(initial.prs),
+    sspn: toInputString(initial.sspn),
+    educationFees: toInputString(initial.educationFees),
+    lifestyle: toInputString(initial.lifestyle),
+    sports: toInputString(initial.sports),
+    childcare: toInputString(initial.childcare),
+    breastfeeding: toInputString(initial.breastfeeding),
+    evCharging: toInputString(initial.evCharging),
+    housingLoanInterest: toInputString(initial.housingLoanInterest),
+    zakat: toInputString(initial.zakat),
+  }));
+  const setField = (key: string) => (value: string) => setNum((prev) => ({ ...prev, [key]: value }));
 
-  const parsed = useMemo<TaxInputs>(
-    () => ({
-      annualIncome: Math.max(0, parseNumberInput(incomeInput)),
-      epfLife: Math.max(0, parseNumberInput(epfInput)),
-      lifestyle: Math.max(0, parseNumberInput(lifestyleInput)),
-      medical: Math.max(0, parseNumberInput(medicalInput)),
-      education: Math.max(0, parseNumberInput(educationInput)),
-      children: Math.max(0, Math.round(parseNumberInput(childrenInput))),
+  const [spouse, setSpouse] = useState<"yes" | "no">(initial.spouse);
+  const [disabledSelf, setDisabledSelf] = useState(initial.disabledSelf);
+  const [disabledSpouse, setDisabledSpouse] = useState(initial.disabledSpouse);
+  const [housingLoanBand, setHousingLoanBand] = useState<HousingLoanBand>(initial.housingLoanBand);
+
+  const parsed = useMemo<IncomeTaxInputs>(() => {
+    const n = (key: string) => Math.max(0, parseNumberInput(num[key] ?? ""));
+    const c = (key: string) => Math.max(0, Math.round(parseNumberInput(num[key] ?? "")));
+    return {
+      annualIncome: n("annualIncome"),
+      disabledSelf,
       spouse,
-    }),
-    [incomeInput, epfInput, lifestyleInput, medicalInput, educationInput, childrenInput, spouse],
-  );
+      disabledSpouse,
+      childrenUnder18: c("childrenUnder18"),
+      childrenTertiary: c("childrenTertiary"),
+      disabledChildren: c("disabledChildren"),
+      disabledChildrenTertiary: c("disabledChildrenTertiary"),
+      medical: n("medical"),
+      parentsMedical: n("parentsMedical"),
+      supportingEquipment: n("supportingEquipment"),
+      lifeInsurance: n("lifeInsurance"),
+      educationMedicalInsurance: n("educationMedicalInsurance"),
+      epf: n("epf"),
+      socsoEis: n("socsoEis"),
+      prs: n("prs"),
+      sspn: n("sspn"),
+      educationFees: n("educationFees"),
+      lifestyle: n("lifestyle"),
+      sports: n("sports"),
+      childcare: n("childcare"),
+      breastfeeding: n("breastfeeding"),
+      evCharging: n("evCharging"),
+      housingLoanInterest: n("housingLoanInterest"),
+      housingLoanBand,
+      zakat: n("zakat"),
+    };
+  }, [num, spouse, disabledSelf, disabledSpouse, housingLoanBand]);
 
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.annualIncome > 0;
   const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
-  const result = useMemo(() => calculate(parsed), [parsed]);
+  const result = useMemo(() => calculateIncomeTax(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
 
   function handleCalculate() {
@@ -226,6 +276,7 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
 
     const payload = {
       annualIncome: Math.round(parsed.annualIncome),
+      totalReliefs: Math.round(result.totalReliefs),
       chargeableIncome: Math.round(result.chargeableIncome),
       taxPayable: Math.round(result.taxPayable),
       effectiveRate: Number(result.effectiveRate.toFixed(2)),
@@ -235,7 +286,9 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
     recordServerEvent({ calculator: "tax", event: "calculator_complete", payload });
 
     if (onCalculate) {
-      const expression = `RM ${Math.round(parsed.annualIncome)}/yr • ${parsed.children} ${parsed.children === 1 ? "child" : "children"}${parsed.spouse === "yes" ? " • spouse" : ""}`;
+      const kids =
+        parsed.childrenUnder18 + parsed.childrenTertiary + parsed.disabledChildren + parsed.disabledChildrenTertiary;
+      const expression = `RM ${Math.round(parsed.annualIncome)}/yr • ${kids} ${kids === 1 ? "child" : "children"}${parsed.spouse === "yes" ? " • spouse" : ""}`;
       const resultStr = `Tax RM ${Math.round(result.taxPayable)}/yr • ${result.effectiveRate.toFixed(2)}% effective`;
       const url = buildShareUrl(parsed, URL_SCHEMA);
       onCalculate(expression, resultStr, url);
@@ -243,15 +296,38 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
   }
 
   function resetForm() {
-    setIncomeInput(toInputString(DEFAULT_INPUTS.annualIncome));
-    setEpfInput(toInputString(DEFAULT_INPUTS.epfLife));
-    setLifestyleInput(toInputString(DEFAULT_INPUTS.lifestyle));
-    setMedicalInput(toInputString(DEFAULT_INPUTS.medical));
-    setEducationInput(toInputString(DEFAULT_INPUTS.education));
-    setChildrenInput(toInputString(DEFAULT_INPUTS.children));
-    setSpouse(DEFAULT_INPUTS.spouse);
+    setNum({
+      annualIncome: toInputString(INCOME_TAX_DEFAULTS.annualIncome),
+      childrenUnder18: "",
+      childrenTertiary: "",
+      disabledChildren: "",
+      disabledChildrenTertiary: "",
+      medical: "",
+      parentsMedical: "",
+      supportingEquipment: "",
+      lifeInsurance: "",
+      educationMedicalInsurance: "",
+      epf: toInputString(INCOME_TAX_DEFAULTS.epf),
+      socsoEis: "",
+      prs: "",
+      sspn: "",
+      educationFees: "",
+      lifestyle: toInputString(INCOME_TAX_DEFAULTS.lifestyle),
+      sports: "",
+      childcare: "",
+      breastfeeding: "",
+      evCharging: "",
+      housingLoanInterest: "",
+      zakat: "",
+    });
+    setSpouse(INCOME_TAX_DEFAULTS.spouse);
+    setDisabledSelf(INCOME_TAX_DEFAULTS.disabledSelf);
+    setDisabledSpouse(INCOME_TAX_DEFAULTS.disabledSpouse);
+    setHousingLoanBand(INCOME_TAX_DEFAULTS.housingLoanBand);
     setHasCalculated(false);
   }
+
+  const capHint = (cap: number) => t("tax.cap").replace("{cap}", money0(cap));
 
   return (
     <div className="w-full">
@@ -291,8 +367,8 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
 
               <NumberField
                 label={t("tax.inputs.income")}
-                value={incomeInput}
-                onChange={setIncomeInput}
+                value={num.annualIncome}
+                onChange={setField("annualIncome")}
                 placeholder="e.g. 72,000"
                 hint={t("tax.inputs.income.hint")}
               />
@@ -302,55 +378,215 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                 <p className="text-xs text-muted-foreground">{t("tax.reliefs.subtitle")}</p>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-3">
+                <ReliefGroup title={t("tax.group.family")} defaultOpen>
+                  <label className="block space-y-2">
+                    <span className="text-sm font-medium">{t("tax.inputs.spouse")}</span>
+                    <select
+                      value={spouse}
+                      onChange={(event) => setSpouse(event.target.value as "yes" | "no")}
+                      className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                    >
+                      <option value="no">{t("common.no")}</option>
+                      <option value="yes">{t("common.yes")}</option>
+                    </select>
+                    <span className="text-xs text-muted-foreground">{t("tax.inputs.spouse.hint")}</span>
+                  </label>
+                  {spouse === "yes" && (
+                    <ToggleRow
+                      label={t("tax.inputs.disabledSpouse")}
+                      checked={disabledSpouse}
+                      onChange={setDisabledSpouse}
+                    />
+                  )}
+                  <ToggleRow label={t("tax.inputs.disabledSelf")} checked={disabledSelf} onChange={setDisabledSelf} />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <NumberField
+                      label={t("tax.inputs.childrenUnder18")}
+                      value={num.childrenUnder18}
+                      onChange={setField("childrenUnder18")}
+                      placeholder="e.g. 2"
+                      maxDecimals={0}
+                      hint={t("tax.inputs.childrenUnder18.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.childrenTertiary")}
+                      value={num.childrenTertiary}
+                      onChange={setField("childrenTertiary")}
+                      placeholder="e.g. 1"
+                      maxDecimals={0}
+                      hint={t("tax.inputs.childrenTertiary.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.disabledChildren")}
+                      value={num.disabledChildren}
+                      onChange={setField("disabledChildren")}
+                      placeholder="0"
+                      maxDecimals={0}
+                      hint={t("tax.inputs.disabledChildren.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.disabledChildrenTertiary")}
+                      value={num.disabledChildrenTertiary}
+                      onChange={setField("disabledChildrenTertiary")}
+                      placeholder="0"
+                      maxDecimals={0}
+                      hint={t("tax.inputs.disabledChildrenTertiary.hint")}
+                    />
+                  </div>
+                </ReliefGroup>
+
+                <ReliefGroup title={t("tax.group.medical")}>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <NumberField
+                      label={t("tax.inputs.medical")}
+                      value={num.medical}
+                      onChange={setField("medical")}
+                      placeholder="0"
+                      hint={capHint(10000)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.parentsMedical")}
+                      value={num.parentsMedical}
+                      onChange={setField("parentsMedical")}
+                      placeholder="0"
+                      hint={capHint(8000)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.lifeInsurance")}
+                      value={num.lifeInsurance}
+                      onChange={setField("lifeInsurance")}
+                      placeholder="0"
+                      hint={t("tax.inputs.lifeInsurance.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.educationMedicalInsurance")}
+                      value={num.educationMedicalInsurance}
+                      onChange={setField("educationMedicalInsurance")}
+                      placeholder="0"
+                      hint={capHint(3000)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.supportingEquipment")}
+                      value={num.supportingEquipment}
+                      onChange={setField("supportingEquipment")}
+                      placeholder="0"
+                      hint={t("tax.inputs.supportingEquipment.hint")}
+                    />
+                  </div>
+                </ReliefGroup>
+
+                <ReliefGroup title={t("tax.group.savings")}>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <NumberField
+                      label={t("tax.inputs.epf")}
+                      value={num.epf}
+                      onChange={setField("epf")}
+                      placeholder="max 4,000"
+                      hint={t("tax.inputs.epf.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.socsoEis")}
+                      value={num.socsoEis}
+                      onChange={setField("socsoEis")}
+                      placeholder="0"
+                      hint={capHint(350)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.prs")}
+                      value={num.prs}
+                      onChange={setField("prs")}
+                      placeholder="0"
+                      hint={capHint(3000)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.sspn")}
+                      value={num.sspn}
+                      onChange={setField("sspn")}
+                      placeholder="0"
+                      hint={capHint(8000)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.educationFees")}
+                      value={num.educationFees}
+                      onChange={setField("educationFees")}
+                      placeholder="0"
+                      hint={capHint(7000)}
+                    />
+                  </div>
+                </ReliefGroup>
+
+                <ReliefGroup title={t("tax.group.lifestyle")}>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <NumberField
+                      label={t("tax.inputs.lifestyle")}
+                      value={num.lifestyle}
+                      onChange={setField("lifestyle")}
+                      placeholder="max 2,500"
+                      hint={t("tax.inputs.lifestyle.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.sports")}
+                      value={num.sports}
+                      onChange={setField("sports")}
+                      placeholder="0"
+                      hint={t("tax.inputs.sports.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.childcare")}
+                      value={num.childcare}
+                      onChange={setField("childcare")}
+                      placeholder="0"
+                      hint={capHint(3000)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.breastfeeding")}
+                      value={num.breastfeeding}
+                      onChange={setField("breastfeeding")}
+                      placeholder="0"
+                      hint={t("tax.inputs.breastfeeding.hint")}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.evCharging")}
+                      value={num.evCharging}
+                      onChange={setField("evCharging")}
+                      placeholder="0"
+                      hint={capHint(2500)}
+                    />
+                    <NumberField
+                      label={t("tax.inputs.housingLoanInterest")}
+                      value={num.housingLoanInterest}
+                      onChange={setField("housingLoanInterest")}
+                      placeholder="0"
+                    />
+                  </div>
+                  {parsed.housingLoanInterest > 0 && (
+                    <label className="block space-y-2">
+                      <span className="text-sm font-medium">{t("tax.inputs.housingLoanBand")}</span>
+                      <select
+                        value={housingLoanBand}
+                        onChange={(event) => setHousingLoanBand(event.target.value as HousingLoanBand)}
+                        className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                      >
+                        <option value="upTo500k">{t("tax.band.upTo500k")}</option>
+                        <option value="above500k">{t("tax.band.above500k")}</option>
+                      </select>
+                    </label>
+                  )}
+                </ReliefGroup>
+              </div>
+
+              <div className="space-y-2">
                 <NumberField
-                  label={t("tax.inputs.epfLife")}
-                  value={epfInput}
-                  onChange={setEpfInput}
-                  placeholder="max 7,000"
-                  hint={t("tax.inputs.epfLife.hint")}
+                  label={t("tax.inputs.zakat")}
+                  value={num.zakat}
+                  onChange={setField("zakat")}
+                  placeholder="0"
+                  hint={t("tax.inputs.zakat.hint")}
                 />
-                <NumberField
-                  label={t("tax.inputs.lifestyle")}
-                  value={lifestyleInput}
-                  onChange={setLifestyleInput}
-                  placeholder="max 2,500"
-                  hint={t("tax.inputs.lifestyle.hint")}
-                />
-                <NumberField
-                  label={t("tax.inputs.medical")}
-                  value={medicalInput}
-                  onChange={setMedicalInput}
-                  placeholder="max 10,000"
-                  hint={t("tax.inputs.medical.hint")}
-                />
-                <NumberField
-                  label={t("tax.inputs.education")}
-                  value={educationInput}
-                  onChange={setEducationInput}
-                  placeholder="max 8,000"
-                  hint={t("tax.inputs.education.hint")}
-                />
-                <NumberField
-                  label={t("tax.inputs.children")}
-                  value={childrenInput}
-                  onChange={setChildrenInput}
-                  placeholder="e.g. 2"
-                  maxDecimals={0}
-                  hint={t("tax.inputs.children.hint")}
-                />
-                <label className="block space-y-2">
-                  <span className="text-sm font-medium">{t("tax.inputs.spouse")}</span>
-                  <select
-                    value={spouse}
-                    onChange={(event) => setSpouse(event.target.value as "yes" | "no")}
-                    className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
-                  >
-                    <option value="no">{t("common.no")}</option>
-                    <option value="yes">{t("common.yes")}</option>
-                  </select>
-                  <span className="text-xs text-muted-foreground">{t("tax.inputs.spouse.hint")}</span>
-                </label>
+                <Link href="/zakat" className="inline-block text-xs font-medium text-primary hover:underline">
+                  {t("tax.zakatLink")} →
+                </Link>
               </div>
 
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
@@ -437,7 +673,6 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                           schema={URL_SCHEMA}
                           defaultName={`Tax RM ${Math.round(parsed.annualIncome)}/yr`}
                         />
-                        <EmbedDialog calculator="tax" />
                       </div>
                     </div>
                     <div className="space-y-3">
@@ -445,7 +680,7 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                         [t("tax.totalReliefs"), result.totalReliefs, t("tax.totalReliefs.hint")],
                         [t("tax.chargeableIncome"), result.chargeableIncome, t("tax.chargeableIncome.hint")],
                         [t("tax.taxBeforeRebate"), result.taxBeforeRebate, t("tax.taxBeforeRebate.hint")],
-                        [t("tax.rebate"), result.rebate, t("tax.rebate.hint")],
+                        [t("tax.individualRebate"), result.individualRebate, t("tax.rebate.hint")],
                       ] as [string, number, string][]).map(([label, value, helper]) => (
                         <div key={label} className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
                           <div className="flex items-center justify-between gap-3 min-w-0">
@@ -455,6 +690,19 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                           <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
                         </div>
                       ))}
+                      {result.zakatRebate > 0 && (
+                        <div className="rounded-2xl bg-emerald-50 px-3 sm:px-4 py-3 min-w-0 dark:bg-emerald-950/20">
+                          <div className="flex items-center justify-between gap-3 min-w-0">
+                            <span className="text-sm text-emerald-700 min-w-0 break-words dark:text-emerald-300">
+                              {t("tax.zakatRebate")}
+                            </span>
+                            <span className="font-semibold tabular-nums text-right break-words text-emerald-700 dark:text-emerald-300">
+                              −{money(result.zakatRebate)}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">{t("tax.zakatRebate.hint")}</p>
+                        </div>
+                      )}
                       <div className="rounded-2xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
                         <div className="flex items-center justify-between gap-3 min-w-0">
                           <span className="text-sm font-semibold min-w-0 break-words">{t("tax.taxPayable")}</span>
@@ -466,6 +714,34 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                           {t("tax.effectiveRate")} {percent(result.effectiveRate)}
                         </p>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                  <CardContent className="p-4 sm:p-6 min-w-0">
+                    <h2 className="text-xl font-semibold">{t("tax.reliefBreakdown")}</h2>
+                    <p className="text-sm text-muted-foreground">{t("tax.reliefBreakdown.hint")}</p>
+                    <div className="mt-4 space-y-2">
+                      {result.reliefLines.map((line) => {
+                        const atCap = line.claimed >= line.cap;
+                        return (
+                          <div
+                            key={line.key}
+                            className="flex items-center justify-between gap-3 rounded-xl bg-muted/40 px-3 py-2 min-w-0"
+                          >
+                            <span className="text-sm min-w-0 break-words">{t(`tax.relief.${line.key}` as never)}</span>
+                            <span className="flex items-center gap-2 flex-shrink-0">
+                              <span className="font-semibold tabular-nums">{money0(line.claimed)}</span>
+                              {atCap && (
+                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                                  {t("tax.cap").replace("{cap}", money0(line.cap))}
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>

@@ -338,30 +338,6 @@
       <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/blog"/>
   </url>
   <url>
-    <loc>https://hellokalku.com/en/partners</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/partners"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/partners"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/partners"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/ms/partners</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/partners"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/partners"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/partners"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/id/partners</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/partners"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/partners"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/partners"/>
-  </url>
-  <url>
     <loc>https://hellokalku.com/en/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>

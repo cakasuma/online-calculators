@@ -14,30 +14,6 @@ const RATE_WINDOW_MS = 60_000;
 const RATE_MAX = 20;
 const rateBucket = new Map<string, { count: number; reset: number }>();
 
-// Whether `s` looks like a plausible public domain name. This is a shape
-// check, not an authoritative one — its purpose is to reject anything that
-// could be abused if rendered to other users (IPs, schemes, html, scripts,
-// internal hostnames). Domains are lowercased before storage so case is not
-// a way to slip past.
-const DOMAIN_RE = /^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
-const FORBIDDEN_DOMAINS = new Set([
-  "localhost",
-  "hellokalku.com",
-  "www.hellokalku.com",
-  "127.0.0.1",
-  "0.0.0.0",
-]);
-
-function isPlausibleDomain(raw: string): boolean {
-  if (raw.length > 253 || raw.length < 4) return false;
-  const lower = raw.toLowerCase().trim();
-  if (FORBIDDEN_DOMAINS.has(lower)) return false;
-  if (lower.endsWith(".hellokalku.com")) return false;
-  // Reject anything that looks like an IPv4 address.
-  if (/^[0-9]+(\.[0-9]+){0,3}$/.test(lower)) return false;
-  return DOMAIN_RE.test(lower);
-}
-
 function rateLimited(key: string): boolean {
   const now = Date.now();
   const bucket = rateBucket.get(key);
@@ -82,27 +58,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ error: "Invalid input" });
     }
 
-    // Sanitise the payload before persisting. /api/events is unauthenticated,
-    // so we treat anything in payload as user input. Specifically:
-    //   1. embed_view events must not carry the raw `referrer` (URL with path
-    //      and query); we keep only the eTLD+1 host. Defence in depth — the
-    //      client now strips this too, but old clients or curl posts might
-    //      still send it.
-    //   2. parentHost on embed_view must look like a real domain. Anything
-    //      else (IPs, javascript: schemes, internal hosts) is dropped, so
-    //      attackers cannot inject a malicious string for partner display.
     const data = { ...parsed.data };
-    if (data.event === "embed_view") {
-      const payload = { ...(data.payload as Record<string, unknown> | undefined) };
-      delete payload.referrer; // never store the full URL even if posted
-      const raw = payload.parentHost;
-      if (typeof raw === "string" && isPlausibleDomain(raw)) {
-        payload.parentHost = raw.toLowerCase();
-      } else {
-        delete payload.parentHost;
-      }
-      data.payload = payload;
-    }
 
     try {
       await storage.recordEvent(data);
@@ -110,24 +66,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       console.error("[event] failed to record", err);
       return res.status(500).json({ error: "Failed to record event" });
-    }
-  });
-
-  app.get("/api/embed-hosts", async (_req, res) => {
-    try {
-      const hosts = await storage.getEmbedHosts();
-      // Cache aggressively — the partner directory does not need to be
-      // sub-minute accurate, and this endpoint is hit by every Partners
-      // page view.
-      res.set("Cache-Control", "public, max-age=900, s-maxage=3600");
-      return res.json({
-        totalHosts: hosts.length,
-        totalEmbedViews: hosts.reduce((sum, h) => sum + h.count, 0),
-        hosts: hosts.slice(0, 100),
-      });
-    } catch (err) {
-      console.error("[embed-hosts] failed", err);
-      return res.status(500).json({ totalHosts: 0, totalEmbedViews: 0, hosts: [] });
     }
   });
 

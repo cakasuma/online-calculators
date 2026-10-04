@@ -1,13 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import EmbedApp from "./EmbedApp";
 import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from "./lib/i18n";
 import "./index.css";
-
-// /embed/<calculator> is the partner-embeddable subtree — no locale prefix,
-// no header/footer/nav, just the calculator. We render a separate app shell
-// and short-circuit the locale-path normalization below.
-const IS_EMBED = window.location.pathname.startsWith("/embed/");
 
 // Normalize the URL so the first path segment is a supported locale.
 // Examples:
@@ -16,9 +10,7 @@ const IS_EMBED = window.location.pathname.startsWith("/embed/");
 //   /en/salary     -> unchanged
 //   /ms/zakat?x=1  -> unchanged
 //   /id/zakat?x=1  -> unchanged
-//   /embed/salary  -> unchanged (embed routes never carry a locale prefix)
 (function initLocalePath() {
-  if (IS_EMBED) return;
   // Source from the shared i18n module so this stays in sync as locales are added.
   const SUPPORTED: readonly string[] = SUPPORTED_LOCALES;
 
@@ -59,7 +51,7 @@ const IS_EMBED = window.location.pathname.startsWith("/embed/");
   window.history.replaceState({}, "", `/${locale}${rest}` + window.location.search);
 })();
 
-createRoot(document.getElementById("root")!).render(IS_EMBED ? <EmbedApp /> : <App />);
+createRoot(document.getElementById("root")!).render(<App />);
 
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
   window.addEventListener("load", () => {

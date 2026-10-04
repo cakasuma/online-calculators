@@ -143,8 +143,12 @@ export function formatRate(rate: number, locale: Locale): string {
   }).format(rate);
 }
 
-/** Forgiving number parser: handles "1,000.50", "1.000,50" and "1000". */
-export function parseAmount(value: string): number {
+/**
+ * Forgiving number parser: handles "1,000.50", "1.000,50" and "1000".
+ * In Indonesian, a lone dot followed by exactly three digits ("1.000") is a
+ * thousands separator, matching how that locale formats numbers.
+ */
+export function parseAmount(value: string, locale: Locale = "en"): number {
   let s = value.replace(/[\s_]/g, "");
   if (!s) return 0;
   const lastDot = s.lastIndexOf(".");
@@ -158,7 +162,7 @@ export function parseAmount(value: string): number {
   } else if (lastDot !== -1) {
     const parts = s.split(".");
     // "1.000.000" is thousands grouping, "1.5" is a decimal.
-    if (parts.length > 2) s = s.replace(/\./g, "");
+    if (parts.length > 2 || (locale === "id" && parts[1].length === 3)) s = s.replace(/\./g, "");
   }
   const n = Number(s);
   return Number.isFinite(n) && n >= 0 ? n : 0;

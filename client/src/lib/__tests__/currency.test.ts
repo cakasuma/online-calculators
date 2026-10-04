@@ -51,6 +51,13 @@ describe("parseAmount", () => {
     expect(parseAmount("12,5")).toBe(12.5);
   });
 
+  it("treats a lone three-digit dotted group as thousands in Indonesian", () => {
+    expect(parseAmount("1.000", "id")).toBe(1000);
+    expect(parseAmount("10.000", "id")).toBe(10000);
+    expect(parseAmount("1.5", "id")).toBe(1.5);
+    expect(parseAmount("1.000", "en")).toBe(1);
+  });
+
   it("returns 0 for junk or negatives", () => {
     expect(parseAmount("")).toBe(0);
     expect(parseAmount("abc")).toBe(0);

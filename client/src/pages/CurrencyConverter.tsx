@@ -74,7 +74,7 @@ export default function CurrencyConverter({ from: pairFrom, to: pairTo, onCalcul
   const [from, setFrom] = useState(initial.from);
   const [to, setTo] = useState(initial.to);
 
-  const amount = parseAmount(amountInput);
+  const amount = parseAmount(amountInput, locale);
   const state = useMemo<ConverterState>(() => ({ amount, from, to }), [amount, from, to]);
   useUrlSync(state, schema);
 
@@ -175,7 +175,7 @@ export default function CurrencyConverter({ from: pairFrom, to: pairTo, onCalcul
             <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
               <label className="block space-y-2 min-w-0">
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{t("currency.from")}</span>
-                <select className={selectClass} value={from} onChange={(e) => changeCurrencies(e.target.value, to)}>
+                <select className={selectClass} value={from} onChange={(e) => (e.target.value === to ? changeCurrencies(to, from) : changeCurrencies(e.target.value, to))}>
                   {CURRENCIES.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.code} — {c.name[locale]}
@@ -196,7 +196,7 @@ export default function CurrencyConverter({ from: pairFrom, to: pairTo, onCalcul
               </Button>
               <label className="block space-y-2 min-w-0">
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{t("currency.to")}</span>
-                <select className={selectClass} value={to} onChange={(e) => changeCurrencies(from, e.target.value)}>
+                <select className={selectClass} value={to} onChange={(e) => (e.target.value === from ? changeCurrencies(to, from) : changeCurrencies(from, e.target.value))}>
                   {CURRENCIES.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.code} — {c.name[locale]}

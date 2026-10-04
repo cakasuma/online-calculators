@@ -284,7 +284,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
       <div className="hk-container py-8 space-y-6">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         {/* Inputs */}
-        <Card className="rounded-3xl">
+        <Card className="rounded-xl">
           <CardContent className="p-6 space-y-5">
             <h2 className="text-lg font-semibold">{t("epf.inputs.heading")}</h2>
 
@@ -378,9 +378,9 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
         <div ref={resultsRef} className="space-y-4">
           {!projection ? (
             /* Empty state */
-            <Card className="rounded-3xl">
+            <Card className="rounded-xl">
               <CardContent className="p-10 flex flex-col items-center justify-center text-center gap-4 min-h-[220px]">
-                <div className="rounded-2xl bg-primary/10 p-4 text-primary">
+                <div className="rounded-xl bg-primary/10 p-4 text-primary">
                   <PiggyBank className="w-8 h-8" />
                 </div>
                 <p className="text-sm text-muted-foreground max-w-xs">
@@ -391,7 +391,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
           ) : (
             <>
               {/* Hero */}
-              <Card className="rounded-3xl bg-gradient-to-br from-primary/15 via-primary/5 to-background border-primary/25">
+              <Card className="rounded-xl bg-accent/50">
                 <CardContent className="p-6 space-y-3">
                   <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
                     <PiggyBank className="w-4 h-4" />
@@ -418,10 +418,10 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </Card>
 
               {/* Target comparison */}
-              <Card className="rounded-3xl">
+              <Card className="rounded-xl">
                 <CardContent className="p-6 space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className={`rounded-2xl p-3 ${projection.meetsTarget ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-amber-500/15 text-amber-600 dark:text-amber-400"}`}>
+                    <div className={`rounded-xl p-3 ${projection.meetsTarget ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-amber-500/15 text-amber-600 dark:text-amber-400"}`}>
                       <Target className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
@@ -451,7 +451,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </Card>
 
               {/* Account split — new contributions have been divided three ways since May 2024 */}
-              <Card className="rounded-3xl">
+              <Card className="rounded-xl">
                 <CardContent className="p-6 space-y-3">
                   <div>
                     <h2 className="text-base font-semibold">{t("epf.accounts.title")}</h2>
@@ -470,7 +470,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
                           ["sejahtera", projection.accounts.sejahtera, "bg-sky-400"],
                           ["fleksibel", projection.accounts.fleksibel, "bg-emerald-400"],
                         ] as [string, number, string][]).map(([key, value, colour]) => (
-                          <div key={key} className="rounded-2xl bg-muted/50 px-4 py-3">
+                          <div key={key} className="rounded-xl bg-muted/50 px-4 py-3">
                             <div className="flex items-center justify-between gap-3">
                               <span className="flex items-center gap-2 text-sm font-medium">
                                 <span className={`h-2.5 w-2.5 rounded-sm ${colour}`} />
@@ -495,7 +495,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </Card>
 
               {/* Retirement Income Adequacy tiers */}
-              <Card className="rounded-3xl">
+              <Card className="rounded-xl">
                 <CardContent className="p-6 space-y-3">
                   <div>
                     <h2 className="text-base font-semibold">{t("epf.tiers.title")}</h2>
@@ -511,7 +511,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
                       return (
                         <div
                           key={key}
-                          className={`flex items-center justify-between gap-3 rounded-2xl px-4 py-3 ${
+                          className={`flex items-center justify-between gap-3 rounded-xl px-4 py-3 ${
                             reached ? "bg-emerald-500/10" : "bg-muted/50"
                           }`}
                         >
@@ -535,7 +535,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </Card>
 
               {/* Monthly retirement income */}
-              <Card className="rounded-3xl">
+              <Card className="rounded-xl">
                 <CardContent className="p-6 space-y-1">
                   <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
                     <TrendingUp className="w-4 h-4" />
@@ -547,7 +547,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </Card>
 
               {/* Year-by-year breakdown */}
-              <Card className="rounded-3xl">
+              <Card className="rounded-xl">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center justify-between gap-2 px-1">
                     <span className="flex items-center gap-2 text-sm font-semibold">

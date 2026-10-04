@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -86,7 +86,7 @@ function NumberField({
           onChange={(event) => onChange(event.target.value)}
           onBlur={() => onChange(formatInputNumber(value, maxDecimals ?? 1))}
           placeholder={placeholder}
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-800 dark:bg-slate-950"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-800 dark:bg-slate-950"
         />
         {suffix && (
           <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -201,27 +201,18 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
         subtitle={t("bmi.subtitle")}
         badges={[t("bmi.badge"), t("bmi.badge.private")]}
         result={
-          <div className="rounded-[20px] border border-white/12 bg-white/[0.08] p-6 backdrop-blur-xl text-white">
-            <p className="text-[13px] text-indigo-100">{t("bmi.yourBmi")}</p>
-            <p className="mt-2 text-3xl md:text-4xl font-bold break-words tabular-nums">
-              {showResults ? num(result.bmi) : "—"}
-            </p>
-            <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{ width: `${showResults ? gaugePct : 0}%`, background: categoryColor }}
-              />
-            </div>
-            <p className="mt-2 text-[13px] text-white/60">
-              {showResults ? categoryLabel : t("bmi.cta.tapToReveal")}
-            </p>
-          </div>
+          <HeadlineResult
+            label={t("bmi.yourBmi")}
+            value={showResults ? num(result.bmi) : "—"}
+            progress={{ pct: showResults ? gaugePct : 0, color: categoryColor }}
+            note={showResults ? categoryLabel : t("bmi.cta.tapToReveal")}
+          />
         }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] min-w-0">
-          <Card className="rounded-2xl sm:rounded-3xl border-slate-200/80 shadow-sm dark:border-slate-800 min-w-0">
+          <Card className="rounded-xl min-w-0">
             <CardContent className="space-y-5 p-4 sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -261,7 +252,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                   <select
                     value={sex}
                     onChange={(event) => setSex(event.target.value as Sex)}
-                    className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                    className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                   >
                     <option value="male">{t("bmi.sex.male")}</option>
                     <option value="female">{t("bmi.sex.female")}</option>
@@ -274,7 +265,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                 <select
                   value={activity}
                   onChange={(event) => setActivity(event.target.value as ActivityLevel)}
-                  className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                  className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="sedentary">{t("bmi.activity.sedentary")}</option>
                   <option value="light">{t("bmi.activity.light")}</option>
@@ -285,7 +276,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                 <span className="text-xs text-muted-foreground">{t("bmi.inputs.activity.hint")}</span>
               </label>
 
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
                 <div className="flex gap-2">
                   <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <p>{t("bmi.disclaimer")}</p>
@@ -295,7 +286,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
               <Button
                 type="button"
                 size="lg"
-                className="w-full gap-2 rounded-2xl text-base font-semibold"
+                className="w-full gap-2 rounded-xl text-base font-semibold"
                 disabled={!isValid}
                 onClick={handleCalculate}
               >
@@ -307,28 +298,28 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
-            <Card className="lg:hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 border-indigo-900/50 text-white">
+            <Card className="lg:hidden ">
               <CardContent className="p-4 sm:p-6">
-                <p className="text-sm text-indigo-100">{t("bmi.yourBmi")}</p>
+                <p className="text-sm text-muted-foreground">{t("bmi.yourBmi")}</p>
                 <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">
                   {showResults ? num(result.bmi) : "—"}
                 </p>
-                <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/15">
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full"
                     style={{ width: `${showResults ? gaugePct : 0}%`, background: categoryColor }}
                   />
                 </div>
-                <p className="mt-2 text-sm text-slate-300">
+                <p className="mt-2 text-sm text-muted-foreground">
                   {showResults ? categoryLabel : t("bmi.cta.tapToReveal")}
                 </p>
               </CardContent>
             </Card>
 
             {!showResults ? (
-              <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
+              <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
                 <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
-                  <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                  <div className="rounded-xl bg-primary/10 p-3 text-primary">
                     <HeartPulse className="h-6 w-6" />
                   </div>
                   <p className="text-base font-semibold">{t("bmi.breakdown.ready")}</p>
@@ -337,7 +328,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
               </Card>
             ) : (
               <>
-                <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                <Card className="rounded-xl shadow-sm min-w-0">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between gap-3">
                       <div>
@@ -346,7 +337,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                           {categoryLabel}
                         </p>
                       </div>
-                      <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                      <div className="rounded-xl bg-primary/10 p-3 text-primary">
                         <Scale className="h-6 w-6" />
                       </div>
                     </div>
@@ -359,7 +350,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                       <p className="mt-3 text-xs text-muted-foreground">{t("bmi.cutoffs.note")}</p>
                     )}
                     {result.categoriesDisagree && result.internationalCategory && (
-                      <div className="mt-3 rounded-2xl bg-muted/50 px-4 py-3">
+                      <div className="mt-3 rounded-xl bg-muted/50 px-4 py-3">
                         <p className="text-sm">
                           {t("bmi.international.differs")}{" "}
                           <span className="font-semibold">
@@ -374,7 +365,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                 </Card>
 
                 {!result.isAdult && (
-                  <Card className="rounded-2xl sm:rounded-3xl border-amber-200 bg-amber-50/60 shadow-sm dark:border-amber-900/50 dark:bg-amber-950/20 min-w-0">
+                  <Card className="rounded-xl border-amber-200 bg-amber-50/60 shadow-sm dark:border-amber-900/50 dark:bg-amber-950/20 min-w-0">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex gap-2">
                         <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-700 dark:text-amber-400" />
@@ -392,7 +383,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                     [t("bmi.bmr"), Math.round(result.bmr), t("bmi.bmr.hint"), Flame],
                     [t("bmi.tdee"), Math.round(result.tdee), t("bmi.tdee.hint"), Activity],
                   ] as [string, number, string, typeof Flame][]).map(([label, value, helper, Icon]) => (
-                    <Card key={label} className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                    <Card key={label} className="rounded-xl shadow-sm min-w-0">
                       <CardContent className="p-4 sm:p-5">
                         <div className="flex items-center justify-between gap-3 min-w-0">
                           <div className="min-w-0 flex-1">
@@ -402,7 +393,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                             </p>
                             <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
                           </div>
-                          <div className="rounded-2xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
+                          <div className="rounded-xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
                             <Icon className="h-5 w-5" />
                           </div>
                         </div>

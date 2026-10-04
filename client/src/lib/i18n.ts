@@ -123,6 +123,18 @@ const translations = {
   // ── Common / Nav ──
   "site.title": { en: "HelloKalku", ms: "HelloKalku", id: "HelloKalku" },
   "nav.home": { en: "Home", ms: "Laman Utama", id: "Beranda" },
+  "nav.calculators": { en: "Calculators", ms: "Kalkulator", id: "Kalkulator" },
+  "nav.guides": { en: "Guides", ms: "Panduan", id: "Panduan" },
+  "nav.allGuides": { en: "All guides", ms: "Semua panduan", id: "Semua panduan" },
+  "home.heading": { en: "Free calculators for Malaysia", ms: "Kalkulator percuma untuk Malaysia", id: "Kalkulator gratis untuk Malaysia" },
+  "home.lede": {
+    en: "Salary, EPF, loans, tax, zakat and more, built on current Malaysian rates. No sign-up, and your numbers stay in your browser.",
+    ms: "Gaji, KWSP, pinjaman, cukai, zakat dan banyak lagi, berdasarkan kadar Malaysia terkini. Tiada pendaftaran, dan nombor anda kekal dalam pelayar anda.",
+    id: "Gaji, EPF, pinjaman, pajak, zakat dan lainnya, berdasarkan tarif Malaysia terkini. Tanpa daftar, dan angka Anda tetap di peramban Anda.",
+  },
+  "home.search.enterHint": { en: "Press Enter to open the first match", ms: "Tekan Enter untuk membuka padanan pertama", id: "Tekan Enter untuk membuka hasil pertama" },
+  "home.guides.title": { en: "Guides", ms: "Panduan", id: "Panduan" },
+  "home.guides.minRead": { en: "min read", ms: "min bacaan", id: "mnt baca" },
   "nav.basic": { en: "Basic", ms: "Asas", id: "Dasar" },
   "nav.scientific": { en: "Scientific", ms: "Saintifik", id: "Ilmiah" },
   "nav.faraid": { en: "Faraid", ms: "Faraid", id: "Faraid" },

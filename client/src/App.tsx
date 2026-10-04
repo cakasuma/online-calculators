@@ -42,9 +42,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toolBrand } from "@/config/tools";
+import { NAV_GROUPS } from "@/config/nav";
 import { initAnalytics, track } from "@/lib/analytics";
 
 import HomePage from "@/pages/Home";
@@ -66,54 +68,13 @@ import Blog from "@/pages/Blog";
 import BlogArticle from "@/pages/BlogArticle";
 import NotFound from "@/pages/not-found";
 
-type NavItem = { href: string; labelKey: TranslationKey; icon: typeof HomeIcon };
-type NavGroup = { labelKey: TranslationKey; items: NavItem[] };
-
-// Single source of truth for the calculator navigation. Drives the desktop
-// top-nav dropdowns, the mobile slide-in drawer, AND the footer columns, so
-// these surfaces stay in sync — add a calculator here and it shows everywhere.
-const NAV_GROUPS: NavGroup[] = [
-  {
-    labelKey: "nav.groupFinance",
-    items: [
-      { href: "/salary", labelKey: "nav.salary", icon: Wallet },
-      { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
-      { href: "/housing-loan", labelKey: "nav.housing", icon: Landmark },
-      { href: "/income-tax", labelKey: "nav.tax", icon: Receipt },
-      { href: "/car-loan", labelKey: "nav.carloan", icon: Car },
-      { href: "/fixed-deposit", labelKey: "nav.fd", icon: Banknote },
-    ],
-  },
-  {
-    labelKey: "nav.groupMath",
-    items: [
-      { href: "/normal", labelKey: "nav.basic", icon: Calculator },
-      { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
-    ],
-  },
-  {
-    labelKey: "nav.groupIslamic",
-    items: [
-      { href: "/faraid", labelKey: "nav.faraid", icon: Scale },
-      { href: "/zakat", labelKey: "nav.zakat", icon: Star },
-      { href: "/wasiat", labelKey: "nav.wasiat", icon: FileText },
-    ],
-  },
-  {
-    labelKey: "nav.groupHealth",
-    items: [
-      { href: "/bmi", labelKey: "nav.bmi", icon: HeartPulse },
-    ],
-  },
-];
-
 type FooterLink = { labelKey?: TranslationKey; label?: string; href: string };
 
 // The footer's calculator columns are derived from NAV_GROUPS (see the footer
 // render below) so they always match the top nav. Only the non-calculator
 // "Learn" column is defined here.
 const FOOTER_LEARN_LINKS: FooterLink[] = [
-  { label: "Guides", href: "/blog" },
+  { labelKey: "nav.allGuides", href: "/blog" },
   { labelKey: "footer.privacy", href: "/privacy" },
   { labelKey: "footer.terms", href: "/terms" },
 ];
@@ -158,6 +119,7 @@ function Layout() {
   const [showHistory, setShowHistory] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [location] = useLocation();
+  const isCalculatorRoute = NAV_GROUPS.some((g) => g.items.some((i) => i.href === location));
 
   useEffect(() => {
     initAnalytics();
@@ -237,151 +199,153 @@ function Layout() {
 
   return (
     <div className={`min-h-screen flex flex-col${location === "/faraid" ? " theme-faraid" : ""}`}>
-      {/* ── NAV (60px, sticky, blurred) ── */}
-      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border safe-area-top">
-        <div className="hk-container h-[60px] flex items-center justify-between gap-3">
-          {/* Left: hamburger (mobile) + logo */}
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => setShowMobileNav(true)}
-              className="md:hidden p-2 -ml-1 rounded-lg hover:bg-muted text-foreground transition-colors"
-              aria-label={t("a11y.navToggle")}
-              aria-expanded={showMobileNav}
-              data-testid="button-mobile-menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <span className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0">
-                <span className="text-white font-extrabold text-[13px] leading-none tracking-tight">HK</span>
+      {/* ── HEADER (56px, sticky): brand · Calculators · Guides · utilities ── */}
+      <header className="sticky top-0 z-50 bg-background border-b border-border safe-area-top">
+        <div className="hk-container h-14 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-8 min-w-0">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label={`${toolBrand.name} — ${t("nav.home")}`}>
+              <span className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0 font-display font-semibold text-[13px] leading-none">
+                HK
               </span>
-              <span className="text-[17px] font-bold text-foreground" data-testid="text-site-title">
+              <span className="font-display text-[17px] font-semibold tracking-tight" data-testid="text-site-title">
                 {toolBrand.name}
               </span>
             </Link>
+
+            <nav className="hidden md:flex items-center gap-1" data-testid="nav-desktop" aria-label="Main">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`flex items-center gap-1 px-3 h-9 rounded-md text-[15px] font-medium transition-colors ${
+                      isCalculatorRoute ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    } hover:bg-muted data-[state=open]:bg-muted`}
+                  >
+                    {t("nav.calculators")}
+                    <ChevronDown className="w-4 h-4 opacity-60" aria-hidden="true" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-[480px] p-3 grid grid-cols-2 gap-x-6 gap-y-3">
+                  {NAV_GROUPS.map((group) => (
+                    <div key={group.labelKey}>
+                      <DropdownMenuLabel className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t(group.labelKey)}
+                      </DropdownMenuLabel>
+                      {group.items.map((item) => (
+                        <DropdownMenuItem key={item.href} asChild>
+                          <Link href={item.href}>
+                            <span className={`flex items-center gap-2.5 w-full cursor-pointer text-[15px] ${item.href === location ? "text-primary font-semibold" : ""}`}>
+                              <item.icon className="w-4 h-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                              {t(item.labelKey)}
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Link
+                href="/blog"
+                className={`px-3 h-9 inline-flex items-center rounded-md text-[15px] font-medium transition-colors hover:bg-muted ${
+                  location.startsWith("/blog") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t("nav.guides")}
+              </Link>
+            </nav>
           </div>
 
-          {/* Centre: desktop nav */}
-          <nav className="hidden md:flex items-center gap-1" data-testid="nav-desktop">
-            <Link href="/">
-              <span className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                location === "/" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-              }`}>
-                {t("nav.home")}
-              </span>
-            </Link>
-            <Link href="/blog">
-              <span className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                location.startsWith("/blog") ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-              }`}>
-                Guides
-              </span>
-            </Link>
-            {NAV_GROUPS.map((group) => {
-              const isGroupActive = group.items.some((item) => item.href === location);
-              return (
-                <DropdownMenu key={group.labelKey}>
-                  <DropdownMenuTrigger asChild>
-                    <button className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer outline-none ${
-                      isGroupActive ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                    }`}>
-                      {t(group.labelKey)}
-                      <ChevronDown className="w-3.5 h-3.5 opacity-60" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="min-w-[180px]">
-                    {group.items.map((item) => (
-                      <DropdownMenuItem key={item.href} asChild>
-                        <Link href={item.href}>
-                          <span className={`flex items-center gap-2 w-full cursor-pointer ${item.href === location ? "text-primary" : ""}`}>
-                            <item.icon className="w-4 h-4 shrink-0" />
-                            {t(item.labelKey)}
-                          </span>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              );
-            })}
-          </nav>
-
-          {/* Right: locale + history + theme */}
-          <div className="flex items-center gap-1.5">
-            <LocaleSwitcher />
+          <div className="flex items-center gap-1">
+            <div className="hidden md:block"><LocaleSwitcher /></div>
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`p-2 rounded-lg border transition-colors ${
-                showHistory ? "bg-primary/10 text-primary border-primary/30" : "border-border hover:bg-muted text-muted-foreground"
+              className={`h-10 w-10 inline-flex items-center justify-center rounded-md transition-colors ${
+                showHistory ? "bg-accent text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
               aria-label={t("a11y.historyToggle")}
               aria-expanded={showHistory}
               data-testid="button-toggle-history"
             >
-              <History className="w-4 h-4" />
+              <History className="w-[18px] h-[18px]" />
             </button>
             <button
               onClick={toggle}
-              className="p-2 rounded-lg border border-border hover:bg-muted text-muted-foreground transition-colors"
+              className="hidden md:inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")}
               data-testid="button-theme-toggle"
             >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+            </button>
+            <button
+              onClick={() => setShowMobileNav(true)}
+              className="md:hidden h-10 w-10 inline-flex items-center justify-center rounded-md text-foreground hover:bg-muted transition-colors"
+              aria-label={t("a11y.navToggle")}
+              aria-expanded={showMobileNav}
+              aria-controls="mobile-nav"
+              data-testid="button-mobile-menu"
+            >
+              <Menu className="w-5 h-5" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* ── MOBILE NAV DRAWER (slide-in from right) ── */}
+      {/* ── MOBILE MENU (the only mobile navigation; slides in from the right) ── */}
       {showMobileNav && (
         <div className="md:hidden fixed inset-0 z-[60]">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileNav(false)} aria-hidden="true" />
-          <div className="hk-drawer absolute right-0 top-0 bottom-0 w-72 max-w-[85vw] bg-background border-l border-border overflow-y-auto p-4" id="mobile-nav" data-testid="nav-mobile">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Menu</span>
-              <button onClick={() => setShowMobileNav(false)} className="p-1.5 rounded-lg hover:bg-muted" aria-label={t("a11y.navToggle")}>
-                <X className="w-4 h-4" />
+          <div className="hk-drawer absolute right-0 top-0 bottom-0 w-80 max-w-[88vw] bg-background border-l border-border flex flex-col safe-area-top safe-area-bottom" id="mobile-nav" data-testid="nav-mobile">
+            <div className="flex items-center justify-between h-14 px-4 border-b border-border shrink-0">
+              <span className="font-display font-semibold">{t("nav.calculators")}</span>
+              <button onClick={() => setShowMobileNav(false)} className="h-10 w-10 inline-flex items-center justify-center rounded-md hover:bg-muted" aria-label={t("a11y.navToggle")}>
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <Link href="/">
-              <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-0.5 ${
-                location === "/" ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-              }`}>
-                <HomeIcon className="w-4 h-4" />
-                {t("nav.home")}
-              </span>
-            </Link>
-            <Link href="/blog">
-              <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-0.5 ${
-                location.startsWith("/blog") ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-              }`}>
-                <BookOpen className="w-4 h-4" />
-                Guides
-              </span>
-            </Link>
-            {NAV_GROUPS.map((group) => (
-              <div key={group.labelKey} className="mt-4">
-                <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                  {t(group.labelKey)}
-                </p>
-                {group.items.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors mb-0.5 ${
-                      item.href === location ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                    }`}>
-                      <item.icon className="w-4 h-4" />
-                      {t(item.labelKey)}
-                    </span>
-                  </Link>
-                ))}
+            <div className="flex-1 overflow-y-auto px-2 py-3">
+              {NAV_GROUPS.map((group) => (
+                <div key={group.labelKey} className="mb-4">
+                  <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t(group.labelKey)}
+                  </p>
+                  {group.items.map((item) => (
+                    <Link key={item.href} href={item.href}>
+                      <span className={`flex items-center gap-3 px-3 min-h-[44px] rounded-md text-base cursor-pointer transition-colors ${
+                        item.href === location ? "bg-accent text-primary font-semibold" : "hover:bg-muted"
+                      }`}>
+                        <item.icon className="w-[18px] h-[18px] shrink-0 text-muted-foreground" aria-hidden="true" />
+                        {t(item.labelKey)}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+              <div className="border-t border-border pt-3">
+                <Link href="/blog">
+                  <span className={`flex items-center gap-3 px-3 min-h-[44px] rounded-md text-base cursor-pointer transition-colors ${
+                    location.startsWith("/blog") ? "bg-accent text-primary font-semibold" : "hover:bg-muted"
+                  }`}>
+                    <BookOpen className="w-[18px] h-[18px] shrink-0 text-muted-foreground" aria-hidden="true" />
+                    {t("nav.guides")}
+                  </span>
+                </Link>
               </div>
-            ))}
+            </div>
+            <div className="shrink-0 border-t border-border px-3 py-3 flex items-center justify-between">
+              <LocaleSwitcher />
+              <button
+                onClick={toggle}
+                className="h-10 w-10 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+                aria-label={theme === "dark" ? t("a11y.themeToggle.light") : t("a11y.themeToggle.dark")}
+              >
+                {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* ── MAIN (layout-neutral; redesigned pages are full-bleed) ── */}
-      <main className="flex-1 min-w-0 w-full pb-16 md:pb-0">
+      <main className="flex-1 min-w-0 w-full">
         {/* Global top ad — only mounts in production when a slot is configured,
             so the full-bleed hero stays flush under the nav everywhere else. */}
         {adsenseEnabled && adsenseSlotTop && (
@@ -465,95 +429,50 @@ function Layout() {
         </div>
       )}
 
-      {/* ── MOBILE BOTTOM NAV (curated 5-slot quick bar; the full calculator
-           list lives in the hamburger drawer above, sourced from NAV_GROUPS) ── */}
-      <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-border safe-area-bottom"
-        aria-label={t("a11y.navToggle")}
-      >
-        <div className="grid grid-cols-5 h-14">
-          {([
-            { href: "/", icon: HomeIcon, labelKey: "nav.home" as TranslationKey },
-            { href: "/salary", icon: Wallet, labelKey: "nav.salary" as TranslationKey },
-            { href: "/faraid", icon: Scale, labelKey: "nav.faraid" as TranslationKey },
-            { href: "/normal", icon: Calculator, labelKey: "nav.basic" as TranslationKey },
-          ] as { href: string; icon: typeof HomeIcon; labelKey: TranslationKey }[]).map(({ href, icon: Icon, labelKey }) => {
-            const isActive = location === href;
-            return (
-              <Link key={href} href={href}>
-                <span
-                  className={`flex flex-col items-center justify-center gap-0.5 h-14 w-full cursor-pointer transition-colors ${
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-[10px] font-medium leading-none">{t(labelKey)}</span>
-                </span>
-              </Link>
-            );
-          })}
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className={`flex flex-col items-center justify-center gap-0.5 h-14 w-full cursor-pointer transition-colors ${
-              showHistory ? "text-primary" : "text-muted-foreground"
-            }`}
-            aria-label={t("a11y.historyToggle")}
-            aria-expanded={showHistory}
-          >
-            <History className="w-5 h-5" />
-            <span className="text-[10px] font-medium leading-none">{t("common.history")}</span>
-          </button>
-        </div>
-      </nav>
-
-      {/* ── FOOTER (dark, brand + calculator cols + Learn col + locale row) ── */}
-      <footer className="hk-why text-white pb-20 md:pb-0 safe-area-bottom">
-        <div className="hk-container py-12 md:py-16">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-8 md:gap-12">
+      {/* ── FOOTER: brand, the same calculator groups as the header, then legal ── */}
+      <footer className="border-t border-border bg-card safe-area-bottom">
+        <div className="hk-container py-10 md:py-12">
+          <div className="grid grid-cols-2 md:grid-cols-[1.4fr_repeat(5,1fr)] gap-x-6 gap-y-8">
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center shrink-0">
-                  <span className="text-white font-extrabold text-[13px] leading-none tracking-tight">HK</span>
-                </span>
-                <span className="text-white font-bold text-[16px]">{toolBrand.name}</span>
-              </div>
-              <p className="text-[13px] text-white/45 leading-relaxed max-w-[220px]">{t("brand.tagline")}</p>
-              <p className="text-[12px] text-white/30 mt-3">
-                {t("footer.builtBy")}{" "}
-                <a href="https://amammustofa.com" target="_blank" rel="noopener noreferrer me"
-                  className="text-white/55 hover:text-white transition-colors underline underline-offset-2">
-                  amammustofa.com
-                </a>
-              </p>
+              <Link href="/" className="inline-flex items-center gap-2.5 mb-3">
+                <span className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-display font-semibold text-[13px] leading-none">HK</span>
+                <span className="font-display text-[17px] font-semibold tracking-tight">{toolBrand.name}</span>
+              </Link>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-[240px]">{t("brand.tagline")}</p>
             </div>
-            {/* Calculator columns — derived from NAV_GROUPS to stay in sync with the top nav */}
             {NAV_GROUPS.map((group) => (
               <div key={group.labelKey}>
-                <p className="text-[11px] font-bold text-white/35 uppercase tracking-widest mb-3.5">{t(group.labelKey)}</p>
-                {group.items.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <span className="block text-[13px] text-white/55 hover:text-white transition-colors cursor-pointer mb-2.5">
-                      {t(item.labelKey)}
-                    </span>
-                  </Link>
-                ))}
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">{t(group.labelKey)}</p>
+                <ul className="space-y-2">
+                  {group.items.map((item) => (
+                    <li key={item.href}>
+                      <Link href={item.href} className="text-sm text-foreground/80 hover:text-foreground hover:underline">
+                        {t(item.labelKey)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
-            {/* Learn column */}
             <div>
-              <p className="text-[11px] font-bold text-white/35 uppercase tracking-widest mb-3.5">Learn</p>
-              {FOOTER_LEARN_LINKS.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <span className="block text-[13px] text-white/55 hover:text-white transition-colors cursor-pointer mb-2.5">
-                    {link.labelKey ? t(link.labelKey) : link.label}
-                  </span>
-                </Link>
-              ))}
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">{t("nav.guides")}</p>
+              <ul className="space-y-2">
+                {FOOTER_LEARN_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-foreground/80 hover:text-foreground hover:underline">
+                      {link.labelKey ? t(link.labelKey) : link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-          <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <p className="text-[12px] text-white/35">
-              © {new Date().getFullYear()} {toolBrand.name}. Free to use.
+          <div className="border-t border-border mt-10 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-muted-foreground">
+            <p>
+              © {new Date().getFullYear()} {toolBrand.name}. {t("footer.builtBy")}{" "}
+              <a href="https://amammustofa.com" target="_blank" rel="noopener noreferrer me" className="underline hover:text-foreground">
+                amammustofa.com
+              </a>
             </p>
             <LocaleSwitcher />
           </div>

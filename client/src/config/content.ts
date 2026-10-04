@@ -7,6 +7,7 @@
 
 import type { Locale } from "@/lib/i18n";
 import type { RouteSlug } from "@/config/seo";
+import { buildCurrencyContent } from "./currencyPairs";
 
 export interface ContentSection {
   heading: string;
@@ -51,6 +52,7 @@ export interface CalculatorContent {
 type ContentMap = Partial<Record<RouteSlug, Record<Locale, CalculatorContent>>>;
 
 export const calculatorContent: ContentMap = {
+  ...buildCurrencyContent(),
   carloan: {
     en: {
       intro:

@@ -12,6 +12,7 @@ const RELATED: Record<string, string[]> = {
   "/income-tax":     ["/salary", "/epf-retirement"],
   "/car-loan":       ["/housing-loan", "/salary"],
   "/fixed-deposit":  ["/epf-retirement", "/salary"],
+  "/currency-converter": ["/salary", "/fixed-deposit"],
   "/faraid":         ["/wasiat", "/zakat"],
   "/zakat":          ["/faraid", "/salary"],
   "/normal":         ["/scientific"],

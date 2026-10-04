@@ -24,6 +24,11 @@ const SLUG_STYLE: Record<string, { accent: string; tagShort: string; tagLong: Re
     tagShort: "HOME",
     tagLong: { en: "All calculators", ms: "Semua kalkulator", id: "Semua kalkulator" },
   },
+  currency: {
+    accent: "#0891B2",
+    tagShort: "CURRENCY",
+    tagLong: { en: "Exchange rates", ms: "Kadar pertukaran", id: "Kurs mata uang" },
+  },
   salary: {
     accent: "#10B981",
     tagShort: "FINANCE",
@@ -199,7 +204,7 @@ function ensureDir(dir: string) {
 
 function generateForRoute(route: RouteSeoEntry, locale: Locale) {
   const copy = route.copy[locale] ?? route.copy.en;
-  const style = SLUG_STYLE[route.slug] ?? SLUG_STYLE.home;
+  const style = SLUG_STYLE[route.slug] ?? (route.slug.startsWith("fx-") ? SLUG_STYLE.currency : SLUG_STYLE.home);
   const heading = copy.heading ?? copy.title;
   const tagline = copy.tagline ?? copy.description;
 

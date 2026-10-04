@@ -3,6 +3,7 @@
 // Keep this module side-effect-free and free of browser-only globals.
 
 import type { Locale } from "@/lib/i18n";
+import { buildCurrencyRoutes } from "./currencyPairs";
 
 export const SITE_ORIGIN = "https://hellokalku.com";
 export const SITE_NAME = "HelloKalku";
@@ -17,6 +18,9 @@ export type RouteSlug =
   | "carloan"
   | "fd"
   | "bmi"
+  | "currency"
+  /** Per-pair currency converter pages, e.g. "fx-usd-myr". */
+  | `fx-${string}`
   | "normal"
   | "scientific"
   | "faraid"
@@ -543,6 +547,7 @@ export const routes: RouteSeoEntry[] = [
       },
     },
   },
+  ...buildCurrencyRoutes(),
 ];
 
 export function findRouteByPath(path: string): RouteSeoEntry | undefined {

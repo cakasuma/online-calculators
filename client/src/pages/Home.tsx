@@ -17,7 +17,7 @@ const TOOL_GROUPS = [
   {
     labelKey: "nav.groupFinance" as TranslationKey,
     descKey: "home.category.Finance.desc" as TranslationKey,
-    hrefs: ["/salary", "/epf-retirement", "/housing-loan", "/income-tax"],
+    hrefs: ["/salary", "/epf-retirement", "/housing-loan", "/income-tax", "/currency-converter"],
   },
   {
     labelKey: "nav.groupHealth" as TranslationKey,

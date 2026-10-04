@@ -186,6 +186,9 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
     setPrincipalInput(toInputString(FIXED_DEPOSIT_DEFAULTS.principal));
     setRateInput(toInputString(FIXED_DEPOSIT_DEFAULTS.annualRate));
     setMonthsInput(toInputString(FIXED_DEPOSIT_DEFAULTS.tenureMonths));
+    setCyclesInput(toInputString(FIXED_DEPOSIT_DEFAULTS.cycles ?? 1));
+    setBreakEnabled(false);
+    setBreakInput("");
     setHasCalculated(false);
   }
 

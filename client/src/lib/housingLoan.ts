@@ -70,6 +70,20 @@ export const FIRST_HOME_EXEMPTION = {
 } as const;
 
 /**
+ * Whether the first-home exemption is still running on the given date.
+ *
+ * The relief covers agreements signed within a window, and the window closes at
+ * the end of the final day in Malaysian time. Without this check the calculator
+ * would carry on granting a lapsed exemption indefinitely, so a buyer using it
+ * after the expiry would be told they owe no duty when they do. An extension in a
+ * later Budget is a one-line edit to `FIRST_HOME_EXEMPTION.expires`.
+ */
+export function isFirstHomeExemptionActive(asOf: Date = new Date()): boolean {
+  const windowCloses = new Date(`${FIRST_HOME_EXEMPTION.expires}T23:59:59.999+08:00`);
+  return asOf.getTime() <= windowCloses.getTime();
+}
+
+/**
  * Flat transfer stamp duty for non-citizens and foreign companies, raised from
  * 4% in Budget 2026 and effective 1 January 2026. It replaces the tiers outright
  * rather than stacking on top of them. Permanent residents are excluded from this
@@ -182,9 +196,21 @@ export interface HousingLoanResult {
 
   /** Whether the first-home stamp duty exemption applies. */
   exempt: boolean;
+  /**
+   * True when the buyer would have qualified for the first-home exemption but the
+   * window has closed, so the UI can say why duty is being charged.
+   */
+  exemptionExpired: boolean;
 }
 
-export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResult {
+/**
+ * @param asOf The date the purchase is being assessed on. Defaults to now; passed
+ *   explicitly in tests so they do not depend on the real clock.
+ */
+export function calculateHousingLoan(
+  input: HousingLoanInputs,
+  asOf: Date = new Date(),
+): HousingLoanResult {
   const price = Math.max(0, input.price);
   const marginPct = Math.max(0, Math.min(100, input.marginPct));
   const rate = Math.max(0, input.rate);
@@ -199,10 +225,13 @@ export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResul
   const term = Math.max(1, Math.round(Math.max(0, input.tenureYears) * 12));
 
   // The exemption is restricted to Malaysian citizens buying their first home.
-  const exempt =
+  const qualifies =
     input.buyerType === "citizen" &&
     input.firstHome === "yes" &&
     price <= FIRST_HOME_EXEMPTION.maxPrice;
+  const windowOpen = isFirstHomeExemptionActive(asOf);
+  const exempt = qualifies && windowOpen;
+  const exemptionExpired = qualifies && !windowOpen;
 
   const grossMot =
     input.buyerType === "foreigner" ? price * FOREIGN_BUYER_MOT_RATE : motStampDuty(price);
@@ -269,6 +298,7 @@ export function calculateHousingLoan(input: HousingLoanInputs): HousingLoanResul
     rebateSurplus,
 
     exempt,
+    exemptionExpired,
   };
 }
 

@@ -12,6 +12,7 @@ import { recordServerEvent, track } from "@/lib/analytics";
 import {
   calculateHousingLoan,
   HOUSING_LOAN_DEFAULTS,
+  isFirstHomeExemptionActive,
   type BuyerType,
   type HousingLoanInputs,
 } from "@/lib/housingLoan";
@@ -432,7 +433,9 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                     <option value="no">{t("common.no")}</option>
                     <option value="yes">{t("common.yes")}</option>
                   </select>
-                  <span className="text-xs text-muted-foreground">{t("housing.firstHome.eligibility")}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {isFirstHomeExemptionActive() ? t("housing.firstHome.eligibility") : t("housing.exemptionExpired")}
+                  </span>
                 </label>
               )}
 
@@ -593,11 +596,13 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                         helper={
                           result.exempt
                             ? t("housing.exempt")
-                            : result.motAbsorbed > 0
-                              ? `${t("housing.motAbsorbed")}: ${money(result.motAbsorbed)} ${t("housing.of")} ${money(result.motDuty)}`
-                              : buyerType === "foreigner"
-                                ? t("housing.foreignRate")
-                                : t("housing.motStampDuty.hint")
+                            : result.exemptionExpired
+                              ? t("housing.exemptionExpired")
+                              : result.motAbsorbed > 0
+                                ? `${t("housing.motAbsorbed")}: ${money(result.motAbsorbed)} ${t("housing.of")} ${money(result.motDuty)}`
+                                : buyerType === "foreigner"
+                                  ? t("housing.foreignRate")
+                                  : t("housing.motStampDuty.hint")
                         }
                         waivedLabel={t("housing.coveredByDeveloper")}
                       />
@@ -605,7 +610,13 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                         label={t("housing.loanStampDuty")}
                         gross={result.loanDuty}
                         payable={result.payableLoanDuty}
-                        helper={result.exempt ? t("housing.exempt") : t("housing.loanStampDuty.hint")}
+                        helper={
+                          result.exempt
+                            ? t("housing.exempt")
+                            : result.exemptionExpired
+                              ? t("housing.exemptionExpired")
+                              : t("housing.loanStampDuty.hint")
+                        }
                       />
                       <CostRow
                         label={t("housing.legalFees")}

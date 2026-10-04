@@ -1417,6 +1417,11 @@ const translations = {
     ms: "Pengecualian penuh sehingga RM500,000, dilanjutkan hingga 31 Dis 2027. Warganegara Malaysia sahaja, dan anda tidak pernah memiliki hartanah kediaman.",
     id: "Pembebasan penuh hingga RM500.000, diperpanjang sampai 31 Des 2027. Hanya warga negara Malaysia, dan Anda belum pernah memiliki properti hunian.",
   },
+  "housing.exemptionExpired": {
+    en: "The first-home exemption ended on 31 Dec 2027, so normal stamp duty applies unless it has been extended.",
+    ms: "Pengecualian rumah pertama berakhir pada 31 Dis 2027, jadi duti setem biasa dikenakan kecuali ia dilanjutkan.",
+    id: "Pembebasan rumah pertama berakhir pada 31 Des 2027, jadi bea meterai biasa berlaku kecuali diperpanjang.",
+  },
   "housing.developerPackage": { en: "Developer package", ms: "Pakej pemaju", id: "Paket pengembang" },
   "housing.developerPackage.hint": { en: "Common on new launches. Leave off for a sub-sale.", ms: "Biasa untuk pelancaran baharu. Biarkan mati untuk sub-jual.", id: "Umum pada peluncuran baru. Biarkan mati untuk rumah second." },
   "housing.inputs.rebate": { en: "Developer rebate", ms: "Rebat pemaju", id: "Rabat pengembang" },

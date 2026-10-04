@@ -172,6 +172,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
     employerRateOverride,
     voluntaryAnnual,
     bonusMonths,
+    workerType,
     locale,
   ]);
 
@@ -183,7 +184,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
   }, [
     currentAge, retirementAge, currentBalance, monthlySalary,
     salaryGrowthRate, dividendRate, employeeRate, employerRateOverride,
-    voluntaryAnnual, bonusMonths,
+    voluntaryAnnual, bonusMonths, workerType,
   ]);
 
   useUrlSync(parsedInputs, EPF_URL_SCHEMA);

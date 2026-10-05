@@ -1829,6 +1829,47 @@ const translations = {
     ms: "Amalan biasa bank: tiada sebelum tiga bulan penuh, kemudian kira-kira separuh kadar kontrak. Terma berbeza mengikut bank, jadi semak kontrak anda.",
     id: "Praktik umum bank: tidak ada sebelum tiga bulan penuh, lalu sekitar setengah tarif kontrak. Ketentuan berbeda per bank, jadi periksa kontrak Anda.",
   },
+
+  // ── Currency converter ───────────────────────────────────────────
+  "nav.currency": { en: "Currency Converter", ms: "Penukar Mata Wang", id: "Konverter Mata Uang" },
+  "tools.currency-converter.name": { en: "Currency Converter (MYR & 16 more)", ms: "Penukar Mata Wang (MYR & 16 lagi)", id: "Konverter Mata Uang (MYR & 16 lainnya)" },
+  "tools.currency-converter.desc": {
+    en: "Convert ringgit, US dollars, Singapore dollars, rupiah and more at the latest exchange rates.",
+    ms: "Tukar ringgit, dolar AS, dolar Singapura, rupiah dan lagi pada kadar pertukaran terkini.",
+    id: "Konversi ringgit, dolar AS, dolar Singapura, rupiah, dan lainnya dengan kurs terbaru.",
+  },
+  "tools.currency-converter.badge": { en: "New", ms: "Baharu", id: "Baru" },
+  "currency.title": { en: "Currency Converter", ms: "Penukar Mata Wang", id: "Konverter Mata Uang" },
+  "currency.subtitle": {
+    en: "Convert ringgit, US dollars, Singapore dollars and 14 more currencies at the latest reference rates.",
+    ms: "Tukar ringgit, dolar AS, dolar Singapura dan 14 mata wang lain pada kadar rujukan terkini.",
+    id: "Konversi ringgit, dolar AS, dolar Singapura, dan 14 mata uang lain dengan kurs referensi terbaru.",
+  },
+  "currency.badge.rates": { en: "ECB reference rates", ms: "Kadar rujukan ECB", id: "Kurs referensi ECB" },
+  "currency.badge.private": { en: "Runs in your browser", ms: "Berjalan dalam pelayar anda", id: "Berjalan di browser Anda" },
+  "currency.inputs.title": { en: "Convert an amount", ms: "Tukar jumlah", id: "Konversi jumlah" },
+  "currency.inputs.subtitle": { en: "The result updates as you type.", ms: "Hasil dikemas kini semasa anda menaip.", id: "Hasil diperbarui saat Anda mengetik." },
+  "currency.amount": { en: "Amount", ms: "Jumlah", id: "Jumlah" },
+  "currency.from": { en: "From", ms: "Dari", id: "Dari" },
+  "currency.to": { en: "To", ms: "Ke", id: "Ke" },
+  "currency.swap": { en: "Swap currencies", ms: "Tukar mata wang", id: "Tukar mata uang" },
+  "currency.result": { en: "Converted amount", ms: "Jumlah ditukar", id: "Jumlah terkonversi" },
+  "currency.rate": { en: "Exchange rate", ms: "Kadar pertukaran", id: "Kurs" },
+  "currency.status.loading": { en: "Fetching the latest rates…", ms: "Mengambil kadar terkini…", id: "Mengambil kurs terbaru…" },
+  "currency.status.live": { en: "Reference rates for {date}", ms: "Kadar rujukan untuk {date}", id: "Kurs referensi untuk {date}" },
+  "currency.status.fallback": {
+    en: "Couldn't load live rates — showing saved rates from {date}.",
+    ms: "Tidak dapat memuatkan kadar langsung — memaparkan kadar tersimpan dari {date}.",
+    id: "Tidak dapat memuat kurs langsung — menampilkan kurs tersimpan dari {date}.",
+  },
+  "currency.quick.title": { en: "Quick conversion table", ms: "Jadual penukaran pantas", id: "Tabel konversi cepat" },
+  "currency.popular.title": { en: "Popular conversions", ms: "Penukaran popular", id: "Konversi populer" },
+  "currency.popular.all": { en: "All currency converters", ms: "Semua penukar mata wang", id: "Semua konverter mata uang" },
+  "currency.disclaimer": {
+    en: "Mid-market reference rates from the European Central Bank, published once per working day. Banks and money changers add a margin or fees, so the rate you actually get will usually be a little lower.",
+    ms: "Kadar rujukan pasaran pertengahan daripada Bank Pusat Eropah, diterbitkan sekali setiap hari bekerja. Bank dan pengurup wang menambah margin atau yuran, jadi kadar sebenar yang anda dapat biasanya lebih rendah sedikit.",
+    id: "Kurs referensi pasar tengah dari Bank Sentral Eropa, diterbitkan sekali setiap hari kerja. Bank dan pedagang valuta asing menambahkan margin atau biaya, jadi kurs yang sebenarnya Anda dapat biasanya sedikit lebih rendah.",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

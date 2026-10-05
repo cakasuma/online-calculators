@@ -28,6 +28,7 @@ export const CALCULATOR_KEYS = [
   "bmi",
   "carloan",
   "fd",
+  "currency",
 ] as const;
 
 export const LEAD_INTENTS = [

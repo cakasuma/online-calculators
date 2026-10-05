@@ -4,7 +4,7 @@ ToolHub MY is a mobile-first utility tools web app built with Vite + React + wou
 
 ## Current Tool Categories
 
-- **Finance:** Malaysia Salary Calculator
+- **Finance:** Malaysia Salary Calculator, Currency Converter (MYR + 16 currencies, 46 prerendered pair pages like `/en/currency-converter/usd-to-myr`)
 - **Math:** Basic Calculator, Scientific Calculator
 - **Islamic:** Faraid Calculator, Zakat Calculator
 - **Documents:** Wasiat Guide
@@ -71,6 +71,16 @@ Supabase is plain Postgres + a built-in table editor, so it works with the exist
 Notes:
 - Tables created by `drizzle-kit push` are owned by the `postgres` role, so RLS is irrelevant — only your server connects with that role; the client never talks to Supabase directly.
 - If you later add a public-readable `/admin/leads` page, gate it with basic auth or a session check; do **not** expose the Supabase anon key from the client.
+
+## Currency converter & FX rates
+
+The converter (`/currency-converter`, plus a prerendered landing page per pair such as `/currency-converter/usd-to-myr` in en/ms/id) reads ECB reference rates from the free [Frankfurter](https://frankfurter.dev) API in the browser, with no API key. A dated snapshot in `client/src/lib/currency.ts` is the offline fallback and the source of the numbers in prerendered HTML. Refresh it before deploying:
+
+```bash
+npx tsx script/update-fx-rates.ts && npx tsx script/generate-sitemap.ts
+```
+
+Add or remove pairs in `client/src/config/currencyPairs.ts`; routes, copy, sitemap entries and OG images are generated from that list.
 
 ## Production Build
 

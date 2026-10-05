@@ -1,4 +1,5 @@
 import {
+  ArrowLeftRight,
   Banknote,
   Calculator,
   Car,
@@ -96,6 +97,16 @@ export const tools: ToolMeta[] = [
     badge: "New",
   },
   {
+    slug: "currency-converter",
+    href: "/currency-converter",
+    name: "Currency Converter (MYR & 16 more)",
+    description: "Convert ringgit, US dollars, Singapore dollars, rupiah and more at the latest exchange rates.",
+    category: "Finance",
+    icon: ArrowLeftRight,
+    featured: true,
+    badge: "New",
+  },
+  {
     slug: "normal-calculator",
     href: "/normal",
     name: "Basic Calculator",
@@ -154,6 +165,7 @@ export const navTools = [
   "/income-tax",
   "/car-loan",
   "/fixed-deposit",
+  "/currency-converter",
   "/normal",
   "/scientific",
   "/faraid",

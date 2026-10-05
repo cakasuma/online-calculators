@@ -29,6 +29,7 @@ import {
   HeartPulse,
   Car,
   Banknote,
+  ArrowLeftRight,
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -45,6 +46,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toolBrand } from "@/config/tools";
+import { parsePairParam, pairSlug } from "@/config/currencyPairs";
 import { initAnalytics, track } from "@/lib/analytics";
 
 import HomePage from "@/pages/Home";
@@ -60,6 +62,7 @@ import IncomeTaxCalculator from "@/pages/IncomeTaxCalculator";
 import CarLoanCalculator from "@/pages/CarLoanCalculator";
 import FixedDepositCalculator from "@/pages/FixedDepositCalculator";
 import BmiCalculator from "@/pages/BmiCalculator";
+import CurrencyConverter from "@/pages/CurrencyConverter";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfUse from "@/pages/TermsOfUse";
 import Blog from "@/pages/Blog";
@@ -82,6 +85,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/income-tax", labelKey: "nav.tax", icon: Receipt },
       { href: "/car-loan", labelKey: "nav.carloan", icon: Car },
       { href: "/fixed-deposit", labelKey: "nav.fd", icon: Banknote },
+      { href: "/currency-converter", labelKey: "nav.currency", icon: ArrowLeftRight },
     ],
   },
   {
@@ -121,6 +125,19 @@ const FOOTER_LEARN_LINKS: FooterLink[] = [
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
 const adsenseSlotTop = import.meta.env.VITE_ADSENSE_SLOT_TOP?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
+
+/** Renders one prerendered currency-pair landing page (/currency-converter/usd-to-myr). */
+function CurrencyPairRoute({ pair, onCalculate }: { pair?: string; onCalculate: (e: string, r: string, u?: string) => void }) {
+  const parsed = parsePairParam(pair);
+  if (!parsed) return <PageContainer><NotFound /></PageContainer>;
+  const [from, to] = parsed;
+  return (
+    <>
+      <CurrencyConverter key={`${from}-${to}`} from={from} to={to} onCalculate={onCalculate} />
+      <CalculatorContent slug={pairSlug(from, to)} />
+    </>
+  );
+}
 
 /** Padded, centred wrapper for pages that are NOT full-bleed redesigns
  *  (static/legal pages, 404). Restores the old contained layout now that
@@ -228,7 +245,7 @@ function Layout() {
   }, [adsenseEnabled]);
 
   const handleCalculate = useCallback(
-    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf" | "housing" | "tax" | "bmi" | "carloan" | "fd") =>
+    (calculator: "normal" | "scientific" | "faraid" | "salary" | "zakat" | "epf" | "housing" | "tax" | "bmi" | "carloan" | "fd" | "currency") =>
       (expression: string, result: string, url?: string) => {
         history.add(calculator, expression, result, url);
       },
@@ -414,6 +431,13 @@ function Layout() {
           <Route path="/fixed-deposit">
             <FixedDepositCalculator onCalculate={handleCalculate("fd")} />
             <CalculatorContent slug="fd" />
+          </Route>
+          <Route path="/currency-converter">
+            <CurrencyConverter onCalculate={handleCalculate("currency")} />
+            <CalculatorContent slug="currency" />
+          </Route>
+          <Route path="/currency-converter/:pair">
+            {(params) => <CurrencyPairRoute pair={params.pair} onCalculate={handleCalculate("currency")} />}
           </Route>
           <Route path="/bmi">
             <BmiCalculator onCalculate={handleCalculate("bmi")} />

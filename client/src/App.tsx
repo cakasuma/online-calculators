@@ -79,22 +79,19 @@ type NavGroup = { labelKey: TranslationKey; items: NavItem[] };
 // these surfaces stay in sync — add a calculator here and it shows everywhere.
 const NAV_GROUPS: NavGroup[] = [
   {
-    labelKey: "nav.groupFinance",
+    labelKey: "nav.groupTakeHome",
     items: [
       { href: "/salary", labelKey: "nav.salary", icon: Wallet },
-      { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
-      { href: "/housing-loan", labelKey: "nav.housing", icon: Landmark },
       { href: "/income-tax", labelKey: "nav.tax", icon: Receipt },
-      { href: "/car-loan", labelKey: "nav.carloan", icon: Car },
-      { href: "/fixed-deposit", labelKey: "nav.fd", icon: Banknote },
-      { href: "/currency-converter", labelKey: "nav.currency", icon: ArrowLeftRight },
+      { href: "/epf-retirement", labelKey: "nav.epf", icon: PiggyBank },
     ],
   },
   {
-    labelKey: "nav.groupMath",
+    labelKey: "nav.groupLoans",
     items: [
-      { href: "/normal", labelKey: "nav.basic", icon: Calculator },
-      { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
+      { href: "/housing-loan", labelKey: "nav.housing", icon: Landmark },
+      { href: "/car-loan", labelKey: "nav.carloan", icon: Car },
+      { href: "/fixed-deposit", labelKey: "nav.fd", icon: Banknote },
     ],
   },
   {
@@ -106,9 +103,12 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    labelKey: "nav.groupHealth",
+    labelKey: "nav.groupMore",
     items: [
+      { href: "/normal", labelKey: "nav.basic", icon: Calculator },
+      { href: "/scientific", labelKey: "nav.scientific", icon: FlaskConical },
       { href: "/bmi", labelKey: "nav.bmi", icon: HeartPulse },
+      { href: "/currency-converter", labelKey: "nav.currency", icon: ArrowLeftRight },
     ],
   },
 ];
@@ -520,8 +520,8 @@ function Layout() {
           {([
             { href: "/", icon: HomeIcon, labelKey: "nav.home" as TranslationKey },
             { href: "/salary", icon: Wallet, labelKey: "nav.salary" as TranslationKey },
-            { href: "/faraid", icon: Scale, labelKey: "nav.faraid" as TranslationKey },
-            { href: "/normal", icon: Calculator, labelKey: "nav.basic" as TranslationKey },
+            { href: "/income-tax", icon: Receipt, labelKey: "nav.tax" as TranslationKey },
+            { href: "/epf-retirement", icon: PiggyBank, labelKey: "nav.epf" as TranslationKey },
           ] as { href: string; icon: typeof HomeIcon; labelKey: TranslationKey }[]).map(({ href, icon: Icon, labelKey }) => {
             const isActive = location === href;
             return (

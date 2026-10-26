@@ -29,6 +29,10 @@
   ],
   "headers": [
     {
+      "source": "/:locale(en|ms|id)/currency-converter/:pair",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, follow" }]
+    },
+    {
       "source": "/embed/(.*)",
       "headers": [
         { "key": "X-Frame-Options", "value": "ALLOWALL" },

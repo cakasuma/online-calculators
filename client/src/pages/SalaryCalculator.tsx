@@ -12,6 +12,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { SalaryPercentile } from "@/components/SalaryPercentile";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
+  boolField,
   buildShareUrl,
   enumField,
   mergeFromUrl,
@@ -23,7 +24,9 @@ import {
 } from "@/lib/urlState";
 import { downloadSalaryPdf } from "@/lib/pdf/salaryPdf";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
-import { calculateSalary } from "@/lib/malaysianPayroll";
+import { calculateSalary, FOREIGN_EPF_RATE } from "@/lib/malaysianPayroll";
+import { RatesVerified } from "@/components/RatesVerified";
+import { WhatNext } from "@/components/WhatNext";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -35,6 +38,7 @@ interface SalaryInputs {
   epfRate: number;
   workerType: WorkerType;
   residentStatus: ResidentStatus;
+  includeSkbbk: boolean;
 }
 
 interface InputErrors {
@@ -51,6 +55,7 @@ const DEFAULT_INPUTS: SalaryInputs = {
   epfRate: 11,
   workerType: "malaysian",
   residentStatus: "resident",
+  includeSkbbk: true,
 };
 
 const money = (value: number) =>
@@ -156,6 +161,7 @@ interface SalaryUrlState {
   epfRate: number;
   workerType: WorkerType;
   residentStatus: ResidentStatus;
+  includeSkbbk: boolean;
 }
 
 const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
@@ -174,6 +180,7 @@ const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
   },
   workerType: enumField<SalaryUrlState, "workerType">("worker", ["malaysian", "foreigner"]),
   residentStatus: enumField<SalaryUrlState, "residentStatus">("res", ["resident", "non-resident"]),
+  includeSkbbk: boolField<SalaryUrlState, "includeSkbbk">("skbbk", true),
 };
 
 interface Props {
@@ -193,6 +200,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
         epfRate: DEFAULT_INPUTS.epfRate,
         workerType: DEFAULT_INPUTS.workerType,
         residentStatus: DEFAULT_INPUTS.residentStatus,
+        includeSkbbk: DEFAULT_INPUTS.includeSkbbk,
       },
       SALARY_URL_SCHEMA,
     ),
@@ -205,6 +213,16 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const [epfRateInput, setEpfRateInput] = useState(toInputString(initial.epfRate));
   const [workerType, setWorkerType] = useState<WorkerType>(initial.workerType);
   const [residentStatus, setResidentStatus] = useState<ResidentStatus>(initial.residentStatus);
+  const [includeSkbbk, setIncludeSkbbk] = useState(initial.includeSkbbk);
+  const [view, setView] = useState<"employee" | "employer">("employee");
+
+  function changeWorkerType(next: WorkerType) {
+    if (next === workerType) return;
+    setWorkerType(next);
+    // Foreign workers default to the mandatory 2% rate; locals back to 11%.
+    setEpfRateInput(String(next === "foreigner" ? FOREIGN_EPF_RATE : DEFAULT_INPUTS.epfRate));
+    track("salary_mode_toggle", { mode: "worker_type", value: next });
+  }
 
   const parsedInput = useMemo<SalaryInputs>(
     () => ({
@@ -214,8 +232,9 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
       epfRate: Math.max(0, parseNumberInput(epfRateInput) || 0),
       workerType,
       residentStatus,
+      includeSkbbk,
     }),
-    [monthlySalaryInput, annualBonusInput, otherReliefInput, epfRateInput, workerType, residentStatus],
+    [monthlySalaryInput, annualBonusInput, otherReliefInput, epfRateInput, workerType, residentStatus, includeSkbbk],
   );
 
   const errors = useMemo(() => validateInputs(parsedInput), [parsedInput]);
@@ -286,6 +305,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
     setEpfRateInput(toInputString(DEFAULT_INPUTS.epfRate));
     setWorkerType(DEFAULT_INPUTS.workerType);
     setResidentStatus(DEFAULT_INPUTS.residentStatus);
+    setIncludeSkbbk(DEFAULT_INPUTS.includeSkbbk);
+    setView("employee");
     setHasCalculated(false);
   }
 
@@ -373,7 +394,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 <span className="text-sm font-medium">{t("salary.inputs.workerType")}</span>
                 <select
                   value={workerType}
-                  onChange={(event) => setWorkerType(event.target.value as WorkerType)}
+                  onChange={(event) => changeWorkerType(event.target.value as WorkerType)}
                   className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="malaysian">{t("salary.inputs.workerType.malaysian")}</option>
@@ -392,6 +413,39 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 </select>
               </label>
             </div>
+
+            {workerType === "malaysian" ? (
+              <label className="flex items-start gap-3 rounded-2xl border bg-muted/30 p-3 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4"
+                  checked={includeSkbbk}
+                  onChange={(event) => {
+                    setIncludeSkbbk(event.target.checked);
+                    track("salary_mode_toggle", { mode: "skbbk", value: event.target.checked });
+                  }}
+                />
+                <span>
+                  <span className="block font-medium">{t("salary.skbbk.label")}</span>
+                  <span className="block text-xs text-muted-foreground">{t("salary.skbbk.hint")}</span>
+                </span>
+              </label>
+            ) : (
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-3 text-sm">
+                {t("salary.foreign.note")}
+              </div>
+            )}
+
+            {workerType === "malaysian" && locale === "id" ? (
+              <button
+                type="button"
+                className="w-full rounded-2xl border border-primary/30 bg-primary/5 p-3 text-left text-sm hover:bg-primary/10"
+                onClick={() => changeWorkerType("foreigner")}
+              >
+                <span className="block">{t("salary.foreign.banner")}</span>
+                <span className="mt-1 block font-semibold text-primary">{t("salary.foreign.apply")} →</span>
+              </button>
+            ) : null}
 
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
               <div className="flex gap-2">
@@ -461,6 +515,9 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 [t("salary.taxMonth"), result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
                 [t("salary.socsoMonth"), result.monthlySocso, percent(monthlySocsoRate), Info],
                 [t("salary.eisMonth"), result.monthlyEis, percent(monthlyEisRate), Info],
+                ...(result.monthlySkbbk > 0
+                  ? ([[t("salary.skbbkMonth"), result.monthlySkbbk, percent((result.monthlySkbbk / parsedInput.monthlySalary) * 100), Info]] as [string, number, string, typeof Wallet][])
+                  : []),
               ] as [string, number, string, typeof Wallet][]).map(([label, value, tooltipInfo, Icon]) => (
                 <Card key={label} className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
                   <CardContent className="p-4 sm:p-5">
@@ -480,6 +537,56 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             </div>
           )}
 
+          {showResults && (
+            <div className="inline-flex rounded-2xl border bg-muted/40 p-1 text-sm" role="tablist">
+              {(["employee", "employer"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  role="tab"
+                  aria-selected={view === v}
+                  onClick={() => {
+                    setView(v);
+                    track("salary_view_toggle", { view: v });
+                  }}
+                  className={`rounded-xl px-4 py-1.5 font-medium transition ${view === v ? "bg-background shadow-sm" : "text-muted-foreground"}`}
+                >
+                  {t(v === "employee" ? "salary.view.employee" : "salary.view.employer")}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {showResults && view === "employer" && (
+            <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0" data-testid="employer-cost">
+              <CardContent className="space-y-3 p-4 sm:p-6">
+                <div>
+                  <h2 className="text-xl font-semibold">{t("salary.employer.title")}</h2>
+                  <p className="text-sm text-muted-foreground">{t("salary.employer.subtitle")}</p>
+                </div>
+                {([
+                  [t("salary.employer.gross"), parsedInput.monthlySalary],
+                  [t("salary.employer.epf").replace("{rate}", String(result.employerEpfPct)), result.monthlyEmployerEpf],
+                  [t("salary.employer.socso"), result.monthlyEmployerSocso],
+                  ...(result.monthlyEmployerEis > 0 ? [[t("salary.employer.eis"), result.monthlyEmployerEis]] : []),
+                ] as [string, number][]).map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between gap-3 rounded-2xl bg-muted/50 px-4 py-3">
+                    <span className="text-sm text-muted-foreground">{label}</span>
+                    <span className="font-semibold tabular-nums">{money(value)}</span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between gap-3 rounded-2xl bg-primary/10 px-4 py-3">
+                  <span className="text-sm font-medium">{t("salary.employer.total")}</span>
+                  <span className="text-lg font-bold tabular-nums">{money(result.monthlyEmployerCost)}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3 px-1 text-sm text-muted-foreground">
+                  <span>{t("salary.employer.annual")}</span>
+                  <span className="font-semibold tabular-nums">{money(result.annualEmployerCost)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {showResults && <SalaryPercentile monthlyGross={parsedInput.monthlySalary} />}
 
           {showResults && (
@@ -488,8 +595,10 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               intent="newsletter"
               source="salary-tax-tips"
               icon={<Sparkles className="w-4 h-4 text-primary" />}
-              title={t("salary.lead.title")}
-              description={t("salary.lead.desc")}
+              title={t("salary.lead.title.result").replace("{net}", Math.round(result.monthlyNet).toLocaleString("en-MY"))}
+              description={t("salary.lead.desc.result")
+                .replace("{gross}", Math.round(parsedInput.monthlySalary).toLocaleString("en-MY"))
+                .replace("{tax}", Math.round(result.annualIncomeTax).toLocaleString("en-MY"))}
               ctaLabel={t("salary.lead.cta")}
               successTitle={t("salary.lead.successTitle")}
               successMessage={t("salary.lead.successDesc")}
@@ -564,6 +673,32 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </CardContent>
             </Card>
           )}
+
+          {showResults && (
+            <WhatNext
+              from="salary"
+              items={[
+                {
+                  target: "income-tax",
+                  href: `/income-tax?${new URLSearchParams({
+                    income: String(Math.round(result.annualGross)),
+                    epf: String(Math.round(Math.min(result.annualEpf, 4000))),
+                    socso: String(Math.round(Math.min(result.annualSocso + result.annualEis, 350))),
+                  }).toString()}`,
+                  title: t("whatnext.salary.tax.title"),
+                  description: t("whatnext.salary.tax.desc"),
+                },
+                {
+                  target: "epf-retirement",
+                  href: `/epf-retirement?sal=${Math.round(parsedInput.monthlySalary)}&emp=${parsedInput.epfRate}`,
+                  title: t("whatnext.salary.epf.title"),
+                  description: t("whatnext.salary.epf.desc"),
+                },
+              ]}
+            />
+          )}
+
+          <RatesVerified sources={["kwsp", "perkeso", "lhdn"]} />
 
           {showResults && <RelatedToolsCard currentHref="/salary" />}
         </div>

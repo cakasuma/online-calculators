@@ -61,32 +61,32 @@ export const routes: RouteSeoEntry[] = [
     sitemap: { priority: 1.0, changefreq: "weekly" },
     copy: {
       en: {
-        title: "Online Calculators for Malaysia | HelloKalku",
+        title: "Malaysia Take-Home Pay Calculator: Salary, Tax & EPF | HelloKalku",
         description:
-          "Free Malaysia-focused calculators for salary (EPF, SOCSO, EIS, PCB), zakat, faraid inheritance, and wasiat planning. Fast, private, mobile-friendly.",
+          "Find your real take-home pay in Malaysia after EPF, SOCSO, EIS, SKBBK and PCB, then plan your income tax and EPF retirement. Also zakat, faraid and loan tools. Free and private.",
         keywords:
-          "online calculator malaysia, salary calculator, zakat calculator, faraid calculator, epf calculator",
-        heading: "Online calculators built for Malaysia",
-        tagline: "Salary, tax, zakat, faraid, and planning tools — free and bilingual.",
+          "malaysia take home pay calculator, salary calculator malaysia, pcb calculator, epf calculator, income tax calculator malaysia",
+        heading: "What is your real take-home pay in Malaysia?",
+        tagline: "Salary, income tax and EPF in one journey, with zakat, faraid and loan tools alongside.",
       },
       
       ms: {
-        title: "Kalkulator Online untuk Malaysia | HelloKalku",
+        title: "Kalkulator Gaji Bersih Malaysia: Gaji, Cukai & EPF | HelloKalku",
         description:
-          "Kalkulator percuma fokus Malaysia: gaji (EPF, SOCSO, EIS, PCB), zakat, faraid, dan perancangan wasiat. Pantas, tepat, dan mesra mudah alih.",
+          "Ketahui gaji bersih sebenar anda di Malaysia selepas EPF, SOCSO, SIP, SKBBK dan PCB, kemudian rancang cukai pendapatan dan EPF. Juga zakat, faraid dan alat pinjaman. Percuma dan peribadi.",
         keywords:
-          "kalkulator online malaysia, kalkulator gaji, kalkulator zakat, kalkulator faraid",
-        heading: "Kalkulator online untuk Malaysia",
-        tagline: "Gaji, cukai, zakat, faraid, dan perancangan — percuma dan dwibahasa.",
+          "kalkulator gaji bersih malaysia, kalkulator gaji, kalkulator pcb, kalkulator epf, kalkulator cukai pendapatan",
+        heading: "Berapa gaji bersih sebenar anda di Malaysia?",
+        tagline: "Gaji, cukai pendapatan dan EPF dalam satu perjalanan, bersama alat zakat, faraid dan pinjaman.",
       },
       id: {
-        title: "Kalkulator Gratis untuk Malaysia | HelloKalku",
+        title: "Kalkulator Gaji Bersih Malaysia: Gaji, Pajak & EPF | HelloKalku",
         description:
-          "Kalkulator gratis fokus Malaysia: gaji (EPF, SOCSO, EIS, PCB), zakat, faraid, dan perencanaan wasiat. Cepat, akurat, dan ramah mobile.",
+          "Ketahui gaji bersih sebenarnya di Malaysia setelah EPF, SOCSO, EIS, SKBBK, dan PCB, lalu rencanakan pajak penghasilan dan EPF. Juga zakat, faraid, dan alat pinjaman. Gratis dan privat.",
         keywords:
-          "kalkulator online malaysia, kalkulator gaji, kalkulator zakat, kalkulator faraid",
-        heading: "Kalkulator online untuk Malaysia",
-        tagline: "Gaji, pajak, zakat, faraid, dan perencanaan — gratis dan dwibahasa.",
+          "kalkulator gaji bersih malaysia, kalkulator gaji, kalkulator pcb, kalkulator epf, kalkulator pajak penghasilan",
+        heading: "Berapa gaji bersih sebenarnya di Malaysia?",
+        tagline: "Gaji, pajak penghasilan, dan EPF dalam satu alur, bersama alat zakat, faraid, dan pinjaman.",
       },
     },
   },

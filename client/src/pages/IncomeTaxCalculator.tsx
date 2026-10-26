@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
+import { RatesVerified } from "@/components/RatesVerified";
+import { WhatNext } from "@/components/WhatNext";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { recordServerEvent, track } from "@/lib/analytics";
@@ -746,9 +748,28 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                   </CardContent>
                 </Card>
 
+                <WhatNext
+                  from="income-tax"
+                  items={[
+                    {
+                      target: "salary",
+                      href: `/salary?gross=${Math.round(parsed.annualIncome / 12)}`,
+                      title: t("whatnext.tax.salary.title"),
+                      description: t("whatnext.tax.salary.desc"),
+                    },
+                    {
+                      target: "epf-retirement",
+                      href: `/epf-retirement?sal=${Math.round(parsed.annualIncome / 12)}`,
+                      title: t("whatnext.tax.epf.title"),
+                      description: t("whatnext.tax.epf.desc"),
+                    },
+                  ]}
+                />
+
                 <RelatedToolsCard currentHref="/income-tax" />
               </>
             )}
+            <RatesVerified sources={["lhdn", "kwsp", "perkeso"]} />
           </div>
         </div>
       </div>

@@ -160,18 +160,18 @@ export const tools: ToolMeta[] = [
 
 export const navTools = [
   "/salary",
+  "/income-tax",
   "/epf-retirement",
   "/housing-loan",
-  "/income-tax",
   "/car-loan",
   "/fixed-deposit",
-  "/currency-converter",
+  "/zakat",
+  "/faraid",
+  "/wasiat",
   "/normal",
   "/scientific",
-  "/faraid",
-  "/zakat",
-  "/wasiat",
   "/bmi",
+  "/currency-converter",
 ];
 
 export const toolBrand = {

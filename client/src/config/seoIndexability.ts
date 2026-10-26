@@ -85,5 +85,7 @@ export function routeVisibleWordCount(route: RouteSeoEntry, locale: Locale): num
 }
 
 export function isRouteIndexable(route: RouteSeoEntry, locale: Locale): boolean {
+  // Currency pair pages are thin and auto-generated: keep them reachable but out of the index.
+  if (route.slug.startsWith("fx-")) return false;
   return routeVisibleWordCount(route, locale) >= MIN_INDEXABLE_WORDS;
 }

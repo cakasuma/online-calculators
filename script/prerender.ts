@@ -15,8 +15,9 @@ import { fileURLToPath } from "node:url";
 import { routes, SITE_ORIGIN, canonicalUrl, type RouteSeoEntry } from "../client/src/config/seo";
 import { calculatorContent, type CalculatorContent } from "../client/src/config/content";
 import { blogArticles, type BlogArticle as BlogEntry } from "../client/src/config/blog";
-import { CONTACT_EMAIL, OPERATOR_URL, companyPages, privacySections, termsSections } from "../client/src/config/legal";
+import { CONTACT_EMAIL, ISSUES_URL, OPERATOR_URL, companyPages, privacySections, termsSections } from "../client/src/config/legal";
 import { tools } from "../client/src/config/tools";
+import { RATES_VERIFIED_DATE, RATE_SOURCES } from "../client/src/lib/sources";
 import { isRouteIndexable, routeVisibleWordCount } from "../client/src/config/seoIndexability";
 import type { Locale } from "../client/src/lib/i18n";
 
@@ -189,9 +190,26 @@ function buildJsonLd(route: RouteSeoEntry, locale: Locale, content: CalculatorCo
     .join("\n");
 }
 
+const TOOL_LINK_GROUPS: { heading: string; hrefs: string[] }[] = [
+  { heading: "Take-home pay, tax and EPF", hrefs: ["/salary", "/income-tax", "/epf-retirement"] },
+  { heading: "Loans and savings", hrefs: ["/housing-loan", "/car-loan", "/fixed-deposit"] },
+  { heading: "Islamic finance", hrefs: ["/zakat", "/faraid", "/wasiat"] },
+  { heading: "More tools", hrefs: ["/normal", "/scientific", "/bmi", "/currency-converter"] },
+];
+
+function renderToolGroups(locale: Locale): string {
+  return TOOL_LINK_GROUPS.map((group) => {
+    const links = group.hrefs
+      .map((href) => tools.find((tool) => tool.href === href))
+      .filter((tool): tool is (typeof tools)[number] => Boolean(tool))
+      .map((tool) => `
+        <li><a href="/${locale}${tool.href}">${escapeHtml(tool.name)}</a></li>`)
+      .join("");
+    return `<h2>${group.heading}</h2><ul>${links}</ul>`;
+  }).join("\n        ");
+}
+
 function renderSharedLinks(locale: Locale): string {
-  const toolLinks = tools.map((tool) => `
-        <li><a href="/${locale}${tool.href}">${escapeHtml(tool.name)}</a></li>`).join("");
   const blogLinks = blogArticles.map((article) => `
         <li><a href="/en/blog/${article.slug}">${escapeHtml(article.title)}</a></li>`).join("");
   const localeLinks = LOCALES.map((alt) => {
@@ -201,7 +219,7 @@ function renderSharedLinks(locale: Locale): string {
 
   return `
       <nav aria-label="Calculators and site information">
-        <h2>Free calculators</h2><ul>${toolLinks}</ul>
+        ${renderToolGroups(locale)}
         <h2>Guides</h2><ul>${blogLinks}</ul>
         <h2>About HelloKalku</h2>
         <p><a href="/${locale}/about">About</a> · <a href="/${locale}/contact">Contact</a> · <a href="/${locale}/privacy">Privacy policy</a> · <a href="/${locale}/terms">Terms of use</a></p>
@@ -252,8 +270,15 @@ function renderContentBody(route: RouteSeoEntry, content: CalculatorContent | un
       <article>
         <h1>${escapeHtml(copy.heading ?? "")}</h1>
         <p>${escapeHtml(copy.tagline ?? "")} HelloKalku provides free, private tools for practical decisions and learning in Malaysia.</p>
-        <h2>Choose a calculator</h2>
-        <ul>${tools.map((tool) => `<li><a href="/${locale}${tool.href}">${escapeHtml(tool.name)}</a> — ${escapeHtml(tool.description)}</li>`).join("")}</ul>
+        <h2>From payslip to plan, in three steps</h2>
+        <ol>
+          <li><a href="/${locale}/salary">Salary calculator</a> — monthly pay after EPF, SOCSO, EIS, the new SKBBK deduction and PCB, with a foreign-worker mode and employer cost view.</li>
+          <li><a href="/${locale}/income-tax">Income tax calculator</a> — add reliefs to see your YA 2026 tax and monthly PCB.</li>
+          <li><a href="/${locale}/epf-retirement">EPF retirement calculator</a> — project your balance against the Basic Savings target.</li>
+        </ol>
+        <p>Rates were last verified on ${RATES_VERIFIED_DATE} against <a href="${RATE_SOURCES.kwsp.url}">KWSP</a>, <a href="${RATE_SOURCES.perkeso.url}">PERKESO</a> and <a href="${RATE_SOURCES.lhdn.url}">LHDN</a>. Built by Mustofa Amami — see our <a href="/${locale}/about">methodology</a>.</p>
+        <h2>Loans, savings and Islamic finance</h2>
+        <ul>${["/housing-loan", "/car-loan", "/fixed-deposit", "/zakat", "/faraid", "/wasiat"].map((href) => tools.find((tool) => tool.href === href)).filter((tool): tool is (typeof tools)[number] => Boolean(tool)).map((tool) => `<li><a href="/${locale}${tool.href}">${escapeHtml(tool.name)}</a> — ${escapeHtml(tool.description)}</li>`).join("")}</ul>
         <h2>Learn how the numbers work</h2>
         <ul>${blogArticles.map((article) => `<li><a href="/en/blog/${article.slug}">${escapeHtml(article.title)}</a> — ${escapeHtml(article.description)}</li>`).join("")}</ul>
       </article>`;
@@ -274,7 +299,7 @@ function renderContentBody(route: RouteSeoEntry, content: CalculatorContent | un
       <article>
         <h1>${escapeHtml(page.title)}</h1>
         ${page.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
-        <p><a href="${OPERATOR_URL}">amammustofa.com</a>${CONTACT_EMAIL ? ` · <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>` : ""}</p>
+        <p><a href="${OPERATOR_URL}">amammustofa.com</a> · <a href="${ISSUES_URL}">GitHub issues</a> · <a href="/${locale}/${route.slug === "about" ? "contact" : "about"}">${route.slug === "about" ? "Contact" : "About"}</a>${CONTACT_EMAIL ? ` · <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>` : ""}</p>
       </article>`;
   }
   if (!content) {

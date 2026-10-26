@@ -19,6 +19,8 @@ import { recordServerEvent, track } from "@/lib/analytics";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
+import { RatesVerified } from "@/components/RatesVerified";
+import { WhatNext } from "@/components/WhatNext";
 import {
   EPF_DEFAULTS,
   basicSavingsTargetAt,
@@ -724,6 +726,31 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </Card>
             </>
           )}
+
+          {projection && (
+            <WhatNext
+              from="epf-retirement"
+              items={[
+                {
+                  target: "salary",
+                  href: `/salary?gross=${Math.round(parsedInputs.monthlySalary)}&epf=${parsedInputs.employeeRate}`,
+                  title: t("whatnext.epf.salary.title"),
+                  description: t("whatnext.epf.salary.desc"),
+                },
+                {
+                  target: "income-tax",
+                  href: `/income-tax?${new URLSearchParams({
+                    income: String(Math.round(parsedInputs.monthlySalary * 12)),
+                    epf: String(Math.min(4000, Math.round(parsedInputs.monthlySalary * 12 * (parsedInputs.employeeRate / 100)))),
+                  }).toString()}`,
+                  title: t("whatnext.epf.tax.title"),
+                  description: t("whatnext.epf.tax.desc"),
+                },
+              ]}
+            />
+          )}
+
+          <RatesVerified sources={["kwsp", "lhdn"]} />
 
           <RelatedToolsCard currentHref="/epf-retirement" />
         </div>

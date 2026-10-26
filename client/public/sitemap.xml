@@ -102,15 +102,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/income-tax"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/income-tax"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/income-tax"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/ms/income-tax</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/income-tax"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/income-tax"/>
       <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/income-tax"/>
   </url>
   <url>
@@ -118,7 +109,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/income-tax"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/income-tax"/>
       <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/income-tax"/>
   </url>
   <url>
@@ -198,120 +188,30 @@
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/normal"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/normal"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/normal"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/ms/normal</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/normal"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/normal"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/normal"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/id/normal</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/normal"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/normal"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/normal"/>
   </url>
   <url>
     <loc>https://hellokalku.com/en/scientific</loc>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/scientific"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/scientific"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/scientific"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/ms/scientific</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/scientific"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/scientific"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/scientific"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/id/scientific</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/scientific"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/scientific"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/scientific"/>
   </url>
   <url>
     <loc>https://hellokalku.com/en/faraid</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/faraid"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/faraid"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/faraid"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/ms/faraid</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/faraid"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/faraid"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/faraid"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/id/faraid</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/faraid"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/faraid"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/faraid"/>
   </url>
   <url>
     <loc>https://hellokalku.com/en/zakat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/zakat"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/zakat"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/zakat"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/ms/zakat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/zakat"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/zakat"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/zakat"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/id/zakat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/zakat"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/zakat"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/zakat"/>
   </url>
   <url>
     <loc>https://hellokalku.com/en/wasiat</loc>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/wasiat"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/wasiat"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/wasiat"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/ms/wasiat</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/wasiat"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/wasiat"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/wasiat"/>
-  </url>
-  <url>
-    <loc>https://hellokalku.com/id/wasiat</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
-      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/wasiat"/>
-      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/wasiat"/>
-      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/wasiat"/>
   </url>
   <url>
     <loc>https://hellokalku.com/en/blog</loc>
@@ -384,6 +284,54 @@
       <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/terms"/>
       <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/terms"/>
       <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/terms"/>
+  </url>
+  <url>
+    <loc>https://hellokalku.com/en/about</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/about"/>
+      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/about"/>
+      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/about"/>
+  </url>
+  <url>
+    <loc>https://hellokalku.com/ms/about</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/about"/>
+      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/about"/>
+      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/about"/>
+  </url>
+  <url>
+    <loc>https://hellokalku.com/id/about</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/about"/>
+      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/about"/>
+      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/about"/>
+  </url>
+  <url>
+    <loc>https://hellokalku.com/en/contact</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/contact"/>
+      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/contact"/>
+      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/contact"/>
+  </url>
+  <url>
+    <loc>https://hellokalku.com/ms/contact</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/contact"/>
+      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/contact"/>
+      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/contact"/>
+  </url>
+  <url>
+    <loc>https://hellokalku.com/id/contact</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+      <xhtml:link rel="alternate" hreflang="en" href="https://hellokalku.com/en/contact"/>
+      <xhtml:link rel="alternate" hreflang="ms-MY" href="https://hellokalku.com/ms/contact"/>
+      <xhtml:link rel="alternate" hreflang="id-ID" href="https://hellokalku.com/id/contact"/>
   </url>
   <url>
     <loc>https://hellokalku.com/en/currency-converter</loc>

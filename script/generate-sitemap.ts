@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { routes, SITE_ORIGIN, canonicalUrl } from "../client/src/config/seo";
 import { blogArticles } from "../client/src/config/blog";
 import type { Locale } from "../client/src/lib/i18n";
+import { isRouteIndexable } from "../client/src/config/seoIndexability";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = path.resolve(__dirname, "../client/public/sitemap.xml");
@@ -31,7 +32,8 @@ for (const route of routes) {
   const priority = route.sitemap?.priority ?? 0.5;
   const changefreq = route.sitemap?.changefreq ?? "monthly";
   for (const locale of LOCALES) {
-    const alts = LOCALES.map(
+    if (!isRouteIndexable(route, locale)) continue;
+    const alts = LOCALES.filter((alt) => isRouteIndexable(route, alt)).map(
       (alt) => `      <xhtml:link rel="alternate" hreflang="${hreflang(alt)}" href="${canonicalUrl(alt, route.path)}"/>`,
     ).join("\n");
     urls.push(

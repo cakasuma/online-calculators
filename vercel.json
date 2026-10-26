@@ -6,18 +6,26 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/", "destination": "/en", "permanent": false },
-    { "source": "/salary", "destination": "/en/salary", "permanent": false },
-    { "source": "/normal", "destination": "/en/normal", "permanent": false },
-    { "source": "/scientific", "destination": "/en/scientific", "permanent": false },
-    { "source": "/faraid", "destination": "/en/faraid", "permanent": false },
-    { "source": "/zakat", "destination": "/en/zakat", "permanent": false },
-    { "source": "/wasiat", "destination": "/en/wasiat", "permanent": false },
-    { "source": "/privacy", "destination": "/en/privacy", "permanent": false },
-    { "source": "/terms", "destination": "/en/terms", "permanent": false }
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.hellokalku.com" }],
+      "destination": "https://hellokalku.com/:path*",
+      "permanent": true
+    },
+    { "source": "/", "destination": "/en", "permanent": true },
+    { "source": "/salary", "destination": "/en/salary", "permanent": true },
+    { "source": "/normal", "destination": "/en/normal", "permanent": true },
+    { "source": "/scientific", "destination": "/en/scientific", "permanent": true },
+    { "source": "/faraid", "destination": "/en/faraid", "permanent": true },
+    { "source": "/zakat", "destination": "/en/zakat", "permanent": true },
+    { "source": "/wasiat", "destination": "/en/wasiat", "permanent": true },
+    { "source": "/privacy", "destination": "/en/privacy", "permanent": true },
+    { "source": "/terms", "destination": "/en/terms", "permanent": true },
+    { "source": "/about", "destination": "/en/about", "permanent": true },
+    { "source": "/contact", "destination": "/en/contact", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/((?!.*\\.).*)", "destination": "/index.html" }
+    { "source": "/((?!404$)(?!.*\\.).*)", "destination": "/404" }
   ],
   "headers": [
     {

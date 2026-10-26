@@ -14,7 +14,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { routes, SITE_ORIGIN, canonicalUrl, type RouteSeoEntry } from "../client/src/config/seo";
 import { calculatorContent, type CalculatorContent } from "../client/src/config/content";
-import { blogArticles } from "../client/src/config/blog";
+import { blogArticles, type BlogArticle as BlogEntry } from "../client/src/config/blog";
+import { CONTACT_EMAIL, OPERATOR_URL, companyPages, privacySections, termsSections } from "../client/src/config/legal";
+import { tools } from "../client/src/config/tools";
+import { isRouteIndexable, routeVisibleWordCount } from "../client/src/config/seoIndexability";
 import type { Locale } from "../client/src/lib/i18n";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,12 +65,12 @@ function escapeHtml(input: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function buildMetaBlock(route: RouteSeoEntry, locale: Locale): string {
+function buildMetaBlock(route: RouteSeoEntry, locale: Locale, indexableLocales: Locale[]): string {
   const copy = route.copy[locale] ?? route.copy.en;
   const canonical = canonicalUrl(locale, route.path);
   const ogLocale = LOCALIZED_STRINGS[locale].ogLocale;
 
-  const altLinks = LOCALES.map((alt) => {
+  const altLinks = indexableLocales.map((alt) => {
     const hreflang = alt === "ms" ? "ms-MY" : alt === "id" ? "id-ID" : "en";
     return `    <link rel="alternate" hreflang="${hreflang}" href="${canonicalUrl(alt, route.path)}" />`;
   }).join("\n");
@@ -78,7 +81,7 @@ function buildMetaBlock(route: RouteSeoEntry, locale: Locale): string {
     copy.keywords ? `    <meta name="keywords" content="${escapeHtml(copy.keywords)}" />` : "",
     `    <link rel="canonical" href="${canonical}" />`,
     altLinks,
-    `    <link rel="alternate" hreflang="x-default" href="${canonicalUrl("en", route.path)}" />`,
+    indexableLocales.includes("en") ? `    <link rel="alternate" hreflang="x-default" href="${canonicalUrl("en", route.path)}" />` : "",
     `    <meta property="og:type" content="${route.slug === "home" ? "website" : "article"}" />`,
     `    <meta property="og:title" content="${escapeHtml(copy.title)}" />`,
     `    <meta property="og:description" content="${escapeHtml(copy.description)}" />`,
@@ -92,7 +95,7 @@ function buildMetaBlock(route: RouteSeoEntry, locale: Locale): string {
     `    <meta name="twitter:title" content="${escapeHtml(copy.title)}" />`,
     `    <meta name="twitter:description" content="${escapeHtml(copy.description)}" />`,
     `    <meta name="twitter:image" content="${SITE_ORIGIN}/og/${locale}/${route.slug}.png" />`,
-    `    <meta name="robots" content="index,follow,max-image-preview:large" />`,
+    `    <meta name="robots" content="${indexableLocales.includes(locale) ? "index,follow,max-image-preview:large" : "noindex,follow"}" />`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -186,7 +189,94 @@ function buildJsonLd(route: RouteSeoEntry, locale: Locale, content: CalculatorCo
     .join("\n");
 }
 
-function renderContentBody(content: CalculatorContent | undefined, copy: { heading?: string; tagline?: string }, locale: Locale): string {
+function renderSharedLinks(locale: Locale): string {
+  const toolLinks = tools.map((tool) => `
+        <li><a href="/${locale}${tool.href}">${escapeHtml(tool.name)}</a></li>`).join("");
+  const blogLinks = blogArticles.map((article) => `
+        <li><a href="/en/blog/${article.slug}">${escapeHtml(article.title)}</a></li>`).join("");
+  const localeLinks = LOCALES.map((alt) => {
+    const label = alt === "ms" ? "Bahasa Malaysia" : alt === "id" ? "Bahasa Indonesia" : "English";
+    return `<a href="/${alt}/">${label}</a>`;
+  }).join(" · ");
+
+  return `
+      <nav aria-label="Calculators and site information">
+        <h2>Free calculators</h2><ul>${toolLinks}</ul>
+        <h2>Guides</h2><ul>${blogLinks}</ul>
+        <h2>About HelloKalku</h2>
+        <p><a href="/${locale}/about">About</a> · <a href="/${locale}/contact">Contact</a> · <a href="/${locale}/privacy">Privacy policy</a> · <a href="/${locale}/terms">Terms of use</a></p>
+        <p>Languages: ${localeLinks}</p>
+        <p>Site operator: <a href="${OPERATOR_URL}">amammustofa.com</a>${CONTACT_EMAIL ? ` · <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>` : ""}</p>
+      </nav>`;
+}
+
+function renderLegalSections(sections: typeof privacySections, locale: Locale): string {
+  const intro = sections === privacySections
+    ? "HelloKalku is committed to protecting your privacy. We do not collect your calculator inputs, use anonymous analytics, and may show Google AdSense ads."
+    : "Please read these Terms of Use carefully before using HelloKalku. By using this site you agree to these terms.";
+  return `
+      <article>
+        <h1>${escapeHtml(sections === privacySections ? "Privacy policy" : "Terms of use")}</h1>
+        <p>${escapeHtml(intro)}</p>
+        ${sections.map((section) => `<section><h2>${escapeHtml(section.heading)}</h2><p>${escapeHtml(section.body)}${section.heading === "10. Contact" ? ` <a href="${OPERATOR_URL}">amammustofa.com</a>${CONTACT_EMAIL ? ` · <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>` : ""}` : ""}</p></section>`).join("\n")}
+      </article>`;
+}
+
+function renderBlogArticle(article: BlogEntry): string {
+  const sections = article.sections.map((section) => `
+        <section>
+          ${section.heading ? `<h2>${escapeHtml(section.heading)}</h2>` : ""}
+          ${section.body?.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("") ?? ""}
+          ${section.list ? `<ul>${section.list.map((item) => `<li>${escapeHtml(item.text)}${item.subtext ? ` — ${escapeHtml(item.subtext)}` : ""}</li>`).join("")}</ul>` : ""}
+          ${section.table ? `<table><thead><tr>${section.table.headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${section.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table>` : ""}
+          ${section.callout ? `<p><strong>${escapeHtml(section.callout)}</strong></p>` : ""}
+          ${section.source ? `<p>Source: <a href="${escapeHtml(section.source.href)}">${escapeHtml(section.source.label)}</a></p>` : ""}
+        </section>`).join("");
+  const related = article.relatedCalculator
+    ? `<p><a href="/en${article.relatedCalculator.href}">${escapeHtml(article.relatedCalculator.label)}</a></p>`
+    : "";
+  return `
+      <article>
+        <h1>${escapeHtml(article.title)}</h1>
+        <p>${escapeHtml(article.description)}</p>
+        <p>${escapeHtml(article.intro)}</p>
+        <p>Published ${escapeHtml(article.publishedDate)} · ${article.readingTime} min read · ${escapeHtml(article.categoryLabel)}</p>
+        ${sections}
+        ${related}
+      </article>`;
+}
+
+function renderContentBody(route: RouteSeoEntry, content: CalculatorContent | undefined, copy: { heading?: string; tagline?: string }, locale: Locale): string {
+  if (route.slug === "home") {
+    return `
+      <article>
+        <h1>${escapeHtml(copy.heading ?? "")}</h1>
+        <p>${escapeHtml(copy.tagline ?? "")} HelloKalku provides free, private tools for practical decisions and learning in Malaysia.</p>
+        <h2>Choose a calculator</h2>
+        <ul>${tools.map((tool) => `<li><a href="/${locale}${tool.href}">${escapeHtml(tool.name)}</a> — ${escapeHtml(tool.description)}</li>`).join("")}</ul>
+        <h2>Learn how the numbers work</h2>
+        <ul>${blogArticles.map((article) => `<li><a href="/en/blog/${article.slug}">${escapeHtml(article.title)}</a> — ${escapeHtml(article.description)}</li>`).join("")}</ul>
+      </article>`;
+  }
+  if (route.slug === "blog") {
+    return `
+      <article>
+        <h1>${escapeHtml(copy.heading ?? "")}</h1>
+        <p>${escapeHtml(copy.tagline ?? "")}</p>
+        <ul>${blogArticles.map((article) => `<li><a href="/en/blog/${article.slug}">${escapeHtml(article.title)}</a> — ${escapeHtml(article.description)}</li>`).join("")}</ul>
+      </article>`;
+  }
+  if (route.slug === "privacy") return renderLegalSections(privacySections, locale);
+  if (route.slug === "terms") return renderLegalSections(termsSections, locale);
+  if (route.slug === "about" || route.slug === "contact") {
+    const page = companyPages[route.slug][locale];
+    return `
+      <article>
+        <h1>${escapeHtml(page.title)}</h1>
+        ${page.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+        <p><a href="${OPERATOR_URL}">amammustofa.com</a>${CONTACT_EMAIL ? ` · <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>` : ""}</p>
+      </article>`;
+  }
   if (!content) {
     if (!copy.heading) return "";
     return `\n      <section>\n        <h1>${escapeHtml(copy.heading)}</h1>${copy.tagline ? `\n        <p>${escapeHtml(copy.tagline)}</p>` : ""}\n      </section>`;
@@ -253,12 +343,16 @@ function renderContentBody(content: CalculatorContent | undefined, copy: { headi
       </article>`;
 }
 
-function applyShell(shell: string, route: RouteSeoEntry, locale: Locale): string {
+function applyShell(shell: string, route: RouteSeoEntry, locale: Locale): { html: string; indexable: boolean; wordCount: number } {
   const copy = route.copy[locale] ?? route.copy.en;
   const content = calculatorContent[route.slug]?.[locale];
-  const metaBlock = buildMetaBlock(route, locale);
+  const pageBody = `${renderContentBody(route, content, copy, locale)}${renderSharedLinks(locale)}`;
+  const wordCount = routeVisibleWordCount(route, locale);
+  const indexable = isRouteIndexable(route, locale);
+  const indexableLocales = LOCALES.filter((alt) => isRouteIndexable(route, alt));
+  const metaBlock = buildMetaBlock(route, locale, indexableLocales);
   const jsonLd = buildJsonLd(route, locale, content);
-  const body = renderContentBody(content, copy, locale);
+  const body = pageBody;
 
   let html = shell;
   html = html.replace(/<html\s+lang="[^"]*"/, `<html lang="${locale}"`);
@@ -270,6 +364,7 @@ function applyShell(shell: string, route: RouteSeoEntry, locale: Locale): string
     .replace(/<title>[\s\S]*?<\/title>/, "")
     .replace(/<meta name="description"[^>]*\/?\s*>/g, "")
     .replace(/<meta name="keywords"[^>]*\/?\s*>/g, "")
+    .replace(/<meta name="robots"[^>]*\/?\s*>/g, "")
     .replace(/<link rel="canonical"[^>]*\/?\s*>/g, "")
     .replace(/<meta property="og:[^>]*\/?\s*>/g, "")
     .replace(/<meta name="twitter:[^>]*\/?\s*>/g, "")
@@ -303,18 +398,102 @@ function applyShell(shell: string, route: RouteSeoEntry, locale: Locale): string
     );
   }
 
-  return html;
+  return { html, indexable, wordCount };
 }
 
 function writeRoute(shell: string, route: RouteSeoEntry, locale: Locale) {
   if (!route.prerender) return;
-  const html = applyShell(shell, route, locale);
+  const { html, indexable, wordCount } = applyShell(shell, route, locale);
   const dir =
     route.path === "/"
       ? path.join(OUT_DIR, locale)
       : path.join(OUT_DIR, locale, route.path.replace(/^\//, ""));
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "index.html"), html, "utf8");
+  if (!indexable) console.log(`[prerender] noindex ${locale}${route.path} (${wordCount} words)`);
+}
+
+function applyBlogArticleShell(shell: string, article: BlogEntry): string {
+  const canonical = `${SITE_ORIGIN}/en/blog/${article.slug}`;
+  const title = `${article.title} | HelloKalku`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.description,
+    datePublished: article.publishedDate,
+    dateModified: article.publishedDate,
+    author: { "@type": "Person", name: "amammustofa", url: OPERATOR_URL },
+    publisher: { "@type": "Organization", name: "HelloKalku", url: SITE_ORIGIN },
+    mainEntityOfPage: canonical,
+    inLanguage: "en",
+    image: `${SITE_ORIGIN}/og-default.png`,
+  };
+  let html = shell.replace(/<html\s+lang="[^"]*"/, '<html lang="en"');
+  html = html
+    .replace(/<title>[\s\S]*?<\/title>/, "")
+    .replace(/<meta name="description"[^>]*\/?\s*>/g, "")
+    .replace(/<meta name="keywords"[^>]*\/?\s*>/g, "")
+    .replace(/<meta name="robots"[^>]*\/?\s*>/g, "")
+    .replace(/<link rel="canonical"[^>]*\/?\s*>/g, "")
+    .replace(/<link rel="alternate"[^>]*\/?\s*>/g, "")
+    .replace(/<meta property="og:[^>]*\/?\s*>/g, "")
+    .replace(/<meta name="twitter:[^>]*\/?\s*>/g, "")
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, "");
+  const metadata = [
+    `<title>${escapeHtml(title)}</title>`,
+    `<meta name="description" content="${escapeHtml(article.description)}" />`,
+    `<meta name="keywords" content="${escapeHtml(article.keywords)}" />`,
+    `<link rel="canonical" href="${canonical}" />`,
+    `<link rel="alternate" hreflang="en" href="${canonical}" />`,
+    `<link rel="alternate" hreflang="x-default" href="${canonical}" />`,
+    `<meta name="robots" content="index,follow,max-image-preview:large" />`,
+    `<meta property="og:type" content="article" />`,
+    `<meta property="og:title" content="${escapeHtml(title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(article.description)}" />`,
+    `<meta property="og:url" content="${canonical}" />`,
+    `<meta property="og:site_name" content="HelloKalku" />`,
+    `<meta property="og:locale" content="en_US" />`,
+    `<meta property="og:image" content="${SITE_ORIGIN}/og-default.png" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(article.description)}" />`,
+    `<meta name="twitter:image" content="${SITE_ORIGIN}/og-default.png" />`,
+    `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</script>`,
+  ].join("\n");
+  html = html.replace("</head>", `${metadata}
+    <style id="prerender-fallback-style">.js #prerender-fallback { display: none !important; }</style>
+    <script>document.documentElement.classList.add('js');</script>
+  </head>`);
+  const body = `${renderBlogArticle(article)}${renderSharedLinks("en")}`;
+  return html.replace('<div id="root"></div>', `<div id="root"></div><div id="prerender-fallback" data-prerender-fallback="blog-article">${body}</div>`);
+}
+
+function writeBlogArticles(shell: string) {
+  for (const article of blogArticles) {
+    const dir = path.join(OUT_DIR, "en", "blog", article.slug);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, "index.html"), applyBlogArticleShell(shell, article), "utf8");
+  }
+}
+
+function writeNotFound(shell: string) {
+  let html = shell.replace(/<html\s+lang="[^"]*"/, '<html lang="en"');
+  html = html.replace(/<title>[\s\S]*?<\/title>/, "<title>Page not found | HelloKalku</title>")
+    .replace(/<meta name="description"[^>]*\/?\s*>/g, "")
+    .replace(/<meta name="keywords"[^>]*\/?\s*>/g, "")
+    .replace(/<meta name="robots"[^>]*\/?\s*>/g, "")
+    .replace(/<link rel="canonical"[^>]*\/?\s*>/g, "")
+    .replace(/<meta property="og:[^>]*\/?\s*>/g, "")
+    .replace(/<meta name="twitter:[^>]*\/?\s*>/g, "")
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, "")
+    .replace("</head>", `<meta name="robots" content="noindex,follow" />
+    <meta name="description" content="The requested HelloKalku page could not be found." />
+    <style id="prerender-fallback-style">.js #prerender-fallback { display: none !important; }</style>
+    <script>document.documentElement.classList.add('js');</script>
+  </head>`);
+  const body = `<article><h1>Page not found</h1><p>The requested page could not be found. Use one of the links below to continue.</p></article>${renderSharedLinks("en")}`;
+  fs.writeFileSync(path.join(OUT_DIR, "404.html"), html.replace('<div id="root"></div>', `<div id="root"></div><div id="prerender-fallback" data-prerender-fallback="not-found">${body}</div>`), "utf8");
 }
 
 function writeSitemap() {
@@ -326,8 +505,9 @@ function writeSitemap() {
     const changefreq = route.sitemap?.changefreq ?? "monthly";
 
     for (const locale of LOCALES) {
+      if (!isRouteIndexable(route, locale)) continue;
       const url = canonicalUrl(locale, route.path);
-      const alts = LOCALES.map((alt) => {
+      const alts = LOCALES.filter((alt) => isRouteIndexable(route, alt)).map((alt) => {
         const hreflang = alt === "ms" ? "ms-MY" : alt === "id" ? "id-ID" : "en";
         return `      <xhtml:link rel="alternate" hreflang="${hreflang}" href="${canonicalUrl(alt, route.path)}" />`;
       }).join("\n");
@@ -389,10 +569,12 @@ function main() {
     }
   }
 
+  writeBlogArticles(shell);
+  writeNotFound(shell);
   writeSitemap();
   writeRobots();
 
-  console.log(`[prerender] wrote ${count} HTML files + sitemap.xml + robots.txt`);
+  console.log(`[prerender] wrote ${count} route pages + ${blogArticles.length} blog articles + 404.html, sitemap.xml + robots.txt`);
 }
 
 main();

@@ -25,8 +25,12 @@ npm run dev
 - `VITE_ADSENSE_SLOT_TOP` – ad slot ID for the global top ad placement
 - `VITE_ADSENSE_SLOT_HOME` – ad slot ID for the homepage ad placement
 
-If these are empty, the UI shows a non-breaking placeholder ad container.
+The sample values in `.env.example` are placeholders; replace them with the IDs from your AdSense account. For Vercel, set the three `VITE_ADSENSE_*` variables in **Project Settings → Environment Variables** for Production, Preview, and Development, then rebuild and redeploy. The client is compiled at build time, so changing runtime-only variables does not update an existing deployment.
 AdSense network scripts/requests are only enabled in production builds (`import.meta.env.PROD`).
+
+### Site contact
+
+The About and Contact pages link to the existing site operator at [amammustofa.com](https://amammustofa.com). No direct contact email is currently configured. When the operator has a public support address, set `CONTACT_EMAIL` in `client/src/config/legal.ts`; the contact pages and privacy/terms pages will then expose it as a mail link.
 
 ### Analytics (Vercel)
 
@@ -94,7 +98,8 @@ npm run start
 This repo is ready for Vercel deployment:
 
 - `vercel.json` sets `npm run build` and output to `dist/public`
-- SPA routing rewrite is configured to route all paths to `index.html`
+- Known routes are prerendered as static HTML. Unknown extensionless routes use the noindex 404 fallback, while client-side routing displays the localized not-found page.
+- The build excludes localized pages with fewer than 300 visible words from indexing and `sitemap.xml`; add useful original content before submitting those URLs for indexing.
 
 ### Suggested Vercel Setup
 

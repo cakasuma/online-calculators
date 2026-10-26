@@ -4,6 +4,7 @@ export interface BlogSection {
   list?: { text: string; subtext?: string }[];
   table?: { headers: string[]; rows: string[][] };
   callout?: string;
+  source?: { label: string; href: string };
 }
 
 export interface BlogArticle {
@@ -62,23 +63,23 @@ export const blogArticles: BlogArticle[] = [
         heading: "SOCSO — Work Injury and Invalidity Protection",
         body: [
           "SOCSO (PERKESO) provides insurance for workplace injuries, occupational diseases, and permanent invalidity. It operates two schemes: the Employment Injury Scheme and the Invalidity Scheme.",
-          "Contribution rates are based on your monthly wages but capped at a wage ceiling of RM4,000 per month. If you earn more than RM4,000, contributions are still calculated as if your wage were RM4,000.",
+          "PERKESO raised the wage ceiling for contributions from RM5,000 to RM6,000 effective 1 October 2024. Wages above RM6,000 use the ceiling band. At RM6,000, the official first-category employee contribution is RM29.75 and the employer contribution is RM104.15.",
         ],
         table: {
-          headers: ["Monthly Wage", "Employee (0.5%)", "Employer (1.75%)", "Total"],
+          headers: ["Monthly Wage", "Employee contribution", "Employer contribution", "Total"],
           rows: [
             ["RM2,000", "RM10.00", "RM35.00", "RM45.00"],
             ["RM3,000", "RM15.00", "RM52.50", "RM67.50"],
-            ["RM4,000 (cap)", "RM20.00", "RM70.00", "RM90.00"],
-            ["RM5,000+ (same as cap)", "RM20.00", "RM70.00", "RM90.00"],
+            ["RM6,000 (ceiling band)", "RM29.75", "RM104.15", "RM133.90"],
           ],
         },
+        source: { label: "PERKESO contribution rates and wage ceiling", href: "https://perkeso.gov.my/en/rate-of-contribution.html" },
       },
       {
         heading: "EIS — Protection If You Lose Your Job",
         body: [
           "EIS (Employment Insurance System), managed by SOCSO/PERKESO, was introduced in January 2018 to protect employees who are retrenched or made redundant.",
-          "The EIS contribution rate is 0.2% from the employee and 0.2% from the employer — a combined 0.4% of monthly wages, capped at RM5,000/month. On a RM5,000 salary, you pay RM10.00 and your employer pays RM10.00.",
+          "EIS contributions are based on the RM6,000 monthly wage ceiling. At the ceiling, the employee and employer each contribute RM11.90. The calculator approximates the employee contribution at 0.2% up to this ceiling amount; PERKESO's table rounds by wage band.",
           "If you are retrenched, EIS provides a Job Search Allowance (up to 80% of your previous wage for the first month, reducing over subsequent months), career counselling, job matching, and upskilling programmes.",
         ],
       },
@@ -91,23 +92,23 @@ export const blogArticles: BlogArticle[] = [
         ],
       },
       {
-        heading: "Worked Example: RM5,000 Gross Salary",
+        heading: "Worked Example: RM6,000 Gross Salary",
         body: [
-          "Here is how all deductions combine for a Malaysian resident employee earning RM5,000 gross per month, under age 60.",
+          "For a Malaysian resident employee below age 60 earning RM6,000 monthly, with no annual bonus or extra declared reliefs, the calculator estimates the following monthly figures.",
         ],
         table: {
           headers: ["Deduction", "Amount", "Note"],
           rows: [
-            ["EPF (Employee 11%)", "RM550.00", "Goes to your EPF account"],
-            ["SOCSO (Employee 0.5%)", "RM20.00", "Capped at RM4,000 wage"],
-            ["EIS (Employee 0.2%)", "RM10.00", "Capped at RM5,000 wage"],
-            ["PCB (single, no additional reliefs)", "~RM113.00", "Varies with declared reliefs"],
-            ["Total Deductions", "~RM693.00", ""],
-            ["Take-Home Pay", "~RM4,307.00", "Before any additional reliefs"],
+            ["EPF (Employee 11%)", "RM660.00", "Goes to your EPF account"],
+            ["SOCSO (employee)", "RM29.75", "PERKESO official ceiling-band amount"],
+            ["EIS (employee)", "RM11.90", "At the RM6,000 wage ceiling"],
+            ["Estimated monthly tax", "RM202.92", "Annualised estimate; actual PCB varies"],
+            ["Total Deductions", "RM904.57", "Under the calculator's assumptions"],
+            ["Take-Home Pay", "RM5,095.43", "Estimated monthly net pay"],
           ],
         },
         callout:
-          "Your employer additionally contributes RM600 (EPF 12%) + RM87.50 (SOCSO 1.75%) + RM10 (EIS 0.2%) = RM697.50 at no cost to you — making your true total compensation package RM5,697.50.",
+          "At RM6,000, the employer additionally contributes RM720 (EPF 12%) + RM104.15 (SOCSO) + RM11.90 (EIS) = RM836.05. Verify the official contribution-table amounts with PERKESO and your payroll department.",
       },
       {
         heading: "How to Verify Your Payslip",
@@ -204,6 +205,8 @@ export const blogArticles: BlogArticle[] = [
         heading: "Basic Savings Target",
         body: [
           "EPF sets a Basic Savings benchmark — the minimum balance EPF considers necessary for a basic retirement income.",
+          "These targets represent a minimum, not a comfortable retirement. Financial planners typically recommend accumulating 2–3× the basic savings target to maintain your working-life lifestyle in retirement.",
+          "Less than 30% of active EPF contributors aged 54 meet the RM270,000 benchmark. If you are below target for your age, making voluntary contributions now significantly improves your retirement outlook.",
         ],
         table: {
           headers: ["Retirement Age", "Basic Savings Target (2026)", "Implied Monthly Income"],
@@ -212,10 +215,6 @@ export const blogArticles: BlogArticle[] = [
             ["60", "RM390,000", "~RM1,300/month for 25 years"],
           ],
         },
-        body: [
-          "These targets represent a minimum, not a comfortable retirement. Financial planners typically recommend accumulating 2–3× the basic savings target to maintain your working-life lifestyle in retirement.",
-          "Less than 30% of active EPF contributors aged 54 meet the RM270,000 benchmark. If you are below target for your age, making voluntary contributions now significantly improves your retirement outlook.",
-        ],
       },
       {
         heading: "Withdrawal Rules",
@@ -293,6 +292,7 @@ export const blogArticles: BlogArticle[] = [
         heading: "Age-Based Savings Benchmarks",
         body: [
           "Compare your current Account 1 balance against these age-based checkpoints to see whether you are on track:",
+          "If your Account 1 balance is below the benchmark for your age, you are at risk of retiring with insufficient savings. The gap is not insurmountable, but it requires deliberate action now.",
         ],
         table: {
           headers: ["Your Age", "Basic Savings Benchmark"],
@@ -307,9 +307,6 @@ export const blogArticles: BlogArticle[] = [
             ["60", "RM390,000"],
           ],
         },
-        body: [
-          "If your Account 1 balance is below the benchmark for your age, you are at risk of retiring with insufficient savings. The gap is not insurmountable, but it requires deliberate action now.",
-        ],
       },
       {
         heading: "Strategies to Close the Gap",
@@ -763,7 +760,7 @@ export const blogArticles: BlogArticle[] = [
         heading: "What is SOCSO (PERKESO)?",
         body: [
           "SOCSO — Social Security Organisation, or PERKESO (Pertubuhan Keselamatan Sosial) in Malay — is the Malaysian statutory body established under the Employees' Social Security Act 1969. It provides two types of social protection insurance: coverage for workplace accidents and occupational diseases, and protection against permanent invalidity or death from any cause.",
-          "SOCSO is mandatory for all Malaysian citizens and permanent residents employed under a contract of service. Contributions are capped at a monthly wage ceiling of RM4,000 — meaning employees earning above RM4,000 still contribute as if their wage were RM4,000.",
+          "SOCSO is mandatory for eligible employees employed under a contract of service. PERKESO's monthly wage ceiling increased to RM6,000 from 1 October 2024; wages above that amount use the RM6,000 ceiling band.",
         ],
       },
       {
@@ -784,17 +781,18 @@ export const blogArticles: BlogArticle[] = [
       {
         heading: "SOCSO Contribution Rates (2026)",
         table: {
-          headers: ["Monthly Wage", "Employee (0.5%)", "Employer (1.75%)", "Total"],
+          headers: ["Monthly Wage", "Employee contribution", "Employer contribution", "Total"],
           rows: [
             ["RM1,000", "RM5.00", "RM17.50", "RM22.50"],
             ["RM1,500", "RM7.50", "RM26.25", "RM33.75"],
             ["RM2,000", "RM10.00", "RM35.00", "RM45.00"],
             ["RM3,000", "RM15.00", "RM52.50", "RM67.50"],
-            ["RM4,000 (maximum wage for calculation)", "RM20.00", "RM70.00", "RM90.00"],
+            ["RM6,000 (ceiling band)", "RM29.75", "RM104.15", "RM133.90"],
           ],
         },
         callout:
-          "SOCSO contributions are capped at the RM4,000 wage ceiling. Even if you earn RM10,000/month, your SOCSO contribution remains RM20.00 (employee) and RM70.00 (employer).",
+          "Even if you earn more than RM6,000 per month, the contribution calculation uses the RM6,000 wage ceiling. PERKESO's official ceiling-band amounts are RM29.75 (employee) and RM104.15 (employer).",
+        source: { label: "PERKESO contribution rates and wage ceiling", href: "https://perkeso.gov.my/en/rate-of-contribution.html" },
       },
       {
         heading: "What is EIS (Employment Insurance System)?",
@@ -821,10 +819,10 @@ export const blogArticles: BlogArticle[] = [
             ["RM2,000", "RM4.00", "RM4.00", "RM8.00"],
             ["RM3,000", "RM6.00", "RM6.00", "RM12.00"],
             ["RM4,000", "RM8.00", "RM8.00", "RM16.00"],
-            ["RM5,000 (maximum)", "RM10.00", "RM10.00", "RM20.00"],
+            ["RM6,000 (maximum)", "RM11.90", "RM11.90", "RM23.80"],
           ],
         },
-        callout: "EIS maximum employee contribution: RM10/month. Maximum employer contribution: RM10/month. Total cap: RM20/month.",
+        callout: "At the RM6,000 wage ceiling, EIS is RM11.90 each for the employee and employer (RM23.80 total). The official table rounds contributions by wage band.",
       },
       {
         heading: "How to Claim SOCSO Benefits",

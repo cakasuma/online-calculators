@@ -138,6 +138,11 @@ function SectionBlock({ section, id }: { section: BlogSection; id?: string }) {
           <p className="leading-relaxed">{section.callout}</p>
         </div>
       )}
+      {section.source && (
+        <p className="text-xs text-muted-foreground">
+          Source: <a href={section.source.href} target="_blank" rel="noopener noreferrer" className="underline">{section.source.label}</a>
+        </p>
+      )}
     </section>
   );
 }
@@ -147,7 +152,13 @@ export default function BlogArticle({ slug }: { slug: string }) {
   const related = blogArticles.filter((a) => a.slug !== slug).slice(0, 3);
 
   useEffect(() => {
-    if (!article) return;
+    if (!article) {
+      document.title = "Page Not Found | HelloKalku";
+      setMeta("name", "robots", "noindex,follow");
+      document.head.querySelector('link[rel="canonical"]')?.remove();
+      document.head.querySelectorAll('link[rel="alternate"]').forEach((el) => el.remove());
+      return;
+    }
     const fullTitle = `${article.title} | HelloKalku`;
     const canonical = `${SITE_ORIGIN}/en/blog/${article.slug}`;
     const ogImage = `${SITE_ORIGIN}/og-default.png`;
@@ -170,8 +181,7 @@ export default function BlogArticle({ slug }: { slug: string }) {
     setMeta("name", "twitter:image", ogImage);
     setLink("canonical", canonical);
     setLink("alternate", canonical, "en");
-    setLink("alternate", canonical, "ms-MY");
-    setLink("alternate", canonical, "id-ID");
+    document.head.querySelectorAll('link[rel="alternate"][hreflang="ms-MY"], link[rel="alternate"][hreflang="id-ID"]').forEach((el) => el.remove());
     setLink("alternate", canonical, "x-default");
   }, [article]);
 

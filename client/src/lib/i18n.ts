@@ -821,6 +821,8 @@ const translations = {
   "footer.builtBy": { en: "Built by", ms: "Dibuat oleh", id: "Dibuat oleh" },
   "footer.privacy": { en: "Privacy", ms: "Privasi", id: "Privasi" },
   "footer.terms": { en: "Terms", ms: "Syarat", id: "Syarat" },
+  "footer.about": { en: "About", ms: "Tentang", id: "Tentang" },
+  "footer.contact": { en: "Contact", ms: "Hubungi", id: "Kontak" },
 
   // ── Partners page ──
 

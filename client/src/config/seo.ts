@@ -28,7 +28,9 @@ export type RouteSlug =
   | "wasiat"
   | "blog"
   | "privacy"
-  | "terms";
+  | "terms"
+  | "about"
+  | "contact";
 
 export interface RouteSeoCopy {
   title: string;
@@ -78,7 +80,7 @@ export const routes: RouteSeoEntry[] = [
         tagline: "Gaji, cukai, zakat, faraid, dan perancangan — percuma dan dwibahasa.",
       },
       id: {
-        title: "Kalkulator Online untuk Malaysia | HelloKalku",
+        title: "Kalkulator Gratis untuk Malaysia | HelloKalku",
         description:
           "Kalkulator gratis fokus Malaysia: gaji (EPF, SOCSO, EIS, PCB), zakat, faraid, dan perencanaan wasiat. Cepat, akurat, dan ramah mobile.",
         keywords:
@@ -112,7 +114,7 @@ export const routes: RouteSeoEntry[] = [
         tagline: "Anggaran gaji bersih dengan EPF, SOCSO, EIS, dan PCB.",
       },
       id: {
-        title: "Kalkulator Gaji Malaysia 2026 (EPF, SOCSO, EIS, PCB) | HelloKalku",
+        title: "Kalkulator Gaji Bersih Malaysia 2026 (EPF, SOCSO, EIS, PCB) | HelloKalku",
         description:
           "Hitung gaji bersih Malaysia dengan potongan EPF, SOCSO, EIS, dan PCB. Mendukung penduduk, non-penduduk, dan pekerja asing.",
         heading: "Kalkulator gaji Malaysia",
@@ -298,7 +300,7 @@ export const routes: RouteSeoEntry[] = [
         tagline: "BMI, julat berat sihat, BMR, dan keperluan kalori harian.",
       },
       id: {
-        title: "Kalkulator BMI (dengan BMR & Kalori Harian) | HelloKalku",
+        title: "Kalkulator Indeks Massa Tubuh (BMI, BMR & Kalori) | HelloKalku",
         description:
           "Hitung Indeks Massa Tubuh (BMI), rentang berat sehat, BMR, dan kebutuhan kalori harian (TDEE) menggunakan rumus Mifflin-St Jeor. Gratis, instan, dan privat.",
         heading: "Kalkulator BMI dengan BMR & kalori",
@@ -360,7 +362,7 @@ export const routes: RouteSeoEntry[] = [
         tagline: "Trigonometri, logaritma, eksponen, dan konstanta.",
       },
       id: {
-        title: "Kalkulator Saintifik Online | HelloKalku",
+        title: "Kalkulator Ilmiah Online | HelloKalku",
         description:
           "Kalkulator saintifik online dengan trigonometri, logaritma, eksponen, faktorial, dan konstanta matematika.",
         heading: "Kalkulator saintifik",
@@ -424,7 +426,7 @@ export const routes: RouteSeoEntry[] = [
         tagline: "Anggaran zakat tahunan untuk semua jenis aset.",
       },
       id: {
-        title: "Kalkulator Zakat Malaysia (Nisab 2026) | HelloKalku",
+        title: "Kalkulator Zakat di Malaysia (Nisab 2026) | HelloKalku",
         description:
           "Hitung zakat tahunan untuk tabungan, emas, perak, investasi, dan aset usaha berdasarkan nisab terkini.",
         heading: "Kalkulator zakat",
@@ -540,10 +542,56 @@ export const routes: RouteSeoEntry[] = [
         heading: "Syarat penggunaan",
       },
       id: {
-        title: "Syarat Penggunaan | HelloKalku",
+        title: "Ketentuan Penggunaan | HelloKalku",
         description:
           "Syarat penggunaan HelloKalku, cakupan layanan, penafian, dan tanggung jawab pengguna.",
         heading: "Syarat penggunaan",
+      },
+    },
+  },
+  {
+    slug: "about",
+    path: "/about",
+    prerender: true,
+    sitemap: { priority: 0.4, changefreq: "yearly" },
+    copy: {
+      en: {
+        title: "About HelloKalku | Free Malaysian Calculators",
+        description: "Learn about HelloKalku, its Malaysia-focused calculators, how results are produced, and the independent site operator.",
+        heading: "About HelloKalku",
+      },
+      ms: {
+        title: "Tentang HelloKalku | Kalkulator Malaysia",
+        description: "Ketahui tentang kalkulator HelloKalku, cara hasil dikira dan pengendali laman bebas.",
+        heading: "Tentang HelloKalku",
+      },
+      id: {
+        title: "Kenali HelloKalku | Kalkulator Malaysia",
+        description: "Kenali kalkulator HelloKalku, cara hasil dihitung, dan pengelola situs independen.",
+        heading: "Tentang HelloKalku",
+      },
+    },
+  },
+  {
+    slug: "contact",
+    path: "/contact",
+    prerender: true,
+    sitemap: { priority: 0.3, changefreq: "yearly" },
+    copy: {
+      en: {
+        title: "Contact HelloKalku | Feedback and Support",
+        description: "Contact the HelloKalku site operator for calculator corrections, accessibility feedback, and privacy requests.",
+        heading: "Contact HelloKalku",
+      },
+      ms: {
+        title: "Hubungi HelloKalku | Maklum Balas dan Bantuan",
+        description: "Hubungi pengendali HelloKalku untuk pembetulan kalkulator, maklum balas kebolehcapaian dan permintaan privasi.",
+        heading: "Hubungi HelloKalku",
+      },
+      id: {
+        title: "Hubungi HelloKalku | Masukan dan Bantuan",
+        description: "Hubungi pengelola HelloKalku untuk koreksi kalkulator, masukan aksesibilitas, dan permintaan privasi.",
+        heading: "Hubungi HelloKalku",
       },
     },
   },

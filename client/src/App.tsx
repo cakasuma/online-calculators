@@ -2,6 +2,7 @@ import { Switch, Route, Router, Link, useLocation } from "wouter";
 import type { TranslationKey } from "@/lib/i18n";
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
 import { routes as seoRoutes, canonicalUrl } from "@/config/seo";
+import { isRouteIndexable } from "@/config/seoIndexability";
 import { CalculatorContent } from "@/components/CalculatorContent";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -67,6 +68,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfUse from "@/pages/TermsOfUse";
 import Blog from "@/pages/Blog";
 import BlogArticle from "@/pages/BlogArticle";
+import CompanyPage from "@/pages/CompanyPage";
 import NotFound from "@/pages/not-found";
 
 type NavItem = { href: string; labelKey: TranslationKey; icon: typeof HomeIcon };
@@ -118,6 +120,8 @@ type FooterLink = { labelKey?: TranslationKey; label?: string; href: string };
 // "Learn" column is defined here.
 const FOOTER_LEARN_LINKS: FooterLink[] = [
   { label: "Guides", href: "/blog" },
+  { labelKey: "footer.about", href: "/about" },
+  { labelKey: "footer.contact", href: "/contact" },
   { labelKey: "footer.privacy", href: "/privacy" },
   { labelKey: "footer.terms", href: "/terms" },
 ];
@@ -197,10 +201,25 @@ function Layout() {
       track("pageview", { path: location });
       return;
     }
-    const route = seoRoutes.find((r) => r.path === location) ?? seoRoutes[0];
+    const route = seoRoutes.find((r) => r.path === location);
+    if (!route) {
+      document.title = locale === "ms" ? "Halaman Tidak Ditemui | HelloKalku" : locale === "id" ? "Halaman Tidak Ditemukan | HelloKalku" : "Page Not Found | HelloKalku";
+      document.documentElement.lang = locale;
+      setMetaTag("name", "robots", "noindex,follow");
+      setMetaTag("name", "description", "The requested HelloKalku page could not be found.");
+      document.head.querySelector('link[rel="canonical"]')?.remove();
+      document.head.querySelectorAll('link[rel="alternate"]').forEach((el) => el.remove());
+      track("pageview", { path: location });
+      return;
+    }
     const copy = route.copy[locale] ?? route.copy.en;
     document.title = copy.title;
     document.documentElement.lang = locale;
+    setMetaTag(
+      "name",
+      "robots",
+      isRouteIndexable(route, locale) ? "index,follow,max-image-preview:large" : "noindex,follow",
+    );
     setMetaTag("name", "description", copy.description);
     if (copy.keywords) setMetaTag("name", "keywords", copy.keywords);
 
@@ -469,6 +488,8 @@ function Layout() {
           </Route>
           <Route path="/privacy"><PageContainer><PrivacyPolicy /></PageContainer></Route>
           <Route path="/terms"><PageContainer><TermsOfUse /></PageContainer></Route>
+          <Route path="/about"><PageContainer><CompanyPage page="about" /></PageContainer></Route>
+          <Route path="/contact"><PageContainer><CompanyPage page="contact" /></PageContainer></Route>
           <Route><PageContainer><NotFound /></PageContainer></Route>
         </Switch>
       </main>

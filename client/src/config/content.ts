@@ -262,8 +262,8 @@ export const calculatorContent: ContentMap = {
         paragraphs: [
           "Net monthly take-home = Gross salary − EPF − SOCSO − EIS − PCB.",
           "EPF (employee, default) = 11% × gross monthly wage, rounded up to the nearest ringgit. Since the restructure of 11 May 2024, the combined employer and employee contribution feeds three accounts: Akaun Persaraan (75%), Akaun Sejahtera (15%) and Akaun Fleksibel (10%).",
-          "SOCSO (employee) is calculated from a tiered table where the maximum employee contribution is RM 24.75 per month for wages of RM 4,000 and above. The employer share for the same band is RM 86.65.",
-          "EIS (employee) = 0.2% of monthly wages, capped at RM 9.90 per month (wage ceiling RM 5,000). Employer contributes a matching 0.2%.",
+          "PERKESO's contribution wage ceiling is RM 6,000. At the ceiling, the official employee SOCSO amount is RM 29.75 and the employer amount is RM 104.15. This calculator uses an approximate 0.5% employee rate capped at RM 29.75; PERKESO's actual schedule rounds contributions by wage band.",
+          "EIS (employee) is approximately 0.2% of monthly wages, capped at the official RM 6,000 ceiling amount of RM 11.90 per month. The employer contributes a matching RM 11.90 at the ceiling. Verify exact payroll deductions against the PERKESO contribution table.",
           "PCB (resident) = MAX(0, lookup(annualised taxable income − reliefs, progressive brackets) − previously-paid PCB − zakat paid through payroll) ÷ months remaining in the year. Non-resident PCB = 30% × monthly chargeable income.",
         ],
       },
@@ -294,7 +294,7 @@ export const calculatorContent: ContentMap = {
             "Other declared relief beyond EPF: RM 0",
           ],
           result:
-            "EPF RM 660/month, SOCSO RM 24.75, EIS RM 9.90, PCB roughly RM 95–110 depending on reliefs claimed. Estimated monthly take-home: ~RM 5,200.",
+            "Using this calculator's assumptions: EPF RM 660/month, SOCSO RM 29.75, EIS RM 11.90, and estimated monthly tax RM 202.92. Estimated take-home pay: RM 5,095.43. Actual PCB varies with payroll timing and declared reliefs.",
         },
         {
           title: "Example 2 — RM 12,000 salary + RM 12,000 annual bonus",
@@ -367,6 +367,8 @@ export const calculatorContent: ContentMap = {
         paragraphs: [
           "Gaji kotor bulanan adalah titik awal. Daripada sana, kontribusi wajib dipotong: EPF, SOCSO, EIS, dan PCB.",
           "Karyawan di bawah 60 tahun secara default berkontribusi 11% ke EPF; Anda boleh menyesuaikan ke 7% atau tahap sukarela lebih tinggi.",
+          "PERKESO menetapkan had gaji caruman RM6,000. Pada had ini, caruman SOCSO pekerja ialah RM29.75 dan majikan RM104.15. Kalkulator menggunakan anggaran kadar pekerja 0.5% yang dihadkan kepada RM29.75; jadual rasmi membundarkan caruman mengikut julat gaji.",
+          "Caruman SIP pekerja dianggarkan pada 0.2% gaji dan dihadkan kepada RM11.90 pada had RM6,000. Majikan mencarum RM11.90 pada had tersebut. Semak jadual PERKESO untuk angka gaji yang tepat.",
           "PCB dikira dengan menyetahunkan pendapatan kotor, menerapkan keringanan cukai yang berlaku, mencari kurung cukai progresif untuk pemastautin, lalu membaginya 12.",
         ],
       },
@@ -375,9 +377,17 @@ export const calculatorContent: ContentMap = {
         paragraphs: [
           "Gaji bersih = Gaji kotor − EPF − SOCSO − EIS − PCB.",
           "EPF (karyawan, default) = 11% × gaji kotor bulanan.",
+          "SOCSO pekerja dianggarkan = 0.5% × gaji bulanan, maksimum RM29.75; SIP pekerja dianggarkan = 0.2%, maksimum RM11.90. Kedua-dua had mengikuti gaji caruman PERKESO RM6,000 dan angka jadual pada had.",
           "PCB (pemastautin) = lookup(pendapatan tahunan kena cukai, kurung progresif) ÷ 12.",
         ],
       },
+      examples: [
+        {
+          title: "Contoh — Gaji RM6,000 sebulan",
+          given: ["Gaji kasar: RM6,000", "EPF pekerja: 11%", "Bonus tahunan dan pelepasan tambahan: RM0"],
+          result: "EPF RM660, SOCSO RM29.75, SIP RM11.90, anggaran cukai bulanan RM202.92 dan anggaran gaji bersih RM5,095.43. PCB sebenar bergantung pada kaedah gaji dan pelepasan yang diisytiharkan.",
+        },
+      ],
       faq: [
         {
           question: "Apakah hasilnya adalah gaji final saya?",
@@ -401,6 +411,8 @@ export const calculatorContent: ContentMap = {
         paragraphs: [
           "Gaji kotor bulanan adalah titik awal. Dari sana, kontribusi wajib dipotong: EPF, SOCSO, EIS, dan PCB.",
           "Karyawan di bawah 60 tahun secara default berkontribusi 11% ke EPF; Anda dapat menyesuaikan ke 7% atau tingkat sukarela lebih tinggi.",
+          "PERKESO menetapkan batas upah iuran RM6.000. Pada batas ini, iuran SOCSO karyawan adalah RM29,75 dan pemberi kerja RM104,15. Kalkulator menggunakan perkiraan tarif karyawan 0,5% yang dibatasi RM29,75; tabel resmi membulatkan iuran per rentang upah.",
+          "Iuran EIS karyawan diperkirakan sebesar 0,2% upah dan dibatasi RM11,90 pada batas RM6.000. Pemberi kerja membayar RM11,90 pada batas tersebut. Periksa tabel PERKESO untuk angka penggajian yang tepat.",
           "PCB dihitung dengan menyetahunkan pendapatan kotor, menerapkan keringanan pajak yang berlaku, mencari kurung pajak progresif untuk penduduk, lalu membaginya 12.",
         ],
       },
@@ -409,9 +421,17 @@ export const calculatorContent: ContentMap = {
         paragraphs: [
           "Gaji bersih = Gaji kotor − EPF − SOCSO − EIS − PCB.",
           "EPF (karyawan, default) = 11% × gaji kotor bulanan.",
+          "SOCSO karyawan diperkirakan = 0,5% × upah bulanan, maksimum RM29,75; EIS karyawan diperkirakan = 0,2%, maksimum RM11,90. Kedua batas mengikuti batas upah iuran PERKESO RM6.000 dan angka tabel pada batas tersebut.",
           "PCB (penduduk) = lookup(pendapatan tahunan kena pajak, kurung progresif) ÷ 12.",
         ],
       },
+      examples: [
+        {
+          title: "Contoh — Gaji RM6.000 per bulan",
+          given: ["Gaji kotor: RM6.000", "EPF karyawan: 11%", "Bonus tahunan dan potongan tambahan: RM0"],
+          result: "EPF RM660, SOCSO RM29,75, EIS RM11,90, perkiraan pajak bulanan RM202,92, dan perkiraan gaji bersih RM5.095,43. PCB sebenarnya bergantung pada metode penggajian dan potongan yang dilaporkan.",
+        },
+      ],
       faq: [
         {
           question: "Apakah hasilnya adalah gaji final saya?",

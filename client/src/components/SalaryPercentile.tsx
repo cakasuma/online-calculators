@@ -166,8 +166,8 @@ export function SalaryPercentile({ monthlyGross }: Props) {
         </div>
 
         {/* Submission-based percentile */}
+        {submissionPctile != null && dist?.sampleSize ? (
         <div className="border-t pt-4">
-          {submissionPctile != null && dist?.sampleSize ? (
             <div className="flex items-start gap-3">
               <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-600 dark:text-emerald-400">
                 <Users className="h-4 w-4" />
@@ -183,17 +183,8 @@ export function SalaryPercentile({ monthlyGross }: Props) {
                 </p>
               </div>
             </div>
-          ) : (
-            <div className="flex items-start gap-3 text-muted-foreground">
-              <div className="rounded-xl bg-muted p-2.5">
-                <Users className="h-4 w-4" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm">{t("salary.percentile.notEnoughData")}</p>
-              </div>
-            </div>
-          )}
         </div>
+        ) : null}
 
         {/* Caveat */}
         <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/40 rounded-lg p-3">

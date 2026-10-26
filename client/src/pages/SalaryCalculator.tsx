@@ -11,7 +11,6 @@ import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { SalaryPercentile } from "@/components/SalaryPercentile";
 import { recordServerEvent, track } from "@/lib/analytics";
-import { TAX_BRACKETS } from "@/lib/incomeTax";
 import {
   buildShareUrl,
   enumField,
@@ -24,6 +23,7 @@ import {
 } from "@/lib/urlState";
 import { downloadSalaryPdf } from "@/lib/pdf/salaryPdf";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
+import { calculateSalary } from "@/lib/malaysianPayroll";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -82,63 +82,6 @@ function formatInputNumber(value: string, maxDecimals = 2): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: maxDecimals,
   }).format(parsed);
-}
-
-function progressiveTax(annualChargeableIncome: number) {
-  const income = Math.max(0, annualChargeableIncome);
-  let tax = 0;
-
-  for (let i = 0; i < TAX_BRACKETS.length; i++) {
-    const current = TAX_BRACKETS[i];
-    const next = TAX_BRACKETS[i + 1];
-    const upper = next?.threshold ?? Infinity;
-    if (income > current.threshold) {
-      tax += (Math.min(income, upper) - current.threshold) * current.rate;
-    }
-  }
-
-  return tax;
-}
-
-function calculateSalary(input: SalaryInputs) {
-  const annualGross = input.monthlySalary * 12 + input.annualBonus;
-  const epfRate = input.epfRate / 100;
-  const monthlyEpf = input.monthlySalary * epfRate;
-  const bonusEpf = input.annualBonus * epfRate;
-  const annualEpf = monthlyEpf * 12 + bonusEpf;
-
-  const monthlySocso = input.workerType === "foreigner" ? 0 : Math.min(input.monthlySalary, 6000) * 0.005;
-  const monthlyEis = input.workerType === "foreigner" ? 0 : Math.min(input.monthlySalary, 6000) * 0.002;
-  const annualSocso = monthlySocso * 12;
-  const annualEis = monthlyEis * 12;
-
-  const epfRelief = Math.min(annualEpf, 4000);
-  const personalRelief = input.residentStatus === "resident" ? 9000 : 0;
-  const chargeableIncome = Math.max(
-    0,
-    annualGross - epfRelief - annualSocso - annualEis - personalRelief - input.otherRelief,
-  );
-  const annualIncomeTax =
-    input.residentStatus === "non-resident" ? annualGross * 0.3 : progressiveTax(chargeableIncome);
-  const monthlyTax = annualIncomeTax / 12;
-
-  const monthlyDeductions = monthlyEpf + monthlySocso + monthlyEis + monthlyTax;
-  const monthlyNet = input.monthlySalary - monthlyDeductions;
-
-  return {
-    annualGross,
-    chargeableIncome,
-    monthlyEpf,
-    monthlySocso,
-    monthlyEis,
-    monthlyTax,
-    monthlyDeductions,
-    monthlyNet,
-    annualIncomeTax,
-    annualEpf,
-    annualSocso,
-    annualEis,
-  };
 }
 
 function validateInputs(input: SalaryInputs): InputErrors {

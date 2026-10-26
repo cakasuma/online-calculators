@@ -2,6 +2,7 @@ import { Switch, Route, Router, Link, useLocation } from "wouter";
 import type { TranslationKey } from "@/lib/i18n";
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
 import { routes as seoRoutes, canonicalUrl } from "@/config/seo";
+import { isRouteIndexable } from "@/config/seoIndexability";
 import { CalculatorContent } from "@/components/CalculatorContent";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -214,6 +215,11 @@ function Layout() {
     const copy = route.copy[locale] ?? route.copy.en;
     document.title = copy.title;
     document.documentElement.lang = locale;
+    setMetaTag(
+      "name",
+      "robots",
+      isRouteIndexable(route, locale) ? "index,follow,max-image-preview:large" : "noindex,follow",
+    );
     setMetaTag("name", "description", copy.description);
     if (copy.keywords) setMetaTag("name", "keywords", copy.keywords);
 

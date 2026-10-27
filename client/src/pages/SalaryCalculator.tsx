@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
-import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult, MobileResultBar } from "@/components/CalculatorHero";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -240,7 +240,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const isValid = Object.keys(errors).length === 0;
   // If the user arrived via a shared link, show results immediately so they
   // don't have to click Calculate just to see what was shared.
-  const [hasCalculated, setHasCalculated] = useState(isValid);
+  const hasCalculated = true;
 
   // Keep the URL in sync with the form state so the address bar is always a
   // copyable share link. Debounced inside useUrlSync.
@@ -253,13 +253,6 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
 
   function handleCalculate() {
     if (!isValid) return;
-    setHasCalculated(true);
-    // On mobile (< lg), results appear below the form — scroll there after render
-    setTimeout(() => {
-      if (window.innerWidth < 1024) {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 120);
     const props = {
       monthlySalary: parsedInput.monthlySalary,
       annualBonus: parsedInput.annualBonus,
@@ -306,32 +299,18 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
     setResidentStatus(DEFAULT_INPUTS.residentStatus);
     setIncludeSkbbk(DEFAULT_INPUTS.includeSkbbk);
     setView("employee");
-    setHasCalculated(false);
   }
 
   const showResults = hasCalculated && isValid;
 
   return (
     <div className="w-full">
+      {isValid && <MobileResultBar label={t("salary.takeHomePay")} value={money(result.monthlyNet)} targetRef={resultsRef} />}
       <CalculatorHero
         category="Finance"
         title={t("salary.title")}
         subtitle={t("salary.subtitle")}
         badges={[t("salary.badge")]}
-        result={
-          <HeadlineResult
-            label={t("salary.takeHomePay")}
-            value={money(showResults ? result.monthlyNet : 0)}
-            progress={{ pct: showResults ? takeHomeRatio : 0 }}
-            note={
-              !isValid
-                ? t("salary.fixInputErrors")
-                : showResults
-                ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                : t("salary.cta.tapToReveal")
-            }
-          />
-        }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
@@ -460,21 +439,24 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </div>
             ) : null}
 
-            <Button
-              type="button"
-              size="lg"
-              className="w-full gap-2 rounded-xl text-base font-semibold"
-              disabled={!isValid}
-              onClick={handleCalculate}
-            >
-              <CalculatorIcon className="h-4 w-4" />
-              {hasCalculated ? t("salary.cta.recalculate") : t("salary.cta.calculate")}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
           </CardContent>
         </Card>
 
         <div ref={resultsRef} className="scroll-mt-20 space-y-6 min-w-0">
+          {isValid && (
+          <HeadlineResult
+            label={t("salary.takeHomePay")}
+            value={money(showResults ? result.monthlyNet : 0)}
+            progress={{ pct: showResults ? takeHomeRatio : 0 }}
+            note={
+              !isValid
+                ? t("salary.fixInputErrors")
+                : showResults
+                ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
+                : t("salary.cta.tapToReveal")
+            }
+          />
+          )}
           {/* Mobile-only take-home summary — mirrors the hero card hidden on small screens */}
           {!showResults ? (
             <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">

@@ -1,10 +1,10 @@
 import { ArrowRight, Calculator as CalculatorIcon, Home, Info, PiggyBank } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult, MobileResultBar } from "@/components/CalculatorHero";
 import { WhatNext } from "@/components/WhatNext";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -268,9 +268,17 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.price > 0;
-  const [hasCalculated, setHasCalculated] = useState(isValid);
+  const hasCalculated = true;
   const result = useMemo(() => calculateHousingLoan(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    if (!isValid) return;
+    const id = setTimeout(handleCalculate, 2500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsed]);
 
   // Widest year drives the bar chart scale so the columns stay comparable.
   const peakYearTotal = useMemo(
@@ -280,12 +288,6 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
 
   function handleCalculate() {
     if (!isValid) return;
-    setHasCalculated(true);
-    setTimeout(() => {
-      if (window.innerWidth < 1024) {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 120);
 
     const payload = {
       price: Math.round(parsed.price),
@@ -323,7 +325,6 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
     setAbsorbLegal(HOUSING_LOAN_DEFAULTS.developerAbsorbsLegal);
     setMotShareInput(toInputString(HOUSING_LOAN_DEFAULTS.motAbsorbedPct));
     setFinanceMrta(HOUSING_LOAN_DEFAULTS.financeMrta);
-    setHasCalculated(false);
   }
 
   const savedYears = Math.floor(result.monthsSaved / 12);
@@ -331,18 +332,12 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
 
   return (
     <div className="w-full">
+      {isValid && <MobileResultBar label={t("housing.monthlyInstallment")} value={money2(result.monthlyInstallment)} targetRef={resultsRef} />}
       <CalculatorHero
         category="Finance"
         title={t("housing.title")}
         subtitle={t("housing.subtitle")}
         badges={[t("housing.badge"), t("housing.badge.private")]}
-        result={
-          <HeadlineResult
-            label={t("housing.monthlyInstallment")}
-            value={money2(showResults ? result.monthlyInstallment : 0)}
-            note={showResults ? `${t("housing.over")} ${parsed.tenureYears} ${t("housing.years")}` : t("housing.cta.tapToReveal")}
-          />
-        }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
@@ -477,21 +472,17 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                size="lg"
-                className="w-full gap-2 rounded-xl text-base font-semibold"
-                disabled={!isValid}
-                onClick={handleCalculate}
-              >
-                <CalculatorIcon className="h-4 w-4" />
-                {hasCalculated ? t("housing.cta.recalculate") : t("housing.cta.calculate")}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
             </CardContent>
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
+            {isValid && (
+            <HeadlineResult
+              label={t("housing.monthlyInstallment")}
+              value={money2(showResults ? result.monthlyInstallment : 0)}
+              note={showResults ? `${t("housing.over")} ${parsed.tenureYears} ${t("housing.years")}` : t("housing.cta.tapToReveal")}
+            />
+            )}
             {!showResults ? (
               <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
                 <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">

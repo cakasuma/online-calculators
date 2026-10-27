@@ -1,10 +1,10 @@
 import { ArrowRight, Calculator as CalculatorIcon, Coins, Landmark, PiggyBank, TrendingUp } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult, MobileResultBar } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -151,18 +151,20 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.principal > 0;
-  const [hasCalculated, setHasCalculated] = useState(isValid);
+  const hasCalculated = true;
   const result = useMemo(() => calculateFixedDeposit(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    if (!isValid) return;
+    const id = setTimeout(handleCalculate, 2500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsed]);
 
   function handleCalculate() {
     if (!isValid) return;
-    setHasCalculated(true);
-    setTimeout(() => {
-      if (window.innerWidth < 1024) {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 120);
 
     const payload = {
       principal: Math.round(parsed.principal),
@@ -186,23 +188,16 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
     setPrincipalInput(toInputString(FIXED_DEPOSIT_DEFAULTS.principal));
     setRateInput(toInputString(FIXED_DEPOSIT_DEFAULTS.annualRate));
     setMonthsInput(toInputString(FIXED_DEPOSIT_DEFAULTS.tenureMonths));
-    setHasCalculated(false);
   }
 
   return (
     <div className="w-full">
+      {isValid && <MobileResultBar label={t("fd.maturityValue")} value={money2(result.maturityValue)} targetRef={resultsRef} />}
       <CalculatorHero
         category="Finance"
         title={t("fd.title")}
         subtitle={t("fd.subtitle")}
         badges={[t("fd.badge"), t("fd.badge.private")]}
-        result={
-          <HeadlineResult
-            label={t("fd.maturityValue")}
-            value={money2(showResults ? result.maturityValue : 0)}
-            note={showResults ? `${parsed.tenureMonths} ${t("fd.months")} @ ${parsed.annualRate}%` : t("fd.cta.tapToReveal")}
-          />
-        }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
@@ -276,21 +271,17 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
                 <p>{t("fd.disclaimer")}</p>
               </div>
 
-              <Button
-                type="button"
-                size="lg"
-                className="w-full gap-2 rounded-xl text-base font-semibold"
-                disabled={!isValid}
-                onClick={handleCalculate}
-              >
-                <CalculatorIcon className="h-4 w-4" />
-                {hasCalculated ? t("fd.cta.recalculate") : t("fd.cta.calculate")}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
             </CardContent>
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
+            {isValid && (
+            <HeadlineResult
+              label={t("fd.maturityValue")}
+              value={money2(showResults ? result.maturityValue : 0)}
+              note={showResults ? `${parsed.tenureMonths} ${t("fd.months")} @ ${parsed.annualRate}%` : t("fd.cta.tapToReveal")}
+            />
+            )}
 
             {!showResults ? (
               <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">

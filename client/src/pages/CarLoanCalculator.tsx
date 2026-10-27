@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
-import { RelatedToolsCard } from "@/components/RelatedToolsCard";
+import { WhatNext } from "@/components/WhatNext";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { recordServerEvent, track } from "@/lib/analytics";
@@ -129,7 +129,7 @@ interface Props {
 export default function CarLoanCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
   const [initial] = useState<CarLoanInputs>(() => mergeFromUrl<CarLoanInputs>(CAR_LOAN_DEFAULTS, URL_SCHEMA));
-  const arrivedViaShare = useMemo(() => urlHasSchemaParams(URL_SCHEMA), []);
+
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const [priceInput, setPriceInput] = useState(toInputString(initial.price));
@@ -160,7 +160,7 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.price > 0;
-  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+  const [hasCalculated, setHasCalculated] = useState(isValid);
   const result = useMemo(() => calculateCarLoan(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
 
@@ -327,17 +327,6 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
-            <Card className="lg:hidden ">
-              <CardContent className="p-4 sm:p-6">
-                <p className="text-sm text-muted-foreground">{t("carloan.monthlyInstalment")}</p>
-                <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">
-                  {money2(showResults ? result.monthlyInstalment : 0)}
-                </p>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {showResults ? `${t("carloan.over")} ${parsed.tenureYears} ${t("carloan.years")}` : t("carloan.cta.tapToReveal")}
-                </p>
-              </CardContent>
-            </Card>
 
             {!showResults ? (
               <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
@@ -540,7 +529,13 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
                   </Card>
                 )}
 
-                <RelatedToolsCard currentHref="/car-loan" />
+                <WhatNext
+                  from="car-loan"
+                  items={[
+                    { target: "salary", href: "/salary", title: t("whatnext.loan.salary.title"), description: t("whatnext.loan.salary.desc") },
+                    { target: "housing-loan", href: "/housing-loan", title: t("whatnext.loan.housing.title"), description: t("whatnext.loan.housing.desc") },
+                  ]}
+                />
               </>
             )}
           </div>

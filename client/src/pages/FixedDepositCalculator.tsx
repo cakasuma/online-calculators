@@ -125,7 +125,7 @@ interface Props {
 export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
   const [initial] = useState<FixedDepositInputs>(() => mergeFromUrl<FixedDepositInputs>(FIXED_DEPOSIT_DEFAULTS, URL_SCHEMA));
-  const arrivedViaShare = useMemo(() => urlHasSchemaParams(URL_SCHEMA), []);
+
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const [principalInput, setPrincipalInput] = useState(toInputString(initial.principal));
@@ -151,7 +151,7 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.principal > 0;
-  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+  const [hasCalculated, setHasCalculated] = useState(isValid);
   const result = useMemo(() => calculateFixedDeposit(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
 
@@ -291,17 +291,6 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
-            <Card className="lg:hidden ">
-              <CardContent className="p-4 sm:p-6">
-                <p className="text-sm text-muted-foreground">{t("fd.maturityValue")}</p>
-                <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">
-                  {money2(showResults ? result.maturityValue : 0)}
-                </p>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {showResults ? `${parsed.tenureMonths} ${t("fd.months")} @ ${parsed.annualRate}%` : t("fd.cta.tapToReveal")}
-                </p>
-              </CardContent>
-            </Card>
 
             {!showResults ? (
               <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">

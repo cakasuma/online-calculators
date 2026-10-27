@@ -21,7 +21,7 @@ interface CalculatorHeroProps {
 export function CalculatorHero({ category, title, subtitle, badges, result }: CalculatorHeroProps) {
   return (
     <section className="hk-pagehead print:hidden">
-      <div className={`hk-container py-8 md:py-10 grid items-end gap-8 ${result ? "md:grid-cols-[minmax(0,1fr)_340px]" : ""}`}>
+      <div className={`hk-container py-6 md:py-10 grid items-end gap-5 md:gap-8 ${result ? "md:grid-cols-[minmax(0,1fr)_340px]" : ""}`}>
         <div className="min-w-0">
           <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
             <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
@@ -36,15 +36,15 @@ export function CalculatorHero({ category, title, subtitle, badges, result }: Ca
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-3 max-w-[62ch] text-base sm:text-[17px] leading-relaxed text-muted-foreground">
+            <p className={`mt-3 max-w-[62ch] text-base sm:text-[17px] leading-relaxed text-muted-foreground ${result ? "hidden sm:block" : ""}`}>
               {subtitle}
             </p>
           )}
           {badges && badges.length > 0 && (
-            <p className="mt-3 text-sm text-muted-foreground">{badges.join(" · ")}</p>
+            <p className={`mt-3 text-sm text-muted-foreground ${result ? "hidden sm:block" : ""}`}>{badges.join(" · ")}</p>
           )}
         </div>
-        {result && <div className="hidden md:block">{result}</div>}
+        {result && <div>{result}</div>}
       </div>
     </section>
   );

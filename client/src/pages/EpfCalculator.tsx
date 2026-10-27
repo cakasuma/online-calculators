@@ -18,7 +18,6 @@ import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n"
 import { recordServerEvent, track } from "@/lib/analytics";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
-import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { RatesVerified } from "@/components/RatesVerified";
 import { WhatNext } from "@/components/WhatNext";
 import {
@@ -114,7 +113,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
   const [initial] = useState<EpfInputs>(() =>
     mergeFromUrl<EpfInputs>({ ...EPF_DEFAULTS }, EPF_URL_SCHEMA),
   );
-  const arrivedViaShare = useMemo(() => urlHasSchemaParams(EPF_URL_SCHEMA), []);
+  
 
   // Form state
   const [currentAge, setCurrentAge] = useState(String(initial.currentAge));
@@ -192,7 +191,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
 
   // Auto-run when arriving via a shared link
   useEffect(() => {
-    if (arrivedViaShare) {
+    {
       const result = projectEpf(parsedInputs);
       setCalcResult(result);
       hasCalculatedRef.current = true;
@@ -752,7 +751,6 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
 
           <RatesVerified sources={["kwsp", "lhdn"]} />
 
-          <RelatedToolsCard currentHref="/epf-retirement" />
         </div>
       </div>
       </div>

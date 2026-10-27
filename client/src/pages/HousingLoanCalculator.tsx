@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
-import { RelatedToolsCard } from "@/components/RelatedToolsCard";
+import { WhatNext } from "@/components/WhatNext";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { recordServerEvent, track } from "@/lib/analytics";
@@ -228,13 +228,6 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
     }
     return merged;
   });
-  const arrivedViaShare = useMemo(
-    () =>
-      urlHasSchemaParams(URL_SCHEMA) ||
-      // A legacy link may carry only the old down-payment parameter.
-      (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("down")),
-    [],
-  );
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const [priceInput, setPriceInput] = useState(toInputString(initial.price));
@@ -275,7 +268,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.price > 0;
-  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+  const [hasCalculated, setHasCalculated] = useState(isValid);
   const result = useMemo(() => calculateHousingLoan(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
 
@@ -739,7 +732,13 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   </CardContent>
                 </Card>
 
-                <RelatedToolsCard currentHref="/housing-loan" />
+                <WhatNext
+                  from="housing-loan"
+                  items={[
+                    { target: "salary", href: "/salary", title: t("whatnext.loan.salary.title"), description: t("whatnext.loan.salary.desc") },
+                    { target: "car-loan", href: "/car-loan", title: t("whatnext.loan.car.title"), description: t("whatnext.loan.car.desc") },
+                  ]}
+                />
               </>
             )}
           </div>

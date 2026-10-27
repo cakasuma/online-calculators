@@ -23,7 +23,6 @@ import {
   type UrlSchema,
 } from "@/lib/urlState";
 import { downloadSalaryPdf } from "@/lib/pdf/salaryPdf";
-import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { calculateSalary, FOREIGN_EPF_RATE } from "@/lib/malaysianPayroll";
 import { RatesVerified } from "@/components/RatesVerified";
 import { WhatNext } from "@/components/WhatNext";
@@ -205,7 +204,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
       SALARY_URL_SCHEMA,
     ),
   );
-  const arrivedViaShare = useMemo(() => urlHasSchemaParams(SALARY_URL_SCHEMA), []);
+  
   const resultsRef = useRef<HTMLDivElement>(null);
   const [monthlySalaryInput, setMonthlySalaryInput] = useState(toInputString(initial.monthlySalary));
   const [annualBonusInput, setAnnualBonusInput] = useState(toInputString(initial.annualBonus));
@@ -241,7 +240,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const isValid = Object.keys(errors).length === 0;
   // If the user arrived via a shared link, show results immediately so they
   // don't have to click Calculate just to see what was shared.
-  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+  const [hasCalculated, setHasCalculated] = useState(isValid);
 
   // Keep the URL in sync with the form state so the address bar is always a
   // copyable share link. Debounced inside useUrlSync.
@@ -477,23 +476,6 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
 
         <div ref={resultsRef} className="scroll-mt-20 space-y-6 min-w-0">
           {/* Mobile-only take-home summary — mirrors the hero card hidden on small screens */}
-          <Card className="lg:hidden ">
-            <CardContent className="p-4 sm:p-6">
-              <p className="text-sm text-muted-foreground">{t("salary.takeHomePay")}</p>
-              <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
-              <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {!isValid
-                  ? t("salary.fixInputErrors")
-                  : showResults
-                  ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                  : t("salary.cta.tapToReveal")}
-              </p>
-            </CardContent>
-          </Card>
-
           {!showResults ? (
             <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
               <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
@@ -590,6 +572,30 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             </Card>
           )}
 
+          {showResults && (
+            <WhatNext
+              from="salary"
+              items={[
+                {
+                  target: "income-tax",
+                  href: `/income-tax?${new URLSearchParams({
+                    income: String(Math.round(result.annualGross)),
+                    epf: String(Math.round(Math.min(result.annualEpf, 4000))),
+                    socso: String(Math.round(Math.min(result.annualSocso + result.annualEis, 350))),
+                  }).toString()}`,
+                  title: t("whatnext.salary.tax.title"),
+                  description: t("whatnext.salary.tax.desc"),
+                },
+                {
+                  target: "epf-retirement",
+                  href: `/epf-retirement?sal=${Math.round(parsedInput.monthlySalary)}&emp=${parsedInput.epfRate}`,
+                  title: t("whatnext.salary.epf.title"),
+                  description: t("whatnext.salary.epf.desc"),
+                },
+              ]}
+            />
+          )}
+
           {showResults && <SalaryPercentile monthlyGross={parsedInput.monthlySalary} />}
 
           {showResults && (
@@ -677,33 +683,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             </Card>
           )}
 
-          {showResults && (
-            <WhatNext
-              from="salary"
-              items={[
-                {
-                  target: "income-tax",
-                  href: `/income-tax?${new URLSearchParams({
-                    income: String(Math.round(result.annualGross)),
-                    epf: String(Math.round(Math.min(result.annualEpf, 4000))),
-                    socso: String(Math.round(Math.min(result.annualSocso + result.annualEis, 350))),
-                  }).toString()}`,
-                  title: t("whatnext.salary.tax.title"),
-                  description: t("whatnext.salary.tax.desc"),
-                },
-                {
-                  target: "epf-retirement",
-                  href: `/epf-retirement?sal=${Math.round(parsedInput.monthlySalary)}&emp=${parsedInput.epfRate}`,
-                  title: t("whatnext.salary.epf.title"),
-                  description: t("whatnext.salary.epf.desc"),
-                },
-              ]}
-            />
-          )}
-
           <RatesVerified sources={["kwsp", "perkeso", "lhdn"]} />
 
-          {showResults && <RelatedToolsCard currentHref="/salary" />}
         </div>
       </div>
       </div>

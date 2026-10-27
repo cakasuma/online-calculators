@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type RefObject } from "react";
+import { useLocale } from "@/hooks/use-locale";
 import { Link } from "wouter";
-import { ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface CalculatorHeroProps {
   /** Breadcrumb category label, e.g. "Finance" / "Math" / "Islamic & Planning". */
@@ -36,12 +37,12 @@ export function CalculatorHero({ category, title, subtitle, badges, result }: Ca
             {title}
           </h1>
           {subtitle && (
-            <p className={`mt-3 max-w-[62ch] text-base sm:text-[17px] leading-relaxed text-muted-foreground ${result ? "hidden sm:block" : ""}`}>
+            <p className={`mt-3 max-w-[62ch] text-base sm:text-[17px] leading-relaxed text-muted-foreground hidden sm:block`}>
               {subtitle}
             </p>
           )}
           {badges && badges.length > 0 && (
-            <p className={`mt-3 text-sm text-muted-foreground ${result ? "hidden sm:block" : ""}`}>{badges.join(" · ")}</p>
+            <p className={`mt-3 text-sm text-muted-foreground hidden sm:block`}>{badges.join(" · ")}</p>
           )}
         </div>
         {result && <div>{result}</div>}
@@ -76,5 +77,39 @@ export function HeadlineResult({ label, value, note, progress }: HeadlineResultP
       )}
       {note && <p className="mt-3 text-sm text-muted-foreground">{note}</p>}
     </div>
+  );
+}
+
+/**
+ * Mobile-only pill that keeps the headline answer on screen while the user edits
+ * inputs. It hides itself once the real result is visible, so only one result
+ * is ever on screen.
+ */
+export function MobileResultBar({ label, value, targetRef }: { label: string; value: string; targetRef: RefObject<HTMLElement> }) {
+  const { t } = useLocale();
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = targetRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([entry]) => setVisible(!entry.isIntersecting), { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [targetRef]);
+  if (!visible) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => targetRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+      className="fixed inset-x-3 bottom-3 z-30 flex min-h-14 items-center justify-between gap-3 rounded-xl border border-primary/30 bg-card px-4 py-2 text-left shadow-lg lg:hidden print:hidden"
+      aria-label={`${label}: ${value}`}
+    >
+      <span className="min-w-0">
+        <span className="block text-xs text-muted-foreground">{label}</span>
+        <span className="block font-display text-xl font-semibold tabular-nums leading-tight">{value}</span>
+      </span>
+      <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-primary">
+        {t("result.breakdown")} <ChevronDown className="h-4 w-4" aria-hidden="true" />
+      </span>
+    </button>
   );
 }

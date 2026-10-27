@@ -1,5 +1,5 @@
 import { ArrowRight, Calculator as CalculatorIcon, ChevronDown, Info, Landmark, Percent, Receipt } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -262,18 +262,20 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.annualIncome > 0;
-  const [hasCalculated, setHasCalculated] = useState(isValid);
+  const hasCalculated = true;
   const result = useMemo(() => calculateIncomeTax(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    if (!isValid) return;
+    const id = setTimeout(handleCalculate, 2500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsed]);
 
   function handleCalculate() {
     if (!isValid) return;
-    setHasCalculated(true);
-    setTimeout(() => {
-      if (window.innerWidth < 1024) {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 120);
 
     const payload = {
       annualIncome: Math.round(parsed.annualIncome),
@@ -325,7 +327,6 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
     setDisabledSelf(INCOME_TAX_DEFAULTS.disabledSelf);
     setDisabledSpouse(INCOME_TAX_DEFAULTS.disabledSpouse);
     setHousingLoanBand(INCOME_TAX_DEFAULTS.housingLoanBand);
-    setHasCalculated(false);
   }
 
   const capHint = (cap: number) => t("tax.cap").replace("{cap}", money0(cap));
@@ -337,17 +338,6 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
         title={t("tax.title")}
         subtitle={t("tax.subtitle")}
         badges={[t("tax.badge"), t("tax.badge.private")]}
-        result={
-          <HeadlineResult
-            label={t("tax.taxPayable")}
-            value={money(showResults ? result.taxPayable : 0)}
-            note={
-              showResults
-                ? `${t("tax.effectiveRate")} ${percent(result.effectiveRate)}`
-                : t("tax.cta.tapToReveal")
-            }
-          />
-        }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
@@ -596,22 +586,22 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
               </div>
 
               <div className="sticky bottom-14 z-20 -mx-4 -mb-5 border-t bg-background/95 px-4 pb-2 pt-3 backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:mb-0 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-0">
-                <Button
-                  type="button"
-                  size="lg"
-                  className="w-full gap-2 rounded-xl text-base font-semibold"
-                  disabled={!isValid}
-                  onClick={handleCalculate}
-                >
-                  <CalculatorIcon className="h-4 w-4" />
-                  {hasCalculated ? t("tax.cta.recalculate") : t("tax.cta.calculate")}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
               </div>
             </CardContent>
           </Card>
 
           <div ref={resultsRef} className="scroll-mt-20 space-y-6 min-w-0">
+            {isValid && (
+            <HeadlineResult
+              label={t("tax.taxPayable")}
+              value={money(showResults ? result.taxPayable : 0)}
+              note={
+                showResults
+                  ? `${t("tax.effectiveRate")} ${percent(result.effectiveRate)}`
+                  : t("tax.cta.tapToReveal")
+              }
+            />
+            )}
             <Card className="lg:hidden ">
               <CardContent className="p-4 sm:p-6">
                 <p className="text-sm text-muted-foreground">{t("tax.taxPayable")}</p>

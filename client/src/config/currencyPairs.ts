@@ -1,8 +1,8 @@
 // SEO config + long-form copy for the currency converter and its per-pair
 // landing pages (e.g. /en/currency-converter/usd-to-myr).
 //
-// Every pair is a real, prerendered, indexable page targeting the long-tail
-// query people actually type ("usd to myr", "convert 100 sgd to ringgit").
+// Every pair is a working page for the long-tail query people type
+// ("usd to myr", "convert 100 sgd to ringgit"), served client-side and noindex.
 // Copy is generated from FX_SNAPSHOT so every page carries real, dated
 // numbers rather than boilerplate. Plain data + pure functions only — this
 // module is consumed by both the React app and the Node build step.
@@ -279,7 +279,9 @@ export function buildPairRoute(from: string, to: string): RouteSeoEntry {
   return {
     slug: pairSlug(a, b),
     path: pairPath(a, b),
-    prerender: true,
+    // Pair pages stay routable in the SPA but are noindex and not prerendered
+    // or listed in the sitemap (see isRouteIndexable).
+    prerender: false,
     sitemap: { priority: involvesMyr ? 0.8 : 0.6, changefreq: "daily" },
     copy,
   };

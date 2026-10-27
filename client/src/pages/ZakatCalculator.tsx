@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { recordServerEvent, track } from "@/lib/analytics";
-import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -564,8 +563,6 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         </CardContent>
       </Card>
 
-      <AdSlot id="zakat-top" variant="banner" />
-
       {/* Accordion Categories */}
       <Accordion type="multiple" defaultValue={["cash", "gold"]} className="space-y-3">
         {/* ── Cash & Savings ── */}
@@ -956,8 +953,6 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         </AccordionItem>
       </Accordion>
 
-      <AdSlot id="zakat-mid" variant="rectangle" />
-
       {/* ── Summary Card ── */}
       <Card className={`border-2 transition-colors ${summaryColor}`}>
         <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
@@ -1120,8 +1115,6 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
           })}
         />
       )}
-
-      <AdSlot id="zakat-bottom" variant="banner" />
 
       {/* About Nisab & Hawl */}
       <Card className="bg-muted/30">

@@ -102,9 +102,10 @@ export const blogArticles: BlogArticle[] = [
             ["EPF (Employee 11%)", "RM660.00", "Goes to your EPF account"],
             ["SOCSO (employee)", "RM29.75", "PERKESO official ceiling-band amount"],
             ["EIS (employee)", "RM11.90", "At the RM6,000 wage ceiling"],
-            ["Estimated monthly tax", "RM202.92", "Annualised estimate; actual PCB varies"],
-            ["Total Deductions", "RM904.57", "Under the calculator's assumptions"],
-            ["Take-Home Pay", "RM5,095.43", "Estimated monthly net pay"],
+            ["SKBBK / Lindung 24 Jam (0.75%)", "RM45.00", "New from 1 June 2026, capped at RM45/month"],
+            ["Estimated monthly tax", "RM204.29", "Annualised estimate; actual PCB varies"],
+            ["Total Deductions", "RM950.94", "Under the calculator's assumptions"],
+            ["Take-Home Pay", "RM5,049.06", "Estimated monthly net pay (RM5,094.06 without SKBBK)"],
           ],
         },
         callout:

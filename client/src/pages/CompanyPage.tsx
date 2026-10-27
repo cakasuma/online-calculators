@@ -1,5 +1,5 @@
 import { useLocale } from "@/hooks/use-locale";
-import { CONTACT_EMAIL, OPERATOR_URL, companyPages } from "@/config/legal";
+import { CONTACT_EMAIL, ISSUES_URL, OPERATOR_URL, companyPages } from "@/config/legal";
 
 export default function CompanyPage({ page }: { page: "about" | "contact" }) {
   const { locale } = useLocale();
@@ -12,6 +12,10 @@ export default function CompanyPage({ page }: { page: "about" | "contact" }) {
       <p className="text-sm leading-relaxed">
         <a href={OPERATOR_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
           amammustofa.com
+        </a>
+        {" · "}
+        <a href={ISSUES_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+          GitHub issues
         </a>
         {CONTACT_EMAIL && <> · <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2">{CONTACT_EMAIL}</a></>}
       </p>

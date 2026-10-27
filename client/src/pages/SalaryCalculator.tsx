@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/hooks/use-locale";
 import type { TranslationKey } from "@/lib/i18n";
-import { CalculatorHero } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { SalaryPercentile } from "@/components/SalaryPercentile";
 import { recordServerEvent, track } from "@/lib/analytics";
 import {
+  boolField,
   buildShareUrl,
   enumField,
   mergeFromUrl,
@@ -23,7 +24,9 @@ import {
 } from "@/lib/urlState";
 import { downloadSalaryPdf } from "@/lib/pdf/salaryPdf";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
-import { calculateSalary } from "@/lib/malaysianPayroll";
+import { calculateSalary, FOREIGN_EPF_RATE } from "@/lib/malaysianPayroll";
+import { RatesVerified } from "@/components/RatesVerified";
+import { WhatNext } from "@/components/WhatNext";
 
 type ResidentStatus = "resident" | "non-resident";
 type WorkerType = "malaysian" | "foreigner";
@@ -35,6 +38,7 @@ interface SalaryInputs {
   epfRate: number;
   workerType: WorkerType;
   residentStatus: ResidentStatus;
+  includeSkbbk: boolean;
 }
 
 interface InputErrors {
@@ -51,6 +55,7 @@ const DEFAULT_INPUTS: SalaryInputs = {
   epfRate: 11,
   workerType: "malaysian",
   residentStatus: "resident",
+  includeSkbbk: true,
 };
 
 const money = (value: number) =>
@@ -137,7 +142,7 @@ function NumberField({
         onChange={(event) => onChange(event.target.value)}
         onBlur={() => onChange(formatInputNumber(value, maxDecimals ?? 2))}
         placeholder={placeholder}
-        className={`w-full rounded-2xl border bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:ring-4 dark:bg-slate-950 ${
+        className={`w-full rounded-xl border bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:ring-4 dark:bg-slate-950 ${
           error
             ? "border-red-400 focus:border-red-500 focus:ring-red-500/10 dark:border-red-500/70"
             : "border-slate-200 focus:border-primary focus:ring-primary/10 dark:border-slate-800"
@@ -156,6 +161,7 @@ interface SalaryUrlState {
   epfRate: number;
   workerType: WorkerType;
   residentStatus: ResidentStatus;
+  includeSkbbk: boolean;
 }
 
 const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
@@ -174,6 +180,7 @@ const SALARY_URL_SCHEMA: UrlSchema<SalaryUrlState> = {
   },
   workerType: enumField<SalaryUrlState, "workerType">("worker", ["malaysian", "foreigner"]),
   residentStatus: enumField<SalaryUrlState, "residentStatus">("res", ["resident", "non-resident"]),
+  includeSkbbk: boolField<SalaryUrlState, "includeSkbbk">("skbbk", true),
 };
 
 interface Props {
@@ -193,6 +200,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
         epfRate: DEFAULT_INPUTS.epfRate,
         workerType: DEFAULT_INPUTS.workerType,
         residentStatus: DEFAULT_INPUTS.residentStatus,
+        includeSkbbk: DEFAULT_INPUTS.includeSkbbk,
       },
       SALARY_URL_SCHEMA,
     ),
@@ -205,6 +213,16 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
   const [epfRateInput, setEpfRateInput] = useState(toInputString(initial.epfRate));
   const [workerType, setWorkerType] = useState<WorkerType>(initial.workerType);
   const [residentStatus, setResidentStatus] = useState<ResidentStatus>(initial.residentStatus);
+  const [includeSkbbk, setIncludeSkbbk] = useState(initial.includeSkbbk);
+  const [view, setView] = useState<"employee" | "employer">("employee");
+
+  function changeWorkerType(next: WorkerType) {
+    if (next === workerType) return;
+    setWorkerType(next);
+    // Foreign workers default to the mandatory 2% rate; locals back to 11%.
+    setEpfRateInput(String(next === "foreigner" ? FOREIGN_EPF_RATE : DEFAULT_INPUTS.epfRate));
+    track("salary_mode_toggle", { mode: "worker_type", value: next });
+  }
 
   const parsedInput = useMemo<SalaryInputs>(
     () => ({
@@ -214,8 +232,9 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
       epfRate: Math.max(0, parseNumberInput(epfRateInput) || 0),
       workerType,
       residentStatus,
+      includeSkbbk,
     }),
-    [monthlySalaryInput, annualBonusInput, otherReliefInput, epfRateInput, workerType, residentStatus],
+    [monthlySalaryInput, annualBonusInput, otherReliefInput, epfRateInput, workerType, residentStatus, includeSkbbk],
   );
 
   const errors = useMemo(() => validateInputs(parsedInput), [parsedInput]);
@@ -286,6 +305,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
     setEpfRateInput(toInputString(DEFAULT_INPUTS.epfRate));
     setWorkerType(DEFAULT_INPUTS.workerType);
     setResidentStatus(DEFAULT_INPUTS.residentStatus);
+    setIncludeSkbbk(DEFAULT_INPUTS.includeSkbbk);
+    setView("employee");
     setHasCalculated(false);
   }
 
@@ -299,26 +320,24 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
         subtitle={t("salary.subtitle")}
         badges={[t("salary.badge")]}
         result={
-          <div className="rounded-[20px] border border-white/12 bg-white/[0.08] p-6 backdrop-blur-xl text-white">
-            <p className="text-[13px] text-emerald-100">{t("salary.takeHomePay")}</p>
-            <p className="mt-2 text-3xl md:text-4xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
-            <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
-              <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
-            </div>
-            <p className="mt-2 text-[13px] text-white/60">
-              {!isValid
+          <HeadlineResult
+            label={t("salary.takeHomePay")}
+            value={money(showResults ? result.monthlyNet : 0)}
+            progress={{ pct: showResults ? takeHomeRatio : 0 }}
+            note={
+              !isValid
                 ? t("salary.fixInputErrors")
                 : showResults
                 ? `${takeHomeRatio.toFixed(1)}% ${t("salary.ofMonthlyGross")}`
-                : t("salary.cta.tapToReveal")}
-            </p>
-          </div>
+                : t("salary.cta.tapToReveal")
+            }
+          />
         }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
       <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] min-w-0">
-        <Card className="rounded-2xl sm:rounded-3xl border-slate-200/80 shadow-sm dark:border-slate-800 min-w-0">
+        <Card className="rounded-xl min-w-0">
           <CardContent className="space-y-5 p-4 sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -373,8 +392,8 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 <span className="text-sm font-medium">{t("salary.inputs.workerType")}</span>
                 <select
                   value={workerType}
-                  onChange={(event) => setWorkerType(event.target.value as WorkerType)}
-                  className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                  onChange={(event) => changeWorkerType(event.target.value as WorkerType)}
+                  className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="malaysian">{t("salary.inputs.workerType.malaysian")}</option>
                   <option value="foreigner">{t("salary.inputs.workerType.foreigner")}</option>
@@ -385,7 +404,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 <select
                   value={residentStatus}
                   onChange={(event) => setResidentStatus(event.target.value as ResidentStatus)}
-                  className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                  className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="resident">{t("salary.inputs.resident")}</option>
                   <option value="non-resident">{t("salary.inputs.nonResident")}</option>
@@ -393,7 +412,40 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </label>
             </div>
 
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
+            {workerType === "malaysian" ? (
+              <label className="flex items-start gap-3 rounded-xl border bg-muted/30 p-3 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4"
+                  checked={includeSkbbk}
+                  onChange={(event) => {
+                    setIncludeSkbbk(event.target.checked);
+                    track("salary_mode_toggle", { mode: "skbbk", value: event.target.checked });
+                  }}
+                />
+                <span>
+                  <span className="block font-medium">{t("salary.skbbk.label")}</span>
+                  <span className="block text-xs text-muted-foreground">{t("salary.skbbk.hint")}</span>
+                </span>
+              </label>
+            ) : (
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm">
+                {t("salary.foreign.note")}
+              </div>
+            )}
+
+            {workerType === "malaysian" && locale === "id" ? (
+              <button
+                type="button"
+                className="w-full rounded-xl border border-primary/30 bg-primary/5 p-3 text-left text-sm hover:bg-primary/10"
+                onClick={() => changeWorkerType("foreigner")}
+              >
+                <span className="block">{t("salary.foreign.banner")}</span>
+                <span className="mt-1 block font-semibold text-primary">{t("salary.foreign.apply")} →</span>
+              </button>
+            ) : null}
+
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
               <div className="flex gap-2">
                 <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <p>{t("salary.disclaimer")}</p>
@@ -401,7 +453,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             </div>
 
             {hasNegativeTakeHome && isValid ? (
-              <div className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300">
+              <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300">
                 <div className="flex gap-2">
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <p>{t("salary.negativeWarning")}</p>
@@ -412,7 +464,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
             <Button
               type="button"
               size="lg"
-              className="w-full gap-2 rounded-2xl text-base font-semibold"
+              className="w-full gap-2 rounded-xl text-base font-semibold"
               disabled={!isValid}
               onClick={handleCalculate}
             >
@@ -423,16 +475,16 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
           </CardContent>
         </Card>
 
-        <div ref={resultsRef} className="space-y-6 min-w-0">
+        <div ref={resultsRef} className="scroll-mt-20 space-y-6 min-w-0">
           {/* Mobile-only take-home summary — mirrors the hero card hidden on small screens */}
-          <Card className="lg:hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 border-emerald-900/50 text-white">
+          <Card className="lg:hidden ">
             <CardContent className="p-4 sm:p-6">
-              <p className="text-sm text-emerald-100">{t("salary.takeHomePay")}</p>
+              <p className="text-sm text-muted-foreground">{t("salary.takeHomePay")}</p>
               <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">{money(showResults ? result.monthlyNet : 0)}</p>
-              <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/15">
-                <div className="h-full rounded-full bg-emerald-400" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
+              <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${showResults ? takeHomeRatio : 0}%` }} />
               </div>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-muted-foreground">
                 {!isValid
                   ? t("salary.fixInputErrors")
                   : showResults
@@ -443,9 +495,9 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
           </Card>
 
           {!showResults ? (
-            <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
+            <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
               <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
-                <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                <div className="rounded-xl bg-primary/10 p-3 text-primary">
                   <CalculatorIcon className="h-6 w-6" />
                 </div>
                 <p className="text-base font-semibold">{t("salary.breakdown.ready")}</p>
@@ -455,29 +507,87 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 min-w-0">
-              {([
-                [t("salary.epfMonth"), result.monthlyEpf, percent(monthlyEpfRate), Wallet],
-                [t("salary.taxMonth"), result.monthlyTax, percent(monthlyTaxRate), TrendingUp],
-                [t("salary.socsoMonth"), result.monthlySocso, percent(monthlySocsoRate), Info],
-                [t("salary.eisMonth"), result.monthlyEis, percent(monthlyEisRate), Info],
-              ] as [string, number, string, typeof Wallet][]).map(([label, value, tooltipInfo, Icon]) => (
-                <Card key={label} className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
-                  <CardContent className="p-4 sm:p-5">
-                    <div className="flex items-center justify-between gap-3 min-w-0">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-muted-foreground">{label}</p>
-                        <p className="mt-1 text-xl sm:text-2xl font-bold break-words tabular-nums">{money(value)}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{t("salary.rateEstimate")} {tooltipInfo}</p>
-                      </div>
-                      <div className="rounded-2xl bg-primary/10 p-2.5 sm:p-3 text-primary flex-shrink-0">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            <Card className="rounded-xl shadow-sm min-w-0" data-testid="payslip">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-baseline justify-between gap-3 border-b border-dashed border-border pb-3">
+                  <span className="text-sm font-medium">{t("salary.inputs.monthlySalary")}</span>
+                  <span className="text-lg font-semibold tabular-nums">{money(parsedInput.monthlySalary)}</span>
+                </div>
+                <ul className="divide-y divide-border/60">
+                  {([
+                    [t("salary.epfMonth"), result.monthlyEpf, monthlyEpfRate],
+                    [t("salary.taxMonth"), result.monthlyTax, monthlyTaxRate],
+                    [t("salary.socsoMonth"), result.monthlySocso, monthlySocsoRate],
+                    [t("salary.eisMonth"), result.monthlyEis, monthlyEisRate],
+                    ...(result.monthlySkbbk > 0
+                      ? ([[t("salary.skbbkMonth"), result.monthlySkbbk, (result.monthlySkbbk / parsedInput.monthlySalary) * 100]] as [string, number, number][])
+                      : []),
+                  ] as [string, number, number][]).map(([label, value, rate]) => (
+                    <li key={label} className="flex items-baseline justify-between gap-3 py-2.5 min-w-0">
+                      <span className="min-w-0 text-sm text-muted-foreground">
+                        {label}
+                        <span className="ml-2 text-xs">{percent(rate)}</span>
+                      </span>
+                      <span className="shrink-0 font-medium tabular-nums">− {money(value)}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-baseline justify-between gap-3 border-t border-border pt-3">
+                  <span className="text-sm font-semibold">{t("salary.takeHomePay")}</span>
+                  <span className="font-display text-2xl font-bold tabular-nums text-primary">{money(result.monthlyNet)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {showResults && (
+            <div className="inline-flex rounded-2xl border bg-muted/40 p-1 text-sm" role="tablist">
+              {(["employee", "employer"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  role="tab"
+                  aria-selected={view === v}
+                  onClick={() => {
+                    setView(v);
+                    track("salary_view_toggle", { view: v });
+                  }}
+                  className={`rounded-xl px-4 py-1.5 font-medium transition ${view === v ? "bg-background shadow-sm" : "text-muted-foreground"}`}
+                >
+                  {t(v === "employee" ? "salary.view.employee" : "salary.view.employer")}
+                </button>
               ))}
             </div>
+          )}
+
+          {showResults && view === "employer" && (
+            <Card className="rounded-xl shadow-sm min-w-0" data-testid="employer-cost">
+              <CardContent className="space-y-3 p-4 sm:p-6">
+                <div>
+                  <h2 className="text-xl font-semibold">{t("salary.employer.title")}</h2>
+                  <p className="text-sm text-muted-foreground">{t("salary.employer.subtitle")}</p>
+                </div>
+                {([
+                  [t("salary.employer.gross"), parsedInput.monthlySalary],
+                  [t("salary.employer.epf").replace("{rate}", String(result.employerEpfPct)), result.monthlyEmployerEpf],
+                  [t("salary.employer.socso"), result.monthlyEmployerSocso],
+                  ...(result.monthlyEmployerEis > 0 ? [[t("salary.employer.eis"), result.monthlyEmployerEis]] : []),
+                ] as [string, number][]).map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between gap-3 rounded-2xl bg-muted/50 px-4 py-3">
+                    <span className="text-sm text-muted-foreground">{label}</span>
+                    <span className="font-semibold tabular-nums">{money(value)}</span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between gap-3 rounded-2xl bg-primary/10 px-4 py-3">
+                  <span className="text-sm font-medium">{t("salary.employer.total")}</span>
+                  <span className="text-lg font-bold tabular-nums">{money(result.monthlyEmployerCost)}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3 px-1 text-sm text-muted-foreground">
+                  <span>{t("salary.employer.annual")}</span>
+                  <span className="font-semibold tabular-nums">{money(result.annualEmployerCost)}</span>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {showResults && <SalaryPercentile monthlyGross={parsedInput.monthlySalary} />}
@@ -488,8 +598,10 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               intent="newsletter"
               source="salary-tax-tips"
               icon={<Sparkles className="w-4 h-4 text-primary" />}
-              title={t("salary.lead.title")}
-              description={t("salary.lead.desc")}
+              title={t("salary.lead.title.result").replace("{net}", Math.round(result.monthlyNet).toLocaleString("en-MY"))}
+              description={t("salary.lead.desc.result")
+                .replace("{gross}", Math.round(parsedInput.monthlySalary).toLocaleString("en-MY"))
+                .replace("{tax}", Math.round(result.annualIncomeTax).toLocaleString("en-MY"))}
               ctaLabel={t("salary.lead.cta")}
               successTitle={t("salary.lead.successTitle")}
               successMessage={t("salary.lead.successDesc")}
@@ -502,12 +614,12 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                 monthlyNet: Math.round(result.monthlyNet),
                 annualTax: Math.round(result.annualIncomeTax),
               })}
-              className="rounded-3xl"
+              className="rounded-xl"
             />
           )}
 
           {showResults && (
-            <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+            <Card className="rounded-xl shadow-sm min-w-0">
               <CardContent className="p-4 sm:p-6 min-w-0">
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <div>
@@ -528,7 +640,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                     />
                     <Button
                       variant="outline"
-                      className="gap-2 rounded-2xl"
+                      className="gap-2 rounded-xl"
                       onClick={() =>
                         downloadSalaryPdf({
                           inputs: parsedInput,
@@ -552,7 +664,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
                     [t("salary.estimatedMonthlyTax"), result.monthlyTax, `${t("salary.approxMonthlyRate")} ${percent(monthlyTaxRate)}`],
                     [t("salary.monthlyDeductions"), result.monthlyDeductions, t("salary.deductionItems")],
                   ] as [string, number, string][]).map(([label, value, helper]) => (
-                    <div key={label} className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+                    <div key={label} className="rounded-xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
                       <div className="flex items-center justify-between gap-3 min-w-0">
                         <span className="text-sm text-muted-foreground min-w-0 break-words">{label}</span>
                         <span className="font-semibold tabular-nums text-right break-words">{money(value)}</span>
@@ -564,6 +676,32 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
               </CardContent>
             </Card>
           )}
+
+          {showResults && (
+            <WhatNext
+              from="salary"
+              items={[
+                {
+                  target: "income-tax",
+                  href: `/income-tax?${new URLSearchParams({
+                    income: String(Math.round(result.annualGross)),
+                    epf: String(Math.round(Math.min(result.annualEpf, 4000))),
+                    socso: String(Math.round(Math.min(result.annualSocso + result.annualEis, 350))),
+                  }).toString()}`,
+                  title: t("whatnext.salary.tax.title"),
+                  description: t("whatnext.salary.tax.desc"),
+                },
+                {
+                  target: "epf-retirement",
+                  href: `/epf-retirement?sal=${Math.round(parsedInput.monthlySalary)}&emp=${parsedInput.epfRate}`,
+                  title: t("whatnext.salary.epf.title"),
+                  description: t("whatnext.salary.epf.desc"),
+                },
+              ]}
+            />
+          )}
+
+          <RatesVerified sources={["kwsp", "perkeso", "lhdn"]} />
 
           {showResults && <RelatedToolsCard currentHref="/salary" />}
         </div>

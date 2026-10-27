@@ -92,25 +92,23 @@ function HeroPreviewCard() {
     { label: "PCB (Income Tax)", value: r.monthlyTax },
   ];
   return (
-    <div className="rounded-[20px] border border-white/12 bg-white/[0.08] p-6 backdrop-blur-xl">
-      <div className="flex items-center gap-2.5 mb-5">
-        <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#3b82f6] to-[#2dd4bf] flex items-center justify-center">
-          <Wallet className="w-5 h-5 text-white" />
-        </div>
+    <div className="rounded-xl border border-border bg-card p-6 shadow-sm" aria-label={t("home.preview.caption")}>
+      <div className="mb-4 flex items-baseline justify-between gap-3 border-b border-dashed border-border pb-4">
         <div className="min-w-0">
-          <div className="text-white font-semibold text-[15px] leading-tight">RM 5,000 {t("home.preview.salary")}</div>
-          <div className="text-white/50 text-[12px]">{t("home.preview.caption")}</div>
+          <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("home.preview.caption")}</div>
+          <div className="mt-1 font-display text-lg font-semibold">RM 5,000 {t("home.preview.salary")}</div>
         </div>
+        <Wallet className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
       </div>
       {rows.map((row) => (
-        <div key={row.label} className="flex justify-between items-center py-2.5 border-b border-white/[0.07]">
-          <span className="text-white/60 text-[13px]">{row.label}</span>
-          <span className="text-red-400 font-semibold text-[13px] tabular-nums">− {money(row.value)}</span>
+        <div key={row.label} className="flex items-center justify-between py-2 text-sm">
+          <span className="text-muted-foreground">{row.label}</span>
+          <span className="font-medium tabular-nums">− {money(row.value)}</span>
         </div>
       ))}
-      <div className="flex justify-between items-center pt-3">
-        <span className="text-white font-semibold text-[13px]">{t("salary.takeHomePay")}</span>
-        <span className="font-bold text-[18px] text-[#4ade80] tabular-nums">{money(r.monthlyNet)}</span>
+      <div className="mt-3 flex items-baseline justify-between border-t border-border pt-4">
+        <span className="text-sm font-semibold">{t("salary.takeHomePay")}</span>
+        <span className="font-display text-2xl font-bold tabular-nums text-primary">{money(r.monthlyNet)}</span>
       </div>
     </div>
   );
@@ -155,14 +153,14 @@ export default function HomePage() {
 
   return (
     <div className="w-full">
-      <section className="hk-hero-bg">
+      <section className="border-b border-border bg-card/40">
         <div className="hk-container py-16 md:py-20">
           <div className="grid md:grid-cols-[1fr_440px] gap-10 lg:gap-16 items-center">
             <div className="min-w-0">
-              <h1 className="text-[34px] sm:text-[44px] md:text-[52px] font-extrabold leading-[1.08] tracking-[-0.02em] text-white">
+              <h1 className="font-display text-[32px] sm:text-[42px] md:text-[48px] font-semibold leading-[1.1] tracking-tight text-foreground">
                 {t("home.hero.h1")}
               </h1>
-              <p className="mt-5 max-w-[520px] text-[16px] sm:text-[17px] leading-[1.6]" style={{ color: "#93c5fd" }}>
+              <p className="mt-5 max-w-[520px] text-[16px] sm:text-[17px] leading-[1.6] text-muted-foreground">
                 {t("home.hero.sub")}
               </p>
 
@@ -174,20 +172,20 @@ export default function HomePage() {
                   value={gross}
                   onChange={(e) => setGross(e.target.value)}
                   placeholder={t("home.hero.inputLabel")}
-                  className="flex-1 rounded-[10px] border border-white/15 bg-white/10 px-4 py-3 text-[15px] text-white placeholder:text-white/50 backdrop-blur outline-none focus:ring-2 focus:ring-white/40"
+                  className="flex-1 h-12 rounded-lg border border-input bg-background px-4 text-base placeholder:text-muted-foreground outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25"
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-white px-5 py-3 text-[15px] font-bold text-[#1d4ed8] shadow-lg shadow-black/20 transition hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center gap-2 h-12 rounded-lg bg-primary px-5 text-[15px] font-semibold text-primary-foreground transition hover:opacity-90"
                 >
                   {t("home.hero.cta")}
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
-              <p className="mt-3 text-[13px] text-white/60">{t("home.hero.hint")}</p>
+              <p className="mt-3 text-[13px] text-muted-foreground">{t("home.hero.hint")}</p>
             </div>
 
-            <div className="hidden md:block">
+            <div>
               <HeroPreviewCard />
             </div>
           </div>

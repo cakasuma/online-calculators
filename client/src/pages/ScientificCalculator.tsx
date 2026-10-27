@@ -254,15 +254,15 @@ export default function ScientificCalculator({ onCalculate }: Props) {
   }, [handleKey]);
 
   const sciBtnClass =
-    "calc-btn h-12 text-xs font-medium rounded-xl bg-slate-100 dark:bg-muted/70 hover:bg-slate-200 dark:hover:bg-muted border border-slate-200/80 dark:border-border transition-all text-slate-700 dark:text-slate-300";
+    "calc-btn h-12 text-xs font-medium rounded-xl bg-muted hover:bg-secondary border transition-colors text-foreground";
   const numBtnClass = (key: string) => {
     const base = "calc-btn h-14 text-base";
-    if (key === "=") return `${base} bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-md shadow-blue-600/30 hover:shadow-lg hover:brightness-110`;
-    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-300 border border-orange-200/70 dark:border-orange-900/60 hover:bg-orange-100 dark:hover:bg-orange-900/50 font-bold text-lg`;
-    if (key === "C") return `${base} bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/70 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/50`;
-    if (["±", "%"].includes(key)) return `${base} bg-slate-100 dark:bg-muted/80 text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-border hover:bg-slate-200 dark:hover:bg-muted`;
-    if (key === "⌫") return `${base} bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/50`;
-    return `${base} bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-muted/40 border border-slate-200 dark:border-border text-foreground shadow-sm`;
+    if (key === "=") return `${base} bg-primary text-primary-foreground hover:bg-primary/90`;
+    if (["+", "-", "×", "÷"].includes(key)) return `${base} bg-accent text-primary border border-primary/20 hover:bg-primary/10 font-bold text-lg`;
+    if (key === "C") return `${base} bg-card text-destructive border hover:bg-muted`;
+    if (["±", "%"].includes(key)) return `${base} bg-muted text-foreground hover:bg-secondary border`;
+    if (key === "⌫") return `${base} bg-muted text-foreground hover:bg-secondary border`;
+    return `${base} bg-card hover:bg-muted border text-foreground`;
   };
 
   return (
@@ -271,32 +271,32 @@ export default function ScientificCalculator({ onCalculate }: Props) {
       <div className="hk-container py-8">
       <div className="max-w-sm mx-auto w-full min-w-0">
       {/* Display */}
-      <div className="mb-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 border border-slate-700/50 dark:border-slate-800 min-h-[100px] flex flex-col justify-end items-end overflow-hidden shadow-lg">
+      <div className="mb-3 p-4 sm:p-5 rounded-xl bg-card border min-h-[100px] flex flex-col justify-end items-end overflow-hidden">
         <div className="flex items-center gap-2 mb-1.5 w-full min-w-0 flex-wrap">
-          <div className="flex text-xs rounded-full border border-slate-600/60 overflow-hidden shrink-0" aria-label="angle mode">
+          <div className="flex text-xs rounded-md border overflow-hidden shrink-0" aria-label="angle mode">
             <button
               onClick={() => setMode("deg")}
-              className={`px-2.5 py-1 font-medium transition-colors ${mode === "deg" ? "bg-blue-600 text-white" : "bg-slate-700/60 text-slate-400 hover:bg-slate-700"}`}
+              className={`px-2.5 py-1 font-medium transition-colors ${mode === "deg" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"}`}
               aria-pressed={mode === "deg"}
             >
               DEG
             </button>
             <button
               onClick={() => setMode("rad")}
-              className={`px-2.5 py-1 font-medium transition-colors ${mode === "rad" ? "bg-blue-600 text-white" : "bg-slate-700/60 text-slate-400 hover:bg-slate-700"}`}
+              className={`px-2.5 py-1 font-medium transition-colors ${mode === "rad" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"}`}
               aria-pressed={mode === "rad"}
             >
               RAD
             </button>
           </div>
           {expression && (
-            <div className="text-sm text-slate-400 font-mono flex-1 overflow-x-auto text-right whitespace-nowrap scrollbar-none">
+            <div className="text-sm text-muted-foreground font-mono flex-1 overflow-x-auto text-right whitespace-nowrap scrollbar-none">
               {expression}
             </div>
           )}
         </div>
         <p
-          className="font-mono font-semibold text-right break-all max-w-full text-white"
+          className="font-mono font-semibold text-right break-all max-w-full text-foreground"
           style={{ fontSize: `clamp(1.1rem, ${display.length > 12 ? "4.5vw" : display.length > 8 ? "6vw" : "9vw"}, ${display.length > 12 ? "1.35rem" : display.length > 8 ? "1.75rem" : "2.5rem"})` }}
           data-testid="sci-display-main"
         >

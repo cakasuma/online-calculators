@@ -2,48 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE — Bold navy + amber palette */
+/* LIGHT — neutral paper, ink text, one cobalt accent.
+   Elevation is declared once: a 1px border. No gradients, no glass. */
 :root {
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
   --opaque-button-border-intensity: -8;
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
-  --background: 214 20% 97%;
-  --foreground: 218 35% 10%;
-  --border: 214 14% 88%;
+  --background: 220 14% 98%;
+  --foreground: 222 28% 11%;
+  --border: 220 13% 89%;
   --card: 0 0% 100%;
-  --card-foreground: 218 35% 10%;
-  --card-border: 214 14% 91%;
-  --sidebar: 214 18% 95%;
-  --sidebar-foreground: 218 35% 10%;
-  --sidebar-border: 214 14% 90%;
-  --sidebar-primary: 215 82% 44%;
+  --card-foreground: 222 28% 11%;
+  --card-border: 220 13% 89%;
+  --sidebar: 220 14% 96%;
+  --sidebar-foreground: 222 28% 11%;
+  --sidebar-border: 220 13% 89%;
+  --sidebar-primary: 222 80% 40%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 215 60% 94%;
-  --sidebar-accent-foreground: 218 35% 10%;
-  --sidebar-ring: 215 82% 44%;
+  --sidebar-accent: 222 50% 95%;
+  --sidebar-accent-foreground: 222 28% 11%;
+  --sidebar-ring: 222 80% 40%;
   --popover: 0 0% 100%;
-  --popover-foreground: 218 35% 10%;
-  --popover-border: 214 14% 88%;
-  --primary: 215 82% 44%;
+  --popover-foreground: 222 28% 11%;
+  --popover-border: 220 13% 89%;
+  --primary: 222 80% 40%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 214 14% 92%;
-  --secondary-foreground: 218 35% 10%;
-  --muted: 214 14% 93%;
-  --muted-foreground: 214 8% 46%;
-  --accent: 215 55% 94%;
-  --accent-foreground: 218 35% 10%;
-  --destructive: 0 72% 50%;
+  --secondary: 220 14% 94%;
+  --secondary-foreground: 222 28% 11%;
+  --muted: 220 14% 95%;
+  --muted-foreground: 220 9% 38%;
+  --accent: 222 50% 95%;
+  --accent-foreground: 222 28% 11%;
+  --destructive: 0 70% 46%;
   --destructive-foreground: 0 0% 100%;
-  --input: 214 10% 76%;
-  --ring: 215 82% 44%;
-  --chart-1: 215 82% 44%;
-  --chart-2: 152 65% 38%;
-  --chart-3: 38 92% 52%;
-  --chart-4: 0 72% 50%;
-  --chart-5: 280 55% 54%;
-  --font-sans: Inter, system-ui, sans-serif;
+  --input: 220 12% 76%;
+  --ring: 222 80% 40%;
+  --chart-1: 222 80% 40%;
+  --chart-2: 152 60% 34%;
+  --chart-3: 38 90% 48%;
+  --chart-4: 0 70% 46%;
+  --chart-5: 280 50% 50%;
+  --font-sans: 'Source Sans 3', system-ui, sans-serif;
+  --font-display: 'Lexend', 'Source Sans 3', system-ui, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   --radius: 0.625rem;
@@ -75,47 +77,47 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-/* DARK MODE */
+/* DARK */
 .dark {
   --button-outline: rgba(255,255,255, .10);
   --badge-outline: rgba(255,255,255, .05);
   --opaque-button-border-intensity: 9;
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
-  --background: 224 22% 7%;
-  --foreground: 220 18% 93%;
-  --border: 224 14% 18%;
-  --card: 224 20% 10%;
-  --card-foreground: 220 18% 93%;
-  --card-border: 224 14% 15%;
-  --sidebar: 224 20% 11%;
-  --sidebar-foreground: 220 18% 93%;
-  --sidebar-border: 224 14% 16%;
-  --sidebar-primary: 215 78% 62%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 215 20% 17%;
-  --sidebar-accent-foreground: 220 18% 93%;
-  --sidebar-ring: 215 78% 62%;
-  --popover: 218 22% 12%;
-  --popover-foreground: 220 18% 93%;
-  --popover-border: 218 14% 18%;
-  --primary: 215 78% 62%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 218 14% 18%;
-  --secondary-foreground: 220 18% 93%;
-  --muted: 218 14% 20%;
-  --muted-foreground: 218 8% 56%;
-  --accent: 215 25% 18%;
-  --accent-foreground: 220 18% 93%;
-  --destructive: 0 70% 55%;
+  --background: 222 20% 8%;
+  --foreground: 220 16% 93%;
+  --border: 222 14% 19%;
+  --card: 222 18% 11%;
+  --card-foreground: 220 16% 93%;
+  --card-border: 222 14% 19%;
+  --sidebar: 222 18% 11%;
+  --sidebar-foreground: 220 16% 93%;
+  --sidebar-border: 222 14% 19%;
+  --sidebar-primary: 222 90% 70%;
+  --sidebar-primary-foreground: 222 47% 9%;
+  --sidebar-accent: 222 20% 17%;
+  --sidebar-accent-foreground: 220 16% 93%;
+  --sidebar-ring: 222 90% 70%;
+  --popover: 222 18% 12%;
+  --popover-foreground: 220 16% 93%;
+  --popover-border: 222 14% 19%;
+  --primary: 222 90% 70%;
+  --primary-foreground: 222 47% 9%;
+  --secondary: 222 14% 18%;
+  --secondary-foreground: 220 16% 93%;
+  --muted: 222 14% 17%;
+  --muted-foreground: 220 9% 62%;
+  --accent: 222 22% 18%;
+  --accent-foreground: 220 16% 93%;
+  --destructive: 0 70% 58%;
   --destructive-foreground: 0 0% 100%;
-  --input: 218 14% 28%;
-  --ring: 215 78% 62%;
-  --chart-1: 215 78% 62%;
+  --input: 222 12% 30%;
+  --ring: 222 90% 70%;
+  --chart-1: 222 90% 70%;
   --chart-2: 152 55% 52%;
-  --chart-3: 38 88% 63%;
-  --chart-4: 0 72% 58%;
-  --chart-5: 280 55% 65%;
+  --chart-3: 38 88% 60%;
+  --chart-4: 0 72% 60%;
+  --chart-5: 280 55% 68%;
   --shadow-2xs: 0px 1px 2px hsl(0 0% 0% / 0.10);
   --shadow-xs: 0px 1px 3px hsl(0 0% 0% / 0.15);
   --shadow-sm: 0px 1px 4px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
@@ -217,16 +219,26 @@
     /* Avoid horizontal scroll on small screens when a child overflows */
     overflow-x: hidden;
   }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  /* Browser surfaces themed from the palette */
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  input, textarea, select { font-variant-numeric: tabular-nums; }
+  a { text-underline-offset: 3px; }
 }
 
 /* iOS safe-area support for notched devices */
 @supports (padding: env(safe-area-inset-top)) {
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
-  }
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  .safe-area-top { padding-top: env(safe-area-inset-top); }
+  .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
   .safe-area-x {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
@@ -235,34 +247,16 @@
 
 /* Calculator-specific utilities */
 @layer utilities {
-  .calc-display {
-    @apply font-mono text-right;
-  }
+  .calc-display { @apply font-mono text-right; }
 
   .calc-btn {
-    @apply flex items-center justify-center rounded-2xl font-semibold transition-all duration-100 select-none;
-    @apply active:scale-[0.93];
+    @apply flex items-center justify-center rounded-xl font-semibold transition-colors duration-100 select-none;
+    @apply active:scale-[0.96];
     /* Minimum touch target for mobile accessibility */
     min-height: 52px;
   }
 
-  .gradient-text {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(215 82% 38%), hsl(195 100% 42%));
-  }
-
-  .dark .gradient-text {
-    background-image: linear-gradient(135deg, hsl(215 78% 65%), hsl(195 90% 55%));
-  }
-
-  .hero-grid {
-    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.045) 1.5px, transparent 1.5px);
-    background-size: 28px 28px;
-  }
-
-  input[type="search"]::-webkit-search-cancel-button {
-    @apply hidden;
-  }
+  input[type="search"]::-webkit-search-cancel-button { @apply hidden; }
 
   [contenteditable][data-placeholder]:empty::before {
     content: attr(data-placeholder);
@@ -272,83 +266,16 @@
 }
 
 @media print {
-  nav,
-  header,
-  footer,
-  .print\:hidden {
-    display: none !important;
-  }
-
-  body {
-    background: white;
-    color: black;
-  }
-
-  .max-w-2xl {
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-}
-
-/* ── Animations ─────────────────────────────────────────────────────────── */
-
-.hero-gradient {
-  background:
-    radial-gradient(ellipse at 10% 90%, hsl(38 95% 55% / 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 10%, hsl(195 100% 48% / 0.11) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, hsl(215 82% 44% / 0.06) 0%, transparent 65%),
-    hsl(var(--card));
-}
-
-/* Scroll-triggered fade-in — toggle .in-view to animate */
-.fade-in-section {
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.fade-in-section.in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Respect user motion preference */
-@media (prefers-reduced-motion: reduce) {
-  .fade-in-section {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
+  nav, header, footer, .print\:hidden { display: none !important; }
+  body { background: white; color: black; }
+  .max-w-2xl { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   HelloKalku redesign — design system
-   Brand hex tokens are used only for the blue accent family and the dark
-   hero gradients (dark by design in both themes). Everything else leans on
-   the shadcn semantic tokens / Tailwind `dark:` variants so the .dark class
-   themes it automatically.
+   HelloKalku layout primitives
    ════════════════════════════════════════════════════════════════════════ */
-:root {
-  --hk-blue-50: #eff6ff;
-  --hk-blue-100: #dbeafe;
-  --hk-blue-500: #3b82f6;
-  --hk-blue-600: #2563eb;
-  --hk-blue-700: #1d4ed8;
-  --hk-dark-900: #0f172a;
-  --hk-dark-800: #1e3a8a;
-  --hk-teal-400: #2dd4bf;
-}
-
-/* Full-bleed section helper: breaks out of any padded parent to the viewport
-   edges, then re-centres an inner container. Pair with .hk-container. */
-.hk-bleed {
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-}
 .hk-container {
-  max-width: 1200px;
+  max-width: 1120px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 20px;
@@ -358,211 +285,83 @@
   .hk-container { padding-left: 32px; padding-right: 32px; }
 }
 
-/* ── Dark hero (homepage + calculator pages) ── */
-.hk-hero-bg {
-  background: linear-gradient(135deg, var(--hk-dark-900) 0%, var(--hk-dark-800) 50%, var(--hk-blue-700) 100%);
-  position: relative;
-  overflow: hidden;
-}
-.hk-hero-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 70% 50%, rgba(59, 130, 246, 0.25) 0%, transparent 60%),
-    radial-gradient(ellipse at 20% 80%, rgba(45, 212, 191, 0.15) 0%, transparent 50%);
-  pointer-events: none;
-}
-.hk-hero-bg > * { position: relative; z-index: 1; }
-.hk-hero-gradient-text {
-  background: linear-gradient(90deg, #60a5fa, #2dd4bf);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+/* Calculator / guides page header: light, flat, separated by a hairline. */
+.hk-pagehead {
+  background: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
 }
 
-/* ── Light article hero (theme-aware) ── */
-.hk-article-hero {
-  background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 60%, #f9fafb 100%);
+/* Row link used in tool directories: border changes on hover, nothing moves. */
+.hk-row {
+  transition: background-color 0.15s, border-color 0.15s;
 }
-.dark .hk-article-hero {
-  background: linear-gradient(180deg, var(--hk-dark-900) 0%, var(--hk-dark-800) 70%, var(--hk-dark-900) 100%);
-}
+.hk-row:hover { background: hsl(var(--accent)); }
 
-/* ── Dark "why" section + blue pre-footer ── */
-.hk-why { background: var(--hk-dark-900); }
-.dark .hk-why { background: #060c18; }
-.hk-prefooter { background: var(--hk-blue-600); }
-.dark .hk-prefooter { background: var(--hk-blue-700); }
+/* Card hover: border colour only (no lift, no shadow). */
+.hk-card { transition: border-color 0.15s; }
 
-/* ── Category filter tab (pill) ── */
+/* Filter chip */
 .hk-cat-tab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 16px;
-  border-radius: 100px;
-  border: 1.5px solid hsl(var(--border));
+  padding: 7px 14px;
+  min-height: 36px;
+  border-radius: 8px;
+  border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: hsl(var(--muted-foreground));
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 }
-.hk-cat-tab:hover { color: var(--hk-blue-600); border-color: #93c5fd; }
-.dark .hk-cat-tab:hover { color: #93c5fd; border-color: #1d4ed8; }
+.hk-cat-tab:hover { color: hsl(var(--foreground)); border-color: hsl(var(--input)); }
 .hk-cat-tab.active {
-  background: var(--hk-blue-600);
-  border-color: var(--hk-blue-600);
-  color: #fff;
-}
-.dark .hk-cat-tab.active { background: var(--hk-blue-600); border-color: var(--hk-blue-600); }
-
-/* ── Tool / guide card hover lift ── */
-.hk-card {
-  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
-}
-.hk-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
-.dark .hk-card:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
-
-/* ── Inputs (calculator) ── */
-.hk-input {
-  width: 100%;
-  border: 1.5px solid hsl(var(--border));
-  background: hsl(var(--card));
-  color: hsl(var(--foreground));
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.hk-input:focus {
-  border-color: var(--hk-blue-500);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-.hk-input-prefix {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
-  font-weight: 600;
-  color: hsl(var(--muted-foreground));
-  pointer-events: none;
+  background: hsl(var(--foreground));
+  border-color: hsl(var(--foreground));
+  color: hsl(var(--background));
 }
 
-/* ── Segmented control (radio toggle) ── */
-.hk-segmented {
-  display: inline-flex;
-  width: 100%;
-  padding: 3px;
-  gap: 3px;
-  border-radius: 10px;
-  background: hsl(var(--muted));
-  border: 1px solid hsl(var(--border));
-}
-.hk-segmented button {
-  flex: 1;
-  padding: 8px 10px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 600;
-  color: hsl(var(--muted-foreground));
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  transition: all 0.15s;
-}
-.hk-segmented button[data-active="true"] {
-  background: hsl(var(--card));
-  color: var(--hk-blue-600);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-.dark .hk-segmented button[data-active="true"] { color: #93c5fd; }
-
-/* ── Result breakdown bar ── */
-.hk-breakdown-bar {
-  display: flex;
-  height: 12px;
-  border-radius: 100px;
-  overflow: hidden;
-  gap: 2px;
-  background: hsl(var(--muted));
-}
-.hk-bar-seg { height: 100%; transition: width 0.4s ease; }
-
-/* ── Callout / formula / inline CTA (article + explainer) ── */
+/* Callout (guides) */
 .hk-callout {
-  border-left: 3px solid var(--hk-blue-500);
-  background: var(--hk-blue-50);
-  color: #1e3a8a;
-  border-radius: 0 10px 10px 0;
+  background: hsl(var(--accent));
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
   padding: 14px 18px;
   font-size: 15px;
 }
-.dark .hk-callout { background: rgba(59, 130, 246, 0.1); color: #bfdbfe; }
-.hk-formula-box {
-  background: var(--hk-dark-900);
-  border-radius: 12px;
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.hk-formula-box code {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: #4ade80;
-}
-.hk-inline-cta {
-  background: linear-gradient(135deg, var(--hk-dark-900), var(--hk-dark-800));
-  border-radius: 14px;
-}
 
-/* ── Reading progress bar ── */
+/* Reading progress bar */
 .hk-progress-bar {
   position: fixed;
   top: 0;
   left: 0;
   height: 3px;
-  background: var(--hk-blue-500);
+  background: hsl(var(--primary));
   z-index: 200;
   transition: width 0.1s linear;
 }
 
-/* ── Sticky guides filter bar ── */
+/* Sticky guides filter bar */
 .hk-filter-bar {
   position: sticky;
-  top: 60px;
+  top: 56px;
   z-index: 30;
-  background: hsl(var(--background) / 0.9);
-  backdrop-filter: blur(12px);
+  background: hsl(var(--background));
   border-bottom: 1px solid hsl(var(--border));
 }
 
-/* ── Mobile nav drawer slide-in from right ── */
+/* Drawer slide-in from right */
 @keyframes hk-drawer-in {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }
-.hk-drawer { animation: hk-drawer-in 0.22s ease-out; }
-
-/* One-shot entrance — content is visible by default; this only plays a gentle
-   reveal once the element is observed in view. Never hides content. */
-@keyframes hk-fade-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.hk-faded-in { animation: hk-fade-in 0.5s ease both; }
+.hk-drawer { animation: hk-drawer-in 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
 @media (prefers-reduced-motion: reduce) {
-  .hk-faded-in { animation: none; }
+  .hk-drawer { animation: none; }
 }
+
 .hk-no-scrollbar::-webkit-scrollbar { display: none; }
 .hk-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

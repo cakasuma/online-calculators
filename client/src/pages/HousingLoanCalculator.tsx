@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -89,7 +89,7 @@ function NumberField({
           onChange={(event) => onChange(event.target.value)}
           onBlur={() => onChange(formatInputNumber(value, maxDecimals ?? 2))}
           placeholder={placeholder}
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-800 dark:bg-slate-950"
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-800 dark:bg-slate-950"
         />
         {suffix && (
           <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -112,7 +112,7 @@ function ToggleRow({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between gap-3 rounded-2xl bg-muted/40 px-4 py-3">
+    <label className="flex items-center justify-between gap-3 rounded-xl bg-muted/40 px-4 py-3">
       <span className="text-sm font-medium">{label}</span>
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
@@ -139,7 +139,7 @@ function Row({
   emphasis?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl px-3 sm:px-4 py-3 min-w-0 ${emphasis ? "bg-primary/10" : "bg-muted/50"}`}>
+    <div className={`rounded-xl px-3 sm:px-4 py-3 min-w-0 ${emphasis ? "bg-primary/10" : "bg-muted/50"}`}>
       <div className="flex items-center justify-between gap-3 min-w-0">
         <span className={`text-sm min-w-0 break-words ${emphasis ? "font-semibold" : "text-muted-foreground"}`}>
           {label}
@@ -171,7 +171,7 @@ function CostRow({
 }) {
   const waived = waivedLabel != null && gross > 0 && payable === 0;
   return (
-    <div className="rounded-2xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
+    <div className="rounded-xl bg-muted/50 px-3 sm:px-4 py-3 min-w-0">
       <div className="flex items-center justify-between gap-3 min-w-0">
         <span className="text-sm text-muted-foreground min-w-0 break-words">{label}</span>
         <span className="font-semibold tabular-nums text-right break-words">
@@ -344,21 +344,17 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
         subtitle={t("housing.subtitle")}
         badges={[t("housing.badge"), t("housing.badge.private")]}
         result={
-          <div className="rounded-[20px] border border-white/12 bg-white/[0.08] p-6 backdrop-blur-xl text-white">
-            <p className="text-[13px] text-indigo-100">{t("housing.monthlyInstallment")}</p>
-            <p className="mt-2 text-3xl md:text-4xl font-bold break-words tabular-nums">
-              {money2(showResults ? result.monthlyInstallment : 0)}
-            </p>
-            <p className="mt-4 text-[13px] text-white/60">
-              {showResults ? `${t("housing.over")} ${parsed.tenureYears} ${t("housing.years")}` : t("housing.cta.tapToReveal")}
-            </p>
-          </div>
+          <HeadlineResult
+            label={t("housing.monthlyInstallment")}
+            value={money2(showResults ? result.monthlyInstallment : 0)}
+            note={showResults ? `${t("housing.over")} ${parsed.tenureYears} ${t("housing.years")}` : t("housing.cta.tapToReveal")}
+          />
         }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] min-w-0">
-          <Card className="rounded-2xl sm:rounded-3xl border-slate-200/80 shadow-sm dark:border-slate-800 min-w-0">
+          <Card className="rounded-xl min-w-0">
             <CardContent className="space-y-5 p-4 sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -412,7 +408,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                 <select
                   value={buyerType}
                   onChange={(event) => setBuyerType(event.target.value as BuyerType)}
-                  className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                  className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                 >
                   <option value="citizen">{t("housing.buyerType.citizen")}</option>
                   <option value="pr">{t("housing.buyerType.pr")}</option>
@@ -427,7 +423,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   <select
                     value={firstHome}
                     onChange={(event) => setFirstHome(event.target.value as "yes" | "no")}
-                    className="w-full rounded-2xl border bg-background px-4 py-3 shadow-sm"
+                    className="w-full rounded-xl border bg-background px-4 py-3 shadow-sm"
                   >
                     <option value="no">{t("common.no")}</option>
                     <option value="yes">{t("common.yes")}</option>
@@ -481,7 +477,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                 hint={t("housing.inputs.extraMonthly.hint")}
               />
 
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200">
                 <div className="flex gap-2">
                   <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <p>{t("housing.disclaimer")}</p>
@@ -491,7 +487,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
               <Button
                 type="button"
                 size="lg"
-                className="w-full gap-2 rounded-2xl text-base font-semibold"
+                className="w-full gap-2 rounded-xl text-base font-semibold"
                 disabled={!isValid}
                 onClick={handleCalculate}
               >
@@ -504,9 +500,9 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
             {!showResults ? (
-              <Card className="rounded-2xl sm:rounded-3xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
+              <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">
                 <CardContent className="flex flex-col items-center justify-center gap-3 p-6 sm:p-10 text-center">
-                  <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+                  <div className="rounded-xl bg-primary/10 p-3 text-primary">
                     <Home className="h-6 w-6" />
                   </div>
                   <p className="text-base font-semibold">{t("housing.breakdown.ready")}</p>
@@ -516,7 +512,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
             ) : (
               <>
                 {result.monthsSaved > 0 && (
-                  <Card className="rounded-2xl sm:rounded-3xl border-emerald-200 bg-emerald-50/60 shadow-sm dark:border-emerald-900/50 dark:bg-emerald-950/20 min-w-0">
+                  <Card className="rounded-xl border-emerald-200 bg-emerald-50/60 shadow-sm dark:border-emerald-900/50 dark:bg-emerald-950/20 min-w-0">
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
                         <PiggyBank className="h-5 w-5 flex-shrink-0" />
@@ -542,7 +538,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   </Card>
                 )}
 
-                <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                <Card className="rounded-xl shadow-sm min-w-0">
                   <CardContent className="p-4 sm:p-6 min-w-0">
                     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                       <div>
@@ -637,7 +633,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                       )}
 
                       {result.rebateAmount > 0 && (
-                        <div className="rounded-2xl bg-emerald-50 px-3 sm:px-4 py-3 min-w-0 dark:bg-emerald-950/20">
+                        <div className="rounded-xl bg-emerald-50 px-3 sm:px-4 py-3 min-w-0 dark:bg-emerald-950/20">
                           <div className="flex items-center justify-between gap-3 min-w-0">
                             <span className="text-sm text-emerald-700 min-w-0 break-words dark:text-emerald-300">
                               {t("housing.rebateApplied")}
@@ -650,7 +646,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                         </div>
                       )}
 
-                      <div className="rounded-2xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
+                      <div className="rounded-xl bg-primary/10 px-3 sm:px-4 py-3.5 min-w-0">
                         <div className="flex items-center justify-between gap-3 min-w-0">
                           <span className="text-sm font-semibold min-w-0 break-words">{t("housing.netCash")}</span>
                           <span className="text-lg font-bold tabular-nums text-right text-primary break-words">
@@ -661,7 +657,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                       </div>
 
                       {result.rebateSurplus > 0 && (
-                        <div className="rounded-2xl bg-emerald-100/70 px-3 sm:px-4 py-3 min-w-0 dark:bg-emerald-900/30">
+                        <div className="rounded-xl bg-emerald-100/70 px-3 sm:px-4 py-3 min-w-0 dark:bg-emerald-900/30">
                           <div className="flex items-center justify-between gap-3 min-w-0">
                             <span className="text-sm font-semibold min-w-0 break-words">{t("housing.rebateSurplus")}</span>
                             <span className="font-bold tabular-nums text-right break-words text-emerald-700 dark:text-emerald-300">
@@ -675,7 +671,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
                   </CardContent>
                 </Card>
 
-                <Card className="rounded-2xl sm:rounded-3xl shadow-sm min-w-0">
+                <Card className="rounded-xl shadow-sm min-w-0">
                   <CardContent className="p-4 sm:p-6 min-w-0">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <h2 className="text-xl font-semibold">{t("housing.schedule.title")}</h2>

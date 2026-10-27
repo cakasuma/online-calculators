@@ -113,7 +113,7 @@ interface Props {
 export default function BmiCalculator({ onCalculate }: Props = {}) {
   const { t } = useLocale();
   const [initial] = useState<BmiInputs>(() => mergeFromUrl<BmiInputs>(DEFAULT_INPUTS, URL_SCHEMA));
-  const arrivedViaShare = useMemo(() => urlHasSchemaParams(URL_SCHEMA), []);
+
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const [heightInput, setHeightInput] = useState(toInputString(initial.height));
@@ -136,7 +136,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.height > 0 && parsed.weight > 0 && parsed.age > 0;
-  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+  const [hasCalculated, setHasCalculated] = useState(isValid);
   const result = useMemo(() => calculateBmi(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
 
@@ -298,23 +298,6 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
-            <Card className="lg:hidden ">
-              <CardContent className="p-4 sm:p-6">
-                <p className="text-sm text-muted-foreground">{t("bmi.yourBmi")}</p>
-                <p className="mt-2 text-2xl sm:text-3xl font-bold break-words tabular-nums">
-                  {showResults ? num(result.bmi) : "—"}
-                </p>
-                <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${showResults ? gaugePct : 0}%`, background: categoryColor }}
-                  />
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {showResults ? categoryLabel : t("bmi.cta.tapToReveal")}
-                </p>
-              </CardContent>
-            </Card>
 
             {!showResults ? (
               <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">

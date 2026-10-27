@@ -1,5 +1,5 @@
 /** Owner: fill with a public support address once one has been established. */
-export const CONTACT_EMAIL = "";
+export const CONTACT_EMAIL = "amammustofa@gmail.com";
 export const OPERATOR_URL = "https://amammustofa.com";
 export const ISSUES_URL = "https://github.com/cakasuma/online-calculators/issues";
 

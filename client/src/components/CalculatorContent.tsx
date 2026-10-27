@@ -112,17 +112,20 @@ export function CalculatorContent({ slug }: Props) {
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold tracking-tight">{t("content.faqTitle")}</h2>
-        <dl className="mt-3 space-y-4">
+        <div className="mt-3 divide-y rounded-lg border">
           {content.faq.map((item, i) => (
-            <div key={i}>
-              <dt className="text-sm font-semibold">{item.question}</dt>
-              <dd className="mt-1 text-sm text-muted-foreground leading-relaxed">{item.answer}</dd>
-            </div>
+            <details key={i} className="group px-4 py-3">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold">
+                {item.question}
+                <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p className="pb-2 text-sm text-muted-foreground leading-relaxed">{item.answer}</p>
+            </details>
           ))}
-        </dl>
+        </div>
       </div>
 
-      {related.length > 0 && (
+      {related.length > 0 && !["salary", "tax", "epf"].includes(slug) && (
         <div className="mt-10 border-t pt-6">
           <h2 className="text-base font-semibold tracking-tight">{t("content.relatedTitle")}</h2>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">

@@ -276,14 +276,14 @@ export default function ScientificCalculator({ onCalculate }: Props) {
           <div className="flex text-xs rounded-md border overflow-hidden shrink-0" aria-label="angle mode">
             <button
               onClick={() => setMode("deg")}
-              className={`px-2.5 py-1 font-medium transition-colors ${mode === "deg" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"}`}
+              className={`px-3 py-2.5 font-medium transition-colors ${mode === "deg" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"}`}
               aria-pressed={mode === "deg"}
             >
               DEG
             </button>
             <button
               onClick={() => setMode("rad")}
-              className={`px-2.5 py-1 font-medium transition-colors ${mode === "rad" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"}`}
+              className={`px-3 py-2.5 font-medium transition-colors ${mode === "rad" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"}`}
               aria-pressed={mode === "rad"}
             >
               RAD

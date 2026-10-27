@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
-import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { RatesVerified } from "@/components/RatesVerified";
 import { WhatNext } from "@/components/WhatNext";
 import { ShareButton } from "@/components/ShareButton";
@@ -192,7 +191,7 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
   const [initial] = useState<IncomeTaxInputs>(() =>
     mergeFromUrl<IncomeTaxInputs>(INCOME_TAX_DEFAULTS, URL_SCHEMA),
   );
-  const arrivedViaShare = useMemo(() => urlHasSchemaParams(URL_SCHEMA), []);
+  
   const resultsRef = useRef<HTMLDivElement>(null);
 
   // Numeric fields are held as strings so the user can type freely.
@@ -263,7 +262,7 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.annualIncome > 0;
-  const [hasCalculated, setHasCalculated] = useState(arrivedViaShare && isValid);
+  const [hasCalculated, setHasCalculated] = useState(isValid);
   const result = useMemo(() => calculateIncomeTax(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
 
@@ -637,10 +636,9 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
               </Card>
             ) : (
               <>
-                <div className="grid gap-4 sm:grid-cols-2 min-w-0">
+                <div className="grid gap-4 min-w-0">
                   {([
                     [t("tax.monthlyPcb"), result.monthlyPcb, Receipt],
-                    [t("tax.effectiveRateLabel"), result.effectiveRate, Percent],
                   ] as [string, number, typeof Receipt][]).map(([label, value, Icon], i) => (
                     <Card key={label} className="rounded-xl shadow-sm min-w-0">
                       <CardContent className="p-4 sm:p-5">
@@ -766,7 +764,6 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                   ]}
                 />
 
-                <RelatedToolsCard currentHref="/income-tax" />
               </>
             )}
             <RatesVerified sources={["lhdn", "kwsp", "perkeso"]} />

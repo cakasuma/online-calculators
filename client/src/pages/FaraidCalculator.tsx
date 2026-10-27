@@ -743,7 +743,7 @@ function Counter({
       <button
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold flex-shrink-0"
+        className="w-11 h-11 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold flex-shrink-0"
       >
         −
       </button>
@@ -751,7 +751,7 @@ function Counter({
       <button
         type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
-        className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold flex-shrink-0"
+        className="w-11 h-11 rounded-lg border flex items-center justify-center hover:bg-muted active:bg-muted text-base font-semibold flex-shrink-0"
       >
         +
       </button>
@@ -1000,7 +1000,7 @@ export default function FaraidCalculator({ onCalculate }: Props) {
                   key={c.code}
                   type="button"
                   onClick={() => setField("currency", c.code)}
-                  className={`px-3 py-2 rounded-full text-sm font-medium border transition-colors ${
+                  className={`px-3.5 py-2.5 rounded-full text-sm font-medium border transition-colors ${
                     form.currency === c.code
                       ? "bg-primary text-primary-foreground border-primary"
                       : "border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"

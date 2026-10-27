@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { Link } from "wouter";
+import { WhatNext } from "@/components/WhatNext";
 import { AlertTriangle, Info, BookOpen, RotateCcw, ChevronDown, Pencil, Loader2, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -494,7 +494,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
               <button
                 type="button"
                 onClick={() => setSilverPriceOverride((v) => !v)}
-                className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
+                className={`ml-1 p-3 -m-2 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
                 title={silverPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                 disabled={livePricesLoading}
               >
@@ -1127,14 +1127,13 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
         </CardContent>
       </Card>
 
-      {/* Back to home */}
-      <div className="pb-4">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="text-muted-foreground gap-2">
-            ← Back to Home
-          </Button>
-        </Link>
-      </div>
+      <WhatNext
+        from="zakat"
+        items={[
+          { target: "wasiat", href: "/wasiat", title: t("whatnext.zakat.wasiat.title"), description: t("whatnext.zakat.wasiat.desc") },
+          { target: "income-tax", href: state.currency === "MYR" && zakatDue > 0 ? `/income-tax?zakat=${Math.round(zakatDue)}` : "/income-tax", title: t("whatnext.zakat.tax.title"), description: t("whatnext.zakat.tax.desc") },
+        ]}
+      />
       </div>
       </div>
     </div>

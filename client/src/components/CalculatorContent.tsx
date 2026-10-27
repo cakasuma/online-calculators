@@ -30,6 +30,11 @@ export function CalculatorContent({ slug }: Props) {
 
   return (
     <section className="mt-12 max-w-3xl mx-auto px-5 sm:px-8 pb-16" data-prerender-content={slug}>
+     <details className="group rounded-xl border bg-card">
+      <summary className="flex min-h-12 cursor-pointer items-center justify-between px-4 py-3 text-base font-semibold">
+        {t("content.howCalculated")}
+      </summary>
+      <div className="px-4 pb-6">
       <p className="text-base leading-relaxed text-muted-foreground">{content.intro}</p>
 
       <div className="mt-8">
@@ -147,6 +152,8 @@ export function CalculatorContent({ slug }: Props) {
           {content.lastReviewed}
         </p>
       )}
+      </div>
+     </details>
     </section>
   );
 }

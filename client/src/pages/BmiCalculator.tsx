@@ -1,5 +1,5 @@
 import { Activity, ArrowRight, Calculator as CalculatorIcon, Flame, HeartPulse, Info, Scale } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
@@ -136,18 +136,20 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.height > 0 && parsed.weight > 0 && parsed.age > 0;
-  const [hasCalculated, setHasCalculated] = useState(isValid);
+  const hasCalculated = true;
   const result = useMemo(() => calculateBmi(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    if (!isValid) return;
+    const id = setTimeout(handleCalculate, 2500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsed]);
 
   function handleCalculate() {
     if (!isValid) return;
-    setHasCalculated(true);
-    setTimeout(() => {
-      if (window.innerWidth < 1024) {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 120);
 
     const payload = {
       height: parsed.height,
@@ -179,7 +181,6 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
     setAgeInput(toInputString(DEFAULT_INPUTS.age));
     setSex(DEFAULT_INPUTS.sex);
     setActivity(DEFAULT_INPUTS.activity);
-    setHasCalculated(false);
   }
 
   // BMI gauge fill: map 12–40 to 0–100%.
@@ -200,14 +201,6 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
         title={t("bmi.title")}
         subtitle={t("bmi.subtitle")}
         badges={[t("bmi.badge"), t("bmi.badge.private")]}
-        result={
-          <HeadlineResult
-            label={t("bmi.yourBmi")}
-            value={showResults ? num(result.bmi) : "—"}
-            progress={{ pct: showResults ? gaugePct : 0, color: categoryColor }}
-            note={showResults ? categoryLabel : t("bmi.cta.tapToReveal")}
-          />
-        }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
@@ -283,21 +276,18 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                size="lg"
-                className="w-full gap-2 rounded-xl text-base font-semibold"
-                disabled={!isValid}
-                onClick={handleCalculate}
-              >
-                <CalculatorIcon className="h-4 w-4" />
-                {hasCalculated ? t("bmi.cta.recalculate") : t("bmi.cta.calculate")}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
             </CardContent>
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
+            {isValid && (
+            <HeadlineResult
+              label={t("bmi.yourBmi")}
+              value={showResults ? num(result.bmi) : "—"}
+              progress={{ pct: showResults ? gaugePct : 0, color: categoryColor }}
+              note={showResults ? categoryLabel : t("bmi.cta.tapToReveal")}
+            />
+            )}
 
             {!showResults ? (
               <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">

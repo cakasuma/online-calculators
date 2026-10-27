@@ -1,5 +1,5 @@
 import { AlertTriangle, ArrowRight, Calculator as CalculatorIcon, Car, Percent, PiggyBank, Receipt, Wallet } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -160,18 +160,20 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
   useUrlSync(parsed, URL_SCHEMA);
 
   const isValid = parsed.price > 0;
-  const [hasCalculated, setHasCalculated] = useState(isValid);
+  const hasCalculated = true;
   const result = useMemo(() => calculateCarLoan(parsed), [parsed]);
   const showResults = hasCalculated && isValid;
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    if (!isValid) return;
+    const id = setTimeout(handleCalculate, 2500);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsed]);
 
   function handleCalculate() {
     if (!isValid) return;
-    setHasCalculated(true);
-    setTimeout(() => {
-      if (window.innerWidth < 1024) {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 120);
 
     const payload = {
       price: Math.round(parsed.price),
@@ -202,7 +204,6 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
     setRegime(CAR_LOAN_DEFAULTS.regime ?? "reducing");
     setSettleEnabled(false);
     setSettleInput("");
-    setHasCalculated(false);
   }
 
   return (
@@ -212,13 +213,6 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
         title={t("carloan.title")}
         subtitle={t("carloan.subtitle")}
         badges={[t("carloan.badge"), t("carloan.badge.private")]}
-        result={
-          <HeadlineResult
-            label={t("carloan.monthlyInstalment")}
-            value={money2(showResults ? result.monthlyInstalment : 0)}
-            note={showResults ? `${t("carloan.over")} ${parsed.tenureYears} ${t("carloan.years")}` : t("carloan.cta.tapToReveal")}
-          />
-        }
       />
 
       <div className="hk-container py-8 space-y-6 sm:space-y-8 min-w-0">
@@ -312,21 +306,17 @@ export default function CarLoanCalculator({ onCalculate }: Props = {}) {
                 <p>{t("carloan.disclaimer")}</p>
               </div>
 
-              <Button
-                type="button"
-                size="lg"
-                className="w-full gap-2 rounded-xl text-base font-semibold"
-                disabled={!isValid}
-                onClick={handleCalculate}
-              >
-                <CalculatorIcon className="h-4 w-4" />
-                {hasCalculated ? t("carloan.cta.recalculate") : t("carloan.cta.calculate")}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
             </CardContent>
           </Card>
 
           <div ref={resultsRef} className="space-y-6 min-w-0">
+            {isValid && (
+            <HeadlineResult
+              label={t("carloan.monthlyInstalment")}
+              value={money2(showResults ? result.monthlyInstalment : 0)}
+              note={showResults ? `${t("carloan.over")} ${parsed.tenureYears} ${t("carloan.years")}` : t("carloan.cta.tapToReveal")}
+            />
+            )}
 
             {!showResults ? (
               <Card className="rounded-xl border-dashed border-slate-300/60 bg-slate-50/40 dark:border-slate-700 dark:bg-slate-900/30">

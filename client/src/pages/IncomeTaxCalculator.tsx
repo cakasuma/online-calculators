@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult, MobileResultBar } from "@/components/CalculatorHero";
 import { RatesVerified } from "@/components/RatesVerified";
 import { WhatNext } from "@/components/WhatNext";
 import { ShareButton } from "@/components/ShareButton";
@@ -333,6 +333,7 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
 
   return (
     <div className="w-full">
+      {isValid && <MobileResultBar label={t("tax.taxPayable")} value={money(result.taxPayable)} targetRef={resultsRef} />}
       <CalculatorHero
         category="Finance"
         title={t("tax.title")}

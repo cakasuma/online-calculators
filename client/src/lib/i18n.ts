@@ -147,11 +147,7 @@ const translations = {
     ms: "Unjuran persaraan EPF",
     id: "Proyeksi pensiun EPF",
   },
-  "epf.subtitle": {
-    en: "Project your KWSP balance at retirement age, compare against the EPF Basic Savings target, and estimate your monthly retirement income.",
-    ms: "Unjurkan baki KWSP anda pada umur persaraan, bandingkan dengan sasaran Simpanan Asas EPF, dan anggarkan pendapatan persaraan bulanan anda.",
-    id: "Proyeksikan saldo KWSP Anda pada usia pensiun, bandingkan dengan target Basic Savings EPF, dan perkirakan pendapatan pensiun bulanan Anda.",
-  },
+  "epf.subtitle": { en: "Projected EPF savings at retirement.", ms: "Unjuran simpanan KWSP semasa bersara.", id: "Proyeksi tabungan EPF saat pensiun." },
   "epf.calculate": { en: "Calculate", ms: "Kira", id: "Hitung" },
   "epf.recalculate": { en: "Recalculate", ms: "Kira semula", id: "Hitung ulang" },
   "epf.inputs.heading": { en: "Your details", ms: "Maklumat anda", id: "Detail Anda" },
@@ -931,7 +927,7 @@ const translations = {
   // ── Salary Calculator ──
   "salary.badge": { en: "Malaysia payroll estimator", ms: "Estimator gaji Malaysia", id: "Estimator gaji Malaysia" },
   "salary.title": { en: "Malaysia Salary Calculator", ms: "Kalkulator Gaji Malaysia", id: "Kalkulator Gaji Malaysia" },
-  "salary.subtitle": { en: "Estimate monthly take-home pay after EPF, SOCSO, EIS, and Malaysian income tax. Useful for salary negotiation, offer comparison, and monthly budgeting.", ms: "Anggaran gaji bersih bulanan selepas EPF, SOCSO, EIS, dan cukai pendapatan Malaysia. Cocok untuk negosiasi gaji, membandingkan penawaran, dan budgeting bulanan.", id: "Estimasi gaji bersih bulanan setelah EPF, SOCSO, EIS, dan pajak penghasilan Malaysia. Cocok untuk negosiasi gaji, membandingkan penawaran, dan budgeting bulanan." },
+  "salary.subtitle": { en: "Monthly take-home after EPF, SOCSO, EIS and tax.", ms: "Gaji bersih bulanan selepas EPF, SOCSO, EIS dan cukai.", id: "Gaji bersih bulanan setelah EPF, SOCSO, EIS dan pajak." },
   "salary.takeHomePay": { en: "Estimated monthly take-home pay", ms: "Anggaran gaji bersih bulanan", id: "Estimasi gaji bersih bulanan" },
   "salary.ofMonthlyGross": { en: "of monthly gross salary", ms: "daripada gaji kotor bulanan", id: "dari gaji kotor bulanan" },
   "salary.fixInputErrors": { en: "Fix input errors to view estimate", ms: "Perbaiki input yang error untuk melihat anggaran", id: "Perbaiki input yang error untuk melihat estimasi" },
@@ -1344,11 +1340,7 @@ const translations = {
     ms: "Kalkulator Pinjaman Perumahan Malaysia",
     id: "Kalkulator Pinjaman Rumah Malaysia",
   },
-  "housing.subtitle": {
-    en: "Work out your monthly home loan repayment plus the stamp duty, legal fees, and total cash you need upfront.",
-    ms: "Kira ansuran bulanan pinjaman rumah anda berserta duti setem, yuran guaman, dan jumlah tunai pendahuluan yang diperlukan.",
-    id: "Hitung cicilan bulanan pinjaman rumah Anda plus bea meterai, biaya hukum, dan total uang muka yang dibutuhkan.",
-  },
+  "housing.subtitle": { en: "Monthly instalment and total interest.", ms: "Ansuran bulanan dan jumlah faedah.", id: "Cicilan bulanan dan total bunga." },
   "housing.badge": { en: "2026 stamp duty", ms: "Duti setem 2026", id: "Bea meterai 2026" },
   "housing.badge.private": { en: "Runs in your browser", ms: "Berjalan dalam pelayar anda", id: "Berjalan di browser Anda" },
   "housing.monthlyInstallment": { en: "Monthly installment", ms: "Ansuran bulanan", id: "Cicilan bulanan" },
@@ -1471,11 +1463,7 @@ const translations = {
 
   // ── Income tax calculator ────────────────────────────────────────
   "tax.title": { en: "Malaysia Income Tax Calculator 2026", ms: "Kalkulator Cukai Pendapatan Malaysia 2026", id: "Kalkulator Pajak Penghasilan Malaysia 2026" },
-  "tax.subtitle": {
-    en: "Estimate your YA 2026 income tax after reliefs and rebates, and see your effective rate and monthly PCB.",
-    ms: "Anggarkan cukai pendapatan TT 2026 anda selepas pelepasan dan rebat, serta lihat kadar berkesan dan PCB bulanan.",
-    id: "Perkirakan pajak penghasilan TP 2026 Anda setelah keringanan dan rebat, serta lihat tarif efektif dan PCB bulanan.",
-  },
+  "tax.subtitle": { en: "Malaysian income tax with reliefs.", ms: "Cukai pendapatan Malaysia dengan pelepasan.", id: "Pajak penghasilan Malaysia dengan relief." },
   "tax.badge": { en: "YA 2026 rates", ms: "Kadar TT 2026", id: "Tarif TP 2026" },
   "tax.badge.private": { en: "Runs in your browser", ms: "Berjalan dalam pelayar anda", id: "Berjalan di browser Anda" },
   "tax.taxPayable": { en: "Tax payable", ms: "Cukai kena dibayar", id: "Pajak terutang" },
@@ -1588,11 +1576,7 @@ const translations = {
 
   // ── BMI calculator ───────────────────────────────────────────────
   "bmi.title": { en: "BMI Calculator (with BMR & Calories)", ms: "Kalkulator BMI (dengan BMR & Kalori)", id: "Kalkulator BMI (dengan BMR & Kalori)" },
-  "bmi.subtitle": {
-    en: "Find your Body Mass Index, healthy weight range, and the daily calories you need to maintain your weight.",
-    ms: "Cari Indeks Jisim Badan, julat berat sihat, dan kalori harian yang diperlukan untuk mengekalkan berat anda.",
-    id: "Temukan Indeks Massa Tubuh, rentang berat sehat, dan kalori harian yang dibutuhkan untuk menjaga berat Anda.",
-  },
+  "bmi.subtitle": { en: "Body mass index and healthy range.", ms: "Indeks jisim badan dan julat sihat.", id: "Indeks massa tubuh dan rentang sehat." },
   "bmi.badge": { en: "WHO categories", ms: "Kategori WHO", id: "Kategori WHO" },
   "bmi.badge.private": { en: "Runs in your browser", ms: "Berjalan dalam pelayar anda", id: "Berjalan di browser Anda" },
   "bmi.yourBmi": { en: "Your BMI", ms: "BMI anda", id: "BMI Anda" },
@@ -1684,11 +1668,7 @@ const translations = {
 
   // ── Car loan calculator ──────────────────────────────────────────
   "carloan.title": { en: "Malaysia Car Loan Calculator", ms: "Kalkulator Pinjaman Kereta Malaysia", id: "Kalkulator Kredit Mobil Malaysia" },
-  "carloan.subtitle": {
-    en: "Work out your monthly hire purchase instalment from the flat rate — and see the true effective interest you actually pay.",
-    ms: "Kira ansuran sewa beli bulanan anda daripada kadar rata — dan lihat faedah berkesan sebenar yang anda bayar.",
-    id: "Hitung cicilan sewa beli bulanan Anda dari suku bunga flat — dan lihat bunga efektif sebenarnya yang Anda bayar.",
-  },
+  "carloan.subtitle": { en: "Monthly instalment and total interest.", ms: "Ansuran bulanan dan jumlah faedah.", id: "Cicilan bulanan dan total bunga." },
   "carloan.badge": { en: "2026 HP rules", ms: "Peraturan SB 2026", id: "Aturan SB 2026" },
   "carloan.badge.private": { en: "Runs in your browser", ms: "Berjalan dalam pelayar anda", id: "Berjalan di browser Anda" },
   "carloan.monthlyInstalment": { en: "Monthly instalment", ms: "Ansuran bulanan", id: "Cicilan bulanan" },
@@ -1764,11 +1744,7 @@ const translations = {
 
   // ── Fixed deposit calculator ─────────────────────────────────────
   "fd.title": { en: "Malaysia Fixed Deposit Calculator", ms: "Kalkulator Simpanan Tetap Malaysia", id: "Kalkulator Deposito Malaysia" },
-  "fd.subtitle": {
-    en: "See how much interest your fixed deposit earns and its maturity value — plus what you gain by letting it auto-renew.",
-    ms: "Lihat berapa banyak faedah simpanan tetap anda peroleh dan nilai matangnya — serta keuntungan jika dibaharui automatik.",
-    id: "Lihat berapa bunga deposito Anda dan nilai jatuh temponya — plus keuntungan jika diperpanjang otomatis.",
-  },
+  "fd.subtitle": { en: "Maturity value and interest earned.", ms: "Nilai matang dan faedah diperoleh.", id: "Nilai jatuh tempo dan bunga diperoleh." },
   "fd.badge": { en: "Tax-exempt", ms: "Dikecualikan cukai", id: "Bebas pajak" },
   "fd.badge.private": { en: "Runs in your browser", ms: "Berjalan dalam pelayar anda", id: "Berjalan di browser Anda" },
   "fd.maturityValue": { en: "Maturity value", ms: "Nilai matang", id: "Nilai jatuh tempo" },

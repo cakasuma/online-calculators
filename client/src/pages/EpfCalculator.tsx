@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalculatorHero } from "@/components/CalculatorHero";
+import { CalculatorHero, MobileResultBar } from "@/components/CalculatorHero";
 import { useLocale } from "@/hooks/use-locale";
 import { formatCurrency, formatInputValue, parseLocaleNumber } from "@/lib/i18n";
 import { recordServerEvent, track } from "@/lib/analytics";
@@ -176,29 +176,13 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
     locale,
   ]);
 
-  // Mark results stale when inputs change after a calculation
-  useEffect(() => {
-    if (hasCalculatedRef.current) {
-      setDirty(true);
-    }
-  }, [
-    currentAge, retirementAge, currentBalance, monthlySalary,
-    salaryGrowthRate, dividendRate, employeeRate, employerRateOverride,
-    voluntaryAnnual, bonusMonths,
-  ]);
-
   useUrlSync(parsedInputs, EPF_URL_SCHEMA);
 
-  // Auto-run when arriving via a shared link
+  // Live projection: recompute whenever inputs change
   useEffect(() => {
-    {
-      const result = projectEpf(parsedInputs);
-      setCalcResult(result);
-      hasCalculatedRef.current = true;
-      setDirty(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setCalcResult(projectEpf(parsedInputs));
+    hasCalculatedRef.current = true;
+  }, [parsedInputs]);
 
   const money = (n: number) => `RM ${formatCurrency(n, locale)}`;
 
@@ -281,6 +265,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
 
   return (
     <div className="w-full">
+      {projection && <MobileResultBar label={`${t("epf.results.projectedAt")} ${projection.inputs.retirementAge}`} value={money(projection.finalBalance)} targetRef={resultsRef} />}
       <CalculatorHero category="Finance" title={t("epf.title")} subtitle={t("epf.subtitle")} />
       <div className="hk-container py-8 space-y-6">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
@@ -357,21 +342,6 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               )}
             </div>
 
-            {/* Calculate button */}
-            <div className="pt-1 space-y-2">
-              {dirty && (
-                <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
-                  {t("epf.results.staleHint")}
-                </p>
-              )}
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleCalculate}
-              >
-                {projection ? t("epf.recalculate") : t("epf.calculate")}
-              </Button>
-            </div>
           </CardContent>
         </Card>
 

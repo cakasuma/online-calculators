@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult, MobileResultBar } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -196,6 +196,7 @@ export default function BmiCalculator({ onCalculate }: Props = {}) {
 
   return (
     <div className="w-full">
+      {isValid && <MobileResultBar label={t("bmi.yourBmi")} value={num(result.bmi)} targetRef={resultsRef} />}
       <CalculatorHero
         category="Health"
         title={t("bmi.title")}

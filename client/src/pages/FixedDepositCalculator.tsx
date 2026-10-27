@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult, MobileResultBar } from "@/components/CalculatorHero";
 import { RelatedToolsCard } from "@/components/RelatedToolsCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -192,6 +192,7 @@ export default function FixedDepositCalculator({ onCalculate }: Props = {}) {
 
   return (
     <div className="w-full">
+      {isValid && <MobileResultBar label={t("fd.maturityValue")} value={money2(result.maturityValue)} targetRef={resultsRef} />}
       <CalculatorHero
         category="Finance"
         title={t("fd.title")}

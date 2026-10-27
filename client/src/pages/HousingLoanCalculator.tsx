@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
-import { CalculatorHero, HeadlineResult } from "@/components/CalculatorHero";
+import { CalculatorHero, HeadlineResult, MobileResultBar } from "@/components/CalculatorHero";
 import { WhatNext } from "@/components/WhatNext";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -332,6 +332,7 @@ export default function HousingLoanCalculator({ onCalculate }: Props = {}) {
 
   return (
     <div className="w-full">
+      {isValid && <MobileResultBar label={t("housing.monthlyInstallment")} value={money2(result.monthlyInstallment)} targetRef={resultsRef} />}
       <CalculatorHero
         category="Finance"
         title={t("housing.title")}

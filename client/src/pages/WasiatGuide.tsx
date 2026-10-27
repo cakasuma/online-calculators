@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { recordServerEvent, track } from "@/lib/analytics";
 import { Link } from "wouter";
 // @ts-ignore
-import jsPDF from "jspdf";
 import {
   Printer,
   Download,
@@ -138,7 +137,7 @@ export default function WasiatGuide() {
     setPdfLoading(true);
     setPdfError(false);
     try {
-      generatePDF();
+      await generatePDF();
     } catch {
       setPdfError(true);
       setTimeout(() => setPdfError(false), 3000);
@@ -147,7 +146,8 @@ export default function WasiatGuide() {
     }
   }
 
-  function generatePDF() {
+  async function generatePDF() {
+    const { default: jsPDF } = await import("jspdf");
     const sym = CURRENCIES.find((c) => c.code === form.currency)?.symbol ?? form.currency;
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
@@ -490,7 +490,7 @@ export default function WasiatGuide() {
                   setStep(s.num);
                 }
               }}
-              className={`flex items-center gap-1.5 group ${
+              className={`flex items-center gap-1.5 group min-h-11 ${
                 s.num <= step ? "cursor-pointer" : "cursor-default"
               }`}
             >

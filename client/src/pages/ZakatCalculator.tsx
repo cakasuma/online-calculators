@@ -494,7 +494,7 @@ export default function ZakatCalculator({ onCalculate }: Props = {}) {
               <button
                 type="button"
                 onClick={() => setSilverPriceOverride((v) => !v)}
-                className={`ml-1 p-1 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
+                className={`ml-1 p-3 -m-2 rounded hover:bg-muted transition-colors disabled:opacity-40 ${silverPriceOverride ? "text-amber-500" : "text-muted-foreground"}`}
                 title={silverPriceOverride ? t("zakat.price.lockToLive") : t("zakat.price.editManually")}
                 disabled={livePricesLoading}
               >

@@ -32,7 +32,7 @@ import {
   Banknote,
   ArrowLeftRight,
 } from "lucide-react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useHistory } from "@/hooks/use-history";
 import { useLocaleState, LocaleContext } from "@/hooks/use-locale";
@@ -52,25 +52,26 @@ import { NAV_GROUPS } from "@/config/nav";
 import { initAnalytics, track } from "@/lib/analytics";
 
 import HomePage from "@/pages/Home";
-import NormalCalculator from "@/pages/NormalCalculator";
-import ScientificCalculator from "@/pages/ScientificCalculator";
-import FaraidCalculator from "@/pages/FaraidCalculator";
-import WasiatGuide from "@/pages/WasiatGuide";
-import ZakatCalculator from "@/pages/ZakatCalculator";
-import SalaryCalculator from "@/pages/SalaryCalculator";
-import EpfCalculator from "@/pages/EpfCalculator";
-import HousingLoanCalculator from "@/pages/HousingLoanCalculator";
-import IncomeTaxCalculator from "@/pages/IncomeTaxCalculator";
-import CarLoanCalculator from "@/pages/CarLoanCalculator";
-import FixedDepositCalculator from "@/pages/FixedDepositCalculator";
-import BmiCalculator from "@/pages/BmiCalculator";
-import CurrencyConverter from "@/pages/CurrencyConverter";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import TermsOfUse from "@/pages/TermsOfUse";
-import Blog from "@/pages/Blog";
-import BlogArticle from "@/pages/BlogArticle";
-import CompanyPage from "@/pages/CompanyPage";
+const NormalCalculator = lazy(() => import("@/pages/NormalCalculator"));
+const ScientificCalculator = lazy(() => import("@/pages/ScientificCalculator"));
+const FaraidCalculator = lazy(() => import("@/pages/FaraidCalculator"));
+const WasiatGuide = lazy(() => import("@/pages/WasiatGuide"));
+const ZakatCalculator = lazy(() => import("@/pages/ZakatCalculator"));
+const SalaryCalculator = lazy(() => import("@/pages/SalaryCalculator"));
+const EpfCalculator = lazy(() => import("@/pages/EpfCalculator"));
+const HousingLoanCalculator = lazy(() => import("@/pages/HousingLoanCalculator"));
+const IncomeTaxCalculator = lazy(() => import("@/pages/IncomeTaxCalculator"));
+const CarLoanCalculator = lazy(() => import("@/pages/CarLoanCalculator"));
+const FixedDepositCalculator = lazy(() => import("@/pages/FixedDepositCalculator"));
+const BmiCalculator = lazy(() => import("@/pages/BmiCalculator"));
+const CurrencyConverter = lazy(() => import("@/pages/CurrencyConverter"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("@/pages/TermsOfUse"));
+const Blog = lazy(() => import("@/pages/Blog"));
+const BlogArticle = lazy(() => import("@/pages/BlogArticle"));
+const CompanyPage = lazy(() => import("@/pages/CompanyPage"));
 import NotFound from "@/pages/not-found";
+import { CONTACT_EMAIL } from "@/config/legal";
 
 type FooterLink = { labelKey?: TranslationKey; label?: string; href: string };
 
@@ -379,6 +380,7 @@ function Layout() {
 
       {/* ── MAIN (layout-neutral; redesigned pages are full-bleed) ── */}
       <main className="flex-1 min-w-0 w-full">
+        <Suspense fallback={<div className="min-h-[60vh]" aria-busy="true" />}>
         <Switch>
           <Route path="/" component={HomePage} />
           <Route path="/salary">
@@ -446,6 +448,7 @@ function Layout() {
           <Route path="/contact"><PageContainer><CompanyPage page="contact" /></PageContainer></Route>
           <Route><PageContainer><NotFound /></PageContainer></Route>
         </Switch>
+        </Suspense>
       </main>
 
       {/* ── HISTORY (right-side overlay drawer, all sizes) ── */}
@@ -508,6 +511,8 @@ function Layout() {
               <a href="https://amammustofa.com" target="_blank" rel="noopener noreferrer me" className="underline hover:text-foreground">
                 amammustofa.com
               </a>
+              {" · "}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-foreground">{CONTACT_EMAIL}</a>
             </p>
             <LocaleSwitcher />
           </div>

@@ -50,7 +50,7 @@ function ReadingProgress() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  return <div className="hk-progress-bar" style={{ width: `${pct}%` }} aria-hidden="true" />;
+  return <div className="hk-progress-bar" style={{ transform: `scaleX(${pct / 100})` }} aria-hidden="true" />;
 }
 
 /** Highlights the TOC entry whose section is currently in view. */

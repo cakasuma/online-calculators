@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { useLocale } from "@/hooks/use-locale";
@@ -889,8 +888,6 @@ export default function WasiatGuide() {
           </CardContent>
         </Card>
 
-        <AdSlot id="wasiat-mid" variant="banner" className="print:hidden" />
-
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => goToStep(1)} className="gap-2 h-11 flex-1">
             <ArrowLeft className="w-4 h-4" />
@@ -1072,8 +1069,6 @@ export default function WasiatGuide() {
           })}
         />
 
-        <AdSlot id="wasiat-bottom" variant="rectangle" className="print:hidden" />
-
         {/* Actions */}
         {pdfError && (
           <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive print:hidden">
@@ -1149,8 +1144,6 @@ export default function WasiatGuide() {
       </div>
 
       {StepIndicator()}
-
-      <AdSlot id="wasiat-top" variant="banner" className="print:hidden" />
 
       {step === 1 && Step1()}
       {step === 2 && Step2()}

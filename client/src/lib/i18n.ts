@@ -1261,9 +1261,9 @@ const translations = {
   },
   "home.faq.q2": { en: "Is HelloKalku free to use?", ms: "Adakah HelloKalku percuma digunakan?", id: "Apakah HelloKalku gratis digunakan?" },
   "home.faq.a2": {
-    en: "Completely free. There is no subscription, no account, and no paywall. HelloKalku is supported by Google AdSense advertisements shown alongside the calculators.",
-    ms: "Sepenuhnya percuma. Tiada langganan, tiada akaun, dan tiada paywall. HelloKalku disokong oleh iklan Google AdSense yang ditunjukkan bersama kalkulator.",
-    id: "Sepenuhnya gratis. Tidak ada langganan, tidak ada akun, dan tidak ada paywall. HelloKalku didukung oleh iklan Google AdSense yang ditampilkan bersama kalkulator.",
+    en: "Completely free. There is no subscription, no account, and no paywall. No advertisements are currently displayed.",
+    ms: "Sepenuhnya percuma. Tiada langganan, akaun atau paywall. Tiada iklan dipaparkan buat masa ini.",
+    id: "Sepenuhnya gratis. Tidak ada langganan, akun, atau paywall. Saat ini tidak ada iklan yang ditampilkan.",
   },
   "home.faq.q3": { en: "Which deductions does the salary calculator cover?", ms: "Apakah potongan yang diliputi kalkulator gaji?", id: "Potongan apa saja yang dicakup kalkulator gaji?" },
   "home.faq.a3": {

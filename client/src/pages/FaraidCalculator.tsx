@@ -11,7 +11,6 @@ import { useLocale } from "@/hooks/use-locale";
 import { CalculatorHero } from "@/components/CalculatorHero";
 import { recordServerEvent, track } from "@/lib/analytics";
 import { TermTooltip } from "@/components/TermTooltip";
-import { AdSlot } from "@/components/AdSlot";
 import { LeadCaptureCard } from "@/components/LeadCaptureCard";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
@@ -1510,9 +1509,6 @@ export default function FaraidCalculator({ onCalculate }: Props) {
         </CardContent>
       </Card>
 
-      {/* Ad slot — above calculate button */}
-      <AdSlot id="ad-above-calculate" variant="banner" className="print:hidden" />
-
       <Button onClick={calculate} className="w-full" size="lg">
         {t("faraid.calculateDist")}
       </Button>
@@ -1738,8 +1734,6 @@ export default function FaraidCalculator({ onCalculate }: Props) {
             })}
           />
 
-          {/* Ad slot — after results */}
-          <AdSlot id="ad-after-results" variant="rectangle" className="print:hidden" />
         </>
       )}
 

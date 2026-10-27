@@ -475,7 +475,7 @@ export default function SalaryCalculator({ onCalculate }: Props = {}) {
           </CardContent>
         </Card>
 
-        <div ref={resultsRef} className="space-y-6 min-w-0">
+        <div ref={resultsRef} className="scroll-mt-20 space-y-6 min-w-0">
           {/* Mobile-only take-home summary — mirrors the hero card hidden on small screens */}
           <Card className="lg:hidden ">
             <CardContent className="p-4 sm:p-6">

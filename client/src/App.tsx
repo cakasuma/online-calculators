@@ -39,7 +39,6 @@ import { useLocaleState, LocaleContext } from "@/hooks/use-locale";
 import { useLocale } from "@/hooks/use-locale";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
-import { AdSlot } from "@/components/AdSlot";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,7 +86,6 @@ const FOOTER_LEARN_LINKS: FooterLink[] = [
 ];
 
 const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
-const adsenseSlotTop = import.meta.env.VITE_ADSENSE_SLOT_TOP?.trim() || "";
 const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
 /** Renders one prerendered currency-pair landing page (/currency-converter/usd-to-myr). */
@@ -381,13 +379,6 @@ function Layout() {
 
       {/* ── MAIN (layout-neutral; redesigned pages are full-bleed) ── */}
       <main className="flex-1 min-w-0 w-full">
-        {/* Global top ad — only mounts in production when a slot is configured,
-            so the full-bleed hero stays flush under the nav everywhere else. */}
-        {adsenseEnabled && adsenseSlotTop && (
-          <div className="hk-container pt-4">
-            <AdSlot id="global-top-ad" client={adsenseClient} slot={adsenseSlotTop} enabled={adsenseEnabled} className="mb-2" />
-          </div>
-        )}
         <Switch>
           <Route path="/" component={HomePage} />
           <Route path="/salary">

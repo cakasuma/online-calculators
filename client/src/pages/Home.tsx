@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { ArrowRight, BookOpen, Clock, PiggyBank, Scale, ShieldCheck, Wallet } from "lucide-react";
-import { AdSlot } from "@/components/AdSlot";
 import { RatesVerified } from "@/components/RatesVerified";
 import { tools } from "@/config/tools";
 import { blogArticles } from "@/config/blog";
@@ -11,9 +10,6 @@ import { calculateSalary } from "@/lib/malaysianPayroll";
 import { track } from "@/lib/analytics";
 import type { TranslationKey } from "@/lib/i18n";
 
-const adsenseClient = import.meta.env.VITE_ADSENSE_CLIENT?.trim() || "";
-const adsenseSlotHome = import.meta.env.VITE_ADSENSE_SLOT_HOME?.trim() || "";
-const adsenseEnabled = import.meta.env.PROD && Boolean(adsenseClient);
 
 const PRIMARY_STEPS = [
   { href: "/salary", slug: "salary-calculator", stepKey: "home.step.salary" },
@@ -289,9 +285,6 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {adsenseEnabled && adsenseSlotHome ? (
-          <AdSlot id="home-slot" slot={adsenseSlotHome} client={adsenseClient} className="mx-auto" />
-        ) : null}
       </section>
 
       {/* ── GUIDES (contained) ── */}

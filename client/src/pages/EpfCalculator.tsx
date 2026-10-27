@@ -291,7 +291,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
             <h2 className="text-lg font-semibold">{t("epf.inputs.heading")}</h2>
 
             {/* Essential fields */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldRow label={t("epf.inputs.currentAge")}>
                 <NumberInput value={currentAge} onChange={setCurrentAge} locale={locale} suffix={t("epf.units.years")} />
               </FieldRow>
@@ -329,7 +329,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
               </button>
 
               {showAdvanced && (
-                <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <FieldRow label={t("epf.inputs.salaryGrowth")}>
                     <NumberInput value={salaryGrowthRate} onChange={setSalaryGrowthRate} locale={locale} suffix="%" />
                   </FieldRow>
@@ -377,7 +377,7 @@ export default function EpfCalculator({ onCalculate }: Props = {}) {
         </Card>
 
         {/* Results */}
-        <div ref={resultsRef} className="space-y-4">
+        <div ref={resultsRef} className="scroll-mt-20 space-y-4">
           {!projection ? (
             /* Empty state */
             <Card className="rounded-xl">

@@ -596,21 +596,23 @@ export default function IncomeTaxCalculator({ onCalculate }: Props = {}) {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                size="lg"
-                className="w-full gap-2 rounded-xl text-base font-semibold"
-                disabled={!isValid}
-                onClick={handleCalculate}
-              >
-                <CalculatorIcon className="h-4 w-4" />
-                {hasCalculated ? t("tax.cta.recalculate") : t("tax.cta.calculate")}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              <div className="sticky bottom-14 z-20 -mx-4 -mb-5 border-t bg-background/95 px-4 pb-2 pt-3 backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:mb-0 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-0">
+                <Button
+                  type="button"
+                  size="lg"
+                  className="w-full gap-2 rounded-xl text-base font-semibold"
+                  disabled={!isValid}
+                  onClick={handleCalculate}
+                >
+                  <CalculatorIcon className="h-4 w-4" />
+                  {hasCalculated ? t("tax.cta.recalculate") : t("tax.cta.calculate")}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
-          <div ref={resultsRef} className="space-y-6 min-w-0">
+          <div ref={resultsRef} className="scroll-mt-20 space-y-6 min-w-0">
             <Card className="lg:hidden ">
               <CardContent className="p-4 sm:p-6">
                 <p className="text-sm text-muted-foreground">{t("tax.taxPayable")}</p>
